@@ -1,1 +1,1 @@
-# LVQLib
+# LVQToolbox
