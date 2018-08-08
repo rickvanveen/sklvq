@@ -6,7 +6,7 @@ Plotting Template Transformer
 An example plot of :class:`skltemplate.template.TemplateTransformer`
 """
 import numpy as np
-from skltemplate import TemplateTransformer
+from lvqtoolbox import TemplateTransformer
 from matplotlib import pyplot as plt
 
 X = np.arange(50, dtype=np.float).reshape(-1, 1)

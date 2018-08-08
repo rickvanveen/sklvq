@@ -6,7 +6,7 @@ Plotting Template Estimator
 An example plot of :class:`skltemplate.template.TemplateEstimator`
 """
 import numpy as np
-from skltemplate import TemplateEstimator
+from lvqtoolbox import TemplateEstimator
 from matplotlib import pyplot as plt
 
 X = np.arange(100).reshape(100, 1)

@@ -6,7 +6,7 @@ Plotting Template Classifier
 An example plot of :class:`skltemplate.template.TemplateClassifier`
 """
 import numpy as np
-from skltemplate import TemplateClassifier
+from lvqtoolbox import TemplateClassifier
 from matplotlib import pyplot as plt
 
 
