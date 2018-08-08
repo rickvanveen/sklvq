@@ -13,7 +13,6 @@ doc/modules/generated/
 doc/datasets/generated/
 
 # Distribution / packaging
-
 .Python
 env/
 build/
@@ -27,6 +26,8 @@ lib64/
 parts/
 sdist/
 var/
+wheels/
+
 *.egg-info/
 .installed.cfg
 *.egg
@@ -49,7 +50,7 @@ htmlcov/
 .cache
 nosetests.xml
 coverage.xml
-*,cover
+*.cover
 .hypothesis/
 
 # Translations
@@ -58,6 +59,14 @@ coverage.xml
 
 # Django stuff:
 *.log
+local_settings.py
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
 
 # Sphinx documentation
 docs/_build/
@@ -68,3 +77,39 @@ target/
 # Sublime
 *.sublime-project
 *.sublime-workspace
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# celery beat schedule file
+celerybeat-schedule
+
+# SageMath parsed files
+*.sage.py
+
+# dotenv
+.env
+
+# virtualenv
+.venv
+venv/
+ENV/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+
+.github/
+.github/*
