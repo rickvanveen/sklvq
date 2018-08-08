@@ -1,5 +1,5 @@
 from sklearn.utils.estimator_checks import check_estimator
-from skltemplate import (TemplateEstimator, TemplateClassifier,
+from lvqtoolbox import (TemplateEstimator, TemplateClassifier,
                          TemplateTransformer)
 
 
