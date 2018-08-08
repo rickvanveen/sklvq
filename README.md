@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/rickvanveen/LVQToolbox.svg?branch=master)](https://travis-ci.org/rickvanveen/LVQToolbox)
 [![Coverage Status](https://coveralls.io/repos/github/rickvanveen/LVQToolbox/badge.svg?branch=master)](https://coveralls.io/github/rickvanveen/LVQToolbox?branch=master)
-[![CircleCI Status](https://circleci.com/gh/scikit-learn-contrib/project-template.svg?style=shield&circle-token=:circle-token)](https://circleci.com/gh/scikit-learn-contrib/project-template/tree/master)
+[![CircleCI](https://circleci.com/gh/rickvanveen/LVQToolbox.svg?style=svg)](https://circleci.com/gh/rickvanveen/LVQToolbox)
 
 **project-template** is a template project for 
 [scikit-learn](http://scikit-learn.org/) 
