@@ -1,8 +1,8 @@
 # LVQToolbox - A template for scikit-learn extensions
 
 [![Build Status](https://travis-ci.org/rickvanveen/LVQToolbox.svg?branch=master)](https://travis-ci.org/rickvanveen/LVQToolbox)
-[![Coveralls Status](https://coveralls.io/repos/scikit-learn-contrib/project-template/badge.svg?branch=master&service=github)](https://coveralls.io/r/scikit-learn-contrib/project-template)
-[![CircleCI Status](https://circleci.com/gh/scikit-learn-contrib/project-template.svg?style=shield&circle-token=:circle-token)](https://circleci.com/gh/scikit-learn-contrib/project-template/tree/master)
+[![Coverage Status](https://coveralls.io/repos/github/rickvanveen/LVQToolbox/badge.svg?branch=master)](https://coveralls.io/github/rickvanveen/LVQToolbox?branch=master)
+[![CircleCI](https://circleci.com/gh/rickvanveen/LVQToolbox.svg?style=svg)](https://circleci.com/gh/rickvanveen/LVQToolbox)
 
 **project-template** is a template project for 
 [scikit-learn](http://scikit-learn.org/) 
