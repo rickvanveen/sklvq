@@ -3,6 +3,7 @@ from .template import (TemplateEstimator, TemplateClassifier,
 from .glvqmodel import (GeneralizedLearningVectorQuantization)
 
 from . import template
+from . import glvqmodel
 
 __all__ = ['TemplateEstimator', 'TemplateClassifier',
-           'TemplateTransformer', 'template']
+           'TemplateTransformer', 'GeneralizedLearningVectorQuantization', 'template', 'glvqmodel']
