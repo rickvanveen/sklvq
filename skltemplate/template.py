@@ -17,7 +17,7 @@ class TemplateEstimator(BaseEstimator):
         A parameter used for demonstation of how to pass and store paramters.
     """
     def __init__(self, demo_param='demo_param'):
-        self.demo_param = demo_param
+            self.demo_param = demo_param
 
     def fit(self, X, y):
         """A reference implementation of a fitting function
