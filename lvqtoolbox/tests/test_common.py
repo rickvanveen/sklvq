@@ -1,12 +1,12 @@
 from sklearn.utils.estimator_checks import check_estimator
 from lvqtoolbox import (TemplateEstimator, TemplateClassifier,
                          TemplateTransformer)
-from lvqtoolbox import GeneralizedLearningVectorQuantization
+from lvqtoolbox import GLVQ
 
 
 def test_glvq():
-	return check_estimator(GeneralizedLearningVectorQuantization)
-	
+	return check_estimator(GLVQ)
+
 
 def test_estimator():
     return check_estimator(TemplateEstimator)

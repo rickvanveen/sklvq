@@ -7,8 +7,8 @@ from sklearn.metrics import euclidean_distances
 import numpy as np
 
 
-class GeneralizedLearningVectorQuantization(BaseEstimator, ClassifierMixin):
-    """GeneralizedLearningVectorQuantization"""
+class GLVQ(BaseEstimator, ClassifierMixin):
+    """GLVQ"""
     def __init__(self, demo_param='demo'):
         self.demo_param = demo_param
 
@@ -34,6 +34,9 @@ class GeneralizedLearningVectorQuantization(BaseEstimator, ClassifierMixin):
 
         self.X_ = X
         self.y_ = y
+
+        self.w_ = np.mean(self.X_)
+        self.w_y_ = self.classes_
         # Return the classifier
         return self
 
