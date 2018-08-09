@@ -7,7 +7,7 @@ from sklearn.metrics import euclidean_distances
 import numpy as np
 
 
-class GLVQ(BaseEstimator, ClassifierMixin):
+class GLVQClassifier(BaseEstimator, ClassifierMixin):
     """GLVQ"""
     def __init__(self, demo_param='demo'):
         self.demo_param = demo_param
@@ -37,6 +37,8 @@ class GLVQ(BaseEstimator, ClassifierMixin):
 
         self.w_ = np.mean(self.X_)
         self.w_y_ = self.classes_
+
+
         # Return the classifier
         return self
 
