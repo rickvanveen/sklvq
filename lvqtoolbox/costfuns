@@ -1,8 +1,0 @@
-
-# import numpy as np
-from scipy.spatial.distance import cdist
-from lvqtoolbox.metrics import squared_euclidean
-
-def std_costfun(prototypes, data):
-
-    distance = cdist(prototypes, data, squared_euclidean)
