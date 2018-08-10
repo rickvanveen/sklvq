@@ -6,6 +6,53 @@ from sklearn.metrics import euclidean_distances
 
 import numpy as np
 
+from scipy.spatial.distance import cdist
+
+
+# GLVQ - Metrics
+
+
+def _squared_euclidean(v1, v2):
+    return np.sum((v1 - v2) ** 2)
+
+
+def _squared_euclidean_grad(v1, v2):
+    return -2 * (v2 - v1)
+
+
+def _euclidean(v1, v2):
+    return np.sqrt(np.sum((v1 - v2) ** 2))
+
+
+def _euclidean_grad(v1, v2):
+    difference = v2 - v1
+    return (-1 * difference) / np.sqrt(np.sum(difference ** 2))
+
+
+# GLVQ - Cost functions
+
+# TODO:
+# TODO: not todo but more consistent with sklearn and theory: W, W_y, w, w_y, X, X_y, x, x_y but not with pep8
+def _relative_distance_difference_cost(prototypes, prototypes_labels, data, data_labels, metricfun):
+    # Prototypes are the x in for the to be optimized f(x, *args)
+    prototypes = prototypes.reshape([prototypes_labels.size, data.shape[1]])
+
+    distances = cdist(prototypes, data, metricfun)
+
+    ii_same = np.array([data_labels == prototype_label for prototype_label in prototypes_labels])
+    ii_diff = ~ii_same
+
+    distance_same = np.where(ii_same, distances, np.inf).min(axis=1)
+    distance_diff = np.where(ii_diff, distances, np.inf).min(axis=1)
+
+    return np.sum((distance_same - distance_diff) / (distance_same + distance_diff))
+
+
+# TODO: Gradient function of the cost function... depending on how the minimizers work.
+# TODO: Hessian function of the cost function ... depending on how the mininimizers work.
+# def std_costfun_grad(modelObject, dataObject):
+# TODO: PrototypeClass?
+
 
 class GLVQClassifier(BaseEstimator, ClassifierMixin):
     """GLVQ"""

@@ -3,7 +3,15 @@
 # a common base class.
 
 
+# TODO: Think about this... keep it in a common class or common module/package
 class LVQClassifier(object):
 
-    def common_function(self):
+    def other_common_function(self):
+        pass
+
+    def _conditional_mean(self):
+        pass
+
+    # TODO: Change this to something more configurable. For now Conditional mean
+    def init_prototypes(self, prototype_labels, data, data_labels):
         pass
