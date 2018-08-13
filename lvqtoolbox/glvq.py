@@ -28,13 +28,13 @@ def _euclidean_grad(v1, v2):
 
 
 # GLVQ - Cost functions
-def _relative_distance_difference_cost(prototypes, prototypes_labels, data, data_labels, metricfun):
+def _relative_distance_difference_cost(prototypes, prototypes_labels, data, data_labels, metric_fun):
     # Prototypes are the x in for the to be optimized f(x, *args)
     prototypes = prototypes.reshape([prototypes_labels.size, data.shape[1]])
 
-    distances = cdist(prototypes, data, metricfun)
+    distances = cdist(data, prototypes, metric_fun)
 
-    ii_same = np.array([data_labels == prototype_label for prototype_label in prototypes_labels])
+    ii_same = np.transpose(np.array([data_labels == prototype_label for prototype_label in prototypes_labels]))
     ii_diff = ~ii_same
 
     distance_same = np.where(ii_same, distances, np.inf).min(axis=1)
@@ -43,10 +43,10 @@ def _relative_distance_difference_cost(prototypes, prototypes_labels, data, data
     return np.sum((distance_same - distance_diff) / (distance_same + distance_diff))
 
 
-# TODO: Gradient function of the cost function... depending on how the minimizers work.
+# TODO: Jacobian function of the cost function... depending on how the minimizers work.
 # TODO: Hessian function of the cost function ... depending on how the mininimizers work.
 
-def _relative_distance_difference_cost_grad(modelObject, dataObject):
+def _relative_distance_difference_cost_jac():
     pass
 
 
