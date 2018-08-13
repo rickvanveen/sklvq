@@ -73,7 +73,7 @@ def _relative_distance_difference_grad(prototypes, p_labels, data, d_labels, met
     gradient = np.zeros(prototypes.shape)
 
     # TODO: REMOVE
-    step_size = 0.01
+    step_size = 0.05
 
     for i_prototype in range(0, num_prototypes):
         ii_same = i_prototype == i_dist_same
@@ -85,10 +85,7 @@ def _relative_distance_difference_grad(prototypes, p_labels, data, d_labels, met
         grad_same = metric_grad(data[ii_same, :], prototypes[i_prototype, :])
         grad_diff = metric_grad(data[ii_diff, :], prototypes[i_prototype, :])
 
-        relative_dist_diff = np.reshape(np.repeat(relative_dist_diff, grad_same.shape[1]), grad_same.shape)
-        relative_dist_same = np.reshape(np.repeat(relative_dist_same, grad_diff.shape[1]), grad_diff.shape)
-
-        gradient[i_prototype, :] = step_size * (relative_dist_diff * grad_same + relative_dist_same * grad_diff)
+        gradient[i_prototype, :] = step_size * (relative_dist_diff @ grad_same + relative_dist_same @ grad_diff)
 
     return reshape_prototypes(gradient, num_prototypes, num_features)
 
@@ -131,6 +128,7 @@ class GLVQClassifier(BaseEstimator, ClassifierMixin):
                                     reshape_prototypes(self.prototypes_, num_prototypes, num_features),
                                     (self.p_labels_, data, d_labels, _squared_euclidean, _squared_euclidean_grad),
                                     'L-BFGS-B',
+                                    _relative_distance_difference_grad,
                                     options={'disp': True})
 
         self.prototypes_ = restore_prototypes(optimize_results.x, num_prototypes, num_features)
