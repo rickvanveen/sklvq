@@ -9,12 +9,12 @@ from lvqtoolbox import GLVQClassifier
 def test_costfun():
     iris = datasets.load_iris()
 
-    classifier = GLVQClassifier
-    classifier.fit(iris.data, iris.target)
+    classifier = GLVQClassifier()
+    classifier = classifier.fit(iris.data, iris.target)
 
     accuracy = classifier.score(iris.data, iris.target)
 
-    #TODO: Create some real tests...
+    #TODO: Create some more tests...
 
 
     # prototype_labels = unique_labels(iris.target)

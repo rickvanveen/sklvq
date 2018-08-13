@@ -10,8 +10,6 @@ from scipy.spatial.distance import cdist
 
 
 # GLVQ - Metrics
-
-
 def _squared_euclidean(v1, v2):
     return np.sum((v1 - v2) ** 2)
 
@@ -30,9 +28,6 @@ def _euclidean_grad(v1, v2):
 
 
 # GLVQ - Cost functions
-
-# TODO:
-# TODO: not todo but more consistent with sklearn and theory: W, W_y, w, w_y, X, X_y, x, x_y but not with pep8
 def _relative_distance_difference_cost(prototypes, prototypes_labels, data, data_labels, metricfun):
     # Prototypes are the x in for the to be optimized f(x, *args)
     prototypes = prototypes.reshape([prototypes_labels.size, data.shape[1]])
@@ -50,8 +45,9 @@ def _relative_distance_difference_cost(prototypes, prototypes_labels, data, data
 
 # TODO: Gradient function of the cost function... depending on how the minimizers work.
 # TODO: Hessian function of the cost function ... depending on how the mininimizers work.
-# def std_costfun_grad(modelObject, dataObject):
-# TODO: PrototypeClass?
+
+def _relative_distance_difference_cost_grad(modelObject, dataObject):
+    pass
 
 
 class GLVQClassifier(BaseEstimator, ClassifierMixin):
