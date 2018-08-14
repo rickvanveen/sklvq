@@ -8,7 +8,7 @@ import numpy as np
 from scipy.spatial.distance import cdist
 from scipy.optimize import minimize
 
-from lvqtoolbox.common import reshape_prototypes, restore_prototypes, init_prototypes
+from lvqtoolbox.common import init_prototypes
 
 
 # GLVQ - Metrics
@@ -17,7 +17,7 @@ def _squared_euclidean(v1, v2):
 
 
 def _squared_euclidean_grad(v1, v2):
-    return -2 * (v2 - v1)
+    return -2 * (v1 - v2)
 
 
 def _euclidean(v1, v2):
@@ -25,21 +25,19 @@ def _euclidean(v1, v2):
 
 
 def _euclidean_grad(v1, v2):
-    difference = v2 - v1
+    difference = v1 - v2
     return (-1 * difference) / np.sqrt(np.sum(difference**2))
 
 
 # GLVQ - Cost functions
 # TODO: naming... hmm maybe divide this up into multiple functions
 def _distances_difference(prototypes, p_labels, data, d_labels, metric):
-    # Prototypes are the x in for the to be optimized f(x, *args)
-    prototypes = restore_prototypes(prototypes, p_labels.size, data.shape[1])
-
     distances = cdist(data, prototypes, metric)
 
     ii_same = np.transpose(np.array([d_labels == prototype_label for prototype_label in p_labels]))
     ii_diff = ~ii_same
 
+    # TODO: Function
     dist_temp = np.where(ii_same, distances, np.inf)
     dist_same = dist_temp.min(axis=1)
     i_dist_same = dist_temp.argmin(axis=1)
@@ -77,47 +75,54 @@ def _identity(relative_distance):
 
 
 # derivative f(x) = x is one TODO: necessary to be configurable?
-def _identity_grad(_):
+def _identity_grad(*args):
     return 1
 
 
 # TODO: f, and metric should be configurable. mu: relative distance also?
-def _relative_distance_difference_cost(prototypes, p_labels, data, d_labels, metric, *args):
-    dist_same, dist_diff, _, _ = _distances_difference(prototypes, p_labels, data, d_labels, metric)
-    return np.sum(_sigmoid(_relative_distance(dist_same, dist_diff)))
+def _relative_distance_difference_cost(prototypes, p_labels,
+                                       data, d_labels,
+                                       scalefun, metricfun, *args):
+    # Prototypes are the x in for the to be optimized f(x, *args)
+    prototypes = prototypes.reshape(p_labels.size, data.shape[1])
+    dist_same, dist_diff, _, _ = _distances_difference(prototypes, p_labels, data, d_labels, metricfun)
+    return np.sum(scalefun(_relative_distance(dist_same, dist_diff)))
 
 
-def _relative_distance_difference_grad(prototypes, p_labels, data, d_labels, metric, metric_grad):
-    dist_same, dist_diff, i_dist_same, i_dist_diff = _distances_difference(prototypes, p_labels, data, d_labels, metric)
-
+# TODO: Maybe change some of the functions to objects/classes better organized and more clear about how to extend. E.g.
+# Scale.value(), Scale.gradient(), Metric.value(), Metric.gradient() etc... but maybe not...
+def _relative_distance_difference_grad(prototypes, p_labels,
+                                       data, d_labels,
+                                       scalefun, metricfun,
+                                       scalefun_grad, metricfun_grad):
     num_features = data.shape[1]
     num_prototypes = p_labels.size
 
-    prototypes = restore_prototypes(prototypes, num_prototypes, num_features)
+    prototypes = prototypes.reshape([num_prototypes, num_features])
+    dist_same, dist_diff, i_dist_same, i_dist_diff = _distances_difference(prototypes,
+                                                                           p_labels, data,
+                                                                           d_labels, metricfun)
     gradient = np.zeros(prototypes.shape)
 
     # TODO: REMOVE
     step_size = 0.05
-
-    relative_distance = _relative_distance(dist_same, dist_diff)
 
     for i_prototype in range(0, num_prototypes):
         ii_same = i_prototype == i_dist_same
         ii_diff = i_prototype == i_dist_diff
 
         # f'(mu(x)) * (2 * d_2(x) / (d_1(x) + d_2(x))^2)
-        relative_dist_same = _sigmoid_grad(_relative_distance(dist_same[ii_same], dist_diff[ii_same])) * \
+        relative_dist_same = scalefun_grad(_relative_distance(dist_same[ii_same], dist_diff[ii_same])) * \
                              _relative_distance_grad(dist_same[ii_same], dist_diff[ii_same])
-        relative_dist_diff = _sigmoid_grad(_relative_distance(dist_diff[ii_diff], dist_same[ii_diff])) * \
+        relative_dist_diff = scalefun_grad(_relative_distance(dist_diff[ii_diff], dist_same[ii_diff])) * \
                              _relative_distance_grad(dist_diff[ii_diff], dist_same[ii_diff])
         # -2 * (x - w)
-        grad_same = metric_grad(prototypes[i_prototype, :], data[ii_same, :])
-        grad_diff = metric_grad(prototypes[i_prototype, :], data[ii_diff, :])
+        grad_same = metricfun_grad(data[ii_same, :], prototypes[i_prototype, :])
+        grad_diff = metricfun_grad(data[ii_diff, :], prototypes[i_prototype, :])
 
         gradient[i_prototype, :] = step_size * (relative_dist_same @ grad_same - relative_dist_diff @ grad_diff)
 
-    # TODO: Same as gradient.ravel()?
-    return reshape_prototypes(gradient, num_prototypes, num_features)
+    return gradient.ravel()
 
 
 class GLVQClassifier(BaseEstimator, ClassifierMixin):
@@ -154,14 +159,33 @@ class GLVQClassifier(BaseEstimator, ClassifierMixin):
         num_features = data.shape[1]
         num_prototypes = self.prototypes_.shape[0]
 
-        self.optimize_results_ = minimize(_relative_distance_difference_cost,
-                                    reshape_prototypes(self.prototypes_, num_prototypes, num_features),
-                                    (self.p_labels_, data, d_labels, _squared_euclidean, _squared_euclidean_grad),
-                                    'L-BFGS-B',
-                                    _relative_distance_difference_grad,
-                                    options={'disp': True})
+        # _sigmoid or _identity
+        scalefun = _sigmoid
+        scalefun_grad = _sigmoid_grad
 
-        self.prototypes_ = restore_prototypes(self.optimize_results_.x, num_prototypes, num_features)
+        # _squared_euclidean or _euclidean
+        metricfun = _squared_euclidean
+        metricfun_grad = _squared_euclidean_grad
+
+        # _relative_distance_difference_cost - GLVQ standard
+        costfun = _relative_distance_difference_cost
+        costfun_args = (self.p_labels_,
+                        data,
+                        d_labels,
+                        scalefun,
+                        metricfun,
+                        scalefun_grad,
+                        metricfun_grad)
+        costfun_grad = _relative_distance_difference_grad
+
+        self.optimize_results_ = minimize(costfun,
+                                          self.prototypes_.ravel(),
+                                          costfun_args,
+                                          'L-BFGS-B',
+                                          costfun_grad,
+                                          options={'disp': True})
+
+        self.prototypes_ = self.optimize_results_.x.reshape([num_prototypes, num_features])
         # Return the classifier
         return self
 

@@ -12,11 +12,3 @@ def _conditional_mean(p_labels, data, d_labels):
 
 def init_prototypes(p_labels, data, d_labels):
     return _conditional_mean(p_labels, data, d_labels)
-
-
-def reshape_prototypes(prototypes, num_prototypes, num_features):
-    return prototypes.reshape([1, num_prototypes * num_features])
-
-
-def restore_prototypes(prototypes, num_prototypes, num_features):
-    return prototypes.reshape([num_prototypes, num_features])
