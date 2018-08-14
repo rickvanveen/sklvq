@@ -16,6 +16,7 @@ def test_costfun():
     classifier = classifier.fit(iris.data, iris.target)
 
     print(classifier.prototypes_)
+    print(classifier.optimize_results_.fun)
 
     predicted = classifier.predict(iris.data)
 
