@@ -1,10 +1,9 @@
-import scipy as sp
 import numpy as np
+
 from sklearn import datasets
-from sklearn.utils.multiclass import unique_labels
 from sklearn import preprocessing
 
-from lvqtoolbox.glvq import GLVQClassifier
+from lvqtoolbox.models import GLVQClassifier
 
 
 def test_glvq_iris():

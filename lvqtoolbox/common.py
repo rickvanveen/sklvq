@@ -16,7 +16,7 @@ def init_prototypes(p_labels, data, d_labels):
 
 
 def compute_distance(prototypes, p_labels, data, d_labels, metric):
-    distances = sp.spatial.distance.cdist(data, prototypes, metric)
+    distances = sp.spatial.distance.cdist(data, prototypes, 'sqeuclidean')
 
     ii_same = np.transpose(np.array([d_labels == prototype_label for prototype_label in p_labels]))
     ii_diff = ~ii_same

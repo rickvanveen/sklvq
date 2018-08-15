@@ -1,6 +1,6 @@
 import numpy as np
 
-from lvqtoolbox.common import compute_distance
+from .common import compute_distance
 
 
 # GLVQ - mu(x) functions

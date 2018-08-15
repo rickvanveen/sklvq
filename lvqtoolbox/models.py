@@ -8,17 +8,25 @@ import numpy as np
 from scipy.spatial.distance import cdist
 from scipy.optimize import minimize
 
-from lvqtoolbox.common import init_prototypes
-from lvqtoolbox.metrics import squared_euclidean, squared_euclidean_grad
-from lvqtoolbox.scaling import sigmoid, sigmoid_grad
-from lvqtoolbox.objective import relative_distance_difference_cost
+from .common import init_prototypes
+from .metrics import squared_euclidean, squared_euclidean_grad
+from .scaling import sigmoid, sigmoid_grad
+from .objective import relative_distance_difference_cost
 
 
 class GLVQClassifier(BaseEstimator, ClassifierMixin):
-    """GLVQ"""
+    """GLVQClassifier"""
 
-    def __init__(self, demo_param='demo'):
-        self.demo_param = demo_param
+    def __init__(self, scalefun='identity', scalefun_kwargs={'beta': 2},
+                 metricfun='sqeuclidean', metricfun_kwargs=None):
+        self.scalefun = scalefun
+        self.scalefun_kwargs = scalefun_kwargs
+        self.metricfun = metricfun
+        self.metricfun_kwargs = metricfun_kwargs
+        # Above should depend on objective function... hmm... TODO: accept **kwargs and go through it
+
+        # TODO: Prototypes per class..
+        # TODO: Random state
 
     def fit(self, data, y):
         """A reference implementation of a fitting function for a classifier.
@@ -35,7 +43,7 @@ class GLVQClassifier(BaseEstimator, ClassifierMixin):
         self : object
             Returns self.
         """
-        # Check that X and y have correct shape
+        # Check that data and y have correct shape
         data, y = check_X_y(data, y)
 
         # Have to do this for sklearn compatibility
@@ -49,7 +57,8 @@ class GLVQClassifier(BaseEstimator, ClassifierMixin):
 
         # Check if p_labels are set in constructor
         # TODO: prototype labels should not be set in constructor... but the configuration should be dict/list ['class': num_prototypes]/[num_prototypes, etc] correspoinding with unique_labels
-        self.p_labels_ = unique_labels(y)
+        self.p_labels_ = unique_labels(y) # TODO: fix
+        self.classes_ = unique_labels(y)
         self.prototypes_ = init_prototypes(self.p_labels_, data, y)
 
         num_features = data.shape[1]
@@ -57,6 +66,7 @@ class GLVQClassifier(BaseEstimator, ClassifierMixin):
 
         # Set these options in constructor and check if it's a string -> for existing functions or callable for custom
         # _sigmoid or _identity
+
         scalefun = sigmoid
         scalefun_grad = sigmoid_grad
         scalefun_kwargs = {'beta': 10}
@@ -111,7 +121,7 @@ class GLVQClassifier(BaseEstimator, ClassifierMixin):
         data = check_array(data)
 
         # TODO: Map to prototypeLabels would be useful in the case the labels are not 0, 1, 2
-        return cdist(data, self.prototypes_, squared_euclidean).argmin(axis=1)
+        return self.classes_[cdist(data, self.prototypes_, squared_euclidean).argmin(axis=1)]
 
         # closest = np.argmin(euclidean_distances(data, self.prototypes_), axis=1)
         # return self.y_[closest]
