@@ -17,14 +17,13 @@ from .objective import relative_distance_difference_cost
 class GLVQClassifier(BaseEstimator, ClassifierMixin):
     """GLVQClassifier"""
 
-    def __init__(self, scalefun='identity', scalefun_kwargs={'beta': 2},
-                 metricfun='sqeuclidean', metricfun_kwargs=None):
-        self.scalefun = scalefun
-        self.scalefun_kwargs = scalefun_kwargs
-        self.metricfun = metricfun
-        self.metricfun_kwargs = metricfun_kwargs
+    def __init__(self, **kwargs):
+        # self.scalefun = scalefun
+        # self.scalefun_kwargs = {'beta': beta}
+        # self.metricfun = metricfun
+        # self.metricfun_kwargs = metricfun_kwargs
         # Above should depend on objective function... hmm... TODO: accept **kwargs and go through it
-
+        pass
         # TODO: Prototypes per class..
         # TODO: Random state
 
@@ -69,7 +68,7 @@ class GLVQClassifier(BaseEstimator, ClassifierMixin):
 
         scalefun = sigmoid
         scalefun_grad = sigmoid_grad
-        scalefun_kwargs = {'beta': 10}
+        scalefun_kwargs = {'beta': 6}
 
         # _squared_euclidean or _euclidean
         metricfun = squared_euclidean

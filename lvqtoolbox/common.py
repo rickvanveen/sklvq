@@ -5,6 +5,7 @@
 import numpy as np
 import scipy as sp
 
+from scipy.spatial.distance import cdist
 
 def _conditional_mean(p_labels, data, d_labels):
     return np.array([np.mean(data[p_label == d_labels, :], axis=0)
