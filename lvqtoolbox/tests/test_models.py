@@ -15,9 +15,6 @@ def test_glvq_iris():
     classifier = GLVQClassifier()
     classifier = classifier.fit(iris.data, iris.target)
 
-    # print(classifier.prototypes_)
-    # print(classifier.optimize_results_.fun)
-
     predicted = classifier.predict(iris.data)
 
     accuracy = np.count_nonzero(predicted == iris.target) / iris.target.size
@@ -33,12 +30,38 @@ def test_glvq_wine():
     classifier = GLVQClassifier()
     classifier = classifier.fit(wine.data, wine.target)
 
-    # print(classifier.prototypes_)
-    # print(classifier.optimize_results_.fun)
-
     predicted = classifier.predict(wine.data)
 
     accuracy = np.count_nonzero(predicted == wine.target) / wine.target.size
 
     print("Wine accuracy: {}".format(accuracy))
 
+
+def test_glvq_cancer():
+    cancer = datasets.load_breast_cancer()
+
+    cancer.data = preprocessing.scale(cancer.data)
+
+    classifier = GLVQClassifier()
+    classifier = classifier.fit(cancer.data, cancer.target)
+
+    predicted = classifier.predict(cancer.data)
+
+    accuracy = np.count_nonzero(predicted == cancer.target) / cancer.target.size
+
+    print("Cancer accuracy: {}".format(accuracy))
+
+
+def test_glvq_digits():
+    digits = datasets.load_digits()
+
+    digits.data = preprocessing.scale(digits.data)
+
+    classifier = GLVQClassifier()
+    classifier = classifier.fit(digits.data, digits.target)
+
+    predicted = classifier.predict(digits.data)
+
+    accuracy = np.count_nonzero(predicted == digits.target) / digits.target.size
+
+    print("Digits accuracy: {}".format(accuracy))
