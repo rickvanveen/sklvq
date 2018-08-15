@@ -11,7 +11,7 @@ from scipy.optimize import minimize
 from lvqtoolbox.common import init_prototypes
 from lvqtoolbox.metrics import squared_euclidean, squared_euclidean_grad
 from lvqtoolbox.scaling import sigmoid, sigmoid_grad
-from lvqtoolbox.objective import relative_distance_difference_cost, relative_distance_difference_grad
+from lvqtoolbox.objective import relative_distance_difference_cost
 
 
 class GLVQClassifier(BaseEstimator, ClassifierMixin):
@@ -20,14 +20,14 @@ class GLVQClassifier(BaseEstimator, ClassifierMixin):
     def __init__(self, demo_param='demo'):
         self.demo_param = demo_param
 
-    def fit(self, data, d_labels):
+    def fit(self, data, y):
         """A reference implementation of a fitting function for a classifier.
 
         Parameters
         ----------
         data : array-like, shape = [n_samples, n_features]
             The training input samples.
-        d_labels : array-like, shape = [n_samples]
+        y : array-like, shape = [n_samples]
             The target values. An array of int.
 
         Returns
@@ -36,14 +36,21 @@ class GLVQClassifier(BaseEstimator, ClassifierMixin):
             Returns self.
         """
         # Check that X and y have correct shape
-        data, d_labels = check_X_y(data, d_labels)
+        data, y = check_X_y(data, y)
+
+        # Have to do this for sklearn compatibility
+        if len(np.unique(y)) == 1:
+            raise ValueError("fitting " + type(
+                self).__name__ + " with only one class is not possible")
+
+
 
         # Store shape of data for easy access
 
         # Check if p_labels are set in constructor
         # TODO: prototype labels should not be set in constructor... but the configuration should be dict/list ['class': num_prototypes]/[num_prototypes, etc] correspoinding with unique_labels
-        self.p_labels_ = unique_labels(d_labels)
-        self.prototypes_ = init_prototypes(self.p_labels_, data, d_labels)
+        self.p_labels_ = unique_labels(y)
+        self.prototypes_ = init_prototypes(self.p_labels_, data, y)
 
         num_features = data.shape[1]
         num_prototypes = self.prototypes_.shape[0]
@@ -52,29 +59,32 @@ class GLVQClassifier(BaseEstimator, ClassifierMixin):
         # _sigmoid or _identity
         scalefun = sigmoid
         scalefun_grad = sigmoid_grad
-        scalefun_kwargs = {'beta': 2}
+        scalefun_kwargs = {'beta': 10}
 
         # _squared_euclidean or _euclidean
         metricfun = squared_euclidean
         metricfun_grad = squared_euclidean_grad
+        metricfun_kwargs = None
 
         # _relative_distance_difference_cost - GLVQ standard
         costfun = relative_distance_difference_cost
         costfun_args = (self.p_labels_,
                         data,
-                        d_labels,
+                        y,
                         scalefun,
                         metricfun,
                         scalefun_grad,
-                        metricfun_grad)
-        costfun_grad = relative_distance_difference_grad
+                        metricfun_grad,
+                        scalefun_kwargs,
+                        metricfun_kwargs)
+        costfun_grad = True
 
         self.optimize_results_ = minimize(costfun,
                                           self.prototypes_.ravel(),
                                           costfun_args,
-                                          'L-BFGS-B')
-                                          # costfun_grad,
-                                          # options={'disp': False})
+                                          'L-BFGS-B',
+                                          costfun_grad,
+                                          options={'disp': False})
 
         self.prototypes_ = self.optimize_results_.x.reshape([num_prototypes, num_features])
         # Return the classifier
