@@ -2,16 +2,19 @@ import numpy as np
 
 from sklearn import datasets
 from sklearn import preprocessing
+from sklearn.model_selection import cross_val_score
+from sklearn.pipeline import make_pipeline
 
 from lvqtoolbox.models import GLVQClassifier
-
 
 def test_glvq_iris():
     iris = datasets.load_iris()
 
     iris.data = preprocessing.scale(iris.data)
 
-    classifier = GLVQClassifier()
+    classifier = GLVQClassifier(metricfun_param='sqeuclidean',
+                                scalingfun_param='sigmoid',
+                                scalingfun_options={'beta': 6})
     classifier = classifier.fit(iris.data, iris.target)
 
     predicted = classifier.predict(iris.data)
@@ -21,12 +24,22 @@ def test_glvq_iris():
     print("Iris accuracy: {}".format(accuracy))
 
 
+def test_glvq_pipeline_iris():
+    iris = datasets.load_iris()
+
+    pipeline = make_pipeline(preprocessing.StandardScaler(), GLVQClassifier(metricfun_param='sqeuclidean',
+                                                                            scalingfun_param='sigmoid',
+                                                                            scalingfun_options={'beta': 6}))
+    accuracy = cross_val_score(pipeline, iris.data, iris.target, cv=5)
+    print("Cross validation (k=5): " + "{}".format(accuracy))
+
+
 def test_glvq_wine():
     wine = datasets.load_wine()
 
     wine.data = preprocessing.scale(wine.data)
 
-    classifier = GLVQClassifier()
+    classifier = GLVQClassifier(optimizer_options={'disp': False})
     classifier = classifier.fit(wine.data, wine.target)
 
     predicted = classifier.predict(wine.data)

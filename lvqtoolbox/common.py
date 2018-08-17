@@ -5,15 +5,18 @@
 import numpy as np
 import scipy as sp
 
+
 from scipy.spatial.distance import cdist
+
 
 def _conditional_mean(p_labels, data, d_labels):
     return np.array([np.mean(data[p_label == d_labels, :], axis=0)
                      for p_label in p_labels])
 
 
-def init_prototypes(p_labels, data, d_labels):
-    return _conditional_mean(p_labels, data, d_labels)
+def init_prototypes(p_labels, data, d_labels, rng):
+    conditional_mean =  _conditional_mean(p_labels, data, d_labels)
+    return conditional_mean + (1e-4 * rng.uniform(-1, 1, conditional_mean.shape))
 
 
 def compute_distance(prototypes, p_labels, data, d_labels, metric):
@@ -32,3 +35,9 @@ def compute_distance(prototypes, p_labels, data, d_labels, metric):
     i_dist_diff = dist_temp.argmin(axis=1)
 
     return dist_same, dist_diff, i_dist_same, i_dist_diff
+
+
+def check_labels(self, labels):
+    if len(np.unique(labels)) == 1:
+        raise ValueError("fitting " + type(
+            self).__name__ + " with only one class is not possible")

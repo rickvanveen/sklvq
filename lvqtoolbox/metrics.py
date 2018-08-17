@@ -2,12 +2,13 @@ import numpy as np
 
 
 # Use cdist build in is much much faster
-def squared_euclidean(x, y):
+def sqeuclidean(x, y):
     return np.sum((x - y) ** 2)
 
 
-def squared_euclidean_grad(x, y):
+def sqeuclidean_grad(x, y):
     return -2 * (x - y)
+
 
 # Use cdist build in is much much faster
 def euclidean(x, y):
