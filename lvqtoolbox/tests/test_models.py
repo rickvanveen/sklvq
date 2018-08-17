@@ -2,10 +2,11 @@ import numpy as np
 
 from sklearn import datasets
 from sklearn import preprocessing
-from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import cross_val_score, GridSearchCV, ParameterGrid
 from sklearn.pipeline import make_pipeline
 
 from lvqtoolbox.models import GLVQClassifier
+
 
 def test_glvq_iris():
     iris = datasets.load_iris()
@@ -14,7 +15,10 @@ def test_glvq_iris():
 
     classifier = GLVQClassifier(metricfun_param='sqeuclidean',
                                 scalingfun_param='sigmoid',
-                                scalingfun_options={'beta': 6})
+                                scalingfun_options={'beta': 6},
+                                prototypes_per_class=1, # Broken
+                                optimizer='CG',
+                                optimizer_options={'disp': True})
     classifier = classifier.fit(iris.data, iris.target)
 
     predicted = classifier.predict(iris.data)
@@ -33,6 +37,20 @@ def test_glvq_pipeline_iris():
     accuracy = cross_val_score(pipeline, iris.data, iris.target, cv=5)
     print("Cross validation (k=5): " + "{}".format(accuracy))
 
+
+# def test_glvq_gridsearch_iris():
+#     iris = datasets.load_iris()
+#
+#     # TODO: AAAH uses setparam and that does not change sigmoid_grad when they set sigmoid
+#     grid = [{'glvqclassifier__scalingfun_param': ['identity']},
+#             {'glvqclassifier__scalingfun_param': ['sigmoid'],
+#              'glvqclassifier__scalingfun_options': list(range(2, 22, 2))}]
+#     grid = ParameterGrid(grid)
+#
+#     pipeline = make_pipeline(preprocessing.StandardScaler(), GLVQClassifier())
+#
+#     estimator = GridSearchCV(pipeline, grid.param_grid, cv=5)
+#     estimator.fit(iris.data, iris.target)
 
 def test_glvq_wine():
     wine = datasets.load_wine()

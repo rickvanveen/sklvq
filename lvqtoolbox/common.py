@@ -15,12 +15,12 @@ def _conditional_mean(p_labels, data, d_labels):
 
 
 def init_prototypes(p_labels, data, d_labels, rng):
-    conditional_mean =  _conditional_mean(p_labels, data, d_labels)
+    conditional_mean = _conditional_mean(p_labels, data, d_labels)
     return conditional_mean + (1e-4 * rng.uniform(-1, 1, conditional_mean.shape))
 
 
 def compute_distance(prototypes, p_labels, data, d_labels, metric):
-    distances = sp.spatial.distance.cdist(data, prototypes, 'sqeuclidean')
+    distances = sp.spatial.distance.cdist(data, prototypes, metric)
 
     ii_same = np.transpose(np.array([d_labels == prototype_label for prototype_label in p_labels]))
     ii_diff = ~ii_same
@@ -35,9 +35,3 @@ def compute_distance(prototypes, p_labels, data, d_labels, metric):
     i_dist_diff = dist_temp.argmin(axis=1)
 
     return dist_same, dist_diff, i_dist_same, i_dist_diff
-
-
-def check_labels(self, labels):
-    if len(np.unique(labels)) == 1:
-        raise ValueError("fitting " + type(
-            self).__name__ + " with only one class is not possible")

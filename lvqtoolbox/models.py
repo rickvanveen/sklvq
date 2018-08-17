@@ -1,17 +1,14 @@
-from sklearn.base import BaseEstimator
-from sklearn.base import ClassifierMixin
-from sklearn.utils import check_random_state
-from sklearn.utils.validation import check_X_y, check_is_fitted, check_array
-from sklearn.utils.multiclass import unique_labels, check_classification_targets
-
 import numpy as np
 
 from scipy.spatial.distance import cdist
 from scipy.optimize import minimize
 
-import inspect
+from sklearn.base import BaseEstimator, ClassifierMixin
+from sklearn.utils import check_random_state
+from sklearn.utils.validation import check_X_y, check_is_fitted, check_array
+from sklearn.utils.multiclass import unique_labels, check_classification_targets
 
-from .common import init_prototypes, check_labels
+from .common import init_prototypes
 from .metrics import sqeuclidean_grad, euclidean_grad
 from .scaling import sigmoid, sigmoid_grad, identity, identity_grad
 from .objective import relative_distance_difference_cost
