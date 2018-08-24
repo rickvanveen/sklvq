@@ -38,19 +38,41 @@ def test_glvq_pipeline_iris():
     print("Cross validation (k=5): " + "{}".format(accuracy))
 
 
-# def test_glvq_gridsearch_iris():
-#     iris = datasets.load_iris()
-#
-#     # TODO: AAAH uses setparam and that does not change sigmoid_grad when they set sigmoid
-#     grid = [{'glvqclassifier__scalingfun_param': ['identity']},
-#             {'glvqclassifier__scalingfun_param': ['sigmoid'],
-#              'glvqclassifier__scalingfun_options': list(range(2, 22, 2))}]
-#     grid = ParameterGrid(grid)
-#
-#     pipeline = make_pipeline(preprocessing.StandardScaler(), GLVQClassifier())
-#
-#     estimator = GridSearchCV(pipeline, grid.param_grid, cv=5)
-#     estimator.fit(iris.data, iris.target)
+def test_glvq_gridsearch_iris():
+    iris = datasets.load_iris()
+
+    # grid = [{'glvqclassifier__scalingfun_param': ['identity']},
+    #         {'glvqclassifier__scalingfun_param': ['sigmoid'],
+    #          'glvqclassifier__scalingfun_options': [{'beta': x} for x in range(2,22,2)]}]
+    # grid = ParameterGrid(grid)
+
+    grid = [{'glvqclassifier__scalingfun_param': ['identity']},
+            {'glvqclassifier__scalingfun_options': [{'beta': 2}],
+            'glvqclassifier__scalingfun_param': ['sigmoid']},
+            {'glvqclassifier__scalingfun_options': [{'beta': 4}],
+            'glvqclassifier__scalingfun_param': ['sigmoid']},
+            {'glvqclassifier__scalingfun_options': [{'beta': 6}],
+            'glvqclassifier__scalingfun_param': ['sigmoid']},
+            {'glvqclassifier__scalingfun_options': [{'beta': 8}],
+            'glvqclassifier__scalingfun_param': ['sigmoid']},
+            {'glvqclassifier__scalingfun_options': [{'beta': 10}],
+            'glvqclassifier__scalingfun_param': ['sigmoid']},
+            {'glvqclassifier__scalingfun_options': [{'beta': 12}],
+            'glvqclassifier__scalingfun_param': ['sigmoid']},
+            {'glvqclassifier__scalingfun_options': [{'beta': 14}],
+            'glvqclassifier__scalingfun_param': ['sigmoid']},
+            {'glvqclassifier__scalingfun_options': [{'beta': 16}],
+            'glvqclassifier__scalingfun_param': ['sigmoid']},
+            {'glvqclassifier__scalingfun_options': [{'beta': 18}],
+            'glvqclassifier__scalingfun_param': ['sigmoid']},
+            {'glvqclassifier__scalingfun_options': [{'beta': 20}],
+            'glvqclassifier__scalingfun_param': ['sigmoid']}]
+
+    pipeline = make_pipeline(preprocessing.StandardScaler(), GLVQClassifier())
+
+    estimator = GridSearchCV(pipeline, grid, cv=5)
+    result = estimator.fit(iris.data, iris.target)
+    print("Done!")
 
 def test_glvq_wine():
     wine = datasets.load_wine()
