@@ -1,6 +1,4 @@
-# TODO: LVQClassifier - base class for LVQClassifier
-# Abstract classes are not Pythonian apparently. However, common functionality which we always need can still be put in
-# a common base class.
+# TODO: WRITE COMMENTS FOR THE FUNCTIONS
 
 import numpy as np
 import scipy as sp
