@@ -2,7 +2,7 @@ import numpy as np
 import scipy as sp
 
 
-def sqeuclidean(x, y):
+def sqeuclidean(data, prototypes):
     """ Wrapper function for scipy's cdist(x, y, 'sqeuclidean') function
 
     See scipy.spatial.distance.cdist for full documentation.
@@ -11,48 +11,38 @@ def sqeuclidean(x, y):
 
     Parameters
     ----------
-    x : ndarray
-        An :math:`m_x` by :math:`n` array of :math:`m_x`
-        original observations in an :math:`n`-dimensional space.
-        Inputs are converted to float type.
-    y : ndarray
-        An :math:`m_y` by :math:`n` array of :math:`m_y`
-        original observations in an :math:`n`-dimensional space.
-        Inputs are converted to float type.
+    data       : ndarray, shape(n_obervations, n_features)
+                 Inputs are converted to float type.
+    prototypes : ndarray, shape(n_prototypes, n_features)
+                 Inputs are converted to float type.
 
     Returns
     -------
-    d : ndarray
-        A :math:`m_x` by :math:`m_y` distance matrix is returned.
-        For each :math:`i` and :math:`j`, the metric
-        ``dist(u=XA[i], v=XB[j])`` is computed and stored in the
-        :math:`ij` th entry.
-
+    distances : ndarray, shape(n_observations, n_prototypes)
+        The dist(u=XA[i], v=XB[j]) is computed and stored in the
+        ij-th entry.
     """
-    return sp.spatial.distance.cdist(x, y, 'sqeuclidean')
+    return sp.spatial.distance.cdist(data, prototypes, 'sqeuclidean')
 
 
-def sqeuclidean_grad(x, y):
+def sqeuclidean_grad(data, prototype):
     """ Implements the derivative of the squared euclidean distance.
 
     Parameters
     ----------
-    x : ndarray
-        An :math: 'm_x' by :math: 'n' array of :math: 'm_x"
-        original observations in an :math:`n`-dimensional space.
-    y : ndarray
-        A single observation by 'n' array in :math: 'n'-dimensional space.
+    data       : ndarray, shape(n_observations, n_features)
+
+    prototype  : ndarray, shape(1, n_features)
 
     Returns
     -------
-    g : ndarray
-        The :math: 'm_x' by :math: 'n' array of :math: 'm_x'
-        by :math: 'n' partial derivatives values.
+    gradient : ndarray, shape(n_observations, n_features)
+                The gradient with respect to the prototype and every observation in data.
     """
-    return -2 * (x - y)
+    return -2 * (data - prototype)
 
 
-def euclidean(x, y):
+def euclidean(data, prototypes):
     """ Wrapper function for scipy's cdist(x, y, 'euclidean') function
 
     See scipy.spatial.distance.cdist for full documentation.
@@ -61,45 +51,35 @@ def euclidean(x, y):
 
     Parameters
     ----------
-    x : ndarray
-        An :math:`m_x` by :math:`n` array of :math:`m_x`
-        original observations in an :math:`n`-dimensional space.
-        Inputs are converted to float type.
-    y : ndarray
-        An :math:`m_y` by :math:`n` array of :math:`m_y`
-        original observations in an :math:`n`-dimensional space.
-        Inputs are converted to float type.
+    data       : ndarray, shape(n_obervations, n_features)
+                 Inputs are converted to float type.
+    prototypes : ndarray, shape(n_prototypes, n_features)
+                 Inputs are converted to float type.
 
     Returns
     -------
-    d : ndarray
-        A :math:`m_x` by :math:`m_y` distance matrix is returned.
-        For each :math:`i` and :math:`j`, the metric
-        ``dist(u=XA[i], v=XB[j])`` is computed and stored in the
-        :math:`ij` th entry.
-
+    distances : ndarray, shape(n_observations, n_prototypes)
+        The dist(u=XA[i], v=XB[j]) is computed and stored in the
+        ij-th entry.
     """
-    return sp.spatial.distance.cdist(x, y, 'euclidean')
+    return sp.spatial.distance.cdist(data, prototypes, 'euclidean')
 
 
-def euclidean_grad(x, y):
+def euclidean_grad(data, prototype):
     """ Implements the derivative of the euclidean distance.
 
     Parameters
     ----------
-    x : ndarray
-        An :math: 'm_x' by :math: 'n' array of :math: 'm_x"
-        original observations in an :math:`n`-dimensional space.
-    y : ndarray
-        A single observation by 'n' array in :math: 'n'-dimensional space.
+    data       : ndarray, shape(n_observations, n_features)
+
+    prototype  : ndarray, shape(1, n_features)
 
     Returns
     -------
-    g : ndarray
-        The :math: 'm_x' by :math: 'n' array of :math: 'm_x'
-        by :math: 'n' partial derivative values.
+    gradient : ndarray, shape(n_observations, n_features)
+               The gradient with respect to the prototype and every observation in data.
     """
-    difference = x - y
+    difference = data - prototype
     return (-1 * difference) / np.sqrt(np.sum(difference**2))
 
 
