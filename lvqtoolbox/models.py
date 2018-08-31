@@ -9,7 +9,7 @@ from sklearn.utils.validation import check_X_y, check_is_fitted, check_array
 from sklearn.utils.multiclass import unique_labels, check_classification_targets
 
 from .common import init_prototypes
-from .metrics import sqeuclidean_grad, euclidean_grad
+from .metrics import sqeuclidean, sqeuclidean_grad, euclidean_grad
 from .scaling import sigmoid, sigmoid_grad, identity, identity_grad
 from .objective import relative_distance_difference_cost
 
@@ -19,17 +19,19 @@ class GLVQClassifier(BaseEstimator, ClassifierMixin):
 
     # TODO: Make costfunction a parameter, but the rest (except optimizer?) depends on this so should be a of_args dict?
     # TODO: This does not work for custom gradient functions....
-    def __init__(self, scalingfun_param='sigmoid', scalingfun_options=None,
-                 metricfun_param='sqeuclidean', metricfun_options=None, prototypes_per_class=1,
-                 optimizer='L-BFGS-B', optimizer_options=None, random_state=None):
-        self.scalingfun_param = scalingfun_param
-        self.scalingfun_options = scalingfun_options
-        self.metricfun_param = metricfun_param
-        self.metricfun_options = metricfun_options
+    def __init__(self, scalefun=sigmoid, scalefun_grad=sigmoid_grad, scalefun_options=None,
+                 distfun=sqeuclidean, distfun_grad=sqeuclidean_grad, distfun_options=None,
+                 prototypes_per_class=1, optimizer='L-BFGS-B', optimizer_options=None, random_state=None):
+        self.scalefun = scalefun
+        self.scalefun_grad = scalefun_grad
+        self.scalefun_options = scalefun_options
+        self.distfun = distfun
+        self.distfun_grad = distfun_grad
+        self.distfun_options = distfun_options
         self.prototypes_per_class = prototypes_per_class
         self.optimizer = optimizer
-        self.optimizer_options=optimizer_options
-        self.random_state=random_state
+        self.optimizer_options = optimizer_options
+        self.random_state = random_state
 
     # def __init(self, demo_param='demo'):
     #     self.demo_param = demo_param
@@ -74,12 +76,12 @@ class GLVQClassifier(BaseEstimator, ClassifierMixin):
         # _sigmoid or _identity
 
         # self.scalingfun_param TODO: support for custom one
-        expected_scalingfuns = {'identity': (identity, identity_grad),
-                                'sigmoid': (sigmoid, sigmoid_grad)}
-        scalefun, scalefun_grad = expected_scalingfuns.get(self.scalingfun_param, (None, None))
-        if scalefun is None or scalefun_grad is None:
-            raise ValueError("Expected 'scalingfun_param' to be of the following: \n \t" +
-                             ", ".join(expected_scalingfuns))
+        # expected_scalingfuns = {'identity': (identity, identity_grad),
+        #                         'sigmoid': (sigmoid, sigmoid_grad)}
+        # scalefun, scalefun_grad = expected_scalingfuns.get(self.scalefun, (None, None))
+        # if scalefun is None or scalefun_grad is None:
+        #     raise ValueError("Expected 'scalingfun_param' to be of the following: \n \t" +
+        #                      ", ".join(expected_scalingfuns))
 
         # TODO: validate scaling fun kwargs (inspect.getargspec())
         # if self.scalingfun_param == 'sigmoid':
@@ -88,21 +90,21 @@ class GLVQClassifier(BaseEstimator, ClassifierMixin):
         #     # for key, value in self.scalingfun_options.items():
         # else:
         #     pass
-        scalingfun_kwargs = self.scalingfun_options
-        if self.scalingfun_options is None:
-            scalingfun_kwargs = {}
-
-        expected_metricfuns = {'sqeuclidean': ('sqeuclidean', sqeuclidean_grad),
-                               'euclidean': ('euclidean', euclidean_grad)}
-        metricfun, metricfun_grad = expected_metricfuns.get(self.metricfun_param, (None, None))
-        if metricfun is None or metricfun_grad is None:
-            raise ValueError("Expected 'metricfun_param' to be on of the following: \n \t" +
-                             ", ".join(expected_metricfuns))
+        scalefun_kwargs = self.scalefun_options
+        if self.scalefun_options is None:
+            scalefun_kwargs = {}
+        #
+        # expected_metricfuns = {'sqeuclidean': ('sqeuclidean', sqeuclidean_grad),
+        #                        'euclidean': ('euclidean', euclidean_grad)}
+        # metricfun, metricfun_grad = expected_metricfuns.get(self.distfun, (None, None))
+        # if metricfun is None or metricfun_grad is None:
+        #     raise ValueError("Expected 'metricfun_param' to be on of the following: \n \t" +
+        #                      ", ".join(expected_metricfuns))
 
         # TODO: validate metric fun kwargs (inspect.getargspec())
-        metricfun_kwargs = self.metricfun_options
-        if self.metricfun_options is None:
-            metricfun_kwargs = {}
+        distfun_kwargs = self.distfun_options
+        if self.distfun_options is None:
+            distfun_kwargs = {}
 
         expected_optimizers = {'L-BFGS-B': 'L-BFGS-B', 'CG': 'CG'}
         optimizer = expected_optimizers.get(self.optimizer, None)
@@ -118,12 +120,12 @@ class GLVQClassifier(BaseEstimator, ClassifierMixin):
         costfun_args = (self.p_labels_,
                         data,
                         d_labels,
-                        scalefun,
-                        metricfun,
-                        scalefun_grad,
-                        metricfun_grad,
-                        scalingfun_kwargs,
-                        metricfun_kwargs)
+                        self.scalefun,
+                        self.distfun,
+                        self.scalefun_grad,
+                        self.distfun_grad,
+                        scalefun_kwargs,
+                        distfun_kwargs)
         costfun_grad = True
 
         self.optimize_results_ = minimize(costfun,
@@ -161,8 +163,7 @@ class GLVQClassifier(BaseEstimator, ClassifierMixin):
         # Input validation
         data = check_array(data)
 
-        # TODO: Map to prototypeLabels would be useful in the case the labels are not 0, 1, 2
-        return self.classes_[cdist(data, self.prototypes_, self.metricfun_param).argmin(axis=1)]
+        return self.classes_[self.distfun(data, self.prototypes_).argmin(axis=1)]
 
         # closest = np.argmin(euclidean_distances(data, self.prototypes_), axis=1)
         # return self.y_[closest]

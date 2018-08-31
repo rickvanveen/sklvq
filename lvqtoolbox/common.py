@@ -22,8 +22,10 @@ def _find_min(indices, distances):
     return dist_temp.min(axis=1), dist_temp.argmin(axis=1)
 
 
-def compute_distance(prototypes, p_labels, data, d_labels, metric):
-    distances = sp.spatial.distance.cdist(data, prototypes, metric)
+def compute_distance(prototypes, p_labels, data, d_labels, distfun):
+    # TODO: Refactor this into euclidean distance function?
+    # distances = sp.spatial.distance.cdist(data, prototypes, distfun)
+    distances = distfun(data, prototypes)
 
     ii_same = np.transpose(np.array([d_labels == prototype_label for prototype_label in p_labels]))
     ii_diff = ~ii_same
