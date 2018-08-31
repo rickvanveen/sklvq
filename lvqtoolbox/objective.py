@@ -1,6 +1,6 @@
 import numpy as np
 
-from .common import compute_distance
+from lvqtoolbox.distance import compute_distance
 
 
 # GLVQ - mu(x) functions
@@ -21,7 +21,8 @@ def relative_distance_difference_cost(prototypes, p_labels,
     num_prototypes = p_labels.size
 
     prototypes = prototypes.reshape(p_labels.size, num_features)
-    dist_same, dist_diff, i_dist_same, i_dist_diff = compute_distance(prototypes, p_labels, data, d_labels, metricfun)
+    dist_same, dist_diff, i_dist_same, i_dist_diff = compute_distance(prototypes, p_labels, data, d_labels,
+                                                                      metricfun, metricfun_kwargs)
 
     gradient = np.zeros(prototypes.shape)
 

@@ -108,3 +108,24 @@ def sqmeuclidean(data, prototypes, *args, omega=None, **kwargs):
             ij-th entry.
         """
     return sp.spatial.distance.cdist(data, prototypes, 'mahanalobis', omega)**2
+
+
+def _find_min(indices, distances):
+    """ Helper function to find the minimum distance and the index of this distance. """
+    dist_temp = np.where(indices, distances, np.inf)
+    return dist_temp.min(axis=1), dist_temp.argmin(axis=1)
+
+
+def compute_distance(prototypes, p_labels, data, d_labels, distfun, distfun_kwargs):
+    """ Computes the distances between each prototype and each observation and finds all indices where the smallest
+    distance is that of the prototype with the same label and with a different label. """
+
+    distances = distfun(data, prototypes, **distfun_kwargs)
+
+    ii_same = np.transpose(np.array([d_labels == prototype_label for prototype_label in p_labels]))
+    ii_diff = ~ii_same
+
+    dist_same, i_dist_same = _find_min(ii_same, distances)
+    dist_diff, i_dist_diff = _find_min(ii_diff, distances)
+
+    return dist_same, dist_diff, i_dist_same, i_dist_diff
