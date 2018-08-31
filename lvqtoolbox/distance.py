@@ -2,7 +2,7 @@ import numpy as np
 import scipy as sp
 
 
-def sqeuclidean(data, prototypes):
+def sqeuclidean(data, prototypes, **kwargs):
     """ Wrapper function for scipy's cdist(x, y, 'sqeuclidean') function
 
     See scipy.spatial.distance.cdist for full documentation.
@@ -25,7 +25,7 @@ def sqeuclidean(data, prototypes):
     return sp.spatial.distance.cdist(data, prototypes, 'sqeuclidean')
 
 
-def sqeuclidean_grad(data, prototype):
+def sqeuclidean_grad(data, prototype, **kwargs):
     """ Implements the derivative of the squared euclidean distance.
 
     Parameters
@@ -42,7 +42,7 @@ def sqeuclidean_grad(data, prototype):
     return -2 * (data - prototype)
 
 
-def euclidean(data, prototypes):
+def euclidean(data, prototypes, **kwargs):
     """ Wrapper function for scipy's cdist(x, y, 'euclidean') function
 
     See scipy.spatial.distance.cdist for full documentation.
@@ -65,7 +65,7 @@ def euclidean(data, prototypes):
     return sp.spatial.distance.cdist(data, prototypes, 'euclidean')
 
 
-def euclidean_grad(data, prototype):
+def euclidean_grad(data, prototype, **kwargs):
     """ Implements the derivative of the euclidean distance.
 
     Parameters
@@ -85,7 +85,7 @@ def euclidean_grad(data, prototype):
 
 # TODO: Note for when working on GMLVQ -> cdist(x, y, 'mahanalobis', Omega)**2 ->
 
-def sqmeuclidean(data, prototypes, omega):
+def sqmeuclidean(data, prototypes, omega, **kwargs):
     """ Implements a weighted variant of the squared euclidean distance.
 
         Note uses scipy.spatial.distance.cdist see scipy documentation.
