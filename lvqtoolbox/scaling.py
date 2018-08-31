@@ -26,6 +26,8 @@ def sigmoid_grad(x, beta=2):
     ----------
      x    : ndarray
            The values that need to be scaled.
+     beta : scalar
+            Controls the slope of the sigmoid function.
 
     Returns
     -------
@@ -37,6 +39,8 @@ def sigmoid_grad(x, beta=2):
 
 def identity(x, **kwargs):
     """ Implements the identity function: f(x) = x
+
+    Note helps with single interface in cost function.
 
     Parameters
     ----------
@@ -52,6 +56,8 @@ def identity(x, **kwargs):
 
 def identity_grad(*args, **kwargs):
     """ Implements the identity function derivative: g(x) = 1
+
+    Note helps with single interface in cost function.
 
     Parameters
     ----------

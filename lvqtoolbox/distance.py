@@ -84,8 +84,8 @@ def euclidean_grad(data, prototype, *args, **kwargs):
 
 
 # TODO: Note for when working on GMLVQ -> cdist(x, y, 'mahanalobis', Omega)**2 ->
-
-def sqmeuclidean(data, prototypes, omega, *args, **kwargs):
+# TODO: Omega=None ...
+def sqmeuclidean(data, prototypes, *args, omega=None, **kwargs):
     """ Implements a weighted variant of the squared euclidean distance.
 
         Note uses scipy.spatial.distance.cdist see scipy documentation.
