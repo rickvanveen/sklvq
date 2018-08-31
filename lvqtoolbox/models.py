@@ -1,6 +1,5 @@
 import numpy as np
 
-from scipy.spatial.distance import cdist
 from scipy.optimize import minimize
 
 from sklearn.base import BaseEstimator, ClassifierMixin
@@ -9,7 +8,7 @@ from sklearn.utils.validation import check_X_y, check_is_fitted, check_array
 from sklearn.utils.multiclass import unique_labels, check_classification_targets
 
 from .common import init_prototypes
-from .metrics import sqeuclidean, sqeuclidean_grad
+from .distance import sqeuclidean, sqeuclidean_grad
 from .scaling import sigmoid, sigmoid_grad
 from .objective import relative_distance_difference_cost
 

@@ -6,7 +6,7 @@ from sklearn.model_selection import cross_val_score, GridSearchCV, ParameterGrid
 from sklearn.pipeline import make_pipeline
 
 from lvqtoolbox.models import GLVQClassifier
-from lvqtoolbox.metrics import sqeuclidean
+from lvqtoolbox.distance import sqeuclidean
 from lvqtoolbox.scaling import identity, sigmoid
 
 
@@ -35,6 +35,7 @@ def test_glvq_pipeline_iris():
                                                                             scalefun_options={'beta': 6}))
     accuracy = cross_val_score(pipeline, iris.data, iris.target, cv=5)
     print("Cross validation (k=5): " + "{}".format(accuracy))
+
 
 # TODO: Test if making everything callable does not screw up grid search
 def test_glvq_gridsearch_iris():

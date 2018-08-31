@@ -24,8 +24,6 @@ def relative_distance_difference_cost(prototypes, p_labels,
     dist_same, dist_diff, i_dist_same, i_dist_diff = compute_distance(prototypes, p_labels, data, d_labels, metricfun)
 
     gradient = np.zeros(prototypes.shape)
-    # TODO: REMOVE
-    step_size = 0.05
 
     for i_prototype in range(0, num_prototypes):
         ii_same = i_prototype == i_dist_same
@@ -40,6 +38,6 @@ def relative_distance_difference_cost(prototypes, p_labels,
         grad_same = metricfun_grad(data[ii_same, :], prototypes[i_prototype, :])
         grad_diff = metricfun_grad(data[ii_diff, :], prototypes[i_prototype, :])
 
-        gradient[i_prototype, :] = step_size * (relative_dist_same.dot(grad_same) - relative_dist_diff.dot(grad_diff))
+        gradient[i_prototype, :] = (relative_dist_same.dot(grad_same) - relative_dist_diff.dot(grad_diff))
 
     return np.sum(scalefun(_relative_distance(dist_same, dist_diff), **scalefun_kwargs)), gradient.ravel()
