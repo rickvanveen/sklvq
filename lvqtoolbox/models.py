@@ -18,6 +18,7 @@ class GLVQClassifier(BaseEstimator, ClassifierMixin):
     """GLVQClassifier"""
 
     # TODO: Make costfunction a parameter, but the rest (except optimizer?) depends on this so should be a of_args dict?
+    # TODO: This does not work for custom gradient functions....
     def __init__(self, scalingfun_param='sigmoid', scalingfun_options=None,
                  metricfun_param='sqeuclidean', metricfun_options=None, prototypes_per_class=1,
                  optimizer='L-BFGS-B', optimizer_options=None, random_state=None):
