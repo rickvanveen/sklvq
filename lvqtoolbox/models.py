@@ -37,7 +37,7 @@ class GLVQClassifier(BaseEstimator, ClassifierMixin):
         ----------
         data : array-like, shape = [n_samples, n_features]
             The training input samples.
-        d_labels : array-like, shape = [n_samples]
+        y : array-like, shape = [n_samples]
             The target values. An array of int.
 
         Returns

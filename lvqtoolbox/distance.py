@@ -11,14 +11,14 @@ def sqeuclidean(data, prototypes, *args, **kwargs):
 
     Parameters
     ----------
-    data       : ndarray, shape(n_obervations, n_features)
+    data       : ndarray, shape = [n_obervations, n_features]
                  Inputs are converted to float type.
-    prototypes : ndarray, shape(n_prototypes, n_features)
+    prototypes : ndarray, shape = [n_prototypes, n_features]
                  Inputs are converted to float type.
 
     Returns
     -------
-    distances : ndarray, shape(n_observations, n_prototypes)
+    distances : ndarray, shape = [n_observations, n_prototypes]
         The dist(u=XA[i], v=XB[j]) is computed and stored in the
         ij-th entry.
     """
@@ -30,13 +30,13 @@ def sqeuclidean_grad(data, prototype, *args, **kwargs):
 
     Parameters
     ----------
-    data       : ndarray, shape(n_observations, n_features)
+    data       : ndarray, shape = [n_observations, n_features]
 
-    prototype  : ndarray, shape(n_features,)
+    prototype  : ndarray, shape = [n_features,]
 
     Returns
     -------
-    gradient : ndarray, shape(n_observations, n_features)
+    gradient : ndarray, shape = [n_observations, n_features]
                 The gradient with respect to the prototype and every observation in data.
     """
     return -2 * (data - prototype)
@@ -51,14 +51,14 @@ def euclidean(data, prototypes, *args, **kwargs):
 
     Parameters
     ----------
-    data       : ndarray, shape(n_obervations, n_features)
+    data       : ndarray, shape = [n_obervations, n_features]
                  Inputs are converted to float type.
-    prototypes : ndarray, shape(n_prototypes, n_features)
+    prototypes : ndarray, shape = [n_prototypes, n_features]
                  Inputs are converted to float type.
 
     Returns
     -------
-    distances : ndarray, shape(n_observations, n_prototypes)
+    distances : ndarray, shape = [n_observations, n_prototypes]
         The dist(u=XA[i], v=XB[j]) is computed and stored in the
         ij-th entry.
     """
@@ -70,13 +70,13 @@ def euclidean_grad(data, prototype, *args, **kwargs):
 
     Parameters
     ----------
-    data       : ndarray, shape(n_observations, n_features)
+    data       : ndarray, shape = [n_observations, n_features]
 
-    prototype  : ndarray, shape(n_features,)
+    prototype  : ndarray, shape = [n_features,]
 
     Returns
     -------
-    gradient : ndarray, shape(n_observations, n_features)
+    gradient : ndarray, shape = [n_observations, n_features]
                The gradient with respect to the prototype and every observation in data.
     """
     difference = data - prototype
@@ -94,16 +94,16 @@ def sqmeuclidean(data, prototypes, *args, omega=None, **kwargs):
 
         Parameters
         ----------
-        data       : ndarray, shape(n_obervations, n_features)
+        data       : ndarray, shape = [n_obervations, n_features]
                      Inputs are converted to float type.
-        prototypes : ndarray, shape(n_prototypes, n_features)
+        prototypes : ndarray, shape = [n_prototypes, n_features]
                      Inputs are converted to float type.
-        omega      : ndarray, shape(n_features, n_features
+        omega      : ndarray, shape = [n_features, n_features]
                     TODO: Does not necessarily has to be square.
 
         Returns
         -------
-        distances : ndarray, shape(n_observations, n_prototypes)
+        distances : ndarray, shape = [n_observations, n_prototypes]
             The dist(u=XA[i], v=XB[j]) is computed and stored in the
             ij-th entry.
         """
