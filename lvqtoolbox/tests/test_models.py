@@ -6,6 +6,8 @@ from sklearn.model_selection import cross_val_score, GridSearchCV, ParameterGrid
 from sklearn.pipeline import make_pipeline
 
 from lvqtoolbox.models import GLVQClassifier
+from lvqtoolbox.metrics import sqeuclidean
+from lvqtoolbox.scaling import identity, sigmoid
 
 
 def test_glvq_iris():
@@ -28,13 +30,13 @@ def test_glvq_iris():
 def test_glvq_pipeline_iris():
     iris = datasets.load_iris()
 
-    pipeline = make_pipeline(preprocessing.StandardScaler(), GLVQClassifier(distfun='sqeuclidean',
-                                                                            scalefun='sigmoid',
+    pipeline = make_pipeline(preprocessing.StandardScaler(), GLVQClassifier(distfun=sqeuclidean,
+                                                                            scalefun=sigmoid,
                                                                             scalefun_options={'beta': 6}))
     accuracy = cross_val_score(pipeline, iris.data, iris.target, cv=5)
     print("Cross validation (k=5): " + "{}".format(accuracy))
 
-
+# TODO: Test if making everything callable does not screw up grid search
 def test_glvq_gridsearch_iris():
     iris = datasets.load_iris()
 
@@ -43,33 +45,34 @@ def test_glvq_gridsearch_iris():
     #          'glvqclassifier__scalingfun_options': [{'beta': x} for x in range(2,22,2)]}]
     # grid = ParameterGrid(grid)
 
-    grid = [{'glvqclassifier__scalingfun_param': ['identity']},
-            {'glvqclassifier__scalingfun_options': [{'beta': 2}],
-            'glvqclassifier__scalingfun_param': ['sigmoid']},
-            {'glvqclassifier__scalingfun_options': [{'beta': 4}],
-            'glvqclassifier__scalingfun_param': ['sigmoid']},
-            {'glvqclassifier__scalingfun_options': [{'beta': 6}],
-            'glvqclassifier__scalingfun_param': ['sigmoid']},
-            {'glvqclassifier__scalingfun_options': [{'beta': 8}],
-            'glvqclassifier__scalingfun_param': ['sigmoid']},
-            {'glvqclassifier__scalingfun_options': [{'beta': 10}],
-            'glvqclassifier__scalingfun_param': ['sigmoid']},
-            {'glvqclassifier__scalingfun_options': [{'beta': 12}],
-            'glvqclassifier__scalingfun_param': ['sigmoid']},
-            {'glvqclassifier__scalingfun_options': [{'beta': 14}],
-            'glvqclassifier__scalingfun_param': ['sigmoid']},
-            {'glvqclassifier__scalingfun_options': [{'beta': 16}],
-            'glvqclassifier__scalingfun_param': ['sigmoid']},
-            {'glvqclassifier__scalingfun_options': [{'beta': 18}],
-            'glvqclassifier__scalingfun_param': ['sigmoid']},
-            {'glvqclassifier__scalingfun_options': [{'beta': 20}],
-            'glvqclassifier__scalingfun_param': ['sigmoid']}]
+    grid = [{'glvqclassifier__scalefun': [identity]},
+            {'glvqclassifier__scalefun_options': [{'beta': 2}],
+            'glvqclassifier__scalefun': [sigmoid]},
+            {'glvqclassifier__scalefun_options': [{'beta': 4}],
+            'glvqclassifier__scalefun': [sigmoid]},
+            {'glvqclassifier__scalefun_options': [{'beta': 6}],
+            'glvqclassifier__scalefun': [sigmoid]},
+            {'glvqclassifier__scalefun_options': [{'beta': 8}],
+            'glvqclassifier__scalefun': [sigmoid]},
+            {'glvqclassifier__scalefun_options': [{'beta': 10}],
+            'glvqclassifier__scalefun': [sigmoid]},
+            {'glvqclassifier__scalefun_options': [{'beta': 12}],
+            'glvqclassifier__scalefun': [sigmoid]},
+            {'glvqclassifier__scalefun_options': [{'beta': 14}],
+            'glvqclassifier__scalefun': [sigmoid]},
+            {'glvqclassifier__scalefun_options': [{'beta': 16}],
+            'glvqclassifier__scalefun': [sigmoid]},
+            {'glvqclassifier__scalefun_options': [{'beta': 18}],
+            'glvqclassifier__scalefun': [sigmoid]},
+            {'glvqclassifier__scalefun_options': [{'beta': 20}],
+            'glvqclassifier__scalefun': [sigmoid]}]
 
     pipeline = make_pipeline(preprocessing.StandardScaler(), GLVQClassifier())
 
     estimator = GridSearchCV(pipeline, grid, cv=5)
     result = estimator.fit(iris.data, iris.target)
     print("Done!")
+
 
 def test_glvq_wine():
     wine = datasets.load_wine()

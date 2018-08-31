@@ -9,16 +9,14 @@ from sklearn.utils.validation import check_X_y, check_is_fitted, check_array
 from sklearn.utils.multiclass import unique_labels, check_classification_targets
 
 from .common import init_prototypes
-from .metrics import sqeuclidean, sqeuclidean_grad, euclidean_grad
-from .scaling import sigmoid, sigmoid_grad, identity, identity_grad
+from .metrics import sqeuclidean, sqeuclidean_grad
+from .scaling import sigmoid, sigmoid_grad
 from .objective import relative_distance_difference_cost
 
 
 class GLVQClassifier(BaseEstimator, ClassifierMixin):
     """GLVQClassifier"""
 
-    # TODO: Make costfunction a parameter, but the rest (except optimizer?) depends on this so should be a of_args dict?
-    # TODO: This does not work for custom gradient functions....
     def __init__(self, scalefun=sigmoid, scalefun_grad=sigmoid_grad, scalefun_options=None,
                  distfun=sqeuclidean, distfun_grad=sqeuclidean_grad, distfun_options=None,
                  prototypes_per_class=1, optimizer='L-BFGS-B', optimizer_options=None, random_state=None):
@@ -32,9 +30,6 @@ class GLVQClassifier(BaseEstimator, ClassifierMixin):
         self.optimizer = optimizer
         self.optimizer_options = optimizer_options
         self.random_state = random_state
-
-    # def __init(self, demo_param='demo'):
-    #     self.demo_param = demo_param
 
     def fit(self, data, y):
         """A reference implementation of a fitting function for a classifier.
@@ -72,36 +67,10 @@ class GLVQClassifier(BaseEstimator, ClassifierMixin):
         num_features = data.shape[1]
         num_prototypes = self.prototypes_.shape[0]
 
-        # Set these options in constructor and check if it's a string -> for existing functions or callable for custom
-        # _sigmoid or _identity
-
-        # self.scalingfun_param TODO: support for custom one
-        # expected_scalingfuns = {'identity': (identity, identity_grad),
-        #                         'sigmoid': (sigmoid, sigmoid_grad)}
-        # scalefun, scalefun_grad = expected_scalingfuns.get(self.scalefun, (None, None))
-        # if scalefun is None or scalefun_grad is None:
-        #     raise ValueError("Expected 'scalingfun_param' to be of the following: \n \t" +
-        #                      ", ".join(expected_scalingfuns))
-
-        # TODO: validate scaling fun kwargs (inspect.getargspec())
-        # if self.scalingfun_param == 'sigmoid':
-        #     if not isinstance(self.scalingfun_options, dict):
-        #         raise ValueError("Expected 'scalingfun_options' to be an instance of Python dictionary.")
-        #     # for key, value in self.scalingfun_options.items():
-        # else:
-        #     pass
         scalefun_kwargs = self.scalefun_options
         if self.scalefun_options is None:
             scalefun_kwargs = {}
-        #
-        # expected_metricfuns = {'sqeuclidean': ('sqeuclidean', sqeuclidean_grad),
-        #                        'euclidean': ('euclidean', euclidean_grad)}
-        # metricfun, metricfun_grad = expected_metricfuns.get(self.distfun, (None, None))
-        # if metricfun is None or metricfun_grad is None:
-        #     raise ValueError("Expected 'metricfun_param' to be on of the following: \n \t" +
-        #                      ", ".join(expected_metricfuns))
 
-        # TODO: validate metric fun kwargs (inspect.getargspec())
         distfun_kwargs = self.distfun_options
         if self.distfun_options is None:
             distfun_kwargs = {}
