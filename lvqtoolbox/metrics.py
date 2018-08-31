@@ -1,3 +1,5 @@
+# TODO: MEtrics is not really a good name... distance...
+
 import numpy as np
 
 
