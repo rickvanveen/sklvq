@@ -32,7 +32,7 @@ def sqeuclidean_grad(data, prototype):
     ----------
     data       : ndarray, shape(n_observations, n_features)
 
-    prototype  : ndarray, shape(1, n_features)
+    prototype  : ndarray, shape(n_features,)
 
     Returns
     -------
@@ -72,7 +72,7 @@ def euclidean_grad(data, prototype):
     ----------
     data       : ndarray, shape(n_observations, n_features)
 
-    prototype  : ndarray, shape(1, n_features)
+    prototype  : ndarray, shape(n_features,)
 
     Returns
     -------
@@ -84,3 +84,27 @@ def euclidean_grad(data, prototype):
 
 
 # TODO: Note for when working on GMLVQ -> cdist(x, y, 'mahanalobis', Omega)**2 ->
+
+def sqmeuclidean(data, prototypes, omega):
+    """ Implements a weighted variant of the squared euclidean distance.
+
+        Note uses scipy.spatial.distance.cdist see scipy documentation.
+
+        Note that any custom function should still accept and return the same as this function.
+
+        Parameters
+        ----------
+        data       : ndarray, shape(n_obervations, n_features)
+                     Inputs are converted to float type.
+        prototypes : ndarray, shape(n_prototypes, n_features)
+                     Inputs are converted to float type.
+        omega      : ndarray, shape(n_features, n_features
+                    TODO: Does not necessarily has to be square.
+
+        Returns
+        -------
+        distances : ndarray, shape(n_observations, n_prototypes)
+            The dist(u=XA[i], v=XB[j]) is computed and stored in the
+            ij-th entry.
+        """
+    return sp.spatial.distance.cdist(data, prototypes, 'mahanalobis', omega)**2
