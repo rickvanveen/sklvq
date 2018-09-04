@@ -70,7 +70,7 @@ def test_glvq_gridsearch_iris():
 
     pipeline = make_pipeline(preprocessing.StandardScaler(), GLVQClassifier())
 
-    estimator = GridSearchCV(pipeline, grid, cv=5)
+    estimator = GridSearchCV(pipeline, grid, cv=10)
     result = estimator.fit(iris.data, iris.target)
     print("Done!")
 

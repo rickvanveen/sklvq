@@ -13,12 +13,14 @@ from .scaling import sigmoid, sigmoid_grad
 from .objective import relative_distance_difference_cost
 
 
+# TODO: MLPClassifier of sklearn also has option for solvers and just accepts all parameters and ignores them when a
+#  solver is used that doesn't use that option. Also options are strings
 class GLVQClassifier(BaseEstimator, ClassifierMixin):
     """GLVQClassifier"""
 
-    def __init__(self, scalefun=sigmoid, scalefun_grad=sigmoid_grad, scalefun_options=None,
-                 distfun=sqeuclidean, distfun_grad=sqeuclidean_grad, distfun_options=None,
-                 prototypes_per_class=1, optimizer='L-BFGS-B', optimizer_options=None, random_state=None):
+    def __init__(self, scalefun=sigmoid, scalefun_grad=sigmoid_grad, scalefun_options={},
+                 distfun=sqeuclidean, distfun_grad=sqeuclidean_grad, distfun_options={},
+                 prototypes_per_class=1, optimizer='L-BFGS-B', optimizer_options={}, random_state=None):
         self.scalefun = scalefun
         self.scalefun_grad = scalefun_grad
         self.scalefun_options = scalefun_options
@@ -61,27 +63,16 @@ class GLVQClassifier(BaseEstimator, ClassifierMixin):
             raise ValueError("Expected 'prototypes_per_class' to be a scalar or vector with value(s) > 0")
 
         rng = check_random_state(self.random_state)
+
         self.prototypes_ = init_prototypes(self.p_labels_, data, d_labels, rng)
 
         num_features = data.shape[1]
         num_prototypes = self.prototypes_.shape[0]
 
-        scalefun_kwargs = self.scalefun_options
-        if self.scalefun_options is None:
-            scalefun_kwargs = {}
-
-        distfun_kwargs = self.distfun_options
-        if self.distfun_options is None:
-            distfun_kwargs = {}
-
         expected_optimizers = {'L-BFGS-B': 'L-BFGS-B', 'CG': 'CG'}
         optimizer = expected_optimizers.get(self.optimizer, None)
         if optimizer is None:
             raise ValueError("Expected 'optimizer' to be one of the following: \n \t" + ", ".join(expected_optimizers))
-
-        optimizer_kwargs = self.optimizer_options
-        if self.optimizer_options is None:
-            optimizer_kwargs = {}
 
         # _relative_distance_difference_cost - GLVQ standard
         costfun = relative_distance_difference_cost
@@ -92,8 +83,8 @@ class GLVQClassifier(BaseEstimator, ClassifierMixin):
                         self.distfun,
                         self.scalefun_grad,
                         self.distfun_grad,
-                        scalefun_kwargs,
-                        distfun_kwargs)
+                        self.scalefun_options,
+                        self.distfun_options)
         costfun_grad = True
 
         self.optimize_results_ = minimize(costfun,
@@ -101,7 +92,7 @@ class GLVQClassifier(BaseEstimator, ClassifierMixin):
                                           costfun_args,
                                           optimizer,
                                           costfun_grad,
-                                          options=optimizer_kwargs)
+                                          options=self.optimizer_options)
 
         self.prototypes_ = self.optimize_results_.x.reshape([num_prototypes, num_features])
         # Return the classifier
