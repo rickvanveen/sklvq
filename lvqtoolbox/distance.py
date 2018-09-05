@@ -100,6 +100,7 @@ def sqmeuclidean(data, prototypes, *args, omega=None, **kwargs):
                      Inputs are converted to float type.
         omega      : ndarray, shape = [n_features, n_features]
                     TODO: Does not necessarily has to be square.
+                    TODO: Handle case when omega is None... use identity or something?
 
         Returns
         -------

@@ -14,19 +14,20 @@ from .objective import relative_distance_difference_cost
 
 
 # TODO: MLPClassifier of sklearn also has option for solvers and just accepts all parameters and ignores them when a
-#  solver is used that doesn't use that option. Also options are strings
+# TODO: solver is used that doesn't use that option. Also options are strings
+# TODO: Problem is that we do nto have only one function but multiple
 class GLVQClassifier(BaseEstimator, ClassifierMixin):
     """GLVQClassifier"""
 
-    def __init__(self, scalefun=sigmoid, scalefun_grad=sigmoid_grad, scalefun_options={},
-                 distfun=sqeuclidean, distfun_grad=sqeuclidean_grad, distfun_options={},
-                 prototypes_per_class=1, optimizer='L-BFGS-B', optimizer_options={}, random_state=None):
-        self.scalefun = scalefun
+    def __init__(self, scalefun=sigmoid, scalefun_grad=sigmoid_grad, scalefun_kwargs=None,
+                 distfun=sqeuclidean, distfun_grad=sqeuclidean_grad, distfun_kwargs=None,
+                 prototypes_per_class=1, optimizer='L-BFGS-B', optimizer_options=None, random_state=None):
+        self.scalefun = scalefun # Costfunction specific?
         self.scalefun_grad = scalefun_grad
-        self.scalefun_options = scalefun_options
-        self.distfun = distfun
+        self.scalefun_kwargs = scalefun_kwargs
+        self.distfun = distfun # LVQ in general - all of them will have it
         self.distfun_grad = distfun_grad
-        self.distfun_options = distfun_options
+        self.distfun_options = distfun_kwargs
         self.prototypes_per_class = prototypes_per_class
         self.optimizer = optimizer
         self.optimizer_options = optimizer_options
@@ -47,34 +48,30 @@ class GLVQClassifier(BaseEstimator, ClassifierMixin):
         self : object
             Returns self.
         """
-        # Check that data and y have correct shape
+        # SciKit-learn required check
         data, d_labels = check_X_y(data, y)
 
-        # Have to do this for sklearn compatibility
+        # SciKit-learn required check
         check_classification_targets(d_labels)
 
-        self.classes_, d_labels = np.unique(d_labels, return_inverse=True)
+        # SciKit-learn required check
+        rng = check_random_state(self.random_state)
 
+        # TODO: Set classes_ to None in init? Compatibility problem with sklearn?
+        self.classes_, d_labels = np.unique(d_labels, return_inverse=True) # TODO: How does this work?
+
+        # TODO: Expect valid input... only check for cases where valid  input leads to incorrect output.
         if np.isscalar(self.prototypes_per_class):
             self.p_labels_ = np.repeat(unique_labels(d_labels), self.prototypes_per_class)
-        elif isinstance(self.prototypes_per_class, np.ndarray):
-            pass
-        else:
-            raise ValueError("Expected 'prototypes_per_class' to be a scalar or vector with value(s) > 0")
-
-        rng = check_random_state(self.random_state)
+        # Assuming valid input: it is now a vector, which does not require any processing
 
         self.prototypes_ = init_prototypes(self.p_labels_, data, d_labels, rng)
 
+        # Assumes valid input for data and prototypes of shape = [n_observations/n_prototypes, n_features]
         num_features = data.shape[1]
         num_prototypes = self.prototypes_.shape[0]
 
-        expected_optimizers = {'L-BFGS-B': 'L-BFGS-B', 'CG': 'CG'}
-        optimizer = expected_optimizers.get(self.optimizer, None)
-        if optimizer is None:
-            raise ValueError("Expected 'optimizer' to be one of the following: \n \t" + ", ".join(expected_optimizers))
-
-        # _relative_distance_difference_cost - GLVQ standard
+        # This object implements the GLVQ standard _relative_distance_difference_cost objective/cost function
         costfun = relative_distance_difference_cost
         costfun_args = (self.p_labels_,
                         data,
@@ -83,14 +80,14 @@ class GLVQClassifier(BaseEstimator, ClassifierMixin):
                         self.distfun,
                         self.scalefun_grad,
                         self.distfun_grad,
-                        self.scalefun_options,
+                        self.scalefun_kwargs,
                         self.distfun_options)
-        costfun_grad = True
+        costfun_grad = True # Bool tells minimize that the costfun return the cost and derivative can be callable
 
         self.optimize_results_ = minimize(costfun,
                                           self.prototypes_.ravel(),
                                           costfun_args,
-                                          optimizer,
+                                          self.optimizer,
                                           costfun_grad,
                                           options=self.optimizer_options)
 

@@ -15,7 +15,7 @@ def test_glvq_iris():
 
     iris.data = preprocessing.scale(iris.data)
 
-    classifier = GLVQClassifier(scalefun_options={'beta': 6},
+    classifier = GLVQClassifier(scalefun_kwargs={'beta': 6},
                                 prototypes_per_class=1,  # Broken
                                 optimizer_options={'disp': True})
     classifier = classifier.fit(iris.data, iris.target)
@@ -32,7 +32,7 @@ def test_glvq_pipeline_iris():
 
     pipeline = make_pipeline(preprocessing.StandardScaler(), GLVQClassifier(distfun=sqeuclidean,
                                                                             scalefun=sigmoid,
-                                                                            scalefun_options={'beta': 6}))
+                                                                            scalefun_kwargs={'beta': 6}))
     accuracy = cross_val_score(pipeline, iris.data, iris.target, cv=5)
     print("Cross validation (k=5): " + "{}".format(accuracy))
 
