@@ -16,8 +16,8 @@ def test_glvq_iris():
     iris.data = preprocessing.scale(iris.data)
 
     classifier = GLVQClassifier(scalefun_kwargs={'beta': 6},
-                                prototypes_per_class=1,  # Broken
-                                optimizer_options={'disp': True})
+                                prototypes_per_class=1, # TODO: Broken x number of prototypes per class
+                                optimizer_options={'disp': False})
     classifier = classifier.fit(iris.data, iris.target)
 
     predicted = classifier.predict(iris.data)
@@ -37,7 +37,6 @@ def test_glvq_pipeline_iris():
     print("Cross validation (k=5): " + "{}".format(accuracy))
 
 
-# TODO: Test if making everything callable does not screw up grid search
 def test_glvq_gridsearch_iris():
     iris = datasets.load_iris()
 
