@@ -13,7 +13,10 @@ def _relative_distance_grad(dist_same, dist_diff):
     return 2 * dist_diff / (dist_same + dist_diff)**2
 
 
-# GLVQ - Cost functions
+def relative_distance_difference_wrapper(prototypes, p_labels, data, d_labels, kwargs):
+    return relative_distance_difference_cost(prototypes, p_labels, data, d_labels, **kwargs)
+
+# GLVQ - Cost functions TODO: from scalefun and further kwargs...
 def relative_distance_difference_cost(prototypes, p_labels,
                                       data, d_labels, scalefun, metricfun,
                                       scalefun_grad, metricfun_grad, scalefun_kwargs, metricfun_kwargs):
@@ -42,3 +45,6 @@ def relative_distance_difference_cost(prototypes, p_labels,
         gradient[i_prototype, :] = (relative_dist_same.dot(grad_same) - relative_dist_diff.dot(grad_diff))
 
     return np.sum(scalefun(_relative_distance(dist_same, dist_diff), **scalefun_kwargs)), gradient.ravel()
+
+
+

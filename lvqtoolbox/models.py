@@ -16,24 +16,28 @@ from .objective import relative_distance_difference_cost
 class GLVQClassifier(BaseEstimator, ClassifierMixin):
     """GLVQClassifier"""
 
-    def __init__(self, scalefun=sigmoid, scalefun_grad=sigmoid_grad, scalefun_kwargs=None,
-                 distfun=sqeuclidean, distfun_grad=sqeuclidean_grad, distfun_kwargs=None,
-                 prototypes_per_class=1, optimizer='L-BFGS-B', optimizer_options=None, random_state=None):
+    def __init__(self, costfun=relative_distance_difference_cost, costfun_grad=True, costfun_kwargs={},
+                 distfun=sqeuclidean, distfun_grad=sqeuclidean_grad, distfun_kwargs={},
+                 prototypes_per_class=1, optimizer='L-BFGS-B', optimizer_options={}, random_state=None):
 
+        # TODO: Rename all cost to objective
+        # TODO: Distfun will be a parameter of the costfun but won't be in the kwargs dictionary...
+        self.costfun = costfun
+        self.costfun_kwargs = costfun_kwargs
+        self.costfun_grad = costfun_grad
 
-        self.scalefun = scalefun # Cost function specific
-        self.scalefun_grad = scalefun_grad # Cost function specific
-        self.scalefun_kwargs = scalefun_kwargs # Cost function specific
-
+        # TODO: maybe rename to solver for consistency with sklearn and other stuff....
+        self.optimizer = optimizer  # LVQ specific
+        self.optimizer_options = optimizer_options  # LVQ specific
 
         self.distfun = distfun # LVQ specific - all of them will have it
         self.distfun_grad = distfun_grad # LVQ specific
         self.distfun_kwargs = distfun_kwargs # LVQ specific
-        self.prototypes_per_class = prototypes_per_class # LVQ specific
-        self.optimizer = optimizer # LVQ specific
-        self.optimizer_options = optimizer_options # LVQ specific
+
+        self.prototypes_per_class = prototypes_per_class  # LVQ specific
         self.random_state = random_state # sklearn specific
 
+    # TODO: Pre-fit that checks everything, then per specific implementation a fit that calls these and puts it's own specifics in place, e.g., what to optimize etc.
     def fit(self, data, y):
         """A reference implementation of a fitting function for a classifier.
 
@@ -58,20 +62,8 @@ class GLVQClassifier(BaseEstimator, ClassifierMixin):
         # SciKit-learn required check
         rng = check_random_state(self.random_state)
 
-        # If no additional kwargs are given
-        if self.scalefun_kwargs is None:
-            self.scalefun_kwargs = {}
 
-        # If no additional kwargs are given
-        if self.distfun_kwargs is None:
-            self.distfun_kwargs = {}
-
-        # If no additional options dict (not kwargs for optimizer) is given
-        if self.optimizer_options is None:
-            self.optimizer_options = {}
-
-        # TODO: Set classes_ to None in init? Compatibility problem with sklearn?
-        self.classes_, d_labels = np.unique(d_labels, return_inverse=True) # TODO: How does this work?
+        self.classes_, d_labels = np.unique(d_labels, return_inverse=True) # TODO: How does this work? ???
 
         # TODO: Expect valid input... only check for cases where valid  input leads to incorrect output.
         if np.isscalar(self.prototypes_per_class):
@@ -80,24 +72,18 @@ class GLVQClassifier(BaseEstimator, ClassifierMixin):
 
         self.prototypes_ = init_prototypes(self.p_labels_, data, d_labels, rng)
 
-        # This object implements the GLVQ standard _relative_distance_difference_cost objective/cost function
-        costfun = relative_distance_difference_cost
-        costfun_args = (self.p_labels_,
-                        data,
-                        d_labels,
-                        self.scalefun,
-                        self.distfun,
-                        self.scalefun_grad,
-                        self.distfun_grad,
-                        self.scalefun_kwargs,
-                        self.distfun_kwargs)
-        costfun_grad = True # Bool tells minimize that the costfun return the cost and derivative can be callable
+        # .......................................... until here should be moved and can be done always...
 
-        self.optimize_results_ = minimize(costfun,
+        # The to be optimized variable is added by minimise from scipy...
+        costfun_option = {''}
+
+        costfun_args = (self.p_labels_, data, d_labels, self.costfun_kwargs)
+
+        self.optimize_results_ = minimize(self.costfun,
                                           self.prototypes_.ravel(),
                                           costfun_args,
                                           self.optimizer,
-                                          costfun_grad,
+                                          self.costfun_grad,
                                           options=self.optimizer_options)
 
         # Assumes valid input for data and prototypes of shape = [n_observations/n_prototypes, n_features]
@@ -144,3 +130,12 @@ class GLVQClassifier(BaseEstimator, ClassifierMixin):
 
         # closest = np.argmin(euclidean_distances(data, self.prototypes_), axis=1)
         # return self.y_[closest]
+
+
+class otherGLVQ(GLVQClassifier):
+    def __init__(self):
+        super(otherGLVQ, self).__init__(costfun=relative_distance_difference_cost) # ETC...
+
+    def fit(self, data, y):
+        #skLVQ.input.validation.validate_fit(x,y,z or self)
+        pass

@@ -13,5 +13,3 @@ def init_prototypes(p_labels, data, d_labels, rng):
     """ Initializes the protoypes using the conditional mean and adds a small random value to break symmetry."""
     conditional_mean = _conditional_mean(p_labels, data, d_labels)
     return conditional_mean + (1e-4 * rng.uniform(-1, 1, conditional_mean.shape))
-
-
