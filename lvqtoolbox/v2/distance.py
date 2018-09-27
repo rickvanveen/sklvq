@@ -35,22 +35,30 @@ class Euclidean(AbstractDistance):
 
 class RelevanceSquaredEuclidean(AbstractDistance):
 
+    # TODO: Why set omega in the init but not prototypes etc...
     def __init__(self, omega=None):
         self.omega = omega
 
+    # TODO: make omega a property and normalise everytime 'automatically' when it is set?
     def normalise(self):
         self.omega = self.omega / np.sqrt(np.sum(np.diagonal(self.omega.T.dot(self.omega))))
 
     def __call__(self, data, prototypes):
-        return sp.spatial.distance.cdist(data, prototypes, 'mahalanobis', self.omega) ** 2
+        return sp.spatial.distance.cdist(data, prototypes, 'mahalanobis', VI=self.omega.T.dot(self.omega)) ** 2
 
+    # TODO: remove if from the gradient function and make sure they are always given valid  input.
+    # Returns: shape = [num_samples, num_features]
     def gradient(self, data, prototype):
-        return np.apply_along_axis(lambda x, l: l.dot(np.atleast_2d(x).T),
+        if data.size == 0:
+            return np.array([])
+        return np.apply_along_axis(lambda x, l: l.dot(np.atleast_2d(x).T).T,
                                    1, (-2 * (data - prototype)), (self.omega.T.dot(self.omega))).squeeze()
 
-    # Returns 3D object (omega.shape[0], omega.shape[1], num_samples)
+    # Returns: shape = [num_samples, omega.size]
     def omega_gradient(self, data, prototype):
-        return np.apply_along_axis(lambda x, o: 2 * np.atleast_2d(x).T.dot(o.dot(np.atleast_2d(x).T).T),
+        if data.size == 0:
+            return np.array([])
+        return np.apply_along_axis(lambda x, o: (o.dot(np.atleast_2d(x).T).dot(2 * np.atleast_2d(x))).ravel(),
                                    1, (data - prototype), self.omega)
 
 

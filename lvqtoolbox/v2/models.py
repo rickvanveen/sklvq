@@ -35,6 +35,11 @@ class LVQClassifier(ABC, BaseEstimator, ClassifierMixin):
         raise NotImplementedError("You should implement this! Must accept (data, y)"
                                   " and return Objective and Solver objects")
 
+    @abstractmethod
+    def restore_from_variables(self, variables):
+        raise NotImplementedError("You should implement this! Must accept (data, y)"
+                                  " and return Objective and Solver objects")
+
     # TODO: could also be class functions things that can be extended by user by providing another class same for omega.
     def init_prototypes(self, data, y):
         conditional_mean = _conditional_mean(self.prototypes_labels_, data, y)
@@ -71,10 +76,8 @@ class LVQClassifier(ABC, BaseEstimator, ClassifierMixin):
 
         variables = solver.solve(variables, objective_args)
 
-        num_features = data.shape[1]
-        num_prototypes = self.prototypes_labels_.size
-
-        self.prototypes_ = variables.reshape(num_prototypes, num_features)
+        # Should be done by subclass...
+        self.restore_from_variables(variables)
 
         return self
 
@@ -87,6 +90,7 @@ class LVQClassifier(ABC, BaseEstimator, ClassifierMixin):
 
         # TODO: Should be set somehwere such that we don't need a predict in every subclass...
         distance = DistanceFactory.create(self.distance)
+        # distance.omega = self.omega_
 
         # Prototypes labels are indices of classes_
 
@@ -122,6 +126,9 @@ class GLVQClassifier(LVQClassifier):
         objective_args = (self.prototypes_labels_, data, labels)
 
         return solver, variables, objective_args
+
+    def restore_from_variables(self, variables):
+        self.prototypes_ = variables.reshape(self.prototypes_.shape)
 
 
 class GMLVQClassifier(LVQClassifier):
@@ -166,3 +173,11 @@ class GMLVQClassifier(LVQClassifier):
         objective_args = (self.prototypes_labels_, data, labels)
 
         return solver, variables, objective_args
+
+    def restore_from_variables(self, variables):
+        prototypes_variables = variables[:self.prototypes_.size]
+        self.prototypes_ = prototypes_variables.reshape(self.prototypes_.shape)
+
+        omega_variables = variables[self.prototypes_.size:]
+        self.omega_ = omega_variables.reshape(self.omega_.shape)
+        self.omega_ = self.omega_ / np.sqrt(np.sum(np.diagonal(self.omega_.T.dot(self.omega_))))
