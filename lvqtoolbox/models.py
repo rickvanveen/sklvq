@@ -91,7 +91,7 @@ class LVQClassifier(ABC, BaseEstimator, ClassifierMixin):
         data = check_array(data)
 
         # Prototypes labels are indices of classes_
-        return self.prototypes_labels_.take(self.distancefun(data, self.prototypes_).argmin(axis=1))
+        return self.prototypes_labels_.take(self._distancefun(data, self.prototypes_).argmin(axis=1))
 
 
 # Template (Context Implementation)
@@ -109,11 +109,11 @@ class GLVQClassifier(LVQClassifier):
     def initialize(self, data, labels):
         """ . """
         # Here add inits for RelativeDistanceObjective... self.distance, self.scaling...
-        self.distancefun = DistanceFactory.create(self.distance)
+        self._distancefun = DistanceFactory.create(self.distance)
         scaling = ScalingFactory.create(self.scaling)
         scaling.beta = self.beta
 
-        objective = RelativeDistanceObjective(distance=self.distancefun, scaling=scaling,
+        objective = RelativeDistanceObjective(distance=self._distancefun, scaling=scaling,
                                               prototypes_shape=self.prototypes_.shape)
 
         solver = SolverFactory.create(self.solver)
@@ -149,7 +149,7 @@ class GMLVQClassifier(LVQClassifier):
             return np.identity(num_features) / num_features
 
     def initialize(self, data, labels):
-        self.distancefun = DistanceFactory.create(self.distance)
+        self._distancefun = DistanceFactory.create(self.distance)
         scaling = ScalingFactory.create(self.scaling)
         scaling.beta = self.beta
 
@@ -157,7 +157,7 @@ class GMLVQClassifier(LVQClassifier):
         self.omega_ = self._init_relevance(data)
 
         # TODO: self.objective? or store final distance... as self.distance (need different name then in init)
-        objective = RelevanceRelativeDistanceObjective(distance=self.distancefun, scaling=scaling,
+        objective = RelevanceRelativeDistanceObjective(distance=self._distancefun, scaling=scaling,
                                                        prototypes_shape=self.prototypes_.shape,
                                                        omega_shape=self.omega_.shape)
         solver = SolverFactory.create(self.solver)
@@ -179,4 +179,4 @@ class GMLVQClassifier(LVQClassifier):
         self.omega_ = omega_variables.reshape(self.omega_.shape)
         self.omega_ = self.omega_ / np.sqrt(np.sum(np.diagonal(self.omega_.T.dot(self.omega_))))
 
-        self.distancefun.omega = self.omega_
+        self._distancefun.omega = self.omega_
