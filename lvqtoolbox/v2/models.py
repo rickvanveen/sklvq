@@ -35,10 +35,12 @@ class LVQClassifier(ABC, BaseEstimator, ClassifierMixin):
         raise NotImplementedError("You should implement this! Must accept (data, y)"
                                   " and return Objective and Solver objects")
 
+    # TODO: Could move this to objective... and "make" it publicly availble objective is tightly coupled with the
+    # TODO: algorithms anyway + we also need these functions in the objective...
     @abstractmethod
     def restore_from_variables(self, variables):
-        raise NotImplementedError("You should implement this! Must accept (data, y)"
-                                  " and return Objective and Solver objects")
+        raise NotImplementedError("You should implement this! Must accept variables"
+                                  " and return correctly shaped variables depending on algorithm")
 
     # TODO: could also be class functions things that can be extended by user by providing another class same for omega.
     def init_prototypes(self, data, y):
@@ -90,7 +92,7 @@ class LVQClassifier(ABC, BaseEstimator, ClassifierMixin):
 
         # TODO: Should be set somehwere such that we don't need a predict in every subclass...
         distance = DistanceFactory.create(self.distance)
-        # distance.omega = self.omega_
+        # distance.omega = self.omega_ #TODO: FIX THIS NOW ONLY GMLVQ or ONLY GLVQ WORKS...
 
         # Prototypes labels are indices of classes_
 

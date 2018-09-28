@@ -6,15 +6,15 @@ from sklearn.model_selection import cross_val_score, GridSearchCV, ParameterGrid
 from sklearn.pipeline import make_pipeline
 
 
-from lvqtoolbox.v2.models import GLVQClassifier
+from lvqtoolbox.v2.models import GMLVQClassifier
 
 
-def test_glvq_iris():
+def test_gmlvq_iris():
     iris = datasets.load_iris()
 
     iris.data = preprocessing.scale(iris.data)
 
-    classifier = GLVQClassifier(scaling='sigmoid', beta=6)
+    classifier = GMLVQClassifier(scaling='sigmoid', beta=2)
     classifier = classifier.fit(iris.data, iris.target)
 
     predicted = classifier.predict(iris.data)
@@ -24,12 +24,12 @@ def test_glvq_iris():
     print("Iris accuracy: {}".format(accuracy))
 
 
-def test_glvq_with_multiple_prototypes_per_class():
+def test_gmlvq_with_multiple_prototypes_per_class():
     iris = datasets.load_iris()
 
     iris.data = preprocessing.scale(iris.data)
 
-    classifier = GLVQClassifier(scaling='sigmoid', beta=6, prototypes_per_class=4)
+    classifier = GMLVQClassifier(scaling='sigmoid', beta=6, prototypes_per_class=4)
     classifier = classifier.fit(iris.data, iris.target)
 
     predicted = classifier.predict(iris.data)
@@ -40,10 +40,11 @@ def test_glvq_with_multiple_prototypes_per_class():
 
 
 # TODO: Have to look into scoring of CV and if they now provide the testing or training scores....
-def test_glvq_pipeline_iris():
+def test_gmlvq_pipeline_iris():
     iris = datasets.load_iris()
 
-    pipeline = make_pipeline(preprocessing.StandardScaler(), GLVQClassifier(scaling='sigmoid',
+    # TODO: Supposed to work with make_pipline because  of not in __all__ error
+    pipeline = make_pipeline(preprocessing.StandardScaler(), GMLVQClassifier(scaling='sigmoid',
                                                                             beta=6))
     accuracy = cross_val_score(pipeline, iris.data, iris.target, cv=5)
     print("Cross validation (k=5): " + "{}".format(accuracy))

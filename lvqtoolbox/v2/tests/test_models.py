@@ -72,7 +72,6 @@ def test_gmlvq_pipeline_iris():
     print("Cross validation (k=5): " + "{}".format(accuracy))
 
 
-
 def omega_gradient(data, prototype, omega):
     return np.apply_along_axis(lambda x, o: (o.dot(np.atleast_2d(x).T).dot(2 * np.atleast_2d(x))).ravel(),
                                1, (data - prototype), omega)
