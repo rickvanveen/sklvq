@@ -1,141 +1,182 @@
-import numpy as np
-
-from scipy.optimize import minimize
+from abc import ABC, abstractmethod
 
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.utils import check_random_state
 from sklearn.utils.validation import check_X_y, check_is_fitted, check_array
 from sklearn.utils.multiclass import unique_labels, check_classification_targets
 
-from .common import init_prototypes
-from .distance import sqeuclidean, sqeuclidean_grad, compute_distance
-from .scaling import sigmoid, sigmoid_grad
-from .objective import relative_distance_difference_cost
+import numpy as np
+
+from lvqtoolbox.distance import DistanceFactory
+from lvqtoolbox.scaling import ScalingFactory
+from lvqtoolbox.solvers import SolverFactory
+
+from lvqtoolbox.objective import RelativeDistanceObjective
+from lvqtoolbox.objective import RelevanceRelativeDistanceObjective
 
 
-class GLVQClassifier(BaseEstimator, ClassifierMixin):
-    """GLVQClassifier"""
+def _conditional_mean(p_labels, data, d_labels):
+    """ Implements the conditional mean, i.e., mean per class"""
+    return np.array([np.mean(data[p_label == d_labels, :], axis=0)
+                     for p_label in p_labels])
 
-    def __init__(self, costfun=relative_distance_difference_cost, costfun_grad=True, costfun_kwargs={},
-                 distfun=sqeuclidean, distfun_grad=sqeuclidean_grad, distfun_kwargs={},
-                 prototypes_per_class=1, optimizer='L-BFGS-B', optimizer_options={}, random_state=None):
 
-        # TODO: Rename all cost to objective
-        # TODO: Distfun will be a parameter of the costfun but won't be in the kwargs dictionary...
-        self.costfun = costfun
-        self.costfun_kwargs = costfun_kwargs
-        self.costfun_grad = costfun_grad
+# Template (Context)
+class LVQClassifier(ABC, BaseEstimator, ClassifierMixin):
 
-        # TODO: maybe rename to solver for consistency with sklearn and other stuff....
-        self.optimizer = optimizer  # LVQ specific
-        self.optimizer_options = optimizer_options  # LVQ specific
+    # But here I can have logic... because it's not a sklearn estimator?
+    # Cannot change the value of the properties given in init...
+    def __init__(self, prototypes_per_class, random_state):
+        self.prototypes_per_class = prototypes_per_class
+        self.random_state = random_state
 
-        self.distfun = distfun # LVQ specific - all of them will have it
-        self.distfun_grad = distfun_grad # LVQ specific
-        self.distfun_kwargs = distfun_kwargs # LVQ specific
+    @abstractmethod
+    def initialize(self, data, y):
+        raise NotImplementedError("You should implement this! Must accept (data, y)"
+                                  " and return Objective and Solver objects")
 
-        self.prototypes_per_class = prototypes_per_class  # LVQ specific
-        self.random_state = random_state # sklearn specific
+    # TODO: Could move this to objective... and "make" it publicly availble objective is tightly coupled with the
+    # TODO: algorithms anyway + we also need these functions in the objective...
+    @abstractmethod
+    def restore_from_variables(self, variables):
+        raise NotImplementedError("You should implement this! Must accept variables"
+                                  " and return correctly shaped variables depending on algorithm")
 
-    # TODO: Pre-fit that checks everything, then per specific implementation a fit that calls these and puts it's own specifics in place, e.g., what to optimize etc.
+    # TODO: could also be class functions things that can be extended by user by providing another class same for omega.
+    def init_prototypes(self, data, y):
+        conditional_mean = _conditional_mean(self.prototypes_labels_, data, y)
+        return conditional_mean + (1e-4 * self.random_state_.uniform(-1, 1, conditional_mean.shape))
+
+    def validate(self, data, y):
+        # SciKit-learn required check
+        data, labels = check_X_y(data, y)
+
+        # SciKit-learn required check
+        check_classification_targets(y)
+
+        # Scikit-learn requires classes_ which stores the labels, y is now an array of indeces fro classes_.
+        self.classes_, y = np.unique(y, return_inverse=True)
+
+        return data, labels
+
+    # TODO: Change to _fit_solver1 and _fit_solver2 and call in the specific the right fit
     def fit(self, data, y):
-        """A reference implementation of a fitting function for a classifier.
+        # Validate SciKit-learn required stuff... labels are indices for self.classes_ which contains the class labels.
+        data, labels = self.validate(data, y)
 
-        Parameters
-        ----------
-        data : array-like, shape = [n_samples, n_features]
-            The training input samples.
-        y : array-like, shape = [n_samples]
-            The target values. An array of int.
+        # SciKit-learn way of doing random stuff...
+        self.random_state_ = check_random_state(self.random_state)
 
-        Returns
-        -------
-        self : object
-            Returns self.
-        """
-        # SciKit-learn required check
-        data, d_labels = check_X_y(data, y)
-
-        # SciKit-learn required check
-        check_classification_targets(d_labels)
-
-        # SciKit-learn required check
-        rng = check_random_state(self.random_state)
-
-
-        self.classes_, d_labels = np.unique(d_labels, return_inverse=True) # TODO: How does this work? ???
-
-        # TODO: Expect valid input... only check for cases where valid  input leads to incorrect output.
+        # Common LVQ steps
+        # I guess it's save to say that LVQ always needs to have initialized prototypes/prototype_labels
         if np.isscalar(self.prototypes_per_class):
-            self.p_labels_ = np.repeat(unique_labels(d_labels), self.prototypes_per_class)
-        # Assuming valid input: it is now a vector, which does not require any processing
+            self.prototypes_labels_ = np.repeat(unique_labels(labels), self.prototypes_per_class)
 
-        self.prototypes_ = init_prototypes(self.p_labels_, data, d_labels, rng)
+        self.prototypes_ = self.init_prototypes(data, labels)
+        # Initialize algorithm specific stuff
+        solver, variables, objective_args = self.initialize(data, labels)
 
-        # .......................................... until here should be moved and can be done always...
+        variables = solver.solve(variables, objective_args)
 
-        # The to be optimized variable is added by minimise from scipy...
-        costfun_option = {''}
+        # Should be done by subclass...
+        self.restore_from_variables(variables)
 
-        costfun_args = (self.p_labels_, data, d_labels, self.costfun_kwargs)
-
-        self.optimize_results_ = minimize(self.costfun,
-                                          self.prototypes_.ravel(),
-                                          costfun_args,
-                                          self.optimizer,
-                                          self.costfun_grad,
-                                          options=self.optimizer_options)
-
-        # Assumes valid input for data and prototypes of shape = [n_observations/n_prototypes, n_features]
-        num_features = data.shape[1]
-        num_prototypes = self.prototypes_.shape[0]
-
-        self.prototypes_ = self.optimize_results_.x.reshape([num_prototypes, num_features])
-        # Return the classifier
         return self
 
-    # # TODO: Score function (based on objective function?) Call this in predict? Necessary to get scores for ROC computation?
-    def decision_function(self, data, d_labels):
-        #decision function of shape (n_samples, n_classes) as all other classifiers
-        check_is_fitted(self, ['prototypes_', 'p_labels_', 'distfun', 'distfun_kwargs'])
-
-        dist_same, dist_diff, _, _ = compute_distance(self.prototypes_, self.p_labels_,
-                                                      data, d_labels,
-                                                      self.distfun, self.distfun_kwargs)
-        return dist_diff.min(axis=1) - dist_same.min(axis=1) # TODO: this works differently...
-
-
     def predict(self, data):
-        """ A reference implementation of a prediction for a classifier.
-
-        Parameters
-        ----------
-        data : array-like of shape = [n_samples, n_features]
-            The input samples.
-
-        Returns
-        -------
-        y : array of int of shape = [n_samples]
-            The label for each sample is the label of the closest sample
-            seen udring fit.
-        """
-        # Check is fit had been called
-        check_is_fitted(self, ['prototypes_', 'p_labels_', 'classes_'])
+        # TODO: The array should be set in subclass or append the array in subclass
+        check_is_fitted(self, ['prototypes_', 'prototypes_labels_', 'classes_', 'random_state_'])
 
         # Input validation
         data = check_array(data)
 
-        # TODO: Does not take the correct label of the prototype...
-        return self.classes_.take(self.distfun(data, self.prototypes_).argmin(axis=1))
-
-        # closest = np.argmin(euclidean_distances(data, self.prototypes_), axis=1)
-        # return self.y_[closest]
+        # Prototypes labels are indices of classes_
+        return self.prototypes_labels_.take(self.distancefun(data, self.prototypes_).argmin(axis=1))
 
 
-class otherGLVQ(GLVQClassifier):
-    def __init__(self):
-        super(otherGLVQ, self).__init__(costfun=relative_distance_difference_cost) # ETC...
+# Template (Context Implementation)
+class GLVQClassifier(LVQClassifier):
 
-    def fit(self, data, y):
-        #skLVQ.input.validation.validate_fit(x,y,z or self)
-        pass
+    def __init__(self, distance='sqeuclidean', solver='l-bfgs-b', scaling='identity', beta=None, verbose=False,
+                 prototypes_per_class=1, random_state=None):
+        self.distance = distance
+        self.solver = solver
+        self.scaling = scaling
+        self.beta = beta
+        self.verbose = verbose
+        super(GLVQClassifier, self).__init__(prototypes_per_class, random_state)
+
+    def initialize(self, data, labels):
+        """ . """
+        # Here add inits for RelativeDistanceObjective... self.distance, self.scaling...
+        self.distancefun = DistanceFactory.create(self.distance)
+        scaling = ScalingFactory.create(self.scaling)
+        scaling.beta = self.beta
+
+        objective = RelativeDistanceObjective(distance=self.distancefun, scaling=scaling,
+                                              prototypes_shape=self.prototypes_.shape)
+
+        solver = SolverFactory.create(self.solver)
+        solver.objective = objective
+
+        variables = self.prototypes_.ravel()
+        objective_args = (self.prototypes_labels_, data, labels)
+
+        return solver, variables, objective_args
+
+    def restore_from_variables(self, variables):
+        self.prototypes_ = variables.reshape(self.prototypes_.shape)
+
+
+class GMLVQClassifier(LVQClassifier):
+
+    def __init__(self, distance='rel-sqeuclidean', solver='l-bfgs-b', scaling='identity', beta=None, verbose=False,
+                 omega='identity', omega_shape=None,  prototypes_per_class=1, random_state=None):
+        self.distance = distance
+        self.solver = solver
+        self.scaling = scaling
+        self.beta = beta
+        self.verbose = verbose
+        self.omega = omega
+        self.omega_shape = omega_shape
+        super(GMLVQClassifier, self).__init__(prototypes_per_class, random_state)
+
+    def _init_relevance(self, data):
+        num_features = data.shape[1]
+
+        # Random/ identity/ some other... maybe also objects? and able to extend them...
+        if not self.omega_shape: # can only be square (identity) else use eye
+            return np.identity(num_features) / num_features
+
+    def initialize(self, data, labels):
+        self.distancefun = DistanceFactory.create(self.distance)
+        scaling = ScalingFactory.create(self.scaling)
+        scaling.beta = self.beta
+
+        # Initialise omega
+        self.omega_ = self._init_relevance(data)
+
+        # TODO: self.objective? or store final distance... as self.distance (need different name then in init)
+        objective = RelevanceRelativeDistanceObjective(distance=self.distancefun, scaling=scaling,
+                                                       prototypes_shape=self.prototypes_.shape,
+                                                       omega_shape=self.omega_.shape)
+        solver = SolverFactory.create(self.solver)
+        solver.objective = objective
+
+        # Construct variables array
+        variables = self.prototypes_.ravel()
+        variables = np.append(variables, self.omega_.ravel())
+
+        objective_args = (self.prototypes_labels_, data, labels)
+
+        return solver, variables, objective_args
+
+    def restore_from_variables(self, variables):
+        prototypes_variables = variables[:self.prototypes_.size]
+        self.prototypes_ = prototypes_variables.reshape(self.prototypes_.shape)
+
+        omega_variables = variables[self.prototypes_.size:]
+        self.omega_ = omega_variables.reshape(self.omega_.shape)
+        self.omega_ = self.omega_ / np.sqrt(np.sum(np.diagonal(self.omega_.T.dot(self.omega_))))
+
+        self.distancefun.omega = self.omega_

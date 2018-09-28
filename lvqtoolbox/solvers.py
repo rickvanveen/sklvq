@@ -20,7 +20,7 @@ class StochasticSolver(AbstractSolver):
         super(StochasticSolver, self).__init__()
 
     def solve(self, *args, **kwargs):
-        print('Calling StochasticSolver.solve()')
+        raise NotImplementedError("Not implemented yet")
 
 
 class LBFGSBSolver(AbstractSolver):
