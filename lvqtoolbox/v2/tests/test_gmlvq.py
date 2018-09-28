@@ -14,7 +14,7 @@ def test_gmlvq_iris():
 
     iris.data = preprocessing.scale(iris.data)
 
-    classifier = GMLVQClassifier(scaling='sigmoid', beta=2)
+    classifier = GMLVQClassifier(scaling='identity', beta=2)
     classifier = classifier.fit(iris.data, iris.target)
 
     predicted = classifier.predict(iris.data)

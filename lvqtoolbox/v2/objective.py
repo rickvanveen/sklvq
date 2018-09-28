@@ -8,7 +8,6 @@ def _find_min(indices, distances):
     return dist_temp.min(axis=1), dist_temp.argmin(axis=1)
 
 
-# mu function... TODO: mu now not configurable like the rest, but could be?
 def _relative_distance(dist_same, dist_diff):
     return (dist_same - dist_diff) / (dist_same + dist_diff)
 
@@ -17,7 +16,6 @@ def _relative_distance_grad(dist_same, dist_diff):
     return 2 * dist_diff / (dist_same + dist_diff) ** 2
 
 
-# Strategy
 class AbstractObjective(ABC):
 
     def __init__(self, distance):
@@ -50,42 +48,50 @@ class RelativeDistanceObjective(AbstractObjective):
 
         return dist_same, dist_diff, i_dist_same, i_dist_diff
 
+    def _gradient_scaling(self, relative_distance, dist_same, dist_diff):
+        gradient_scaling = (  # All samples where the current prototype is the closest and has the same label
+                self.scaling.gradient(relative_distance) *
+                _relative_distance_grad(dist_same, dist_diff))
+        return np.atleast_2d(gradient_scaling)
+
     # (dS/dmu * dmu/dd_i * dd_i/dw_i) for i J and K
-    def _partial_gradient(self, ii_samples, relative_distance, dist_same, dist_diff, data, prototype):
-        relative_dist = (  # All samples where the current prototype is the closest and has the same label
-                self.scaling.gradient(relative_distance[ii_samples]) *
-                _relative_distance_grad(dist_same[ii_samples], dist_diff[ii_samples]))
-
+    def _prototype_gradient(self, gradient_scaling, data, prototype):
         # d'_J(x, w) for all x (samples) in data and the current prototype
-        dist_grad = self.distance.gradient(data[ii_samples, :], prototype)
+        dist_grad_wrt_prototype = np.atleast_2d(self.distance.gradient(data, prototype))
+        return gradient_scaling.dot(dist_grad_wrt_prototype)
 
-        return relative_dist.dot(dist_grad)
-
-    # TODO: Handle the case where there is no data... the current prototype is never the closest with different/same label.
     # dS/dw_J() = (dS/dmu * dmu/dd_J * dd_J/dw_J) - (dS/dmu * dmu/dd_K * dd_K/dw_K)
     def _gradient(self, dist_same, dist_diff, i_dist_same, i_dist_diff,
                   relative_distance, data, prototypes, prototypes_labels):
-
         gradient = np.zeros(self.prototypes_shape)
         for i_prototype in range(0, prototypes_labels.size):
             # Find for which samples this prototype is the closest and has the same label
             ii_same = i_prototype == i_dist_same
-            gradient[i_prototype] = self._partial_gradient(ii_same, relative_distance, dist_same,
-                                                           dist_diff, data, prototypes[i_prototype, :])
+            if any(ii_same):
+                gradient_scaling = self._gradient_scaling(relative_distance[ii_same], dist_same[ii_same],
+                                                          dist_diff[ii_same])
+                gradient[i_prototype] = self._prototype_gradient(gradient_scaling, data[ii_same, :],
+                                                                 prototypes[i_prototype, :])
 
             # Find for which samples this prototype is the closes and has a different label
             ii_diff = i_prototype == i_dist_diff
-            gradient[i_prototype] -= self._partial_gradient(ii_diff, relative_distance, dist_diff,
-                                                            dist_same, data, prototypes[i_prototype, :])
-        return gradient
+            if any(ii_diff):
+                gradient_scaling = self._gradient_scaling(relative_distance[ii_diff], dist_diff[ii_diff],
+                                                          dist_same[ii_diff])
+                gradient[i_prototype] -= self._prototype_gradient(gradient_scaling, data[ii_diff, :],
+                                                                  prototypes[i_prototype, :])
+        return gradient.ravel()
 
     # S() = sum(f(mu(x)))
     def _cost(self, relative_distance):
         return np.sum(self.scaling(relative_distance))
 
+    def restore_from_variables(self, variables):
+        return variables.reshape(self.prototypes_shape)
+
     def __call__(self, variables, prototypes_labels, data, labels):
         # Variables 1D -> 2D prototypes
-        prototypes = variables.reshape(self.prototypes_shape)
+        prototypes = self.restore_from_variables(variables)
 
         # dist_same, d_J(X, w_J), contains the distances between all
         # samples X and the closest prototype with the same label (_J)
@@ -102,7 +108,7 @@ class RelativeDistanceObjective(AbstractObjective):
         # First part is S = Sum(f(u(x))), Second part: gradient of all the prototypes "flattened" (ravel()) -> 1D array
         return self._cost(relative_distance), self._gradient(dist_same, dist_diff, i_dist_same,
                                                              i_dist_diff, relative_distance,
-                                                             data, prototypes, prototypes_labels).ravel()
+                                                             data, prototypes, prototypes_labels)
 
 
 class RelevanceRelativeDistanceObjective(RelativeDistanceObjective):
@@ -111,53 +117,60 @@ class RelevanceRelativeDistanceObjective(RelativeDistanceObjective):
         self.omega_shape = omega_shape
         super(RelevanceRelativeDistanceObjective, self).__init__(distance, scaling, prototypes_shape)
 
-    def __call__(self, variables, prototype_labels, data, labels):
-        num_features = data.shape[1]
-        num_prototypes = prototype_labels.size
+    # TODO: Omega data structure omega.normalise() makes so much more sense...
+    def _normalise(self, omega):
+        return omega / np.sqrt(np.sum(np.diagonal(omega.T.dot(omega))))
 
-        prototypes_variables = variables[:(num_prototypes * num_features)]
-        prototypes = prototypes_variables.reshape(prototype_labels.size, num_features)
+    def restore_from_variables(self, variables):
+        prototypes_size = np.prod(self.prototypes_shape)
+        prototypes_variables = variables[:prototypes_size]
+        prototypes = prototypes_variables.reshape(self.prototypes_shape)
 
         # TODO: Works for Global but not Local matrices...
-        omega_variables = variables[(num_prototypes * num_features):]
+        omega_variables = variables[prototypes_size:]
         omega = omega_variables.reshape(self.omega_shape)
 
-        # Update omega for the distance object used in compute_distance
-        self.distance.omega = omega
-        self.distance.normalise()
-        dist_same, dist_diff, i_dist_same, i_dist_diff = self._compute_distance(data, labels,
-                                                                                prototypes, prototype_labels)
-        gradient = np.zeros(prototypes.shape)
-        gradient_omega = np.zeros(omega.shape).ravel()
+        return prototypes, self._normalise(omega)
 
-        for i_prototype in range(0, num_prototypes):
+    def _omega_gradient(self, gradient_scaling, data, prototype):
+        dist_grad_wrt_omega = np.atleast_2d(self.distance.omega_gradient(data, prototype))
+        return gradient_scaling.dot(dist_grad_wrt_omega)
+
+    def _gradient(self, dist_same, dist_diff, i_dist_same, i_dist_diff,
+                  relative_distance, data, prototypes, prototypes_labels):
+        gradient_prototypes = np.zeros(self.prototypes_shape)
+        gradient_omega = np.zeros(self.omega_shape).ravel() # Already 1D because easier...
+
+        for i_prototype in range(0, prototypes_labels.size):
             ii_same = i_prototype == i_dist_same
+            if any(ii_same):
+                gradient_scaling = self._gradient_scaling(relative_distance[ii_same], dist_same[ii_same],
+                                                      dist_diff[ii_same])
+                gradient_prototypes[i_prototype] = (
+                        gradient_prototypes[i_prototype] + self._prototype_gradient(gradient_scaling, data[ii_same, :],
+                                                                                    prototypes[i_prototype, :]))
+                gradient_omega = gradient_omega + self._omega_gradient(gradient_scaling, data[ii_same, :],
+                                                                       prototypes[i_prototype, :])
+
+            # Find for which samples this prototype is the closes and has a different label
             ii_diff = i_prototype == i_dist_diff
+            if any(ii_diff):
+                gradient_scaling = self._gradient_scaling(relative_distance[ii_diff], dist_diff[ii_diff],
+                                                      dist_same[ii_diff])
+                gradient_prototypes[i_prototype] = (
+                    gradient_prototypes[i_prototype] - self._prototype_gradient(gradient_scaling, data[ii_diff, :],
+                                                                            prototypes[i_prototype, :]))
+                gradient_omega = (gradient_omega - self._omega_gradient(gradient_scaling, data[ii_diff, :],
+                                                                        prototypes[i_prototype, :]))
+        return np.append(gradient_prototypes.ravel(), gradient_omega.ravel())
 
-            relative_dist_same = np.atleast_2d(
-                        self.scaling.gradient(_relative_distance(dist_same[ii_same], dist_diff[ii_same])) *
-                        _relative_distance_grad(dist_same[ii_same], dist_diff[ii_same]))
-            relative_dist_diff = np.atleast_2d(
-                        self.scaling.gradient(_relative_distance(dist_same[ii_diff], dist_diff[ii_diff])) *
-                        _relative_distance_grad(dist_diff[ii_diff], dist_same[ii_diff]))
+    def __call__(self, variables, prototypes_labels, data, labels):
+        prototypes, omega = self.restore_from_variables(variables)
 
-            # Gradient prototypes TODO: Handle the case where there is no data... this prototype is never the closest with different label.
-            grad_dist_same = np.atleast_2d(self.distance.gradient(data[ii_same, :], prototypes[i_prototype, :]))
-            grad_dist_diff = np.atleast_2d(self.distance.gradient(data[ii_diff, :], prototypes[i_prototype, :]))
+        self.distance.omega = omega
+        dist_same, dist_diff, i_dist_same, i_dist_diff = self._compute_distance(data, labels,
+                                                                                prototypes, prototypes_labels)
+        relative_distance = _relative_distance(dist_same, dist_diff)
 
-            if relative_dist_same.size > 0:
-                gradient[i_prototype, :] = gradient[i_prototype, :] + relative_dist_same.dot(grad_dist_same)
-            if relative_dist_diff.size > 0:
-                gradient[i_prototype, :] = gradient[i_prototype, :] - relative_dist_diff.dot(grad_dist_diff)
-
-            # Gradient Omega
-            grad_omega_same = self.distance.omega_gradient(data[ii_same, :], prototypes[i_prototype, :])
-            grad_omega_diff = self.distance.omega_gradient(data[ii_diff, :], prototypes[i_prototype, :])
-
-            # Seems to give similar answers to Kerstins's matlab version on Iris dataset
-            if grad_omega_same.size != 0:
-                gradient_omega = gradient_omega + np.sum(np.atleast_2d(relative_dist_same).T * grad_omega_same, axis=0)
-            if grad_omega_diff.size != 0:
-                gradient_omega = gradient_omega - np.sum(np.atleast_2d(relative_dist_diff).T * grad_omega_diff, axis=0)
-
-        return np.sum(self.scaling(_relative_distance(dist_same, dist_diff))), np.append(gradient.ravel(), gradient_omega)
+        return self._cost(relative_distance), self._gradient(dist_same, dist_diff, i_dist_same, i_dist_diff,
+                                                             relative_distance, data, prototypes, prototypes_labels)
