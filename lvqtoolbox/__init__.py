@@ -1,3 +1,3 @@
-from .models import GLVQClassifier, GMLVQClassifier
+from .models import GLVQClassifier
 
-__all__ = ['GLVQClassifier', 'GMLVQClassifier']
+__all__ = ['GLVQClassifier']
