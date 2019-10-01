@@ -16,7 +16,7 @@ def test_glvq_iris():
 
     iris.data = preprocessing.scale(iris.data)
 
-    classifier = GLVQClassifier(activation='soft+', activation_params={'beta': 8})
+    classifier = GLVQClassifier(activation='sigmoid', activation_params={'beta': 8})
     classifier = classifier.fit(iris.data, iris.target)
 
     predicted = classifier.predict(iris.data)

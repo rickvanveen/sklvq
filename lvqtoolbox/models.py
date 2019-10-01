@@ -9,6 +9,7 @@ import numpy as np
 
 from . import distances
 from . import activations
+from lvqtoolbox.objectives import relative_distance_objective
 
 
 def _conditional_mean(p_labels, data, d_labels):
@@ -109,9 +110,8 @@ class GLVQClassifier(LVQClassifier):
 
         # Initialisation of Objective function
         activation = activations.create(self.activation, self.activation_params)
-        # activation.beta = self.beta
 
-        objective = RelativeDistanceObjective(self._distancefun, activation)
+        objective = relative_distance_objective.RelativeDistanceObjective(self._distancefun, activation)
 
         # Initialisation of Solver ['sgd', 'bgd']
         solver = StochasticGradientDescent(objective=objective, model=self)

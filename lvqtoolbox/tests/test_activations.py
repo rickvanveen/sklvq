@@ -15,4 +15,4 @@ def test_sigmoid_init():
     nt.eq_(sigmoid_instance.beta, 6)
 
     sigmoid_instance = activations.create('sigmoid', None)
-    nt.eq_(sigmoid_instance.beta, 2)
+    nt.eq_(sigmoid_instance.beta, 1)
