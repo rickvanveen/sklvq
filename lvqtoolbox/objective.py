@@ -74,7 +74,7 @@ class RelativeDistanceObjective(AbstractObjective):
                         gradient[i_prototype] + self._prototype_gradient(gradient_scaling, data[ii_same, :],
                                                                          prototypes[i_prototype, :]))
 
-            # Find for which samples this prototype is the closes and has a different label
+            # Find for which samples this prototype is the closest and has a different label
             ii_diff = i_prototype == i_dist_diff
             if any(ii_diff):
                 gradient_scaling = self._gradient_scaling(relative_distance[ii_diff], dist_diff[ii_diff],
@@ -154,7 +154,7 @@ class RelevanceRelativeDistanceObjective(RelativeDistanceObjective):
                 gradient_omega = gradient_omega + self._omega_gradient(gradient_scaling, data[ii_same, :],
                                                                        prototypes[i_prototype, :])
 
-            # Find for which samples this prototype is the closes and has a different label
+            # Find for which samples this prototype is the closest and has a different label
             ii_diff = i_prototype == i_dist_diff
             if any(ii_diff):
                 gradient_scaling = self._gradient_scaling(relative_distance[ii_diff], dist_diff[ii_diff],
