@@ -6,7 +6,7 @@
 # from sklearn.pipeline import make_pipeline
 #
 #
-# from lvqtoolbox.models import GMLVQClassifier
+# from sklvq.models import GMLVQClassifier
 #
 #
 # def test_gmlvq_iris():

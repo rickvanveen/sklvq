@@ -17,7 +17,7 @@ except ImportError:
     print('scipy is required during installation')
     sys.exit(1)
 
-setup(name='lvqtoolbox',
+setup(name='sklvq',
       version='0.0.3',
       description='Sklearn compatible LVQ algorithms',
       author='',
