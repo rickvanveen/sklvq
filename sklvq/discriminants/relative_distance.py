@@ -3,6 +3,7 @@ from . import DiscriminativeBaseClass
 import numpy as np
 
 
+# TODO: accept data rather than something preprocessed... discriminant(xi) should provide some score.
 class RelativeDistance(DiscriminativeBaseClass):
 
     # TODO: Look into why runtime warming occurs and what to do about it. Maybe the initialization of the

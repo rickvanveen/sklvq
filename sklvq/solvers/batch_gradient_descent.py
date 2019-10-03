@@ -3,6 +3,7 @@ import numpy as np
 
 from . import SolverBaseClass
 
+
 # TODO: GradientDescent abstract super class with Stochastic, (Batch, Mini-Batch) subclasses How to divide...
 # TODO: convergence check... gradient zero?
 # TODO: Annealing strategies
@@ -37,7 +38,7 @@ class BatchGradientDescent(SolverBaseClass):
                 batch_labels = labels[batches[i_batch]]
 
                 gradient = objective.gradient(batch, batch_labels, model)
-                #TODO: add more stuff, e.g.,  waypoint averaging, convergence check, which sucks
+                # TODO: add more stuff, e.g., waypoint averaging, convergence check
 
                 model.update(self.step_size * gradient)
 

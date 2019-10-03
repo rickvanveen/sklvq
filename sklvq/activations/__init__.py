@@ -1,11 +1,17 @@
-from ..misc.utils import find
+from ..misc import utils
 
 from .activation_base_class import ActivationBaseClass
 
-class_aliases = {'soft+': 'SoftPlus'}
-module_aliases = {'soft+': 'soft_plus'}
+
+ALIASES = {'soft+': 'soft-plus'}
+BASE_CLASS = ActivationBaseClass
+PACKAGE = 'sklvq.activations'
 
 
-def create(activation_type, activation_params):
-    return find(activation_type, activation_params, ActivationBaseClass, 'sklvq.activations',
-                class_aliases=class_aliases, module_aliases=module_aliases)
+def grab(class_type, class_params):
+    if class_type in ALIASES.keys():
+        class_type = ALIASES[class_type]
+
+    module_name, class_name = utils.process(class_type)
+
+    return utils.find(PACKAGE, module_name, class_name, class_params, BASE_CLASS)

@@ -4,9 +4,10 @@ import numpy as np
 from . import DistanceBaseClass
 
 
+# TODO: not prototypes but model should be given...
 class Euclidean(DistanceBaseClass):
 
-    def __call__(self, data, prototypes):
+    def __call__(self, data, model):
         """ Wrapper function for scipy's cdist(x, y, 'euclidean') function
 
             See scipy.spatial.distance.cdist for full documentation.
@@ -26,9 +27,14 @@ class Euclidean(DistanceBaseClass):
                 The dist(u=XA[i], v=XB[j]) is computed and stored in the
                 ij-th entry.
         """
-        return sp.spatial.distance.cdist(data, prototypes, 'euclidean')
+        return sp.spatial.distance.cdist(data, model.prototypes_, 'euclidean')
 
-    def gradient(self, data, prototype):
+    @staticmethod
+    def _gradient(data, prototypes):
+        difference = data - prototypes
+        return (-1 * difference) / np.sqrt(np.sum(difference ** 2))
+
+    def gradient(self, data, model, i_prototype):
         """ Implements the derivative of the euclidean distance, with respect to 1 prototype
 
             Parameters
@@ -41,6 +47,6 @@ class Euclidean(DistanceBaseClass):
             -------
             gradient : ndarray, shape = [n_observations, n_features]
                        The gradient with respect to the prototype and every observation in data.
+
         """
-        difference = data - prototype
-        return (-1 * difference) / np.sqrt(np.sum(difference ** 2))
+        return self._gradient(data, model.prototypes_[i_prototype, :])

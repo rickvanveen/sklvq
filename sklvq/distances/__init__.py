@@ -1,13 +1,17 @@
-from ..misc.utils import find
+from ..misc import utils
 
 from .distance_base_class import DistanceBaseClass
 
 # key equals the keyword and the value what the module/class are actually called
-class_aliases = {'sqeuclidean': 'SquaredEuclidean'}
-module_aliases = {'sqeuclidean': 'squared_euclidean'}
+ALIASES = {'sqeuclidean': 'squared-euclidean'}
+BASE_CLASS = DistanceBaseClass
+PACKAGE = 'sklvq.distances'
 
 
-def create(distance_type, distance_params):
-    return find(distance_type, distance_params, DistanceBaseClass, 'sklvq.distances',
-                class_aliases=class_aliases,
-                module_aliases=module_aliases)
+def grab(class_type, class_params):
+    if class_type in ALIASES.keys():
+        class_type = ALIASES[class_type]
+
+    module_name, class_name = utils.process(class_type)
+
+    return utils.find(PACKAGE, module_name, class_name, class_params, BASE_CLASS)

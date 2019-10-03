@@ -1,10 +1,16 @@
-from ..misc.utils import find
+from ..misc import utils
+
 from .discriminant_base_class import DiscriminativeBaseClass
 
-class_aliases = {'reldist': 'RelativeDistance'}
-module_aliases = {'reldist': 'relative_distance'}
+ALIASES = {'reldist': 'relative-distance'}
+BASE_CLASS = DiscriminativeBaseClass
+PACKAGE = 'sklvq.discriminants'
 
 
-def create(discriminative_type, discriminative_params):
-    return find(discriminative_type, discriminative_params, DiscriminativeBaseClass, 'sklvq.discriminants',
-                class_aliases=class_aliases, module_aliases=module_aliases)
+def grab(class_type, class_params):
+    if class_type in ALIASES.keys():
+        class_type = ALIASES[class_type]
+
+    module_name, class_name = utils.process(class_type)
+
+    return utils.find(PACKAGE, module_name, class_name, class_params, BASE_CLASS)

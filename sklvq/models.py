@@ -6,13 +6,14 @@ from sklearn.utils import check_random_state
 from sklearn.utils.multiclass import unique_labels, check_classification_targets
 from sklearn.utils.validation import check_X_y, check_is_fitted, check_array
 
+# Can be switched out by parameters to the models.
 from . import activations
 from . import discriminants
 from . import distances
 from . import solvers
 
-# TODO: change the objectives as they don't need to be  instantiated by factory. One objective per classifier
-from .objectives.generalized_objective_function import GeneralizedObjectiveFunction
+# Cannot be switched out by parameters to the models.
+from .objectives import GeneralizedObjectiveFunction
 
 
 def _conditional_mean(p_labels, data, d_labels):
@@ -71,7 +72,9 @@ class LVQClassifier(ABC, BaseEstimator, ClassifierMixin):
         self._to_be_checked_if_fitted = ['prototypes_', 'prototypes_labels_', 'classes_', 'random_state_']
 
         # Common LVQ steps
-        self.distance_ = distances.create(self.distance_type, self.distance_params)
+        # TODO: figure out where to put this logically... either like this or input to discriminant
+        #  or objective
+        self.distance_ = distances.grab(self.distance_type, self.distance_params)
 
         # I guess it's save to say that LVQ always needs to have initialized prototypes/prototype_labels
         if np.isscalar(self.prototypes_per_class):
@@ -81,7 +84,7 @@ class LVQClassifier(ABC, BaseEstimator, ClassifierMixin):
         # Initialize algorithm specific stuff
         objective = self.initialize(data, labels)
 
-        solver = solvers.create(self.solver_type, self.solver_params)
+        solver = solvers.grab(self.solver_type, self.solver_params)
 
         return solver.solve(data, labels, objective, self)
 
@@ -94,7 +97,7 @@ class LVQClassifier(ABC, BaseEstimator, ClassifierMixin):
 
         # TODO: Reject option?
         # Prototypes labels are indices of classes_
-        return self.prototypes_labels_.take(self.distance_(data, self.prototypes_).argmin(axis=1))
+        return self.prototypes_labels_.take(self.distance_(data, self).argmin(axis=1))
 
 
 # TODO: Maybe we need a GeneralizedLVQ abstract class to ensure the classifier has all the methods that are used in
@@ -118,10 +121,12 @@ class GLVQClassifier(LVQClassifier):
 
     def initialize(self, data, labels):
         """ . """
+        # Depends on model. Probably
+        self.variables_shape_ = self.prototypes_.shape
 
-        activation = activations.create(self.activation_type, self.activation_params)
+        activation = activations.grab(self.activation_type, self.activation_params)
 
-        discriminant = discriminants.create(self.discriminant_type, self.discriminant_params)
+        discriminant = discriminants.grab(self.discriminant_type, self.discriminant_params)
 
         objective = GeneralizedObjectiveFunction(activation=activation, discriminant=discriminant)
 

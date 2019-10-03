@@ -1,44 +1,51 @@
 from importlib import import_module
 
 
+# Argument must be the name of the class using '-', so 'squared_euclidean.SquaredEuclidean' -> 'squared-euclidean'
+
+
 # TODO: Documentation
 # TODO: Extend to include default rules similar to sklearn api
-def find(object_type, object_params, base_class, package, class_aliases=None, module_aliases=None):
+# TODO: Look into how to deal with the aliases better
+# TODO: Look into how to restrict access to certain LVQ classifiers... e.g., not all distance measures are suitable for
+#  every classifier
+
+# PACKAGE, module_name, class_name, class_params, BASE_CLASS
+def find(package, module_name, class_name, class_params, base_class):
     try:
-        if '.' in object_type:
-            module_name, class_name = object_type.rsplit('.', 1)
-        else:
-            module_name = object_type
-            class_name = object_type
-
-        # Lazy evaluation?
-        if (module_aliases is not None) and (module_name in module_aliases.keys()):
-            module_name = module_aliases[module_name]
-
         object_module = import_module('.' + module_name, package=package)
-
-        # Lazy evaluation?
-        if (class_aliases is not None) and (class_name in class_aliases.keys()):
-            class_name = class_aliases[class_name]
-        else:
-            class_name = class_name.capitalize()
-
         object_class = getattr(object_module, class_name)
 
-        # In the case None are given but the object does accept arguments
-        object_params = object_params if object_params is not None else {}
-
-        # In the case arguments are given but the object doesn't accept any.
+        # If for some reason the object_doesnt accept the arguments... TODO: This might not be correct
         try:
-            instance = object_class(**object_params)
+            instance = object_class(**class_params)
         except TypeError:
             instance = object_class()
 
     except (AttributeError, ModuleNotFoundError):
-        raise ImportError('{} is not part of our collection or an alias needs to be created!'.format(object_type))
+        raise ImportError('{} is not part of our collection or '
+                          'an alias needs to be created!'.format(module_name.replace('_', '-')))
     else:
         if not issubclass(object_class, base_class):
             raise ImportError(
-                "We currently don't have {}, but you are welcome to send in the request for it!".format(object_class))
+                "We currently don't have {}, "
+                "but you are welcome to send in the request for it!".format(module_name.replace('_', '-')))
 
     return instance
+
+
+def process(object_type_argument):
+    # RULE: argument given as parameter to LVQ equals 'squared-euclidean' this will look for the SquaredEuclidean
+    # object in the squared_euclidean module in the provided package.
+
+    # Construct default module name
+    object_type_argument = object_type_argument.casefold()
+    module_name = object_type_argument.replace('-', '_')
+
+    # Construct default class name
+    class_name = ''
+    object_type_parts = object_type_argument.rsplit('-')
+    for part in object_type_parts:
+        class_name += part.capitalize()
+
+    return module_name, class_name
