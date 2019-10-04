@@ -4,7 +4,6 @@ import numpy as np
 from . import DistanceBaseClass
 
 
-# TODO: not prototypes but model should be given...
 class Euclidean(DistanceBaseClass):
 
     def __call__(self, data, model):

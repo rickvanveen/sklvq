@@ -1,4 +1,4 @@
 from .objective_base_class import ObjectiveBaseClass
-from .generalized_objective_function import GeneralizedObjectiveFunction
+from .generalized_objective import GeneralizedObjective
 
-__all__ = ['GeneralizedObjectiveFunction']
+__all__ = ['GeneralizedObjective']

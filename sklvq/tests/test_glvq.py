@@ -5,6 +5,7 @@ from sklearn import preprocessing
 from sklearn.model_selection import cross_val_score, GridSearchCV, ParameterGrid
 from sklearn.pipeline import make_pipeline
 
+import pandas as pd
 
 from sklvq.models import GLVQClassifier
 
@@ -16,8 +17,8 @@ def test_glvq_iris():
 
     iris.data = preprocessing.scale(iris.data)
 
-    classifier = GLVQClassifier(distance_type='euclidean',
-                                activation_type='sigmoid', activation_params={'beta': 8})
+    classifier = GLVQClassifier(solver_type='bgd', distance_type='squared-euclidean',
+                                activation_type='swish', activation_params={'beta': 6})
     classifier = classifier.fit(iris.data, iris.target)
 
     predicted = classifier.predict(iris.data)
@@ -58,20 +59,24 @@ def test_glvq_gridsearch_iris():
     estimator = GLVQClassifier()
     pipeline = make_pipeline(preprocessing.StandardScaler(), estimator)
 
-    param_grid = [{'glvqclassifier__activation_type': ['identity'],
-                   'glvqclassifier__prototypes_per_class': [1, 2, 3]},
-                  {'glvqclassifier__activation_type': ['swish'],
-                   'glvqclassifier__activation_params': [{'beta': beta} for beta in list(range(2, 10, 2))],
-                   'glvqclassifier__prototypes_per_class': [1, 2, 3]},
-                  {'glvqclassifier__activation_type': ['soft+'],
-                   'glvqclassifier__activation_params': [{'beta': beta} for beta in list(range(2, 10, 2))],
-                   'glvqclassifier__prototypes_per_class': [1, 2, 3]}]
+    # param_grid = [{'glvqclassifier__activation_type': ['identity'],
+    #                'glvqclassifier__prototypes_per_class': [1, 2, 3]},
+    #               {'glvqclassifier__activation_type': ['swish'],
+    #                'glvqclassifier__activation_params': [{'beta': beta} for beta in list(range(2, 10, 2))],
+    #                'glvqclassifier__prototypes_per_class': [1, 2, 3]},
+    #               {'glvqclassifier__activation_type': ['soft+'],
+    #                'glvqclassifier__activation_params': [{'beta': beta} for beta in list(range(2, 10, 2))],
+    #                'glvqclassifier__prototypes_per_class': [1, 2, 3]}]
+
+    param_grid = [{'glvqclassifier__solver_type': ['bgd', 'lbfgs'],
+                    'glvqclassifier__activation_type': ['sigmoid', 'swish'],
+                    'glvqclassifier__activation_params': [{'beta': beta} for beta in list(range(2, 10, 2))]}]
 
     search = GridSearchCV(pipeline, param_grid, scoring='accuracy', cv=5, n_jobs=2)
 
     search.fit(iris.data, iris.target)
 
-    # df = pd.DataFrame(search.cv_results_)
+    df = pd.DataFrame(search.cv_results_)
     # df.to_clipboard()
 
     print("Best parameter (CV score=%0.3f):" % search.best_score_)

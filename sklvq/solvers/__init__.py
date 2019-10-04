@@ -1,7 +1,7 @@
 from ..misc import utils
 from .solver_base_class import SolverBaseClass
 
-ALIASES = {'bgd': 'batch-gradient-descent'}
+ALIASES = {'bgd': 'batch-gradient-descent', 'lbfgs': 'lbfgs-solver'}
 BASE_CLASS = SolverBaseClass
 PACKAGE = 'sklvq.solvers'
 
