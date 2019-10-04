@@ -3,6 +3,8 @@ from . import ObjectiveBaseClass
 
 import numpy as np
 
+# TODO: regularization
+
 
 class GeneralizedObjective(ObjectiveBaseClass):
     def __init__(self, activation=None, discriminant=None):
@@ -40,7 +42,6 @@ class GeneralizedObjective(ObjectiveBaseClass):
 
         return np.sum(self.activation(self.discriminant(dist_same, dist_diff)))
 
-
     # TODO: This function should be the models problem so we can still use this one class for multiple GXLVQ
     #  algorithms? However, do they take the same input.
     # d1, d2, u(d1, d2), x, (w_i, [omega]), i's)
@@ -63,19 +64,19 @@ class GeneralizedObjective(ObjectiveBaseClass):
         # Here it is in 2d shape now we have to put it to the correct 1d (only considering glvq)
         return gradient.ravel()
 
-    # TODO: Compatibility with scipy lbfgs solver: (variables, model, data, labels)
     def gradient(self, variables, model, data, labels):
         model.set_from_variables(variables)
 
+        # This doesn't work when the discriminant function computes the distances
         dist_same, dist_diff, i_dist_same, i_dist_diff = self._compute_distance(data, labels, model)
 
-        # Step 3: Evaluate for all samples the discriminant function: u(d1, d2) = (d1 - d2) / (d1 + d2)
-        discriminant_score = self.discriminant(dist_same, dist_diff)  # TODO this should be u(x) not u(d1, d2)?
+        # Step 3: Evaluate for all samples the discriminant function: u(d1(x, model), d2(x, model)) = (d1 - d2) / (d1 + d2)
+        discriminant_score = self.discriminant(dist_same, dist_diff)
+        # TODO this should be u(x, model) not u(d1, d2)? The questions is... do we need the distance to the closest
+        #  prototype with same and different label because of the glvq cost function or because of u(x)
 
         # Allocation of the gradient
         gradient = np.zeros(model.variables_size_)
-
-        # gradient = np.zeros(model.variables_size_)
 
         # For each prototype
         for i_prototype in range(0, model.prototypes_labels_.size):
