@@ -7,8 +7,10 @@ import scipy as sp
 class AdaptiveSquaredEuclidean(DistanceBaseClass):
 
     # TODO: make the model do this when updating omega
-    def normalise(self):
-        self.omega = self.omega / np.sqrt(np.sum(np.diagonal(self.omega.T.dot(self.omega))))
+    # TODO: move this out of this class
+    @staticmethod
+    def _normalise_omega(omega):
+        return omega / np.sqrt(np.sum(np.diagonal(omega.T.dot(omega))))
 
     def __call__(self, data, model):
         """ Implements a weighted variant of the squared euclidean distance.
