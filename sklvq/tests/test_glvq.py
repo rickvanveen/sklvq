@@ -70,15 +70,16 @@ def test_glvq_gridsearch_iris():
 
     param_grid = [{'glvqclassifier__solver_type': ['bgd', 'lbfgs'],
                    'glvqclassifier__distance_type': ['cosine-distance'],
+                   'glvqclassifier__distance_params': [{'beta': beta} for beta in list(range(2, 10, 2))],
                     'glvqclassifier__activation_type': ['sigmoid', 'swish'],
                     'glvqclassifier__activation_params': [{'beta': beta} for beta in list(range(2, 10, 2))]}]
 
-    search = GridSearchCV(pipeline, param_grid, scoring='accuracy', cv=5, n_jobs=2)
+    search = GridSearchCV(pipeline, param_grid, scoring='accuracy', cv=5, n_jobs=2, return_train_score=True)
 
     search.fit(iris.data, iris.target)
 
-    # df = pd.DataFrame(search.cv_results_)
-    # df.to_clipboard()
+    df = pd.DataFrame(search.cv_results_)
+    df.to_clipboard()
 
     print("Best parameter (CV score=%0.3f):" % search.best_score_)
     print(search.best_params_)
