@@ -10,8 +10,7 @@ from . import SolverBaseClass
 # TODO: Annealing strategies/functions
 # TODO: statistics.
 
-
-class BatchGradientDescent(SolverBaseClass):
+class SteepestGradientDescent(SolverBaseClass):
 
     def __init__(self, max_runs=10, batch_size=25, step_size=0.05):
         self.max_runs = max_runs
@@ -52,3 +51,4 @@ class BatchGradientDescent(SolverBaseClass):
                 #  mean a small gradient but does mean no change in cost?
 
         return model
+

@@ -6,6 +6,7 @@ from sklearn.pipeline import make_pipeline
 
 from sklvq.models import GMLVQClassifier
 
+import pandas as pd
 
 def test_gmlvq_iris():
     iris = datasets.load_iris()
@@ -52,7 +53,7 @@ def test_gmlvq_gridsearch_iris():
     estimator = GMLVQClassifier()
     pipeline = make_pipeline(preprocessing.StandardScaler(), estimator)
 
-    param_grid = [{'gmlvqclassifier__solver_type': ['bgd', 'lbfgs'],
+    param_grid = [{'gmlvqclassifier__solver_type': ['lbfgs'],
                    'gmlvqclassifier__activation_type': ['sigmoid', 'swish'],
                    'gmlvqclassifier__activation_params': [{'beta': beta} for beta in list(range(2, 10, 2))]}]
 
@@ -60,8 +61,8 @@ def test_gmlvq_gridsearch_iris():
 
     search.fit(iris.data, iris.target)
 
-    # df = pd.DataFrame(search.cv_results_)
-    # df.to_clipboard()
+    df = pd.DataFrame(search.cv_results_)
+    df.to_clipboard()
 
     print("Best parameter (CV score=%0.3f):" % search.best_score_)
     print(search.best_params_)

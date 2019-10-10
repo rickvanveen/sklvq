@@ -17,7 +17,7 @@ def test_glvq_iris():
 
     iris.data = preprocessing.scale(iris.data)
 
-    classifier = GLVQClassifier(solver_type='bgd', distance_type='cosine-distance',
+    classifier = GLVQClassifier(solver_type='lbfgs', distance_type='squared-euclidean',
                                 activation_type='swish', activation_params={'beta': 8})
     classifier = classifier.fit(iris.data, iris.target)
 
@@ -68,9 +68,9 @@ def test_glvq_gridsearch_iris():
     #                'glvqclassifier__activation_params': [{'beta': beta} for beta in list(range(2, 10, 2))],
     #                'glvqclassifier__prototypes_per_class': [1, 2, 3]}]
 
-    param_grid = [{'glvqclassifier__solver_type': ['bgd', 'lbfgs'],
-                   'glvqclassifier__distance_type': ['cosine-distance'],
-                   'glvqclassifier__distance_params': [{'beta': beta} for beta in list(range(2, 10, 2))],
+    param_grid = [{'glvqclassifier__solver_type': ['lbfgs'],
+                   'glvqclassifier__distance_type': ['squared-euclidean'],
+                   # 'glvqclassifier__distance_params': [{'beta': beta} for beta in list(range(2, 10, 2))],
                     'glvqclassifier__activation_type': ['sigmoid', 'swish'],
                     'glvqclassifier__activation_params': [{'beta': beta} for beta in list(range(2, 10, 2))]}]
 
