@@ -3,10 +3,10 @@ import numpy as np
 
 
 # Tightly coupled with GMLVQClassifier
-class GeneralizedMatrixLearning(GeneralizedBaseObjective):
+class GeneralizedVectorLearning(GeneralizedBaseObjective):
 
     def __init__(self, activation=None, discriminant=None):
-        super(GeneralizedMatrixLearning, self).__init__(activation, discriminant)
+        super(GeneralizedVectorLearning, self).__init__(activation, discriminant)
 
     def _gradient(self, activation_gradient, discriminant_gradient, discriminant_score, data, model, i_prototype):
         # Should return the gradient with respect to all the variables of the model.

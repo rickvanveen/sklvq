@@ -47,7 +47,8 @@ class GeneralizedBaseObjective(ObjectiveBaseClass):
                 activation_gradient = self.activation.gradient(discriminant_score[ii_winner_same])
 
                 #  Computes the following partial derivatives: du/ddi, with i = 1,2 (depending on order of input)
-                discriminant_gradient = self.discriminant.gradient(dist_same[ii_winner_same], dist_diff[ii_winner_same])
+                discriminant_gradient = self.discriminant.gradient(dist_same[ii_winner_same],
+                                                                   dist_diff[ii_winner_same], 1)
 
                 gradient += self._gradient(activation_gradient, discriminant_gradient,
                                            discriminant_score[ii_winner_same], data[ii_winner_same, :],
@@ -60,11 +61,12 @@ class GeneralizedBaseObjective(ObjectiveBaseClass):
                 activation_gradient = self.activation.gradient(discriminant_score[ii_winner_diff])
 
                 #  Computes the following partial derivatives: du/ddi, with i = 1,2 (depending on order of input)
-                discriminant_gradient = self.discriminant.gradient(dist_diff[ii_winner_diff], dist_same[ii_winner_diff])
+                discriminant_gradient = self.discriminant.gradient(dist_same[ii_winner_diff],
+                                                                   dist_diff[ii_winner_diff], -1)
 
                 # Where self._gradient can be implemented by a specific algorithm using a subclass of this objective.
                 # TODO: this should be += and the minus should come from the derivative of the relative distance...
-                gradient -= self._gradient(activation_gradient, discriminant_gradient,
+                gradient += self._gradient(activation_gradient, discriminant_gradient,
                                            discriminant_score[ii_winner_diff], data[ii_winner_diff, :],
                                            model, i_prototype)
 

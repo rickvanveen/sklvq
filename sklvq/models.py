@@ -15,6 +15,7 @@ from . import solvers
 # Cannot be switched out by parameters to the models.
 from .objectives import GeneralizedLearning
 from .objectives import GeneralizedMatrixLearning
+from .objectives import GeneralizedVectorLearning
 
 
 def _conditional_mean(p_labels, data, d_labels):
@@ -211,7 +212,7 @@ class GMLVQClassifier(LVQClassifier):
     def initialize(self, data, labels):
         """ . """
         # Initialize omega.
-        self.omega_ = np.diag(np.ones(data.shape[1]))
+        self.omega_ = self._normalise(np.diag(np.ones(data.shape[1])))
 
         # Depends also on local (per class/prototype) global omega # TODO: implement local per class and prototype
         self.variables_size_ = self.prototypes_.size + self.omega_.size
@@ -254,3 +255,45 @@ class GMLVQClassifier(LVQClassifier):
     @staticmethod
     def _normalise(omega):
         return omega / np.sqrt(np.sum(np.diagonal(omega.T.dot(omega))))
+
+
+# class GRLVQClassifier(LVQClassifier):
+#
+#     def __init__(self,
+#                  distance_type='relevance-squared-euclidean', distance_params=None,
+#                  activation_type='identity', activation_params=None,
+#                  discriminant_type='relative-distance', discriminant_params=None,
+#                  solver_type='bgd', solver_params=None,
+#                  verbose=False,
+#                  prototypes_per_class=1, random_state=None):
+#         self.activation_type = activation_type
+#         self.activation_params = activation_params
+#         self.discriminant_type = discriminant_type
+#         self.discriminant_params = discriminant_params
+#         self.verbose = verbose
+#
+#         super(GRLVQClassifier, self).__init__(distance_type, distance_params,
+#                                               solver_type, solver_params,
+#                                               prototypes_per_class, random_state)
+#
+#     def set(self, prototypes, vector):
+#         self.prototypes_ = prototypes
+#
+#     def get(self):
+#         pass
+#
+#     def set_variables(self, variables):
+#         pass
+#
+#     def get_variables(self):
+#         pass
+#
+#     def from_variables(self, variables):
+#         pass
+#
+#     @staticmethod
+#     def to_variables(*args):
+#         pass
+#
+#     def update(self, gradient):
+#         pass
