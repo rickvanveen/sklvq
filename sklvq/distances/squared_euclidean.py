@@ -1,4 +1,5 @@
 import scipy as sp
+import numpy as np
 
 from . import DistanceBaseClass
 
@@ -45,4 +46,4 @@ class SquaredEuclidean(DistanceBaseClass):
             gradient : ndarray, shape = [n_observations, n_features]
                         The gradient with respect to the prototype and every observation in data.
         """
-        return self._gradient(data, model.prototypes_[i_prototype, :])
+        return np.atleast_2d(self._gradient(data, model.prototypes_[i_prototype, :]))

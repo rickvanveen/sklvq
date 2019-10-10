@@ -5,13 +5,15 @@ from . import SolverBaseClass
 
 
 # TODO: GradientDescent abstract super class with Stochastic, (Batch, Mini-Batch) subclasses How to divide...
+# TODO: MORE solver schemes
 # TODO: convergence check... gradient zero?
-# TODO: Annealing strategies
+# TODO: Annealing strategies/functions
+# TODO: statistics.
 
 
 class BatchGradientDescent(SolverBaseClass):
 
-    def __init__(self, max_runs=8, batch_size=25, step_size=0.05):
+    def __init__(self, max_runs=10, batch_size=25, step_size=0.05):
         self.max_runs = max_runs
         self.batch_size = batch_size
         self.step_size = step_size
@@ -38,7 +40,7 @@ class BatchGradientDescent(SolverBaseClass):
                 batch_labels = labels[batches[i_batch]]
 
                 # gradient = objective.gradient(batch, batch_labels, model)
-                gradient = objective.gradient(model.get_to_variables(), model, batch, batch_labels)
+                gradient = objective.gradient(model.get_variables(), model, batch, batch_labels)
                 # TODO: add more stuff, e.g., waypoint averaging
 
                 model.update(self.step_size * gradient)

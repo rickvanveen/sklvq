@@ -10,7 +10,7 @@ class LbfgsSolver(SolverBaseClass):
     #     pass
 
     def solve(self, data, labels, objective, model):
-        result = sp.optimize.fmin_l_bfgs_b(objective.cost, model.get_to_variables(),
+        result = sp.optimize.fmin_l_bfgs_b(objective, model.get_variables(),
                                            fprime=objective.gradient, args=(model, data, labels))
-        model.restore_from_variables(result[0])
+        model.set_variables(result[0])
         return model

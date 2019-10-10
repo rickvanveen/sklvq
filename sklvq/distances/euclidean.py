@@ -48,4 +48,4 @@ class Euclidean(DistanceBaseClass):
                        The gradient with respect to the prototype and every observation in data.
 
         """
-        return self._gradient(data, model.prototypes_[i_prototype, :])
+        return np.atleast_2d(self._gradient(data, model.prototypes_[i_prototype, :]))

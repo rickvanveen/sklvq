@@ -13,7 +13,8 @@ from . import distances
 from . import solvers
 
 # Cannot be switched out by parameters to the models.
-from .objectives import GeneralizedObjective
+from .objectives import GeneralizedLearning
+from .objectives import GeneralizedMatrixLearning
 
 
 def _conditional_mean(p_labels, data, d_labels):
@@ -36,6 +37,37 @@ class LVQClassifier(ABC, BaseEstimator, ClassifierMixin):
 
     @abstractmethod
     def initialize(self, data, y):
+        raise NotImplementedError("You should implement this! Must accept (data, y)"
+                                  " and return Solver object")
+
+    @abstractmethod
+    def set(self, *args):
+        raise NotImplementedError("You should implement this! Must accept (data, y)"
+                                  " and return Solver object")
+
+    @abstractmethod
+    def get(self):
+        raise NotImplementedError("You should implement this! Must accept (data, y)"
+                                  " and return Solver object")
+
+    @abstractmethod
+    def set_variables(self, variables):
+        raise NotImplementedError("You should implement this! Must accept (data, y)"
+                                  " and return Solver object")
+
+    @abstractmethod
+    def get_variables(self):
+        raise NotImplementedError("You should implement this! Must accept (data, y)"
+                                  " and return Solver object")
+
+    @abstractmethod
+    def from_variables(self, variables):
+        raise NotImplementedError("You should implement this! Must accept (data, y)"
+                                  " and return Solver object")
+
+    @staticmethod
+    @abstractmethod
+    def to_variables(*args):
         raise NotImplementedError("You should implement this! Must accept (data, y)"
                                   " and return Solver object")
 
@@ -100,8 +132,6 @@ class LVQClassifier(ABC, BaseEstimator, ClassifierMixin):
         return self.prototypes_labels_.take(self.distance_(data, self).argmin(axis=1))
 
 
-# TODO: I think we cannot switch out more then the distance, activation function, and solver... discriminant function
-#  is basically fixed to the objective function? and a GLVQClassifier thus needs it's own objective function implementation.
 # Template (Context Implementation)
 class GLVQClassifier(LVQClassifier):
 
@@ -123,39 +153,48 @@ class GLVQClassifier(LVQClassifier):
 
     def initialize(self, data, labels):
         """ . """
-        # Depends on model. Probably
         self.variables_size_ = self.prototypes_.size
 
         activation = activations.grab(self.activation_type, self.activation_params)
 
         discriminant = discriminants.grab(self.discriminant_type, self.discriminant_params)
 
-        objective = GeneralizedObjective(activation=activation, discriminant=discriminant)
+        objective = GeneralizedLearning(activation=activation, discriminant=discriminant)
 
         return objective
 
-    # TODO: function needed for update and stuff model.to_variable(model.get()) or something this is all ugly and confusing
-    def set_from_variables(self, variables):
-        self.prototypes_ = self.restore_from_variables(variables)
+    # NOTE: not very interesting for GLVQ, but potentially useful for others.
+    def set(self, prototypes):
+        self.prototypes_ = prototypes
 
-    def get_to_variables(self):
-        return self.prototypes_.ravel()
+    def get(self):
+        return self.prototypes_
 
-    def update(self, gradient_update):
-        self.prototypes_ -= self.restore_from_variables(gradient_update)
+    # TODO might be added to LVQBaseClass
+    def set_variables(self, variables):
+        self.set(self.from_variables(variables))
 
-    def restore_from_variables(self, x):
-        return x.reshape(self.prototypes_.shape)
+    # TODO might be added to LVQBaseClass
+    def get_variables(self):
+        return self.to_variables(self.get())
 
-    def to_variables(self, x):
-        return x.ravel()
+    def from_variables(self, variables):
+        return variables.reshape(self.prototypes_.shape)
+
+    @staticmethod
+    def to_variables(prototypes):
+        return prototypes.ravel()
+
+    def update(self, gradient_update_variables):
+        self.prototypes_ -= self.from_variables(gradient_update_variables)
 
 
 class GMLVQClassifier(LVQClassifier):
+
     def __init__(self,
                  distance_type='adaptive-squared-euclidean', distance_params=None,
                  activation_type='identity', activation_params=None,
-                 discriminant_type='adaptive-relative-distance', discriminant_params=None,
+                 discriminant_type='relative-distance', discriminant_params=None,
                  solver_type='bgd', solver_params=None,
                  verbose=False,
                  prototypes_per_class=1, random_state=None):
@@ -174,19 +213,44 @@ class GMLVQClassifier(LVQClassifier):
         # Initialize omega.
         self.omega_ = np.diag(np.ones(data.shape[1]))
 
-        # Depends on model.
-        # self.variables_shape_ = self.prototypes_.shape
-
         # Depends also on local (per class/prototype) global omega # TODO: implement local per class and prototype
-        self._variables_size = self.prototypes_.size + self.omega_.size
+        self.variables_size_ = self.prototypes_.size + self.omega_.size
 
         activation = activations.grab(self.activation_type, self.activation_params)
 
         discriminant = discriminants.grab(self.discriminant_type, self.discriminant_params)
 
-        objective = GeneralizedObjective(activation=activation, discriminant=discriminant)
+        objective = GeneralizedMatrixLearning(activation=activation, discriminant=discriminant)
 
         return objective
 
-    def update(self, gradient_update):
-        pass
+    def set(self, prototypes, omega):
+        self.prototypes_ = prototypes
+        self.omega_ = omega
+
+    def get(self):
+        return self.prototypes_, self.omega_
+
+    # TODO might be added to LVQBaseClass
+    def set_variables(self, variables):
+        self.set(*self.from_variables(variables))
+
+    # TODO might be added to LVQBaseClass
+    def get_variables(self):
+        return self.to_variables(*self.get())
+
+    def from_variables(self, variables):
+        prototypes = np.reshape(variables[:self.prototypes_.size], self.prototypes_.shape)
+        omega = self._normalise(np.reshape(variables[self.prototypes_.size:], self.omega_.shape))
+        return prototypes, omega
+
+    @staticmethod
+    def to_variables(prototypes, omega):
+        return np.append(prototypes.ravel(), omega.ravel())
+
+    def update(self, gradient_update_variables):
+        self.set_variables(self.to_variables(*self.get()) - gradient_update_variables)
+
+    @staticmethod
+    def _normalise(omega):
+        return omega / np.sqrt(np.sum(np.diagonal(omega.T.dot(omega))))

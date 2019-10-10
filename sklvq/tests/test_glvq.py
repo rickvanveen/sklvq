@@ -17,8 +17,8 @@ def test_glvq_iris():
 
     iris.data = preprocessing.scale(iris.data)
 
-    classifier = GLVQClassifier(solver_type='bgd', distance_type='squared-euclidean',
-                                activation_type='swish', activation_params={'beta': 6})
+    classifier = GLVQClassifier(solver_type='lbfgs', distance_type='squared-euclidean',
+                                activation_type='swish', activation_params={'beta': 8})
     classifier = classifier.fit(iris.data, iris.target)
 
     predicted = classifier.predict(iris.data)
@@ -76,7 +76,7 @@ def test_glvq_gridsearch_iris():
 
     search.fit(iris.data, iris.target)
 
-    df = pd.DataFrame(search.cv_results_)
+    # df = pd.DataFrame(search.cv_results_)
     # df.to_clipboard()
 
     print("Best parameter (CV score=%0.3f):" % search.best_score_)

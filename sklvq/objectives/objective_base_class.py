@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 class ObjectiveBaseClass(ABC):
 
     @abstractmethod
-    def cost(self, variables, data, labels, model):
+    def __call__(self, variables, data, labels, model):
         raise NotImplementedError("You should implement this!")
 
     @abstractmethod

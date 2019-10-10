@@ -1,9 +1,7 @@
 from . import DiscriminativeBaseClass
-
 import numpy as np
 
 
-# TODO: accept data rather than something preprocessed... discriminant(xi) should provide some score.
 class RelativeDistance(DiscriminativeBaseClass):
 
     # TODO: Look into why runtime warming occurs and what to do about it. Maybe the initialization of the
@@ -12,10 +10,14 @@ class RelativeDistance(DiscriminativeBaseClass):
         with np.errstate(divide='ignore', invalid='ignore'):  # Suppresses runtime warning
             return (dist_same - dist_diff) / (dist_same + dist_diff)
 
-    def gradient(self, dist_same, dist_diff):
+    @staticmethod
+    def gradient_same(dist_same, dist_diff):
         """ The partial derivative of the objective itself with respect to the prototypes (GLVQ) """
         with np.errstate(divide='ignore', invalid='ignore'):  # Suppresses runtime warning
             return 2 * dist_diff / (dist_same + dist_diff) ** 2
 
-    def call(self, data, model):
-        pass
+    @staticmethod
+    def gradient_diff(dist_same, dist_diff):
+        """ The partial derivative of the objective itself with respect to the prototypes (GLVQ) """
+        with np.errstate(divide='ignore', invalid='ignore'):  # Suppresses runtime warning
+            return -2 * dist_same / (dist_same + dist_diff) ** 2
