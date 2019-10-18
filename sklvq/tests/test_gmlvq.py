@@ -4,9 +4,10 @@ from sklearn import preprocessing
 from sklearn.model_selection import cross_val_score, GridSearchCV, ParameterGrid
 from sklearn.pipeline import make_pipeline
 
-from sklvq.models import GMLVQClassifier
+from sklvq import GMLVQClassifier
 
 import pandas as pd
+
 
 def test_gmlvq_iris():
     iris = datasets.load_iris()

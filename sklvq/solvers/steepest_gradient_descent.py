@@ -8,7 +8,7 @@ from . import SolverBaseClass
 # TODO: MORE solver schemes
 # TODO: convergence check... gradient zero?
 # TODO: Annealing strategies/functions
-# TODO: statistics.
+# TODO: statistics. Callable like with scipy solvers so just one method...
 
 class SteepestGradientDescent(SolverBaseClass):
 

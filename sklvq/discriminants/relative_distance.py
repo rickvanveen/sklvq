@@ -11,11 +11,11 @@ class RelativeDistance(DiscriminativeBaseClass):
             return (dist_same - dist_diff) / (dist_same + dist_diff)
 
     @staticmethod
-    def gradient(dist_same, dist_diff, winner):
+    def gradient(dist_same, dist_diff, winner_same):
         """ The partial derivative of the objective itself with respect to the prototypes (GLVQ) """
-        if winner == -1:
-            return RelativeDistance.gradient_diff(dist_same, dist_diff)
-        return RelativeDistance.gradient_same(dist_same, dist_diff)
+        if winner_same:
+            return RelativeDistance.gradient_same(dist_same, dist_diff)
+        return RelativeDistance.gradient_diff(dist_same, dist_diff)
 
     @staticmethod
     def gradient_same(dist_same, dist_diff):

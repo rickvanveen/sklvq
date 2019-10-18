@@ -23,6 +23,25 @@ def _conditional_mean(p_labels, data, d_labels):
                      for p_label in p_labels])
 
 
+# TODO: LVQ related parameters
+# PrototypesPerClass: (default=1) the number of prototypes per class used. This could
+# %  be a number or a vector with the number for each class
+# %  initialPrototypes : (default=[]) a set of prototypes to start with. If not given initialization near the class means # TODO: Custom protoypes provided or initialization near the mean
+# %  initialMatrix     : the matrix omega to start with. If not given random TODO: Custom constant provided, Random (rectangular), Unity (square)
+# %  initialization for rectangular matrices and Unity for squared omega
+# %  dim               : (default=nb of features for training) the maximum rank or projection dimension # TODO: liRAM extension...
+# %  regularization    : (default=0) values usually between 0 and 1 treat with care. # TODO: Regularization of the eigenvalue spectrum of Lambda
+# %  Regularizes the eigenvalue spectrum of omega'*omega to be more homogeneous
+
+#  TODO: LVQ Optimization parameters using Steepest GD.
+# % parameter for the stochastic gradient descent sgd
+# %  learningRatePrototypes: (default=[]) the learning rate for the prototypes. # TODO: separate step sizes for variables...
+# %  Could be the start and end value used for a sigmoidal spectrum or a vector of length nb_epochs
+# %  learningRateMatrix    : (default=[]) the learning rate for the matrix.
+# %  Could be the start and end value used for a sigmoidal spectrum or a vector of length nb_epochs
+# %  MatrixStart           : (default=1) the epoch to start the matrix training # TODO: When to start learning -> implied by step size
+
+
 # Template (Context)
 class LVQClassifier(ABC, BaseEstimator, ClassifierMixin):
 
@@ -37,44 +56,36 @@ class LVQClassifier(ABC, BaseEstimator, ClassifierMixin):
 
     @abstractmethod
     def initialize(self, data, y):
-        raise NotImplementedError("You should implement this! Must accept (data, y)"
-                                  " and return Solver object")
+        raise NotImplementedError("You should implement this!")
 
     @abstractmethod
     def set(self, *args):
-        raise NotImplementedError("You should implement this! Must accept (data, y)"
-                                  " and return Solver object")
+        raise NotImplementedError("You should implement this!")
 
     @abstractmethod
     def get(self):
-        raise NotImplementedError("You should implement this! Must accept (data, y)"
-                                  " and return Solver object")
+        raise NotImplementedError("You should implement this!")
 
     @abstractmethod
     def set_variables(self, variables):
-        raise NotImplementedError("You should implement this! Must accept (data, y)"
-                                  " and return Solver object")
+        raise NotImplementedError("You should implement this!")
 
     @abstractmethod
     def get_variables(self):
-        raise NotImplementedError("You should implement this! Must accept (data, y)"
-                                  " and return Solver object")
+        raise NotImplementedError("You should implement this!")
 
     @abstractmethod
     def from_variables(self, variables):
-        raise NotImplementedError("You should implement this! Must accept (data, y)"
-                                  " and return Solver object")
+        raise NotImplementedError("You should implement this!")
 
     @staticmethod
     @abstractmethod
     def to_variables(*args):
-        raise NotImplementedError("You should implement this! Must accept (data, y)"
-                                  " and return Solver object")
+        raise NotImplementedError("You should implement this!")
 
     @abstractmethod
     def update(self, gradient):
-        raise NotImplementedError("You should implement this! Must accept gradient update"
-                                  " and modify all the variables that need updating")
+        raise NotImplementedError("You should implement this!")
 
     # TODO: could also be class functions things that can be extended by user by providing another class same for omega.
     def init_prototypes(self, data, y):
@@ -135,12 +146,12 @@ class LVQClassifier(ABC, BaseEstimator, ClassifierMixin):
 # Template (Context Implementation)
 class GLVQClassifier(LVQClassifier):
 
-    # NOTE: Objective should be fixed. If another objective is needed a new classifier should be created.
+    # NOTE: Objective will be fixed. If another objective is needed a new classifier and objective should be created.
     def __init__(self,
                  distance_type='squared-euclidean', distance_params=None,
                  activation_type='identity', activation_params=None,
                  discriminant_type='relative-distance', discriminant_params=None,
-                 solver_type='bgd', solver_params=None,
+                 solver_type='sgd', solver_params=None,
                  prototypes_per_class=1, random_state=None):
         self.activation_type = activation_type
         self.activation_params = activation_params
@@ -195,7 +206,7 @@ class GMLVQClassifier(LVQClassifier):
                  distance_type='adaptive-squared-euclidean', distance_params=None,
                  activation_type='identity', activation_params=None,
                  discriminant_type='relative-distance', discriminant_params=None,
-                 solver_type='bgd', solver_params=None,
+                 solver_type='sgd', solver_params=None,
                  verbose=False,
                  prototypes_per_class=1, random_state=None):
         self.activation_type = activation_type

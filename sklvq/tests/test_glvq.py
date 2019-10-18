@@ -7,7 +7,7 @@ from sklearn.pipeline import make_pipeline
 
 import pandas as pd
 
-from sklvq.models import GLVQClassifier
+from sklvq import GLVQClassifier
 
 # TODO: right real tests at some point and put these in the examples which should then be tested here.
 

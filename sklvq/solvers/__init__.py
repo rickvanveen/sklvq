@@ -2,7 +2,7 @@ from ..misc import utils
 from .solver_base_class import SolverBaseClass
 from .scipy_base_solver import ScipyBaseSolver
 
-ALIASES = {'bgd': 'batch-gradient-descent', 'lbfgs': 'lbfgs-solver', 'bfgs': 'bfgs-solver'}
+ALIASES = {'sgd': 'steepest-gradient-descent', 'lbfgs': 'lbfgs-solver', 'bfgs': 'bfgs-solver'}
 BASE_CLASS = SolverBaseClass
 PACKAGE = 'sklvq.solvers'
 
