@@ -1,4 +1,4 @@
-from .lvq_base_classifier import LVQClassifier
+from .base import LVQClassifier
 from .gmlvq_classifier import GMLVQClassifier
 from .glvq_classifier import GLVQClassifier
 

@@ -1,4 +1,4 @@
-from .solver_base_class import SolverBaseClass
+from .base import SolverBaseClass
 from .scipy_base_solver import ScipyBaseSolver
 from .steepest_gradient_descent import SteepestGradientDescent
 from .adaptive_gradient_descent import AdaptiveGradientDescent
