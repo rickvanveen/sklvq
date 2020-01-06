@@ -51,8 +51,8 @@ def test_identity():
     shape = (3,4)
     x = np.random.rand(size).reshape(shape)
 
-    assert identity(x) == x
-    assert identity.gradient(x) == np.ones(x.shape)
+    assert np.all(identity(x) == x)
+    assert np.all(identity.gradient(x) == np.ones(x.shape))
 
 
 def test_sigmoid():
