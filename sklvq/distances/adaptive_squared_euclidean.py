@@ -9,20 +9,6 @@ if TYPE_CHECKING:
     from sklvq.models import LVQClassifier
 
 
-def _prototype_gradient(data: np.ndarray, prototype: np.ndarray, omega: np.ndarray) -> np.ndarray:
-    direction = (-2 * (data - prototype)).T
-    relevance = omega.T.dot(omega)
-    return np.matmul(relevance, direction).T
-
-
-def _omega_gradient(data: np.ndarray, prototype: np.ndarray, omega: np.ndarray) -> np.ndarray:
-    difference = data - prototype
-    scaled_omega = omega.dot(difference.T)
-    scaled_diff = 2 * difference
-    return np.einsum('ij,jk->jik', scaled_omega, scaled_diff).reshape(data.shape[0],
-                                                                      omega.shape[0] * omega.shape[1])
-
-
 class AdaptiveSquaredEuclidean(DistanceBaseClass):
 
     def __call__(self, data: np.ndarray, model) -> np.ndarray:
@@ -64,3 +50,17 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
                             model.omega_))
 
         return np.hstack((prototype_gradient.reshape(shape[0], shape[1] * shape[2]), omega_gradient))
+
+
+def _prototype_gradient(data: np.ndarray, prototype: np.ndarray, omega: np.ndarray) -> np.ndarray:
+    direction = (-2 * (data - prototype)).T
+    relevance = omega.T.dot(omega)
+    return np.matmul(relevance, direction).T
+
+
+def _omega_gradient(data: np.ndarray, prototype: np.ndarray, omega: np.ndarray) -> np.ndarray:
+    difference = data - prototype
+    scaled_omega = omega.dot(difference.T)
+    scaled_diff = 2 * difference
+    return np.einsum('ij,jk->jik', scaled_omega, scaled_diff).reshape(data.shape[0],
+                                                                      omega.shape[0] * omega.shape[1])

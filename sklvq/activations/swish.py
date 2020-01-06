@@ -2,14 +2,6 @@ from . import ActivationBaseClass
 import numpy as np
 
 
-def _sgd(x: np.ndarray, beta: int) -> np.ndarray:
-    return 1 / (np.exp(-beta * x) + 1)
-
-
-def _swish(x: np.ndarray, beta: int) -> np.ndarray:
-    return x * _sgd(x, beta)
-
-
 class Swish(ActivationBaseClass):
 
     def __init__(self, beta: int = 1):
@@ -50,3 +42,11 @@ class Swish(ActivationBaseClass):
             The elementwise transformed input values
         """
         return (self.beta * _swish(x, self.beta)) + (_sgd(x, self.beta) * (1 - self.beta * _swish(x, self.beta)))
+
+
+def _sgd(x: np.ndarray, beta: int) -> np.ndarray:
+    return 1 / (np.exp(-beta * x) + 1)
+
+
+def _swish(x: np.ndarray, beta: int) -> np.ndarray:
+    return x * _sgd(x, beta)

@@ -2,56 +2,6 @@ from . import DiscriminativeBaseClass
 import numpy as np
 
 
-def _gradient_same(dist_same: np.ndarray, dist_diff: np.ndarray) -> np.ndarray:
-    """ The partial derivative of the discriminant function with respect to the prototype with the same label:
-        .. math::
-
-            \\frac{\\partial \\mu}{\\partial w_1} = \\frac{2 \\cdot d(x, w_1))}{(d(x, w_1) + d(x, w_2))^2},
-
-        with :math:`w_1` the prototype with the same label and :math:`w_2` the prototype with a different label.
-
-    Parameters
-    ----------
-    dist_same : ndarray
-        The distance from at least one sample to the closest prototype with the same label.
-    dist_diff : ndarray
-        The distance from at least one sample to the closest prototype with a different label.
-
-    Returns
-    -------
-    ndarray
-        The relative distance per sample
-
-    """
-    with np.errstate(divide='ignore', invalid='ignore'):  # Suppresses runtime warning
-        return 2 * dist_diff / (dist_same + dist_diff) ** 2
-
-
-def _gradient_diff(dist_same: np.ndarray, dist_diff: np.ndarray) -> np.ndarray:
-    """ The partial derivative of the discriminant function with respect to the prototype with a different label:
-        .. math::
-
-            \\frac{\\partial \\mu}{\\partial w_2} = \\frac{-2 \\cdot d(x, w_1))}{(d(x, w_1) + d(x, w_2))^2},
-
-        with :math:`w_1` the prototype with the same label and :math:`w_2` the prototype with a different label.
-
-    Parameters
-    ----------
-    dist_same : ndarray
-        The distance from at least one sample to the closest prototype with the same label.
-    dist_diff : ndarray
-        The distance from at least one sample to the closest prototype with a different label.
-
-    Returns
-    -------
-    ndarray
-        The relative distance per sample
-
-    """
-    with np.errstate(divide='ignore', invalid='ignore'):  # Suppresses runtime warning
-        return -2 * dist_same / (dist_same + dist_diff) ** 2
-
-
 class RelativeDistance(DiscriminativeBaseClass):
 
     def __call__(self, dist_same: np.ndarray, dist_diff: np.ndarray) -> np.ndarray:
@@ -101,3 +51,52 @@ class RelativeDistance(DiscriminativeBaseClass):
         if winner_same:
             return _gradient_same(dist_same, dist_diff)
         return _gradient_diff(dist_same, dist_diff)
+
+
+def _gradient_same(dist_same: np.ndarray, dist_diff: np.ndarray) -> np.ndarray:
+    """ The partial derivative of the discriminant function with respect to the prototype with the same label:
+        .. math::
+
+            \\frac{\\partial \\mu}{\\partial w_1} = \\frac{2 \\cdot d(x, w_1))}{(d(x, w_1) + d(x, w_2))^2},
+
+        with :math:`w_1` the prototype with the same label and :math:`w_2` the prototype with a different label.
+
+    Parameters
+    ----------
+    dist_same : ndarray
+        The distance from at least one sample to the closest prototype with the same label.
+    dist_diff : ndarray
+        The distance from at least one sample to the closest prototype with a different label.
+
+    Returns
+    -------
+    ndarray
+        The relative distance per sample
+
+    """
+    with np.errstate(divide='ignore', invalid='ignore'):  # Suppresses runtime warning
+        return 2 * dist_diff / (dist_same + dist_diff) ** 2
+
+def _gradient_diff(dist_same: np.ndarray, dist_diff: np.ndarray) -> np.ndarray:
+    """ The partial derivative of the discriminant function with respect to the prototype with a different label:
+        .. math::
+
+            \\frac{\\partial \\mu}{\\partial w_2} = \\frac{-2 \\cdot d(x, w_1))}{(d(x, w_1) + d(x, w_2))^2},
+
+        with :math:`w_1` the prototype with the same label and :math:`w_2` the prototype with a different label.
+
+    Parameters
+    ----------
+    dist_same : ndarray
+        The distance from at least one sample to the closest prototype with the same label.
+    dist_diff : ndarray
+        The distance from at least one sample to the closest prototype with a different label.
+
+    Returns
+    -------
+    ndarray
+        The relative distance per sample
+
+    """
+    with np.errstate(divide='ignore', invalid='ignore'):  # Suppresses runtime warning
+        return -2 * dist_same / (dist_same + dist_diff) ** 2
