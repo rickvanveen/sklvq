@@ -1,9 +1,6 @@
 .DS_Store
 .pytest_cache
 
-# TEMP
-sklvq/tests/*
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
