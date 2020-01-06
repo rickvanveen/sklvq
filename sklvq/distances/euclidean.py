@@ -28,11 +28,6 @@ class Euclidean(DistanceBaseClass):
         """
         return sp.spatial.distance.cdist(data, model.prototypes_, 'euclidean')
 
-    @staticmethod
-    def _gradient(data: np.ndarray, prototype: np.ndarray) -> np.ndarray:
-        difference = data - prototype
-        return (-1 * difference) / np.sqrt(np.sum(difference ** 2))
-
     def gradient(self, data: np.ndarray, model, i_prototype: int) -> np.ndarray:
         """ Implements the derivative of the euclidean distance, with respect to 1 prototype
 

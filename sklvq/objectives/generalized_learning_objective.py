@@ -40,8 +40,9 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
                 activation_gradient = self.activation.gradient(discriminant_score[ii_winner_same])
 
                 #  Computes the following partial derivatives: du/ddi, with i = 1
-                discriminant_gradient = self.discriminant.gradient_same(dist_same[ii_winner_same],
-                                                                        dist_diff[ii_winner_same])
+                discriminant_gradient = self.discriminant.gradient(dist_same[ii_winner_same],
+                                                                   dist_diff[ii_winner_same],
+                                                                   True)
 
                 # Computes the following partial derivatives: ddi/dwi, with i = 1
                 distance_gradient = model.distance_.gradient(data[ii_winner_same], model, i_prototype)
@@ -56,8 +57,9 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
                 activation_gradient = self.activation.gradient(discriminant_score[ii_winner_diff])
 
                 #  Computes the following partial derivatives: du/ddi, with i = 2
-                discriminant_gradient = self.discriminant.gradient_diff(dist_same[ii_winner_diff],
-                                                                        dist_diff[ii_winner_diff])
+                discriminant_gradient = self.discriminant.gradient(dist_same[ii_winner_diff],
+                                                                   dist_diff[ii_winner_diff],
+                                                                   False)
 
                 # Computes the following partial derivatives: ddi/dwi, with i = 2
                 distance_gradient = model.distance_.gradient(data[ii_winner_diff], model, i_prototype)
