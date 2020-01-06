@@ -30,7 +30,7 @@ class SoftPlus(ActivationBaseClass):
         """ Implements the sigmoid function's derivative :cite:`Villmann2019`:
             .. math::
 
-                g(x) = \\frac{\\beta \\cdot e^{\\beta \\cdot x}}{1 + e^{\\beta \cdot x}}
+                g(x) = \\frac{\\beta \\cdot e^{\\beta \\cdot x}}{1 + e^{\\beta \\cdot x}}
 
         Parameters
         ----------
