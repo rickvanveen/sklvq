@@ -56,7 +56,6 @@ def test_identity():
 
 
 def test_sigmoid():
-
     # Check init
     sigmoid = activations.grab('sigmoid', {'beta': 6})
     assert sigmoid.beta == 6

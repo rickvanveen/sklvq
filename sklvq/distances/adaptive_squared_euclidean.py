@@ -11,32 +11,50 @@ if TYPE_CHECKING:
 
 class AdaptiveSquaredEuclidean(DistanceBaseClass):
 
-    def __call__(self, data: np.ndarray, model) -> np.ndarray:
-        """ Implements a weighted variant of the squared euclidean distance.
+    def __call__(self, data: np.ndarray, model: 'LVQClassifier') -> np.ndarray:
+        """ Implements a weighted variant of the squared euclidean distance:
+            .. math::
+                d^{\\Lambda}(w, x) = (x - w)^T \\Lambda (x - w)
 
-                Note uses scipy.spatial.distance.cdist see scipy documentation.
+        .. note::
+            Uses scipy.spatial.distance.cdist, see scipy documentation for more detail.
 
-                Note that any custom function should still accept and return the same as this function.
+        Parameters
+        ----------
+        data : ndarray
+            A matrix containing the samples on the rows.
+        model : LVQClassifier
+            In principle any LVQClassifier that calls it's relevance matrix omega.
+            Specifically here, GMLVQClassifier.
 
-                Parameters
-                ----------
-                data       : ndarray, shape = [n_obervations, n_features]
-                             Inputs are converted to float type.
-                prototypes : ndarray, shape = [n_prototypes, n_features]
-                             Inputs are converted to float type.
-                omega      : ndarray, shape = [n_features, n_features]
-
-                Returns
-                -------
-                distances : ndarray, shape = [n_observations, n_prototypes]
-                    The dist(u=XA[i], v=XB[j]) is computed and stored in the
-                    ij-th entry.
-            """
+        Returns
+        -------
+        ndarray
+            The adaptive squared euclidean distance for every sample to every prototype stored row-wise.
+        """
         return sp.spatial.distance.cdist(data, model.prototypes_, 'mahalanobis',
                                          VI=model.omega_.T.dot(model.omega_)) ** 2
 
-    # TODO local matrices
-    def gradient(self, data: np.ndarray, model, i_prototype: int) -> np.ndarray:
+    def gradient(self, data: np.ndarray, model: 'LVQClassifier', i_prototype: int) -> np.ndarray:
+        """ The partial derivative of the adaptive squared euclidean distance function, with respect
+        to a specified prototype and the matrix omega.
+
+        Parameters
+        ----------
+        data : ndarray
+            A matrix containing the samples on the rows.
+        model : LVQClassifier
+            In principle any LVQClassifier that calls it's relevance matrix omega.
+            Specifically here, GMLVQClassifier.
+        i_prototype : int
+            An integer index value of the relevant prototype
+
+        Returns
+        -------
+        ndarray
+            The gradient for every feature/dimension. Returned in one 1D vector. The non-relevant prototype's
+            gradient is set to 0, but is still included in the output.
+        """
         shape = [data.shape[0], *model.prototypes_.shape]
         prototype_gradient = np.zeros(shape)
 

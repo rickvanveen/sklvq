@@ -19,12 +19,14 @@ def _conditional_mean(p_labels, data, d_labels):
 class LVQClassifier(ABC, BaseEstimator, ClassifierMixin):
 
     # Sklearn: You cannot change the value of the properties given in init.
-    def __init__(self, distance_type, distance_params, solver_type, solver_params, prototypes_per_class, random_state):
+    def __init__(self, distance_type, distance_params, solver_type, solver_params,
+                 prototypes_per_class, prototypes, random_state):
         self.distance_type = distance_type
         self.distance_params = distance_params
         self.solver_type = solver_type
         self.solver_params = solver_params
         self.prototypes_per_class = prototypes_per_class
+        self.prototypes = prototypes
         self.random_state = random_state
 
     @abstractmethod
@@ -89,11 +91,16 @@ class LVQClassifier(ABC, BaseEstimator, ClassifierMixin):
         #  or objective
         self.distance_ = distances.grab(self.distance_type, self.distance_params)
 
-        # I guess it's save to say that LVQ always needs to have initialized prototypes/prototype_labels
+        # Always given by default value accepts anything
         if np.isscalar(self.prototypes_per_class):
             self.prototypes_labels_ = np.repeat(unique_labels(labels), self.prototypes_per_class)
 
-        self.prototypes_ = self.init_prototypes(data, labels)
+        # If prototypes is not already set initialize them to the class conditional mean.
+        if self.prototypes is None:
+            self.prototypes_ = self.init_prototypes(data, labels)
+        else:
+            self.prototypes_ = self.prototypes
+
         # Initialize algorithm specific stuff
         objective = self.initialize(data, labels)
 

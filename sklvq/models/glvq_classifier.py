@@ -20,7 +20,7 @@ class GLVQClassifier(LVQClassifier):
                  activation_type = 'identity', activation_params=None,
                  discriminant_type='relative-distance', discriminant_params=None,
                  solver_type='sgd', solver_params=None,
-                 prototypes_per_class=1, random_state=None):
+                 prototypes=None, prototypes_per_class=1, random_state=None):
         self.activation_type = activation_type
         self.activation_params = activation_params
         self.discriminant_type = discriminant_type
@@ -28,7 +28,7 @@ class GLVQClassifier(LVQClassifier):
 
         super(GLVQClassifier, self).__init__(distance_type, distance_params,
                                              solver_type, solver_params,
-                                             prototypes_per_class, random_state)
+                                             prototypes_per_class, prototypes, random_state)
 
     def initialize(self, data, labels):
         """ . """

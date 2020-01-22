@@ -1,11 +1,6 @@
 from importlib import import_module
 
-
-# Argument must be the name of the class using '-', so 'squared_euclidean.SquaredEuclidean' -> 'squared-euclidean'
-
-
 # TODO: Documentation
-# TODO: Look into how to deal with the aliases better
 # TODO: Look into how to restrict access to certain LVQ classifiers... e.g., not all distance measures are suitable for
 #  every classifier
 # TODO: look into how to deal with custom objects

@@ -20,25 +20,28 @@ class GMLVQClassifier(LVQClassifier):
                  distance_type='adaptive-squared-euclidean', distance_params=None,
                  activation_type='identity', activation_params=None,
                  discriminant_type='relative-distance', discriminant_params=None,
-                 solver_type='sgd', solver_params=None,
-                 verbose=False,
-                 prototypes_per_class=1, random_state=None):
+                 solver_type='sgd', solver_params=None, verbose=False,
+                 prototypes=None, prototypes_per_class=1, omega=None, random_state=None):
         self.activation_type = activation_type
         self.activation_params = activation_params
         self.discriminant_type = discriminant_type
         self.discriminant_params = discriminant_params
+        self.omega = omega
         self.verbose = verbose
 
         super(GMLVQClassifier, self).__init__(distance_type, distance_params,
                                               solver_type, solver_params,
-                                              prototypes_per_class, random_state)
+                                              prototypes_per_class, prototypes, random_state)
 
     # Get's called in fit.
     def initialize(self, data, labels):
         """ . """
         # Initialize omega. TODO: Make dynamic like the rest.
-        self.omega_ = np.diag(np.ones(data.shape[1]))
-        self.omega_ = self._normalise(self.omega_)
+        if self.omega is None:
+            self.omega_ = np.diag(np.ones(data.shape[1]))
+            self.omega_ = self._normalise(self.omega_)
+        else:
+            self.omega_ = self.omega
 
         # Depends also on local (per class/prototype) global omega # TODO: implement local per class and prototype
         self.variables_size_ = self.prototypes_.size + self.omega_.size
