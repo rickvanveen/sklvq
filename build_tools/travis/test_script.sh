@@ -1,3 +1,3 @@
 mkdir tmp
-cd tmp || return
+cd tmp
 pytest -v --cov=sklvq --pyargs sklvq
