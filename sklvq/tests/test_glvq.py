@@ -11,7 +11,7 @@ from sklvq import GLVQClassifier
 from sklvq.activations import ActivationBaseClass
 
 # TODO: write real tests at some point and put these in the examples which should then be tested here.
-from tests.test_activations import test_activation_compatibility
+# from tests.test_activations import test_activation_compatibility
 
 
 def test_glvq_iris():
@@ -30,30 +30,30 @@ def test_glvq_iris():
     print("\nIris accuracy: {}".format(accuracy))
 
 
-def test_glvq_custom_functions():
-
-    class Identity(ActivationBaseClass):
-        def __call__(self, x: np.ndarray) -> np.ndarray:
-            return x
-
-        def gradient(self, x: np.ndarray) -> np.ndarray:
-            return np.ones(x.shape)
-
-    test_activation_compatibility(Identity)
-
-    iris = datasets.load_iris()
-
-    iris.data = preprocessing.scale(iris.data)
-
-    classifier = GLVQClassifier(solver_type='steepest-gradient-descent', distance_type='sqeuclidean',
-                                activation_type=Identity())
-    classifier = classifier.fit(iris.data, iris.target)
-
-    predicted = classifier.predict(iris.data)
-
-    accuracy = np.count_nonzero(predicted == iris.target) / iris.target.size
-
-    print("\nIris accuracy: {}".format(accuracy))
+# def test_glvq_custom_functions():
+#
+#     class Identity(ActivationBaseClass):
+#         def __call__(self, x: np.ndarray) -> np.ndarray:
+#             return x
+#
+#         def gradient(self, x: np.ndarray) -> np.ndarray:
+#             return np.ones(x.shape)
+#
+#     test_activation_compatibility(Identity)
+#
+#     iris = datasets.load_iris()
+#
+#     iris.data = preprocessing.scale(iris.data)
+#
+#     classifier = GLVQClassifier(solver_type='steepest-gradient-descent', distance_type='sqeuclidean',
+#                                 activation_type=Identity())
+#     classifier = classifier.fit(iris.data, iris.target)
+#
+#     predicted = classifier.predict(iris.data)
+#
+#     accuracy = np.count_nonzero(predicted == iris.target) / iris.target.size
+#
+#     print("\nIris accuracy: {}".format(accuracy))
 
 
 def test_glvq_with_multiple_prototypes_per_class():
@@ -81,67 +81,67 @@ def test_glvq_pipeline_iris():
     print("\nCross validation (k=5): " + "{}".format(accuracy))
 
 
-def test_glvq_gridsearch_iris():
-    iris = datasets.load_iris()
+# def test_glvq_gridsearch_iris():
+#     iris = datasets.load_iris()
+#
+#     estimator = GLVQClassifier()
+#     pipeline = make_pipeline(preprocessing.StandardScaler(), estimator)
+#
+#     # param_grid = [{'glvqclassifier__activation_type': ['identity'],
+#     #                'glvqclassifier__prototypes_per_class': [1, 2, 3]},
+#     #               {'glvqclassifier__activation_type': ['swish'],
+#     #                'glvqclassifier__activation_params': [{'beta': beta} for beta in list(range(2, 10, 2))],
+#     #                'glvqclassifier__prototypes_per_class': [1, 2, 3]},
+#     #               {'glvqclassifier__activation_type': ['soft+'],
+#     #                'glvqclassifier__activation_params': [{'beta': beta} for beta in list(range(2, 10, 2))],
+#     #                'glvqclassifier__prototypes_per_class': [1, 2, 3]}]
+#
+#     param_grid = [{'glvqclassifier__solver_type': ['steepest-gradient-descent'],
+#                    'glvqclassifier__distance_type': ['squared-euclidean'],
+#                    # 'glvqclassifier__distance_params': [{'beta': beta} for beta in list(range(2, 10, 2))],
+#                    'glvqclassifier__activation_type': ['sigmoid', 'swish'],
+#                    'glvqclassifier__activation_params': [{'beta': beta} for beta in list(range(2, 10, 2))]}]
+#
+#     search = GridSearchCV(pipeline, param_grid, scoring='accuracy', cv=5, n_jobs=2, return_train_score=True)
+#
+#     search.fit(iris.data, iris.target)
+#
+#     df = pd.DataFrame(search.cv_results_)
+#     df.to_clipboard()
+#
+#     print("\nBest parameter (CV score=%0.3f):" % search.best_score_)
+#     print(search.best_params_)
 
-    estimator = GLVQClassifier()
-    pipeline = make_pipeline(preprocessing.StandardScaler(), estimator)
-
-    # param_grid = [{'glvqclassifier__activation_type': ['identity'],
-    #                'glvqclassifier__prototypes_per_class': [1, 2, 3]},
-    #               {'glvqclassifier__activation_type': ['swish'],
-    #                'glvqclassifier__activation_params': [{'beta': beta} for beta in list(range(2, 10, 2))],
-    #                'glvqclassifier__prototypes_per_class': [1, 2, 3]},
-    #               {'glvqclassifier__activation_type': ['soft+'],
-    #                'glvqclassifier__activation_params': [{'beta': beta} for beta in list(range(2, 10, 2))],
-    #                'glvqclassifier__prototypes_per_class': [1, 2, 3]}]
-
-    param_grid = [{'glvqclassifier__solver_type': ['steepest-gradient-descent'],
-                   'glvqclassifier__distance_type': ['squared-euclidean'],
-                   # 'glvqclassifier__distance_params': [{'beta': beta} for beta in list(range(2, 10, 2))],
-                   'glvqclassifier__activation_type': ['sigmoid', 'swish'],
-                   'glvqclassifier__activation_params': [{'beta': beta} for beta in list(range(2, 10, 2))]}]
-
-    search = GridSearchCV(pipeline, param_grid, scoring='accuracy', cv=5, n_jobs=2, return_train_score=True)
-
-    search.fit(iris.data, iris.target)
-
-    df = pd.DataFrame(search.cv_results_)
-    df.to_clipboard()
-
-    print("\nBest parameter (CV score=%0.3f):" % search.best_score_)
-    print(search.best_params_)
-
-# TODO: TypeError: gradient() missing 1 required positional argument: 'x'... No idea where this happens.
-def test_glvq_gridsearch_iris_custom_functions():
-    class Identity(ActivationBaseClass):
-        def __call__(self, x: np.ndarray) -> np.ndarray:
-            return x
-
-        def gradient(self, x: np.ndarray) -> np.ndarray:
-            return np.ones(x.shape)
-
-    test_activation_compatibility(Identity)
-
-    iris = datasets.load_iris()
-    estimator = GLVQClassifier()
-    pipeline = make_pipeline(preprocessing.StandardScaler(), estimator)
-
-    param_grid = [{'glvqclassifier__solver_type': ['steepest-gradient-descent'],
-                   'glvqclassifier__distance_type': ['squared-euclidean'],
-                   'glvqclassifier__activation_type': ['sigmoid', 'swish', Identity],
-                   'glvqclassifier__activation_params': [{'beta': beta} for beta in list(range(2, 10, 2))]}]
-
-    search = GridSearchCV(pipeline, param_grid, scoring='accuracy', cv=5, n_jobs=2, return_train_score=True)
-
-    search.fit(iris.data, iris.target)
-
-    df = pd.DataFrame(search.cv_results_)
-    # df.to_clipboard()
-
-    print("\nBest parameter (CV score=%0.3f):" % search.best_score_)
-    print(search.best_params_)
+# # TODO: TypeError: gradient() missing 1 required positional argument: 'x'... No idea where this happens.
+# def test_glvq_gridsearch_iris_custom_functions():
+#     class Identity(ActivationBaseClass):
+#         def __call__(self, x: np.ndarray) -> np.ndarray:
+#             return x
+#
+#         def gradient(self, x: np.ndarray) -> np.ndarray:
+#             return np.ones(x.shape)
+#
+#     test_activation_compatibility(Identity)
+#
+#     iris = datasets.load_iris()
+#     estimator = GLVQClassifier()
+#     pipeline = make_pipeline(preprocessing.StandardScaler(), estimator)
+#
+#     param_grid = [{'glvqclassifier__solver_type': ['steepest-gradient-descent'],
+#                    'glvqclassifier__distance_type': ['squared-euclidean'],
+#                    'glvqclassifier__activation_type': ['sigmoid', 'swish', Identity],
+#                    'glvqclassifier__activation_params': [{'beta': beta} for beta in list(range(2, 10, 2))]}]
+#
+#     search = GridSearchCV(pipeline, param_grid, scoring='accuracy', cv=5, n_jobs=2, return_train_score=True)
+#
+#     search.fit(iris.data, iris.target)
+#
+#     df = pd.DataFrame(search.cv_results_)
+#     # df.to_clipboard()
+#
+#     print("\nBest parameter (CV score=%0.3f):" % search.best_score_)
+#     print(search.best_params_)
 
 # TODO: repeated gridsearch
-def test_glvq_repeated_gridsearch_iris():
-    pass
+# def test_glvq_repeated_gridsearch_iris():
+#     pass

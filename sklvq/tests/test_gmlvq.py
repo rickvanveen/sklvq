@@ -58,8 +58,7 @@ def test_gmlvq_gridsearch_iris():
     pipeline = make_pipeline(preprocessing.StandardScaler(), estimator)
 
     param_grid = [{'gmlvqclassifier__solver_type': ['steepest-gradient-descent',
-                                                    'adaptive-gradient-descent',
-                                                    'adaptive-moment-estimation'],
+                                                    'lbfgs'],
                    'gmlvqclassifier__activation_type': ['sigmoid'],
                    'gmlvqclassifier__activation_params': [{'beta': 2}]}]
 
