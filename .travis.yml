@@ -1,46 +1,43 @@
 language: python
 
-cache:
-  directories:
-  - $HOME/.cache/pip
-
 matrix:
   include:
-    - env: PYTHON_VERSION="3.5" NUMPY_VERSION="*" SCIPY_VERSION="*"
-           SKLEARN_VERSION="*"
-    - env: PYTHON_VERSION="3.6" NUMPY_VERSION="*" SCIPY_VERSION="*"
-           SKLEARN_VERSION="*"
-    - env: PYTHON_VERSION="3.7" NUMPY_VERSION="*" SCIPY_VERSION="*"
-           SKLEARN_VERSION="*"
-    - env: PYTHON_VERSION="3.7" NUMPY_VERSION="*" SCIPY_VERSION="*"
-           SKLEARN_VERSION="nightly"
+    - python: 3.7
+      dist: xenial
 
-install:
-  # install miniconda
-  - deactivate
-  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
-  - MINICONDA_PATH=/home/travis/miniconda
-  - chmod +x miniconda.sh && ./miniconda.sh -b -p $MINICONDA_PATH
-  - export PATH=$MINICONDA_PATH/bin:$PATH
-  - conda update --yes conda
-  # create the testing environment
-  - conda create -n testenv --yes python=$PYTHON_VERSION pip
-  - source activate testenv
-  - |
-      if [ $SKLEARN_VERSION = "nightly" ]; then
-          conda install --yes numpy==$NUMPY_VERSION scipy==$SCIPY_VERSION cython nose pytest pytest-cov pandas
-          # install nightly wheels
-          pip install --pre -f https://sklearn-nightly.scdn8.secure.raxcdn.com scikit-learn
-      else
-          conda install --yes numpy==$NUMPY_VERSION scipy==$SCIPY_VERSION scikit-learn==$SKLEARN_VERSION cython nose pytest pytest-cov pandas
-      fi
-  - pip install codecov
-  - pip install .
+install: source build_tools/travis/install.sh
 
 script:
-  - mkdir for_test
-  - cd for_test
-  - pytest -v --cov=sklvq --pyargs sklvq
+  - bash build_tools/travis/test_script.sh
 
-after_success:
-  - codecov --token=CODECOV_TOKEN
+after_success: source build_tools/travis/after_success.sh
+
+#install:
+#  # install miniconda
+#  - deactivate # TravisCI default virtualenv
+#  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+#  - MINICONDA_PATH=$HOME/miniconda
+#  - chmod +x miniconda.sh && ./miniconda.sh -b -p $MINICONDA_PATH
+#  - export PATH=$MINICONDA_PATH/bin:$PATH
+#  - conda update --yes conda
+#  # create the testing environment
+#  - conda create -n testenv --yes python=$PYTHON_VERSION pip
+#  - source activate testenv
+#  - |
+#      if [ $SKLEARN_VERSION = "nightly" ]; then
+#          conda install --yes numpy==$NUMPY_VERSION scipy==$SCIPY_VERSION cython nose pytest pytest-cov pandas
+#          # install nightly wheels
+#          pip install --pre -f https://sklearn-nightly.scdn8.secure.raxcdn.com scikit-learn
+#      else
+#          conda install --yes numpy==$NUMPY_VERSION scipy==$SCIPY_VERSION scikit-learn==$SKLEARN_VERSION cython nose pytest pytest-cov pandas
+#      fi
+#  - pip install codecov
+#  - pip install .
+
+#script:
+#  - mkdir for_test
+#  - cd for_test
+#  - pytest -v --cov=sklvq --pyargs sklvq
+
+#after_success:
+#  - codecov --token=CODECOV_TOKEN

@@ -37,7 +37,8 @@ CLASSIFIERS = ['Intended Audience :: Science/Research',
 EXTRAS_REQUIRE = {
     'tests': [
         'pytest',
-        'pytest-cov'],
+        'pytest-cov',
+        'pandas'],
     'docs': [
         'sphinx',
         'sphinx-gallery',
