@@ -7,9 +7,6 @@ from sklearn.pipeline import make_pipeline
 
 from sklvq import GLVQClassifier
 
-# TODO: write real tests at some point and put these in the examples which should then be tested here.
-# from tests.test_activations import test_activation_compatibility
-
 
 def test_glvq_iris():
     iris = datasets.load_iris()

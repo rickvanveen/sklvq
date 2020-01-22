@@ -1,1 +1,1 @@
-codecov --token=CODECOV_TOKEN
+codecov -t CODECOV_TOKEN
