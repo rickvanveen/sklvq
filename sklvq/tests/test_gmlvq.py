@@ -6,8 +6,6 @@ from sklearn.pipeline import make_pipeline
 
 from sklvq import GMLVQClassifier
 
-import pandas as pd
-
 
 def test_gmlvq_iris():
     iris = datasets.load_iris()
@@ -65,9 +63,6 @@ def test_gmlvq_gridsearch_iris():
     search = GridSearchCV(pipeline, param_grid, scoring='accuracy', cv=5, n_jobs=2)
 
     search.fit(iris.data, iris.target)
-
-    df = pd.DataFrame(search.cv_results_)
-    df.to_clipboard()
 
     print("Best parameter (CV score=%0.3f):" % search.best_score_)
     print(search.best_params_)
