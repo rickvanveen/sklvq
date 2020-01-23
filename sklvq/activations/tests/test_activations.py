@@ -60,7 +60,7 @@ def test_sigmoid():
     sigmoid = Sigmoid(beta=other_beta)
     assert sigmoid.beta == other_beta
     s2 = sigmoid(x)
-    g1 = sigmoid(x)
+    g2 = sigmoid(x)
 
     # Check if grab and class() give same answer
     assert_array_almost_equal(s1, s2)
