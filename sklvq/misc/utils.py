@@ -5,6 +5,7 @@ from importlib import import_module
 #  every classifier
 # TODO: look into how to deal with custom objects
 
+
 def grab(class_type, class_params, aliases, package, base_class):
     if callable(class_type):
         return class_type
