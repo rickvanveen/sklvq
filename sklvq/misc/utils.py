@@ -1,4 +1,5 @@
 from importlib import import_module
+import inspect
 
 # TODO: Documentation
 # TODO: Look into how to restrict access to certain LVQ classifiers... e.g., not all distance measures are suitable for
@@ -7,8 +8,12 @@ from importlib import import_module
 
 
 def grab(class_type, class_params, aliases, package, base_class):
-    if callable(class_type):
-        return class_type
+    if inspect.isclass(class_type):
+        try:
+            instance = class_type(**class_params)
+        except TypeError:
+            instance = class_type()
+        return instance
 
     if class_type in aliases.keys():
         class_type = aliases[class_type]
