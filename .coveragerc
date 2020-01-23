@@ -16,4 +16,5 @@ exclude_lines =
     if 0:
     if __name__ == .__main__.:
     if self.verbose:
+    if TYPE_CHECKING:
 show_missing = True
