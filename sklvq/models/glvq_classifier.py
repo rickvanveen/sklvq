@@ -1,6 +1,5 @@
 from . import LVQClassifier
-import inspect
-from typing import Union
+import numpy as np
 
 # Can be switched out by parameters to the models.
 from sklvq import activations, discriminants
@@ -17,7 +16,7 @@ class GLVQClassifier(LVQClassifier):
                  distance_type='squared-euclidean', distance_params=None,
                  activation_type = 'identity', activation_params=None,
                  discriminant_type='relative-distance', discriminant_params=None,
-                 solver_type='sgd', solver_params=None,
+                 solver_type='steepest-gradient-descent', solver_params=None,
                  prototypes=None, prototypes_per_class=1, random_state=None):
         self.activation_type = activation_type
         self.activation_params = activation_params
@@ -33,6 +32,7 @@ class GLVQClassifier(LVQClassifier):
 
         # Get the size of the variables (1D vector) of the model that need to be optimized.
         self.variables_size_ = self.prototypes_.size
+        self._number_of_params = 1
 
         # Grab the chosen activation, and discriminant functions and initialize with set parameters.
         activation = activations.grab(self.activation_type,
@@ -48,7 +48,7 @@ class GLVQClassifier(LVQClassifier):
         return objective
 
     def set_model_params(self, prototypes):
-        self.prototypes_ = prototypes
+        self.prototypes_ = np.atleast_2d(prototypes)
 
     def get_model_params(self):
         return self.prototypes_

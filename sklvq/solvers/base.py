@@ -8,6 +8,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sklvq.models import LVQClassifier
 
+# TODO: vSGD, Adam, WA-GD (LeKander)
+
 
 class SolverBaseClass(ABC):
 
@@ -29,12 +31,17 @@ class ScipyBaseSolver(SolverBaseClass):
               labels: np.ndarray,
               objective: ObjectiveBaseClass,
               model: 'LVQClassifier') -> 'LVQClassifier':
+
+        params = {'jac': objective.gradient}
+        if self.params is not None:
+            params.update(self.params)
+
         result = sp.optimize.minimize(
             objective,
             model.get_variables(),
             method=self.method,
-            jac=objective.gradient,
-            args=(model, data, labels))
+            args=(model, data, labels),
+            **params)
 
         model.set_variables(result.x)
         return model

@@ -20,7 +20,7 @@ class GMLVQClassifier(LVQClassifier):
                  distance_type='adaptive-squared-euclidean', distance_params=None,
                  activation_type='identity', activation_params=None,
                  discriminant_type='relative-distance', discriminant_params=None,
-                 solver_type='sgd', solver_params=None, verbose=False,
+                 solver_type='steepest-gradient-descent', solver_params=None, verbose=False,
                  prototypes=None, prototypes_per_class=1, omega=None, random_state=None):
         self.activation_type = activation_type
         self.activation_params = activation_params
@@ -36,12 +36,13 @@ class GMLVQClassifier(LVQClassifier):
     # Get's called in fit.
     def initialize(self, data, labels):
         """ . """
-        # Initialize omega. TODO: Make dynamic like the rest.
         if self.omega is None:
             self.omega_ = np.diag(np.ones(data.shape[1]))
             self.omega_ = self._normalise(self.omega_)
         else:
             self.omega_ = self.omega
+
+        self._number_of_params = 2
 
         # Depends also on local (per class/prototype) global omega # TODO: implement local per class and prototype
         self.variables_size_ = self.prototypes_.size + self.omega_.size
@@ -58,7 +59,7 @@ class GMLVQClassifier(LVQClassifier):
         return objective
 
     def set_model_params(self, prototypes, omega):
-        self.prototypes_ = prototypes
+        self.prototypes_ = np.atleast_2d(prototypes)
         self.omega_ = omega
 
     def get_model_params(self):
@@ -73,8 +74,8 @@ class GMLVQClassifier(LVQClassifier):
     def to_variables(prototypes, omega):
         return np.append(prototypes.ravel(), omega.ravel())
 
-    def update(self, gradient_update_variables):
-        self.set_variables(self.to_variables(*self.get_model_params()) - gradient_update_variables)
+    def update(self, *args):
+        self.set_variables(self.to_variables(*self.get_model_params()) - self.to_variables(args[0], args[1]))
 
     @staticmethod
     def _normalise(omega):
