@@ -8,8 +8,6 @@ from sklvq import activations, discriminants
 # Cannot be switched out by parameters to the models.
 from sklvq.objectives import GeneralizedLearningObjective
 
-# TODO: White list of methods suitable for GLVQ
-
 
 # Template (Context Implementation)
 class GLVQClassifier(LVQClassifier):
@@ -32,30 +30,28 @@ class GLVQClassifier(LVQClassifier):
 
     def initialize(self, data, labels):
         """ . """
+
+        # Get the size of the variables (1D vector) of the model that need to be optimized.
         self.variables_size_ = self.prototypes_.size
 
-        activation = activations.grab(self.activation_type, self.activation_params)
+        # Grab the chosen activation, and discriminant functions and initialize with set parameters.
+        activation = activations.grab(self.activation_type,
+                                      self.activation_params)
 
-        discriminant = discriminants.grab(self.discriminant_type, self.discriminant_params)
+        discriminant = discriminants.grab(self.discriminant_type,
+                                          self.discriminant_params)
 
-        objective = GeneralizedLearningObjective(activation=activation, discriminant=discriminant)
+        # The objective is fixed as this determines what else to initialize.
+        objective = GeneralizedLearningObjective(activation=activation,
+                                                 discriminant=discriminant)
 
         return objective
 
-    # NOTE: not very interesting for GLVQ, but potentially useful for others.
-    def set(self, prototypes):
+    def set_model_params(self, prototypes):
         self.prototypes_ = prototypes
 
-    def get(self):
+    def get_model_params(self):
         return self.prototypes_
-
-    # TODO might be added to LVQBaseClass
-    def set_variables(self, variables):
-        self.set(self.from_variables(variables))
-
-    # TODO might be added to LVQBaseClass
-    def get_variables(self):
-        return self.to_variables(self.get())
 
     def from_variables(self, variables):
         return variables.reshape(self.prototypes_.shape)

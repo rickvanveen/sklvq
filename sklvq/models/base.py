@@ -10,6 +10,9 @@ from sklearn.utils.validation import check_X_y, check_is_fitted, check_array
 from sklvq import distances, solvers, discriminants
 
 
+from collections.abc import Iterable
+
+
 def _conditional_mean(p_labels, data, d_labels):
     """ Implements the conditional mean, i.e., mean per class"""
     return np.array([np.mean(data[p_label == d_labels, :], axis=0)
@@ -34,23 +37,22 @@ class LVQClassifier(ABC, BaseEstimator, ClassifierMixin):
         raise NotImplementedError("You should implement this!")
 
     @abstractmethod
-    def set(self, *args):
-        raise NotImplementedError("You should implement this!")
-
-    @abstractmethod
-    def get(self):
-        raise NotImplementedError("You should implement this!")
-
-    @abstractmethod
-    def set_variables(self, variables):
-        raise NotImplementedError("You should implement this!")
-
-    @abstractmethod
-    def get_variables(self):
+    def set_model_params(self, *args):
         raise NotImplementedError("You should implement this!")
 
     @abstractmethod
     def from_variables(self, variables):
+        raise NotImplementedError("You should implement this!")
+
+    def set_variables(self, variables):
+        model_params = self.from_variables(variables)
+        try:
+            self.set_model_params(*model_params)
+        except TypeError:
+            self.set_model_params(model_params)
+
+    @abstractmethod
+    def get_model_params(self):
         raise NotImplementedError("You should implement this!")
 
     @staticmethod
@@ -58,11 +60,19 @@ class LVQClassifier(ABC, BaseEstimator, ClassifierMixin):
     def to_variables(*args):
         raise NotImplementedError("You should implement this!")
 
+    def get_variables(self):
+        model_params = self.get_model_params()
+        try:
+            variables = self.to_variables(*model_params)
+        except TypeError:
+            variables = self.to_variables(model_params)
+        return variables
+
     @abstractmethod
     def update(self, gradient):
         raise NotImplementedError("You should implement this!")
 
-    # TODO: could also be class functions things that can be extended by user by providing another class same for omega.
+    # TODO: could also be class functions thing that can be extended by user by providing another class same for omega.
     def init_prototypes(self, data, y):
         conditional_mean = _conditional_mean(self.prototypes_labels_, data, y)
         return conditional_mean + (1e-4 * self.random_state_.uniform(-1, 1, conditional_mean.shape))

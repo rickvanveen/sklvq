@@ -10,7 +10,7 @@ from sklvq.objectives import GeneralizedLearningObjective
 from sklvq.objectives.generalized_learning_objective import _find_min
 
 
-# TODO: White list of methods suitable for GMLVQ
+# TODO: Local variant
 # TODO: Transform function sklearn
 
 
@@ -46,31 +46,23 @@ class GMLVQClassifier(LVQClassifier):
         # Depends also on local (per class/prototype) global omega # TODO: implement local per class and prototype
         self.variables_size_ = self.prototypes_.size + self.omega_.size
 
-        if type(self.activation_type) == str:
-            activation = activations.grab(self.activation_type, self.activation_params)
-        elif inspect.isclass(self.activation_type):
-            activation = self.activation_type(self.activation_params)
+        activation = activations.grab(self.activation_type,
+                                      self.activation_params)
 
-        discriminant = discriminants.grab(self.discriminant_type, self.discriminant_params)
+        discriminant = discriminants.grab(self.discriminant_type,
+                                          self.discriminant_params)
 
-        objective = GeneralizedLearningObjective(activation=activation, discriminant=discriminant)
+        objective = GeneralizedLearningObjective(activation=activation,
+                                                 discriminant=discriminant)
 
         return objective
 
-    def set(self, prototypes, omega):
+    def set_model_params(self, prototypes, omega):
         self.prototypes_ = prototypes
         self.omega_ = omega
 
-    def get(self):
+    def get_model_params(self):
         return self.prototypes_, self.omega_
-
-    # TODO might be added to LVQBaseClass
-    def set_variables(self, variables):
-        self.set(*self.from_variables(variables))
-
-    # TODO might be added to LVQBaseClass
-    def get_variables(self):
-        return self.to_variables(*self.get())
 
     def from_variables(self, variables):
         prototypes = np.reshape(variables[:self.prototypes_.size], self.prototypes_.shape)
@@ -82,7 +74,7 @@ class GMLVQClassifier(LVQClassifier):
         return np.append(prototypes.ravel(), omega.ravel())
 
     def update(self, gradient_update_variables):
-        self.set_variables(self.to_variables(*self.get()) - gradient_update_variables)
+        self.set_variables(self.to_variables(*self.get_model_params()) - gradient_update_variables)
 
     @staticmethod
     def _normalise(omega):
@@ -91,7 +83,7 @@ class GMLVQClassifier(LVQClassifier):
     def fit_transform(self, data, y):
         return self.fit(data, y).transform(data)
 
-    def transform(self, data):
+    def transform(self, data: np.ndarray) -> np.ndarray:
         data = check_array(data)
 
         check_is_fitted(self)
@@ -107,7 +99,6 @@ class GMLVQClassifier(LVQClassifier):
 
         return data_new
 
-    # TODO: not really the decision function
     def dist_function(self, data):
         # SciKit-learn list of checked params before predict
         check_is_fitted(self)
