@@ -62,7 +62,7 @@ def test_custom_activation_grab():
             return x
 
         def gradient(self, x: np.ndarray) -> np.ndarray:
-            return np.ones(x.shape)
+            return np.ones(x.shape) * self.beta
 
     custom_activation = activations.grab(CustomActivation, None)
     assert isinstance(custom_activation, CustomActivation)
@@ -73,7 +73,7 @@ def test_custom_activation_grab():
     s1 = custom_activation(z)
     g1 = custom_activation.gradient(z)
 
-    custom_activation = CustomActivation()
+    custom_activation = CustomActivation(beta=2)
     s2 = custom_activation(z)
     g2 = custom_activation.gradient(z)
 

@@ -14,7 +14,7 @@ def test_glvq_iris():
     iris.data = preprocessing.scale(iris.data)
 
     classifier = GLVQClassifier(solver_type='steepest-gradient-descent', distance_type='squared-euclidean',
-                                activation_type='identity', activation_params={'beta': 2})
+                                activation_type='sigmoid', activation_params={'beta': 2})
     classifier = classifier.fit(iris.data, iris.target)
 
     predicted = classifier.predict(iris.data)
@@ -22,32 +22,6 @@ def test_glvq_iris():
     accuracy = np.count_nonzero(predicted == iris.target) / iris.target.size
 
     print("\nIris accuracy: {}".format(accuracy))
-
-
-# def test_glvq_custom_functions():
-#
-#     class Identity(ActivationBaseClass):
-#         def __call__(self, x: np.ndarray) -> np.ndarray:
-#             return x
-#
-#         def gradient(self, x: np.ndarray) -> np.ndarray:
-#             return np.ones(x.shape)
-#
-#     test_activation_compatibility(Identity)
-#
-#     iris = datasets.load_iris()
-#
-#     iris.data = preprocessing.scale(iris.data)
-#
-#     classifier = GLVQClassifier(solver_type='steepest-gradient-descent', distance_type='sqeuclidean',
-#                                 activation_type=Identity())
-#     classifier = classifier.fit(iris.data, iris.target)
-#
-#     predicted = classifier.predict(iris.data)
-#
-#     accuracy = np.count_nonzero(predicted == iris.target) / iris.target.size
-#
-#     print("\nIris accuracy: {}".format(accuracy))
 
 
 def test_glvq_with_multiple_prototypes_per_class():

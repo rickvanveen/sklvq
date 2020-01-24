@@ -11,5 +11,3 @@ from .. import GMLVQClassifier
 )
 def test_estimators(estimator):
     return check_estimator(estimator)
-
-

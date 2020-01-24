@@ -12,9 +12,9 @@ def test_gmlvq_iris():
 
     iris.data = preprocessing.scale(iris.data)
 
-    classifier = GMLVQClassifier(solver_type='steepest-gradient-descent',
-                                 solver_params={'max_runs': 100, 'batch_size': 25}, activation_type='sigmoid',
-                                 activation_params={'beta': 2})
+    classifier = GMLVQClassifier(solver_type='lbfgs',
+                                 solver_params={'params': {'jac': None}}, activation_type='swish',
+                                 activation_params={'beta': 4})
     classifier = classifier.fit(iris.data, iris.target)
 
     predicted = classifier.predict(iris.data)
