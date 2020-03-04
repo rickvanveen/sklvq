@@ -10,15 +10,18 @@ from sklvq.activations.swish import Swish
 from sklearn.utils._testing import assert_array_almost_equal
 
 
+# values producing nice round results
+# inflection points
+# relative and absolute borders
+
+
 # Check if grab returns correct class, defaults of init (if any), basic workings are correct.
 def test_identity():
     identity = activations.grab('identity', None)
     # Test if grab returns the correct class
     assert isinstance(identity, Identity)
 
-    identity = Identity()
-
-    # Random data
+    # Random data - which is okay for the identity function
     rng = np.random.RandomState(0)
     x = rng.random_sample((5, 4))
 
@@ -29,130 +32,61 @@ def test_identity():
 
 def test_sigmoid():
     default_beta = 1
-    other_beta = 6
+    other_beta = 10
 
-    rng = np.random.RandomState(0)
-    x = rng.random_sample((5, 4))
-
-    # Check defaults
+    # Check if defaults are set using grab method
     sigmoid = activations.grab('sigmoid', None)
     assert isinstance(sigmoid, Sigmoid)
     assert sigmoid.beta == default_beta
-    s1 = sigmoid(x)
-    g1 = sigmoid.gradient(x)
 
-    sigmoid = Sigmoid()
-    assert sigmoid.beta == default_beta
-    s2 = sigmoid(x)
-    g2 = sigmoid.gradient(x)
+    assert (sigmoid(np.array([0])) == pytest.approx(0.5))
+    assert (sigmoid.gradient(np.array([0])) == pytest.approx(0.25))
 
-    # Check if grab and class() give same answer
-    assert_array_almost_equal(s1, s2)
-    assert_array_almost_equal(g1, g2)
+    # Always positive
+    assert (sigmoid(np.array([-1]) > 0))
+    assert (sigmoid(np.array([1]) > 0))
 
-    # Check other init
+    # Symmetry
+    assert (1 - sigmoid(np.array([-1])) == pytest.approx(sigmoid(np.array([1]))))
+
+    # Check if parameters are passed to sigmoid class when using grab
     sigmoid = activations.grab('sigmoid', {'beta': other_beta})
     assert isinstance(sigmoid, Sigmoid)
     assert sigmoid.beta == other_beta
-    s1 = sigmoid(x)
-    g1 = sigmoid(x)
 
-    sigmoid = Sigmoid(beta=other_beta)
-    assert sigmoid.beta == other_beta
-    s2 = sigmoid(x)
-    g2 = sigmoid(x)
-
-    # Check if grab and class() give same answer
-    assert_array_almost_equal(s1, s2)
-    assert_array_almost_equal(g1, g2)
+    assert (sigmoid(np.array([0])) == pytest.approx(0.5))
+    assert (sigmoid.gradient(np.array([0])) == pytest.approx(2.5))
 
 
 def test_soft_plus():
     default_beta = 1
-    other_beta = 6
-
-    rng = np.random.RandomState(0)
-    x = rng.random_sample((5, 4))
+    other_beta = 10
 
     soft_plus = activations.grab('soft+', None)
     assert isinstance(soft_plus, SoftPlus)
     assert soft_plus.beta == default_beta
-    s1 = soft_plus(x)
-    g1 = soft_plus.gradient(x)
 
     soft_plus = activations.grab('soft-plus', None)
     assert isinstance(soft_plus, SoftPlus)
     assert soft_plus.beta == default_beta
-    s2 = soft_plus(x)
-    g2 = soft_plus.gradient(x)
-
-    soft_plus = SoftPlus()
-    assert soft_plus.beta == default_beta
-    s3 = soft_plus(x)
-    g3 = soft_plus.gradient(x)
-
-    # Check if they all provide the same answer
-    assert_array_almost_equal(s1, s2)
-    assert_array_almost_equal(s1, s3)
-    assert_array_almost_equal(g1, g2)
-    assert_array_almost_equal(g1, g3)
 
     soft_plus = activations.grab('soft+', {'beta': other_beta})
     assert isinstance(soft_plus, SoftPlus)
     assert soft_plus.beta == other_beta
-    s1 = soft_plus(x)
-    g1 = soft_plus.gradient(x)
 
     soft_plus = activations.grab('soft-plus', {'beta': other_beta})
     assert isinstance(soft_plus, SoftPlus)
     assert soft_plus.beta == other_beta
-    s2 = soft_plus(x)
-    g2 = soft_plus.gradient(x)
-
-    soft_plus = SoftPlus(beta=other_beta)
-    assert soft_plus.beta == other_beta
-    s3 = soft_plus(x)
-    g3 = soft_plus.gradient(x)
-
-    # Check if they all provide the same answer and use beta
-    assert_array_almost_equal(s1, s2)
-    assert_array_almost_equal(s2, s3)
-    assert_array_almost_equal(g1, g2)
-    assert_array_almost_equal(g1, g3)
 
 
 def test_swish():
     default_beta = 1
-    other_beta = 6
-
-    rng = np.random.RandomState(0)
-    x = rng.random_sample((5, 4))
+    other_beta = 10
 
     swift = activations.grab('swish', None)
     assert isinstance(swift, Swish)
     assert swift.beta == default_beta
-    s1 = swift(x)
-    g1 = swift(x)
-
-    swish = Swish()
-    assert swish.beta == default_beta
-    s2 = swish(x)
-    g2 = swift(x)
-
-    assert_array_almost_equal(s1, s2)
-    assert_array_almost_equal(g1, g2)
 
     swift = activations.grab('swish', {'beta': other_beta})
     assert isinstance(swift, Swish)
     assert swift.beta == other_beta
-    s1 = swift(x)
-    g1 = swift(x)
-
-    swish = Swish(beta=other_beta)
-    assert swish.beta == other_beta
-    s2 = swish(x)
-    g2 = swift(x)
-
-    assert_array_almost_equal(s1, s2)
-    assert_array_almost_equal(g1, g2)
-
