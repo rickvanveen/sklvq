@@ -6,6 +6,7 @@ import inspect
 #  every classifier
 # TODO: look into how to deal with custom objects
 
+# TODO: when wrong parameters are provided all the defaults will be used without warnings.... this is not really nice.
 
 def grab(class_type, class_params, aliases, package, base_class):
     if inspect.isclass(class_type):

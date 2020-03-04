@@ -6,7 +6,6 @@ if TYPE_CHECKING:
     from sklvq.models import LVQClassifier
 
 
-# TODO: regularization?
 class GeneralizedLearningObjective(ObjectiveBaseClass):
 
     # TODO: These parameters are not actually optional... should be non-optional parameters.
@@ -14,22 +13,23 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
         self.activation = activation
         self.discriminant = discriminant
 
+    # Note: Objective changes the model... and does not copy it...
     def __call__(self,variables: np.ndarray, model: 'LVQClassifier', data: np.ndarray, labels: np.ndarray) -> np.ndarray:
-        model.set_variables(variables)
+        model.set_model_params(model.to_params(variables))
 
         dist_same, dist_diff, _, _ = _compute_distance(data, labels, model)
 
-        # self.discriminant(x, model)
         return np.sum(self.activation(self.discriminant(dist_same, dist_diff)))
 
+    # Note: Gradient function changes the model... and does not copy it...
     def gradient(self, variables: np.ndarray, model: 'LVQClassifier', data: np.ndarray, labels: np.ndarray) -> np.ndarray:
-        model.set_variables(variables)
+        model.set_model_params(model.to_params(variables))
 
         dist_same, dist_diff, i_dist_same, i_dist_diff = _compute_distance(data, labels, model)
 
         discriminant_score = self.discriminant(dist_same, dist_diff)
 
-        gradient = np.zeros(model.variables_size_)
+        gradient = np.zeros(variables.size)
 
         # For each prototype
         for i_prototype in range(0, model.prototypes_labels_.size):
