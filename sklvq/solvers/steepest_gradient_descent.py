@@ -4,8 +4,6 @@ import numpy as np
 from . import SolverBaseClass
 from sklvq.objectives import ObjectiveBaseClass
 
-from operator import mul
-
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sklvq.models import LVQClassifier
@@ -23,9 +21,6 @@ class SteepestGradientDescent(SolverBaseClass):
               objective: ObjectiveBaseClass,
               model: 'LVQClassifier') -> 'LVQClassifier':
 
-        if self.step_size.size is not model._number_of_params:
-            self.step_size = np.repeat(self.step_size, model._number_of_params)
-
         step_size = self.step_size
         for i_run in range(0, self.max_runs):
 
@@ -41,19 +36,39 @@ class SteepestGradientDescent(SolverBaseClass):
                 axis=0)
 
             for i_batch in range(0, len(batches)):
-                # Select data to base the update on...
+                # Select the batch
                 batch = data[batches[i_batch], :]
                 batch_labels = labels[batches[i_batch]]
 
-                gradient = model.from_variables(objective.gradient(model.get_variables(), model, batch, batch_labels))
+                # Get model params variable shape (flattened)
+                model_variables = model.to_variables(
+                    model.get_model_params()
+                )
 
-                # Applies step_size[0] (multiplies) to first returned model_param, steps_size[1] to second etc.
-                if isinstance(gradient, tuple):
-                    gradient = tuple(map(mul, tuple(np.atleast_1d(step_size)), gradient))
-                    model.update(*gradient)
-                else:
-                    gradient = step_size * gradient
-                    model.update(gradient)
+                # Compute the objective gradient
+                objective_gradient = model.to_params(
+                    objective.gradient(
+                        model_variables,
+                        model,
+                        batch,
+                        batch_labels
+                    )
+                )
+
+                # Apply the step size to the model parameters
+                objective_gradient = model.to_variables(
+                    model.mul_params(
+                        objective_gradient,
+                        step_size
+                    )
+                )
+
+                # Update the model
+                model.set_model_params(
+                    model.to_params(
+                        model_variables - objective_gradient
+                    )
+                )
 
             step_size = self.step_size / (1 + i_run/self.max_runs)
 

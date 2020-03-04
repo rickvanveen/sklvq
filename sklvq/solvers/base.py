@@ -38,10 +38,11 @@ class ScipyBaseSolver(SolverBaseClass):
 
         result = sp.optimize.minimize(
             objective,
-            model.get_variables(),
+            model.to_variables(model.get_model_params()),
             method=self.method,
             args=(model, data, labels),
             **params)
 
-        model.set_variables(result.x)
+        # Update model
+        model.set_model_params(model.to_params(result.x))
         return model

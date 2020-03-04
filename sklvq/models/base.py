@@ -37,40 +37,34 @@ class LVQClassifier(ABC, BaseEstimator, ClassifierMixin):
         raise NotImplementedError("You should implement this!")
 
     @abstractmethod
-    def set_model_params(self, *args):
+    def set_model_params(self, model_params):
         raise NotImplementedError("You should implement this!")
-
-    @abstractmethod
-    def from_variables(self, variables):
-        raise NotImplementedError("You should implement this!")
-
-    def set_variables(self, variables):
-        model_params = self.from_variables(variables)
-        try:
-            self.set_model_params(*model_params)
-        except TypeError:
-            self.set_model_params(model_params)
 
     @abstractmethod
     def get_model_params(self):
         raise NotImplementedError("You should implement this!")
 
     @staticmethod
-    @abstractmethod
-    def to_variables(*args):
-        raise NotImplementedError("You should implement this!")
-
-    def get_variables(self):
-        model_params = self.get_model_params()
-        try:
-            variables = self.to_variables(*model_params)
-        except TypeError:
-            variables = self.to_variables(model_params)
-        return variables
+    def to_variables(model_params):
+        return np.concatenate(model_params).ravel()
 
     @abstractmethod
-    def update(self, gradient):
+    def to_params(self, variables):
         raise NotImplementedError("You should implement this!")
+
+    @staticmethod
+    @abstractmethod
+    def normalize_params(model_params):
+        raise NotImplementedError("You should implement this!")
+
+    @staticmethod
+    @abstractmethod
+    def mul_params(model_params, other):
+        raise NotImplementedError("You should implement this!")
+
+    @staticmethod
+    def normalize_prototypes(prototypes):
+        return prototypes / np.linalg.norm(prototypes, axis=1, keepdims=True)
 
     # TODO: could also be class functions thing that can be extended by user by providing another class same for omega.
     def init_prototypes(self, data, y):

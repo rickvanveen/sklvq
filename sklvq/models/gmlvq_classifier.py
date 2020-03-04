@@ -9,6 +9,10 @@ from sklvq.objectives import GeneralizedLearningObjective
 
 from sklvq.objectives.generalized_learning_objective import _find_min
 
+from typing import Tuple
+from typing import Union
+
+ModelParamsType = Tuple[np.ndarray, np.ndarray]
 
 # TODO: Local variant
 # TODO: Transform function sklearn
@@ -38,7 +42,7 @@ class GMLVQClassifier(LVQClassifier):
         """ . """
         if self.omega is None:
             self.omega_ = np.diag(np.ones(data.shape[1]))
-            self.omega_ = self._normalise(self.omega_)
+            self.omega_ = self._normalise_omega(self.omega_)
         else:
             self.omega_ = self.omega
 
@@ -58,30 +62,36 @@ class GMLVQClassifier(LVQClassifier):
 
         return objective
 
-    def set_model_params(self, prototypes, omega):
-        self.prototypes_ = np.atleast_2d(prototypes)
-        self.omega_ = omega
+    def set_model_params(self, model_params: ModelParamsType) -> None:
+        (self.prototypes_, self.omega_) = model_params
 
-    def get_model_params(self):
+    def get_model_params(self) -> ModelParamsType:
         return self.prototypes_, self.omega_
 
-    def from_variables(self, variables):
-        prototypes = np.reshape(variables[:self.prototypes_.size], self.prototypes_.shape)
-        omega = self._normalise(np.reshape(variables[self.prototypes_.size:], self.omega_.shape))
-        return prototypes, omega
+    def to_params(self, variables: np.ndarray) -> ModelParamsType:
+        # First part of the variables are the prototypes
+        prototype_indices = range(self.prototypes_.size)
+
+        # Second part are the omegas
+        omega_indices = range(self.prototypes_.size, variables.size)
+
+        # Return tuple of correctly reshaped prototypes and omegas
+        return (np.reshape(np.take(variables, prototype_indices), self.prototypes_.shape),
+                np.reshape(np.take(variables, omega_indices), self.omega_.shape))
 
     @staticmethod
-    def to_variables(prototypes, omega):
-        return np.append(prototypes.ravel(), omega.ravel())
-
-    def update(self, *args):
-        self.set_variables(self.to_variables(*self.get_model_params()) - self.to_variables(args[0], args[1]))
-
-    @staticmethod
-    def _normalise(omega):
+    def _normalise_omega(omega: np.ndarray) -> np.ndarray:
         return omega / np.sqrt(np.sum(np.diagonal(omega.T.dot(omega))))
 
-    def fit_transform(self, data, y):
+    @staticmethod
+    def normalize_params(model_params: ModelParamsType) -> ModelParamsType:
+        (prototypes, omega) = model_params
+        normalized_prototypes = prototypes / np.linalg.norm(prototypes, axis=1, keepdims=True)
+        normalized_omega = GMLVQClassifier._normalise_omega(omega)
+        return (normalized_prototypes,
+                normalized_omega)
+
+    def fit_transform(self, data: np.ndarray, y: np.ndarray) -> np.ndarray:
         return self.fit(data, y).transform(data)
 
     def transform(self, data: np.ndarray) -> np.ndarray:
@@ -142,3 +152,14 @@ class GMLVQClassifier(LVQClassifier):
         winner = distances[:, 0]
 
         return -1 * winner
+
+    @staticmethod
+    def mul_params(model_params: ModelParamsType, other: Tuple[int, float, np.ndarray]) -> ModelParamsType:
+        (prots, omegs) = model_params
+        if isinstance(other, np.ndarray):
+            if other.size >= 2:
+                return (prots * other[0],
+                        omegs * other[1])
+        # Scalar int or float
+        return (prots * other,
+                omegs * other)

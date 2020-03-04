@@ -7,6 +7,10 @@ from sklvq import activations, discriminants
 # Cannot be switched out by parameters to the models.
 from sklvq.objectives import GeneralizedLearningObjective
 
+from typing import Tuple
+
+ModelParamsType = np.ndarray
+
 
 # Template (Context Implementation)
 class GLVQClassifier(LVQClassifier):
@@ -14,7 +18,7 @@ class GLVQClassifier(LVQClassifier):
     # NOTE: Objective will be fixed. If another objective is needed a new classifier and objective should be created.
     def __init__(self,
                  distance_type='squared-euclidean', distance_params=None,
-                 activation_type = 'identity', activation_params=None,
+                 activation_type='identity', activation_params=None,
                  discriminant_type='relative-distance', discriminant_params=None,
                  solver_type='steepest-gradient-descent', solver_params=None,
                  prototypes=None, prototypes_per_class=1, random_state=None):
@@ -47,18 +51,22 @@ class GLVQClassifier(LVQClassifier):
 
         return objective
 
-    def set_model_params(self, prototypes):
-        self.prototypes_ = np.atleast_2d(prototypes)
+    # Functions used in optimizers...
+    def set_model_params(self, model_params):
+        self.prototypes_ = model_params
 
     def get_model_params(self):
         return self.prototypes_
 
-    def from_variables(self, variables):
-        return variables.reshape(self.prototypes_.shape)
+    def to_params(self, variables):
+        return np.reshape(variables, self.prototypes_.shape)
 
     @staticmethod
-    def to_variables(prototypes):
-        return prototypes.ravel()
+    def normalize_params(model_params):
+        return LVQClassifier.normalize_prototypes(model_params)
 
-    def update(self, gradient_update_variables):
-        self.prototypes_ -= self.from_variables(gradient_update_variables)
+    @staticmethod
+    def mul_params(model_params: ModelParamsType, other: Tuple[int, float]) -> ModelParamsType:
+        prots = model_params
+        # Scalar int or float
+        return prots * other
