@@ -21,6 +21,7 @@ class AdaptiveMomentEstimation(SolverBaseClass):
         self.beta1 = beta1
         self.beta2 = beta2
         self.step_size = step_size
+        self.epsilon = 1e-4
 
     def solve(self, data: np.ndarray,
               labels: np.ndarray,
@@ -79,7 +80,7 @@ class AdaptiveMomentEstimation(SolverBaseClass):
                 v_hat = v / (1 - self.beta2**p)
 
                 # Make the epsilon (small value) a parameter
-                objective_gradient = self.step_size * m_hat / (np.sqrt(v_hat) + 1e-4)
+                objective_gradient = self.step_size * m_hat / (np.sqrt(v_hat) + self.epsilon)
 
                 model.set_model_params(
                     model.to_params(

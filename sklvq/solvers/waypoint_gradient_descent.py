@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
 class WaypointGradientDescent(SolverBaseClass):
 
-    def __init__(self, max_runs=10, step_size=0.2, loss=0.1, gain=1.1, k=3):
+    def __init__(self, max_runs=10, step_size=np.array([1, 2]), loss=2/3, gain=1.1, k=5):
         self.max_runs = max_runs
         self.step_size = step_size
         self.loss = loss
