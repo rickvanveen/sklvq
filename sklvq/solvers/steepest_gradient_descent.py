@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 class SteepestGradientDescent(SolverBaseClass):
 
-    def __init__(self, max_runs=10, batch_size=10, step_size=0.2):
+    def __init__(self, max_runs=10, batch_size=1, step_size=0.2):
         self.max_runs = max_runs
         self.batch_size = batch_size
         self.step_size = step_size

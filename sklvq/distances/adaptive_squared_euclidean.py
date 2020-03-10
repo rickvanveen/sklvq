@@ -61,19 +61,21 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
         prototype_gradient[:, i_prototype, :] = np.atleast_2d(
             _prototype_gradient(data,
                                 model.prototypes_[i_prototype, :],
-                                model.omega_))
+                                model.omega_)
+        )
         omega_gradient = np.atleast_2d(
             _omega_gradient(data,
                             model.prototypes_[i_prototype, :],
-                            model.omega_))
+                            model.omega_)
+        )
 
         return np.hstack((prototype_gradient.reshape(shape[0], shape[1] * shape[2]), omega_gradient))
 
 
 def _prototype_gradient(data: np.ndarray, prototype: np.ndarray, omega: np.ndarray) -> np.ndarray:
-    direction = (-2 * (data - prototype)).T
+    difference = (-2 * (data - prototype)).T
     relevance = omega.T.dot(omega)
-    return np.matmul(relevance, direction).T
+    return np.matmul(relevance, difference).T
 
 
 def _omega_gradient(data: np.ndarray, prototype: np.ndarray, omega: np.ndarray) -> np.ndarray:

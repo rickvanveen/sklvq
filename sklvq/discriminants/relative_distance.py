@@ -77,6 +77,7 @@ def _gradient_same(dist_same: np.ndarray, dist_diff: np.ndarray) -> np.ndarray:
     with np.errstate(divide='ignore', invalid='ignore'):  # Suppresses runtime warning
         return 2 * dist_diff / (dist_same + dist_diff) ** 2
 
+
 def _gradient_diff(dist_same: np.ndarray, dist_diff: np.ndarray) -> np.ndarray:
     """ The partial derivative of the discriminant function with respect to the prototype with a different label:
         .. math::

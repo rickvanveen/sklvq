@@ -8,8 +8,7 @@ if TYPE_CHECKING:
 
 class GeneralizedLearningObjective(ObjectiveBaseClass):
 
-    # TODO: These parameters are not actually optional... should be non-optional parameters.
-    def __init__(self, activation=None, discriminant=None):
+    def __init__(self, activation, discriminant):
         self.activation = activation
         self.discriminant = discriminant
 

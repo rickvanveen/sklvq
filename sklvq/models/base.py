@@ -91,8 +91,6 @@ class LVQClassifier(ABC, BaseEstimator, ClassifierMixin):
         self.random_state_ = check_random_state(self.random_state)
 
         # Common LVQ steps
-        # TODO: figure out where to put this logically... either like this or input to discriminant
-        #  or objective
         self.distance_ = distances.grab(self.distance_type, self.distance_params)
 
         # Always given by default value accepts anything
