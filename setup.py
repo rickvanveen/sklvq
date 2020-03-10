@@ -1,5 +1,4 @@
 #! /usr/bin/env python
-
 import codecs
 import os
 
@@ -20,7 +19,7 @@ URL = 'https://github.com/rickvanveen/sklvq'
 LICENSE = 'GNU Affero General Public License v3.0'
 DOWNLOAD_URL = 'https://github.com/rickvanveen/sklvq'
 VERSION = __version__
-INSTALL_REQUIRES = ['numpy', 'scipy', 'scikit-learn']
+INSTALL_REQUIRES = ['numpy', 'scipy', 'scikit-learn', 'numdifftools']
 CLASSIFIERS = ['Intended Audience :: Science/Research',
                'Intended Audience :: Developers',
                'License :: OSI Approved',
