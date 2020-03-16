@@ -1,5 +1,4 @@
 from . import LVQClassifier
-import inspect
 
 import numpy as np
 from sklearn.utils.validation import check_is_fitted, check_array
@@ -7,11 +6,7 @@ from sklearn.utils.validation import check_is_fitted, check_array
 from sklvq import activations, discriminants, objectives
 from sklvq.objectives import GeneralizedLearningObjective
 
-from sklvq.objectives.generalized_learning_objective import _find_min
-
 from typing import Tuple
-from typing import Union
-
 ModelParamsType = Tuple[np.ndarray, np.ndarray]
 
 # TODO: Local variant
@@ -41,11 +36,11 @@ class GMLVQClassifier(LVQClassifier):
     def initialize(self, data, labels):
         """ . """
         if self.omega is None:
-            self.omega_ = np.diag(np.ones(data.shape[1]))
-            self.omega_ = self._normalise_omega(self.omega_)
+            self.omega_ = np.eye(data.shape[1])
         else:
             self.omega_ = self.omega
 
+        self.omega_ = self._normalise_omega(self.omega_)
         self._number_of_params = 2
 
         # Depends also on local (per class/prototype) global omega # TODO: implement local per class and prototype
@@ -63,10 +58,14 @@ class GMLVQClassifier(LVQClassifier):
         return objective
 
     def set_model_params(self, model_params: ModelParamsType) -> None:
-        (self.prototypes_, self.omega_) = model_params
+
+        (self.prototypes_, omega) = model_params
+        self.omega_ = self._normalise_omega(omega)
+
 
     def get_model_params(self) -> ModelParamsType:
         return self.prototypes_, self.omega_
+
 
     def to_params(self, variables: np.ndarray) -> ModelParamsType:
         # First part of the variables are the prototypes
@@ -109,6 +108,7 @@ class GMLVQClassifier(LVQClassifier):
         data_new = data.dot(eigenvectors)
 
         return data_new
+
 
     def dist_function(self, data):
         # SciKit-learn list of checked params before predict
