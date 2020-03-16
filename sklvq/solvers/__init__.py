@@ -1,14 +1,10 @@
-from .solver_base_class import SolverBaseClass
-from .scipy_base_solver import ScipyBaseSolver
+from .base import (SolverBaseClass, ScipyBaseSolver)
 from .steepest_gradient_descent import SteepestGradientDescent
-from .adaptive_gradient_descent import AdaptiveGradientDescent
-from .adaptive_moment_estimation import AdaptiveMomentEstimation
+
 
 __all__ = ['SolverBaseClass',
            'ScipyBaseSolver',
-           'SteepestGradientDescent',
-           'AdaptiveGradientDescent',
-           'AdaptiveMomentEstimation']
+           'SteepestGradientDescent']
 
 from ..misc import utils
 

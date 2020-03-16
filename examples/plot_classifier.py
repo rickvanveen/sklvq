@@ -1,10 +1,10 @@
-# """
-# ============================
-# Plotting Template Classifier
-# ============================
-#
-# An example plot of :class:`skltemplate.template.TemplateClassifier`
-# """
+"""
+============================
+Plotting Template Classifier
+============================
+
+An example plot of :class:`skltemplate.template.TemplateClassifier`
+"""
 # import numpy as np
 # from sklvq import TemplateClassifier
 # from matplotlib import pyplot as plt

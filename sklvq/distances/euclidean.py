@@ -3,10 +3,14 @@ import numpy as np
 
 from . import DistanceBaseClass
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sklvq.models import LVQClassifier
+
 
 class Euclidean(DistanceBaseClass):
 
-    def __call__(self, data: np.ndarray, model) -> np.ndarray:
+    def __call__(self, data: np.ndarray, model: 'LVQClassifier') -> np.ndarray:
         """ Wrapper function for scipy's cdist(x, y, 'euclidean') function
 
             See scipy.spatial.distance.cdist for full documentation.
@@ -28,11 +32,6 @@ class Euclidean(DistanceBaseClass):
         """
         return sp.spatial.distance.cdist(data, model.prototypes_, 'euclidean')
 
-    @staticmethod
-    def _gradient(data: np.ndarray, prototype: np.ndarray) -> np.ndarray:
-        difference = data - prototype
-        return (-1 * difference) / np.sqrt(np.sum(difference ** 2))
-
     def gradient(self, data: np.ndarray, model, i_prototype: int) -> np.ndarray:
         """ Implements the derivative of the euclidean distance, with respect to 1 prototype
 
@@ -45,7 +44,7 @@ class Euclidean(DistanceBaseClass):
                        The gradient with respect to the prototype and every observation in data.
 
         """
-        shape = [data.shape[0], *model.prototypes_.shape]
+        shape = [data.shape[0], * model.prototypes_.shape]
         gradient = np.zeros(shape)
 
         difference = data - model.prototypes_[i_prototype, :]

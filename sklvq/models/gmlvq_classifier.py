@@ -1,5 +1,4 @@
 from . import LVQClassifier
-import inspect
 
 import numpy as np
 from sklearn.utils.validation import check_is_fitted, check_array
@@ -7,10 +6,11 @@ from sklearn.utils.validation import check_is_fitted, check_array
 from sklvq import activations, discriminants, objectives
 from sklvq.objectives import GeneralizedLearningObjective
 
-from sklvq.objectives.generalized_learning_objective import _find_min
+from typing import Tuple
 
+ModelParamsType = Tuple[np.ndarray, np.ndarray]
 
-# TODO: White list of methods suitable for GMLVQ
+# TODO: Local variant
 # TODO: Transform function sklearn
 
 
@@ -20,75 +20,80 @@ class GMLVQClassifier(LVQClassifier):
                  distance_type='adaptive-squared-euclidean', distance_params=None,
                  activation_type='identity', activation_params=None,
                  discriminant_type='relative-distance', discriminant_params=None,
-                 solver_type='sgd', solver_params=None,
-                 verbose=False,
-                 prototypes_per_class=1, random_state=None):
+                 solver_type='steepest-gradient-descent', solver_params=None, verbose=False,
+                 prototypes=None, prototypes_per_class=1, omega=None, random_state=None):
         self.activation_type = activation_type
         self.activation_params = activation_params
         self.discriminant_type = discriminant_type
         self.discriminant_params = discriminant_params
+        self.omega = omega
         self.verbose = verbose
 
         super(GMLVQClassifier, self).__init__(distance_type, distance_params,
                                               solver_type, solver_params,
-                                              prototypes_per_class, random_state)
+                                              prototypes_per_class, prototypes, random_state)
 
     # Get's called in fit.
     def initialize(self, data, labels):
         """ . """
-        # Initialize omega. TODO: Make dynamic like the rest.
-        self.omega_ = np.diag(np.ones(data.shape[1]))
-        self.omega_ = self._normalise(self.omega_)
+        if self.omega is None:
+            self.omega_ = np.eye(data.shape[1])
+        else:
+            self.omega_ = self.omega
+
+        self.omega_ = self._normalise_omega(self.omega_)
+
+        self._number_of_params = 2
 
         # Depends also on local (per class/prototype) global omega # TODO: implement local per class and prototype
         self.variables_size_ = self.prototypes_.size + self.omega_.size
 
-        if type(self.activation_type) == str:
-            activation = activations.grab(self.activation_type, self.activation_params)
-        elif inspect.isclass(self.activation_type):
-            activation = self.activation_type(self.activation_params)
+        activation = activations.grab(self.activation_type,
+                                      self.activation_params)
 
-        discriminant = discriminants.grab(self.discriminant_type, self.discriminant_params)
+        discriminant = discriminants.grab(self.discriminant_type,
+                                          self.discriminant_params)
 
-        objective = GeneralizedLearningObjective(activation=activation, discriminant=discriminant)
+        objective = GeneralizedLearningObjective(activation=activation,
+                                                 discriminant=discriminant)
 
         return objective
 
-    def set(self, prototypes, omega):
-        self.prototypes_ = prototypes
-        self.omega_ = omega
+    def set_model_params(self, model_params: ModelParamsType) -> None:
+        (self.prototypes_, omega) = model_params
+        self.omega_ = self._normalise_omega(omega)
 
-    def get(self):
+
+    def get_model_params(self) -> ModelParamsType:
         return self.prototypes_, self.omega_
 
-    # TODO might be added to LVQBaseClass
-    def set_variables(self, variables):
-        self.set(*self.from_variables(variables))
+    def to_params(self, variables: np.ndarray) -> ModelParamsType:
+        # First part of the variables are the prototypes
+        prototype_indices = range(self.prototypes_.size)
 
-    # TODO might be added to LVQBaseClass
-    def get_variables(self):
-        return self.to_variables(*self.get())
+        # Second part are the omegas
+        omega_indices = range(self.prototypes_.size, variables.size)
 
-    def from_variables(self, variables):
-        prototypes = np.reshape(variables[:self.prototypes_.size], self.prototypes_.shape)
-        omega = self._normalise(np.reshape(variables[self.prototypes_.size:], self.omega_.shape))
-        return prototypes, omega
+        # Return tuple of correctly reshaped prototypes and omegas
+        return (np.reshape(np.take(variables, prototype_indices), self.prototypes_.shape),
+                np.reshape(np.take(variables, omega_indices), self.omega_.shape))
 
     @staticmethod
-    def to_variables(prototypes, omega):
-        return np.append(prototypes.ravel(), omega.ravel())
-
-    def update(self, gradient_update_variables):
-        self.set_variables(self.to_variables(*self.get()) - gradient_update_variables)
-
-    @staticmethod
-    def _normalise(omega):
+    def _normalise_omega(omega: np.ndarray) -> np.ndarray:
         return omega / np.sqrt(np.sum(np.diagonal(omega.T.dot(omega))))
 
-    def fit_transform(self, data, y):
+    @staticmethod
+    def normalize_params(model_params: ModelParamsType) -> ModelParamsType:
+        (prototypes, omega) = model_params
+        normalized_prototypes = prototypes / np.linalg.norm(prototypes, axis=1, keepdims=True)
+        normalized_omega = GMLVQClassifier._normalise_omega(omega)
+        return (normalized_prototypes,
+                normalized_omega)
+
+    def fit_transform(self, data: np.ndarray, y: np.ndarray) -> np.ndarray:
         return self.fit(data, y).transform(data)
 
-    def transform(self, data):
+    def transform(self, data: np.ndarray) -> np.ndarray:
         data = check_array(data)
 
         check_is_fitted(self)
@@ -104,7 +109,23 @@ class GMLVQClassifier(LVQClassifier):
 
         return data_new
 
-    # TODO: not really the decision function
+    # def predict(self, X):
+    #     D = self.decision_function(X)
+    #     return self.classes_[np.argmax(D, axis=1)]
+    # return self.prototypes_labels_.take(self.distance_(data, self).argmin(axis=1))
+
+    # array-like of shape (n_samples,) or (n_samples, n_classes)
+    #         Target scores. In the binary and multilabel cases, these can be either
+    #         probability estimates or non-thresholded decision values (as returned
+    #         by `decision_function` on some classifiers). In the multiclass case,
+    #         these must be probability estimates which sum to 1. The binary
+    #         case expects a shape (n_samples,), and the scores must be the scores of
+    #         the class with the greater label. The multiclass and multilabel
+    #         cases expect a shape (n_samples, n_classes). In the multiclass case,
+    #         the order of the class scores must correspond to the order of
+    #         ``labels``, if provided, or else to the numerical or lexicographical
+    #         order of the labels in ``y_true``.
+
     def dist_function(self, data):
         # SciKit-learn list of checked params before predict
         check_is_fitted(self)
@@ -147,3 +168,14 @@ class GMLVQClassifier(LVQClassifier):
         winner = distances[:, 0]
 
         return -1 * winner
+
+    @staticmethod
+    def mul_params(model_params: ModelParamsType, other: Tuple[int, float, np.ndarray]) -> ModelParamsType:
+        (prots, omegs) = model_params
+        if isinstance(other, np.ndarray):
+            if other.size >= 2:
+                return (prots * other[0],
+                        omegs * other[1])
+        # Scalar int or float
+        return (prots * other,
+                omegs * other)

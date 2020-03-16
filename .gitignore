@@ -1,9 +1,6 @@
 .DS_Store
 .pytest_cache
 
-# TEMP
-sklvq/tests/*
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -14,9 +11,8 @@ __pycache__/
 
 # scikit-learn specific
 doc/_build/
+doc/generated/
 doc/auto_examples/
-doc/modules/generated/
-doc/datasets/generated/
 
 # Distribution / packaging
 .Python

@@ -37,6 +37,7 @@ class SquaredEuclidean(DistanceBaseClass):
 
             Parameters
             ----------
+            model
             data       : ndarray, shape = [n_observations, n_features]
 
             prototype  : ndarray, shape = [n_features,]

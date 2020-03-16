@@ -1,10 +1,10 @@
-# """
-# ===========================
-# Plotting Template Estimator
-# ===========================
-#
-# An example plot of :class:`skltemplate.template.TemplateEstimator`
-# """
+"""
+===========================
+Plotting Template Estimator
+===========================
+
+An example plot of :class:`skltemplate.template.TemplateEstimator`
+"""
 # import numpy as np
 # from sklvq import TemplateEstimator
 # from matplotlib import pyplot as plt
