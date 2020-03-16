@@ -34,11 +34,12 @@ class VarianceGradientDescent(SolverBaseClass):
             random_state=model.random_state_)
 
         P = labels.size
+
         g = np.zeros(variables_size)
         v = np.zeros(variables_size)
         h = np.zeros(variables_size)
 
-        hess_diagonal = nd.Derivative(objective.gradient, n=1)
+        hess_diagonal = nd.Hessdiag(objective)
 
         for i_sample in range(0, len(shuffled_indices)):
             # Get sample and its label
@@ -99,13 +100,13 @@ class VarianceGradientDescent(SolverBaseClass):
                      + (inv_tau * objective_gradient))
 
                 v = (((1 - inv_tau) * v)
-                     + (inv_tau * objective_gradient ** 2))
+                     + (inv_tau * (objective_gradient ** 2)))
 
                 h = (((1 - inv_tau) * h)
                      + (inv_tau * hess_diagonal(model_variables, model, sample, sample_label)))
 
-                tau = (1 - g**2 / v) * tau + 1
-                eta = g**2 / (v * h)
+                tau = (1 - (g**2) / v) * tau + 1
+                eta = (g**2) / (v * h)
 
                 model.set_model_params(
                     model.to_params(

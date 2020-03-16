@@ -46,7 +46,8 @@ class LVQClassifier(ABC, BaseEstimator, ClassifierMixin):
 
     @staticmethod
     def to_variables(model_params):
-        return np.concatenate(model_params).ravel()
+        return np.concatenate(list(map(np.ravel, model_params)))
+        # return np.concatenate(model_params).ravel()
 
     @abstractmethod
     def to_params(self, variables):
@@ -110,6 +111,30 @@ class LVQClassifier(ABC, BaseEstimator, ClassifierMixin):
 
         return solver.solve(data, labels, objective, self)
 
+    def decision_function(self, data):
+        # SciKit-learn list of checked params before predict
+        check_is_fitted(self)
+
+        # Input validation
+        data = check_array(data)
+
+        # Of shape n_observations , n_prototypes
+        distances = self.distance_(data, self)
+
+        # Allocation
+        min_distances = np.zeros((data.shape[0], self.classes_.size))
+
+        # return n_observations, n_classes
+        for i, c in enumerate(self.classes_):
+            min_distances[:, i] = distances[:, self.prototypes_labels_ == c].min(axis=1)
+
+        sum_min_distances = np.sum(min_distances, axis=1)
+
+        return (1 - (min_distances / sum_min_distances[:, np.newaxis])) / 2
+
+    def predict_proba(self, data):
+        return self.decision_function(data)
+
     def predict(self, data):
         # SciKit-learn list of checked params before predict
         check_is_fitted(self)
@@ -117,6 +142,9 @@ class LVQClassifier(ABC, BaseEstimator, ClassifierMixin):
         # Input validation
         data = check_array(data)
 
+        decision_values = self.decision_function(data)
+
         # TODO: Reject option?
         # Prototypes labels are indices of classes_
-        return self.prototypes_labels_.take(self.distance_(data, self).argmin(axis=1))
+        # return self.prototypes_labels_.take(self.distance_(data, self).argmin(axis=1))
+        return self.classes_[decision_values.argmax(axis=1)]
