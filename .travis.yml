@@ -1,0 +1,13 @@
+language: python
+
+matrix:
+  include:
+    - python: 3.7
+      dist: xenial
+
+install: source build_tools/travis/install.sh
+
+script:
+  - bash build_tools/travis/test_script.sh
+
+after_success: source build_tools/travis/after_success.sh

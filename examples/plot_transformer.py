@@ -1,10 +1,10 @@
-# """
-# =============================
-# Plotting Template Transformer
-# =============================
-#
-# An example plot of :class:`skltemplate.template.TemplateTransformer`
-# """
+"""
+=============================
+Plotting Template Transformer
+=============================
+
+An example plot of :class:`skltemplate.template.TemplateTransformer`
+"""
 # import numpy as np
 # from sklvq import TemplateTransformer
 # from matplotlib import pyplot as plt

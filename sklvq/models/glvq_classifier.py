@@ -1,6 +1,5 @@
 from . import LVQClassifier
-import inspect
-from typing import Union
+import numpy as np
 
 # Can be switched out by parameters to the models.
 from sklvq import activations, discriminants
@@ -8,7 +7,9 @@ from sklvq import activations, discriminants
 # Cannot be switched out by parameters to the models.
 from sklvq.objectives import GeneralizedLearningObjective
 
-# TODO: White list of methods suitable for GLVQ
+from typing import Tuple
+
+ModelParamsType = np.ndarray
 
 
 # Template (Context Implementation)
@@ -17,10 +18,10 @@ class GLVQClassifier(LVQClassifier):
     # NOTE: Objective will be fixed. If another objective is needed a new classifier and objective should be created.
     def __init__(self,
                  distance_type='squared-euclidean', distance_params=None,
-                 activation_type = 'identity', activation_params=None,
+                 activation_type='identity', activation_params=None,
                  discriminant_type='relative-distance', discriminant_params=None,
-                 solver_type='sgd', solver_params=None,
-                 prototypes_per_class=1, random_state=None):
+                 solver_type='steepest-gradient-descent', solver_params=None,
+                 prototypes=None, prototypes_per_class=1, random_state=None):
         self.activation_type = activation_type
         self.activation_params = activation_params
         self.discriminant_type = discriminant_type
@@ -28,41 +29,44 @@ class GLVQClassifier(LVQClassifier):
 
         super(GLVQClassifier, self).__init__(distance_type, distance_params,
                                              solver_type, solver_params,
-                                             prototypes_per_class, random_state)
+                                             prototypes_per_class, prototypes, random_state)
 
     def initialize(self, data, labels):
         """ . """
+
+        # Get the size of the variables (1D vector) of the model that need to be optimized.
         self.variables_size_ = self.prototypes_.size
+        self._number_of_params = 1
 
-        activation = activations.grab(self.activation_type, self.activation_params)
+        # Grab the chosen activation, and discriminant functions and initialize with set parameters.
+        activation = activations.grab(self.activation_type,
+                                      self.activation_params)
 
-        discriminant = discriminants.grab(self.discriminant_type, self.discriminant_params)
+        discriminant = discriminants.grab(self.discriminant_type,
+                                          self.discriminant_params)
 
-        objective = GeneralizedLearningObjective(activation=activation, discriminant=discriminant)
+        # The objective is fixed as this determines what else to initialize.
+        objective = GeneralizedLearningObjective(activation=activation,
+                                                 discriminant=discriminant)
 
         return objective
 
-    # NOTE: not very interesting for GLVQ, but potentially useful for others.
-    def set(self, prototypes):
-        self.prototypes_ = prototypes
+    # Functions used in optimizers...
+    def set_model_params(self, model_params):
+        self.prototypes_ = model_params
 
-    def get(self):
+    def get_model_params(self):
         return self.prototypes_
 
-    # TODO might be added to LVQBaseClass
-    def set_variables(self, variables):
-        self.set(self.from_variables(variables))
-
-    # TODO might be added to LVQBaseClass
-    def get_variables(self):
-        return self.to_variables(self.get())
-
-    def from_variables(self, variables):
-        return variables.reshape(self.prototypes_.shape)
+    def to_params(self, variables):
+        return np.reshape(variables, self.prototypes_.shape)
 
     @staticmethod
-    def to_variables(prototypes):
-        return prototypes.ravel()
+    def normalize_params(model_params):
+        return LVQClassifier.normalize_prototypes(model_params)
 
-    def update(self, gradient_update_variables):
-        self.prototypes_ -= self.from_variables(gradient_update_variables)
+    @staticmethod
+    def mul_params(model_params: ModelParamsType, other: Tuple[int, float]) -> ModelParamsType:
+        prots = model_params
+        # Scalar int or float
+        return prots * other

@@ -1,4 +1,4 @@
-from .distance_base_class import DistanceBaseClass
+from .base import DistanceBaseClass
 # from .adaptive_euclidean import
 from .adaptive_squared_euclidean import AdaptiveSquaredEuclidean
 from .euclidean import Euclidean

@@ -1,4 +1,6 @@
-from sklvq.models.glvq_classifier import GLVQClassifier
-from sklvq.models.gmlvq_classifier import GMLVQClassifier
+from .models.glvq_classifier import GLVQClassifier
+from .models.gmlvq_classifier import GMLVQClassifier
 
-__all__ = ['GLVQClassifier', 'GMLVQClassifier']
+from ._version import __version__
+
+__all__ = ['GLVQClassifier', 'GMLVQClassifier', '__version__']

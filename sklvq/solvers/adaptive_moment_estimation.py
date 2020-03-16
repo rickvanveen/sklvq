@@ -1,3 +1,8 @@
+# Adam
+# Stochastic gradient descent based
+# Maintains two moving averages for the gradient m and the hadamard squared gradient v
+# Beta1 and beta2 control the decay rate of these averages. (hyperparameters)
+# Eta step size (in total 3 hyperparamters)
 from sklearn.utils import shuffle
 import numpy as np
 
@@ -8,64 +13,79 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sklvq.models import LVQClassifier
 
-# TODO: Not correct. Needs to be changed
 
-#Adam *
 class AdaptiveMomentEstimation(SolverBaseClass):
 
-    def __init__(self, max_runs: int = 20, batch_size: int = 1):
+    def __init__(self, max_runs=20, beta1=0.9, beta2=0.999, step_size=0.001):
         self.max_runs = max_runs
-        self.batch_size = batch_size
-        self.step_size = 0.1
-        self.beta1 = 0.9
-        self.beta2 = 0.999
+        self.beta1 = beta1
+        self.beta2 = beta2
+        self.step_size = step_size
+        self.epsilon = 1e-4
 
     def solve(self, data: np.ndarray,
               labels: np.ndarray,
               objective: ObjectiveBaseClass,
-              model: 'LVQClassifier') -> 'LVQClassifier':
-        # Note: time t is not reset per run, but continues on
+              model: 'LVQClassifier') -> 'LVQCLassifier':
 
-        # Adam
-        average_gradient = np.zeros(model.variables_size_)
-        average_squared_gradient = np.zeros(model.variables_size_)
+        # Administration
+        variables_size = model.to_variables(model.get_model_params()).size
 
-        # average_delta_update = np.zeros(model.variables_size_)
+        # Init/allocation of moving averages (m and v in literature)
+        m = np.zeros(variables_size)
+        v = np.zeros(variables_size)
+        p = 0
 
         for i_run in range(0, self.max_runs):
-
+            # Randomize order of data
             shuffled_indices = shuffle(
                 range(0, labels.size),
                 random_state=model.random_state_)
 
-            batches = np.array_split(
-                shuffled_indices,
-                list(range(self.batch_size,
-                           labels.size,
-                           self.batch_size)),
-                axis=0)
+            for i_sample in range(0, len(shuffled_indices)):
 
-            for i_batch in range(0, len(batches)):
-                # Select data to base the update on...
-                batch = data[batches[i_batch], :]
-                batch_labels = labels[batches[i_batch]]
+                # Update power
+                p += 1
 
-                # Adadelta
-                gradient = objective.gradient(
-                    model.get_variables(),
-                    model,
-                    batch,
-                    batch_labels)
+                # Get sample and its label
+                sample = np.atleast_2d(
+                    data[shuffled_indices[i_sample], :])
 
-                average_gradient = self.beta1 * average_gradient + (1 - self.beta1) * gradient
-                average_squared_gradient = self.beta2 * average_squared_gradient + (1 - self.beta2) * gradient**2
+                sample_label = np.atleast_1d(
+                    labels[shuffled_indices[i_sample]])
 
-                corrected_average_gradient = average_gradient / (1 - self.beta1)
-                corrected_average_squared_gradient = average_squared_gradient / (1 - self.beta2)
+                # Get model params variable shape (flattened)
+                model_variables = model.to_variables(
+                    model.get_model_params()
+                )
 
-                delta_update = ((self.step_size / (np.sqrt(corrected_average_squared_gradient) + 1e-8))
-                                * corrected_average_gradient)
+                # Gradient in variables form
+                objective_gradient = objective.gradient(
+                        model_variables,
+                        model,
+                        sample,
+                        sample_label
+                    )
 
-                model.update(delta_update)
+                # Update biased (init 0) moving gradient averages m and v.
+                m = ((self.beta1 * m)
+                     + ((1 - self.beta1) * objective_gradient))
+
+                v = ((self.beta2 * v)
+                     + ((1 - self.beta2) * objective_gradient**2))
+
+                # Update unbiased moving gradient averages
+                m_hat = m / (1 - self.beta1**p)
+
+                v_hat = v / (1 - self.beta2**p)
+
+                # Make the epsilon (small value) a parameter
+                objective_gradient = self.step_size * m_hat / (np.sqrt(v_hat) + self.epsilon)
+
+                model.set_model_params(
+                    model.to_params(
+                        model_variables - objective_gradient
+                    )
+                )
 
         return model

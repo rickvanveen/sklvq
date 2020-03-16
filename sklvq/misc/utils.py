@@ -1,18 +1,20 @@
 from importlib import import_module
-
-
-# Argument must be the name of the class using '-', so 'squared_euclidean.SquaredEuclidean' -> 'squared-euclidean'
-
+import inspect
 
 # TODO: Documentation
-# TODO: Look into how to deal with the aliases better
 # TODO: Look into how to restrict access to certain LVQ classifiers... e.g., not all distance measures are suitable for
 #  every classifier
 # TODO: look into how to deal with custom objects
 
+# TODO: when wrong parameters are provided all the defaults will be used without warnings.... this is not really nice.
+
 def grab(class_type, class_params, aliases, package, base_class):
-    if callable(class_type):
-        return class_type
+    if inspect.isclass(class_type):
+        try:
+            instance = class_type(**class_params)
+        except TypeError:
+            instance = class_type()
+        return instance
 
     if class_type in aliases.keys():
         class_type = aliases[class_type]
