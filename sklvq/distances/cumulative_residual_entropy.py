@@ -34,21 +34,29 @@ class CumulativeResidualEntropy(DistanceBaseClass):
         """
         prototypes = model.prototypes_
 
-        ccre = np.zeros((data.shape[0], prototypes.shape[0]))
+        n_observations, n_features = data.shape
+        n_prototypes = prototypes.shape[0]
 
-        if self.n_bins is None: #
-            self.n_bins = np.floor(model.prototypes_.shape[1] / 10)
+        ccre = np.zeros((n_observations, n_prototypes))
+
+        # if self.n_bins is None: #
+        #     self.n_bins = np.floor(n_features / 10)
 
         max_data = np.max(data)
         min_data = np.min(data)
-        n_steps = data.size + 1
+        n_steps = n_features + 1 # in init
         step_size = (max_data - min_data) / n_steps
+
+        # Target -> data
         lambdas = np.linspace(min_data, max_data + step_size, n_steps)
 
         # lambdas = np.linspace(np.min(data), np.max(data), data.size)
 
         # define the bins for the prototype(s) Equally spaced bins
-        p_bins = np.linspace(np.min(prototypes), np.max(prototypes), prototypes.size)
+        # Reference -> prototype, bins moeten minder zijn dan het,
+        n_bins = int(np.floor(n_features / 10)) # in init
+        p_bins = np.linspace(np.min(prototypes), np.max(prototypes), n_bins)
+
         for i, sample in enumerate(data):
             sample_cre = _cre(sample, lambdas)
             # Loop over prototype
@@ -62,9 +70,9 @@ class CumulativeResidualEntropy(DistanceBaseClass):
                     if not np.any(((prototype >= p_bins[k]) & (prototype < p_bins[k + 1]))):
                         continue
 
-                    subset = np.array(sample[((sample >= p_bins[k]) & (sample < p_bins[k + 1]))])
-                    # Check if sample has data in this bin if yes, compute cre if not 0
+                    subset = np.array(sample[((prototype >= p_bins[k]) & (prototype < p_bins[k + 1]))])
 
+                    # Check if sample has data in this bin if yes, compute cre if not 0
                     if subset.size == 0:
                         continue
 
@@ -72,7 +80,7 @@ class CumulativeResidualEntropy(DistanceBaseClass):
                     cre = _cre(subset, lambdas)
 
                     # Calculate weight proportional to size(subset)/size(sample)
-                    weight = subset.size / sample.size
+                    weight = subset.size / n_features
 
                     # Calculate weigth * CRE(subset)
                     wcre = weight * cre

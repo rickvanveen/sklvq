@@ -9,13 +9,13 @@ from sklvq import GLVQClassifier
 
 
 def test_glvq_iris():
-    iris = datasets.load_iris()
+    iris = datasets.load_digits()
 
     iris.data = preprocessing.scale(iris.data)
 
     classifier = GLVQClassifier(solver_type='lbfgs',
                                 solver_params={'params': {'jac': None}},
-                                distance_type='sqeuclidean',
+                                distance_type='cumulative-residual-entropy',
                                 activation_type='swish',
                                 activation_params={'beta': 2})
     classifier = classifier.fit(iris.data, iris.target)
@@ -25,6 +25,11 @@ def test_glvq_iris():
     accuracy = np.count_nonzero(predicted == iris.target) / iris.target.size
 
     print("\nIris accuracy: {}".format(accuracy))
+
+
+def test_glvq_digits():
+    digits = datasets.load_digits()
+    print(digits.data.shape)
 
 
 def test_glvq_with_multiple_prototypes_per_class():
