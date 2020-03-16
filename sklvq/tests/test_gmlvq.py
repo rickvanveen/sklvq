@@ -13,7 +13,8 @@ def test_gmlvq_iris():
     iris.data = preprocessing.scale(iris.data)
 
     classifier = GMLVQClassifier(solver_type='lbfgs',
-                                 solver_params={'params': {'jac': None}}, activation_type='swish',
+                                 solver_params={'max_runs': 20, 'k':2, 'step_size': np.array([0.2, 0.01])},
+                                 activation_type='swish',
                                  activation_params={'beta': 4})
     classifier = classifier.fit(iris.data, iris.target)
 

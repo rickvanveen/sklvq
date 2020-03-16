@@ -13,8 +13,11 @@ def test_glvq_iris():
 
     iris.data = preprocessing.scale(iris.data)
 
-    classifier = GLVQClassifier(solver_type='steepest-gradient-descent', distance_type='squared-euclidean',
-                                activation_type='sigmoid', activation_params={'beta': 2})
+    classifier = GLVQClassifier(solver_type='lbfgs',
+                                solver_params={'params': {'jac': None}},
+                                distance_type='sqeuclidean',
+                                activation_type='swish',
+                                activation_params={'beta': 2})
     classifier = classifier.fit(iris.data, iris.target)
 
     predicted = classifier.predict(iris.data)
