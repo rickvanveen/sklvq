@@ -1,7 +1,7 @@
 from .base import DiscriminativeBaseClass
-# from .relative_distance import RelativeDistance
-#
-# __all__ = ['DiscriminativeBaseClass', 'RelativeDistance']
+from .relative_distance import RelativeDistance
+
+__all__ = ['DiscriminativeBaseClass', 'RelativeDistance']
 
 from ..misc import utils
 
