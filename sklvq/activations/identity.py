@@ -3,6 +3,12 @@ import numpy as np
 
 
 class Identity(ActivationBaseClass):
+    """ Callable Identity function
+
+    See also
+    --------
+    Sigmoid, SoftPlus, Swish
+    """
 
     def __call__(self, x: np.ndarray) -> np.ndarray:
         """ Implements the identity function:
@@ -12,13 +18,11 @@ class Identity(ActivationBaseClass):
 
         Parameters
         ----------
-        x : ndarray
-            Anything really.
+        x : numpy.ndarray
 
         Returns
         -------
-        x : ndarray
-            Effectively does nothing.
+        x : numpy.ndarray
         """
         return x
 
@@ -27,15 +31,15 @@ class Identity(ActivationBaseClass):
         Implements the identity function's derivative:
             .. math::
 
-                g(x) = 1
+                \\frac{\\partial f}{\\partial x} = 1
 
         Parameters
         ----------
-        x : ndarray
-            Anything really.
+        x : numpy.ndarray
 
         Returns
         -------
-        1 : int
+        numpy.ndarray
+            Output has the same size and shape as the input and contains only 1's.
         """
         return np.ones(x.shape)
