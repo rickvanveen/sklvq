@@ -3,7 +3,7 @@ import numpy as np
 
 
 class Identity(ActivationBaseClass):
-    """ Callable Identity function
+    """ Identity function
 
     See also
     --------
