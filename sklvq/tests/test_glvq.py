@@ -12,6 +12,7 @@ def test_glvq_iris():
     iris = datasets.load_iris()
 
     iris.data = preprocessing.scale(iris.data)
+
     classifier = GLVQClassifier(solver_type='lbfgs',
                                 solver_params={'params': {'jac': None}},
                                 distance_type='sqeuclidean',

@@ -1,8 +1,3 @@
-# it's a BGD
-# 5 Hyperparameters or 4....: learning rates (prototypes, [omega]), the number of epochs the waypoints are averaged,
-# loss < 1 and gain > 1 learning rate change factors for waypoint averaging and gradient steps...
-# No update of learning steps... due to A normalized gradient I think
-
 from sklearn.utils import shuffle
 import numpy as np
 

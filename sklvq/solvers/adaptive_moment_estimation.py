@@ -1,8 +1,3 @@
-# Adam
-# Stochastic gradient descent based
-# Maintains two moving averages for the gradient m and the hadamard squared gradient v
-# Beta1 and beta2 control the decay rate of these averages. (hyperparameters)
-# Eta step size (in total 3 hyperparamters)
 from sklearn.utils import shuffle
 import numpy as np
 

@@ -22,6 +22,7 @@ Predictor and Transformer
    :toctree: generated/
    :template: class.rst
 
+<<<<<<< HEAD
    GMLVQClassifier
 
 Objective Functions
@@ -134,3 +135,6 @@ Solvers
    :template: callable.rst
 
     BfgsSolver
+=======
+   GMLVQClassifier
+>>>>>>> e137efd835422bc26161ea02d0bc1b488c79ef6a

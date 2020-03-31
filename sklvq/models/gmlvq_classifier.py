@@ -41,6 +41,7 @@ class GMLVQClassifier(LVQClassifier):
             self.omega_ = self.omega
 
         self.omega_ = self._normalise_omega(self.omega_)
+
         self._number_of_params = 2
 
         # Depends also on local (per class/prototype) global omega # TODO: implement local per class and prototype
@@ -58,7 +59,6 @@ class GMLVQClassifier(LVQClassifier):
         return objective
 
     def set_model_params(self, model_params: ModelParamsType) -> None:
-
         (self.prototypes_, omega) = model_params
         self.omega_ = self._normalise_omega(omega)
 
@@ -108,7 +108,6 @@ class GMLVQClassifier(LVQClassifier):
         data_new = data.dot(eigenvectors)
 
         return data_new
-
 
     def dist_function(self, data):
         # SciKit-learn list of checked params before predict

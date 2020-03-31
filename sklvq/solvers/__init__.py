@@ -1,12 +1,19 @@
 from .base import (SolverBaseClass, ScipyBaseSolver)
 from .steepest_gradient_descent import SteepestGradientDescent
+from .waypoint_gradient_descent import WaypointGradientDescent
+from .lbfgs_solver import LbfgsSolver
+from .bfgs_solver import BfgsSolver
+from .adaptive_moment_estimation import AdaptiveMomentEstimation
+from ..misc import utils
 
 
 __all__ = ['SolverBaseClass',
            'ScipyBaseSolver',
-           'SteepestGradientDescent']
-
-from ..misc import utils
+           'SteepestGradientDescent',
+           'WaypointGradientDescent',
+           'AdaptiveMomentEstimation',
+           'LbfgsSolver',
+           'BfgsSolver']
 
 ALIASES = {'sgd': 'steepest-gradient-descent',
            'lbfgs': 'lbfgs-solver',

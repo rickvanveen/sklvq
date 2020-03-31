@@ -9,39 +9,55 @@ if TYPE_CHECKING:
 
 
 class Euclidean(DistanceBaseClass):
+    """ Euclidean distance function
+
+    See also
+    --------
+    SquaredEuclidean, AdaptiveEuclidean, AdaptiveSquaredEuclidean
+    """
 
     def __call__(self, data: np.ndarray, model: 'LVQClassifier') -> np.ndarray:
-        """ Wrapper function for scipy's cdist(x, y, 'euclidean') function
+        """
+        Computes the Euclidean distance:
+            .. math::
 
-            See scipy.spatial.distance.cdist for full documentation.
+                d(\\vec{w}, \\vec{x}) = \\sqrt{(\\vec{x} - \\vec{w})^T (\\vec{x} - \\vec{w})},
 
-            Note that any custom function should still accept and return the same.
+            with :math:`\\vec{w}` a prototype and :math:`\\vec{x}` a sample.
 
-            Parameters
-            ----------
-            data       : ndarray, shape = [n_obervations, n_features]
-                         Inputs are converted to float type.
-            prototypes : ndarray, shape = [n_prototypes, n_features]
-                         Inputs are converted to float type.
+        .. note::
+            Makes use of the scipy's cdist(x, y, 'euclidean') function, see scipy.spatial.distance.cdist
+            for full documentation.
 
-            Returns
-            -------
-            distances : ndarray, shape = [n_observations, n_prototypes]
-                The dist(u=XA[i], v=XB[j]) is computed and stored in the
-                ij-th entry.
+        Parameters
+        ----------
+        data : numpy.ndarray with shape (n_samples, n_features)
+        model : LVQClassifier
+            Can be any LVQClassifier but only prototypes will be used to compute the distance
+
+        Returns
+        -------
+        distances : numpy.ndarray with shape (n_observations, n_prototypes)
+            The dist(u=XA[i], v=XB[j]) is computed and stored in the
+            ij-th entry.
         """
         return sp.spatial.distance.cdist(data, model.prototypes_, 'euclidean')
 
     def gradient(self, data: np.ndarray, model, i_prototype: int) -> np.ndarray:
-        """ Implements the derivative of the euclidean distance, with respect to 1 prototype
+        """ Implements the derivative of the euclidean distance, with respect to a single prototype
 
-            Parameters
-            ----------
+        Parameters
+        ----------
+        data : numpy.ndarray with shape (n_samples, n_features)
+        model : LVQClassifier
+            Only prototypes need to be available in the LVQClassifier
+        i_prototype : int
+            Index of the prototype to compute the gradient for
 
-            Returns
-            -------
-            gradient : ndarray, shape = [n_observations, n_features]
-                       The gradient with respect to the prototype and every observation in data.
+        Returns
+        -------
+        gradient : ndarray with shape (n_samples, n_features)
+            The gradient with respect to the prototype and every sample in data.
 
         """
         shape = [data.shape[0], * model.prototypes_.shape]

@@ -8,8 +8,6 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sklvq.models import LVQClassifier
 
-# TODO: vSGD, Adam, WA-GD (LeKander)
-
 
 class SolverBaseClass(ABC):
 
