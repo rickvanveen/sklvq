@@ -4,6 +4,7 @@ import numpy as np
 from . import DistanceBaseClass
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from sklvq.models import LVQClassifier
 
@@ -16,7 +17,7 @@ class Euclidean(DistanceBaseClass):
     SquaredEuclidean, AdaptiveEuclidean, AdaptiveSquaredEuclidean
     """
 
-    def __call__(self, data: np.ndarray, model: 'LVQClassifier') -> np.ndarray:
+    def __call__(self, data: np.ndarray, model: "LVQClassifier") -> np.ndarray:
         """
         Computes the Euclidean distance:
             .. math::
@@ -41,7 +42,7 @@ class Euclidean(DistanceBaseClass):
             The dist(u=XA[i], v=XB[j]) is computed and stored in the
             ij-th entry.
         """
-        return sp.spatial.distance.cdist(data, model.prototypes_, 'euclidean')
+        return sp.spatial.distance.cdist(data, model.prototypes_, "euclidean")
 
     def gradient(self, data: np.ndarray, model, i_prototype: int) -> np.ndarray:
         """ Implements the derivative of the euclidean distance, with respect to a single prototype
@@ -60,12 +61,13 @@ class Euclidean(DistanceBaseClass):
             The gradient with respect to the prototype and every sample in data.
 
         """
-        shape = [data.shape[0], * model.prototypes_.shape]
+        shape = [data.shape[0], *model.prototypes_.shape]
         gradient = np.zeros(shape)
 
         difference = data - model.prototypes_[i_prototype, :]
 
         gradient[:, i_prototype, :] = np.atleast_2d(
-            (-1 * difference) / np.sqrt(np.sum(difference ** 2)))
+            (-1 * difference) / np.sqrt(np.sum(difference ** 2))
+        )
 
         return gradient.reshape(shape[0], shape[1] * shape[2])

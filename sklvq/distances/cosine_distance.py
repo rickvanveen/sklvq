@@ -5,7 +5,6 @@ from . import DistanceBaseClass
 
 
 class CosineDistance(DistanceBaseClass):
-
     def __init__(self, beta=1):
         self.beta = beta
 
@@ -20,13 +19,14 @@ class CosineDistance(DistanceBaseClass):
         angle = _angle(data, prototype)
 
         gradient[:, i_prototype, :] = np.atleast_2d(
-            _gamma_gradient(angle, self.beta) * _angle_gradient(data, prototype, angle))
+            _gamma_gradient(angle, self.beta) * _angle_gradient(data, prototype, angle)
+        )
 
         return gradient.reshape(shape[0], shape[1] * shape[2])
 
 
 def _angle(data: np.ndarray, prototypes: np.ndarray) -> np.ndarray:
-    return -1 * (cdist(data, np.atleast_2d(prototypes), 'cosine') + 1)
+    return -1 * (cdist(data, np.atleast_2d(prototypes), "cosine") + 1)
 
 
 def _gamma(angle: np.ndarray, beta: int) -> np.ndarray:
@@ -37,6 +37,10 @@ def _gamma_gradient(angle: np.ndarray, beta: int) -> np.ndarray:
     return (-beta * np.exp(-beta * angle + beta)) / (np.exp(beta) - 1)
 
 
-def _angle_gradient(data: np.ndarray, prototype: np.ndarray, angle: np.ndarray) -> np.ndarray:
-    return np.atleast_2d((prototype / (np.linalg.norm(data) * np.linalg.norm(prototype))) -
-                         (angle * data / np.linalg.norm(data) ** 2))
+def _angle_gradient(
+    data: np.ndarray, prototype: np.ndarray, angle: np.ndarray
+) -> np.ndarray:
+    return np.atleast_2d(
+        (prototype / (np.linalg.norm(data) * np.linalg.norm(prototype)))
+        - (angle * data / np.linalg.norm(data) ** 2)
+    )

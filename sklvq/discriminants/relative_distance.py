@@ -28,11 +28,15 @@ class RelativeDistance(DiscriminativeBaseClass):
             The relative distance for each sample
 
         """
-        with np.errstate(divide='ignore', invalid='ignore'):  # Suppresses runtime warning TODO: fix
+        with np.errstate(
+            divide="ignore", invalid="ignore"
+        ):  # Suppresses runtime warning TODO: fix
             return (dist_same - dist_diff) / (dist_same + dist_diff)
 
     # TODO: Maybe winner_same should be an array that indicates if its the same or different label for every sample...
-    def gradient(self, dist_same: np.ndarray, dist_diff: np.ndarray, winner_same: bool) -> np.ndarray:
+    def gradient(
+        self, dist_same: np.ndarray, dist_diff: np.ndarray, winner_same: bool
+    ) -> np.ndarray:
         """ The partial derivative of the relative distance function.
 
         Two possible scenarios that change based on winner_same being True or False:
@@ -74,10 +78,10 @@ class RelativeDistance(DiscriminativeBaseClass):
 
 
 def _gradient_same(dist_same: np.ndarray, dist_diff: np.ndarray) -> np.ndarray:
-    with np.errstate(divide='ignore', invalid='ignore'):  # Suppresses runtime warning
+    with np.errstate(divide="ignore", invalid="ignore"):  # Suppresses runtime warning
         return 2 * dist_diff / (dist_same + dist_diff) ** 2
 
 
 def _gradient_diff(dist_same: np.ndarray, dist_diff: np.ndarray) -> np.ndarray:
-    with np.errstate(divide='ignore', invalid='ignore'):  # Suppresses runtime warning
+    with np.errstate(divide="ignore", invalid="ignore"):  # Suppresses runtime warning
         return -2 * dist_same / (dist_same + dist_diff) ** 2

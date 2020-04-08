@@ -5,12 +5,12 @@ from . import SolverBaseClass
 from sklvq.objectives import ObjectiveBaseClass
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from sklvq.models import LVQClassifier
 
 
 class AdaptiveMomentEstimation(SolverBaseClass):
-
     def __init__(self, max_runs=20, beta1=0.9, beta2=0.999, step_size=0.001):
         self.max_runs = max_runs
         self.beta1 = beta1
@@ -18,10 +18,13 @@ class AdaptiveMomentEstimation(SolverBaseClass):
         self.step_size = step_size
         self.epsilon = 1e-4
 
-    def solve(self, data: np.ndarray,
-              labels: np.ndarray,
-              objective: ObjectiveBaseClass,
-              model: 'LVQClassifier') -> 'LVQCLassifier':
+    def solve(
+        self,
+        data: np.ndarray,
+        labels: np.ndarray,
+        objective: ObjectiveBaseClass,
+        model: "LVQClassifier",
+    ) -> "LVQCLassifier":
 
         # Administration
         variables_size = model.to_variables(model.get_model_params()).size
@@ -34,8 +37,8 @@ class AdaptiveMomentEstimation(SolverBaseClass):
         for i_run in range(0, self.max_runs):
             # Randomize order of data
             shuffled_indices = shuffle(
-                range(0, labels.size),
-                random_state=model.random_state_)
+                range(0, labels.size), random_state=model.random_state_
+            )
 
             for i_sample in range(0, len(shuffled_indices)):
 
@@ -43,44 +46,35 @@ class AdaptiveMomentEstimation(SolverBaseClass):
                 p += 1
 
                 # Get sample and its label
-                sample = np.atleast_2d(
-                    data[shuffled_indices[i_sample], :])
+                sample = np.atleast_2d(data[shuffled_indices[i_sample], :])
 
-                sample_label = np.atleast_1d(
-                    labels[shuffled_indices[i_sample]])
+                sample_label = np.atleast_1d(labels[shuffled_indices[i_sample]])
 
                 # Get model params variable shape (flattened)
-                model_variables = model.to_variables(
-                    model.get_model_params()
-                )
+                model_variables = model.to_variables(model.get_model_params())
 
                 # Gradient in variables form
                 objective_gradient = objective.gradient(
-                        model_variables,
-                        model,
-                        sample,
-                        sample_label
-                    )
+                    model_variables, model, sample, sample_label
+                )
 
                 # Update biased (init 0) moving gradient averages m and v.
-                m = ((self.beta1 * m)
-                     + ((1 - self.beta1) * objective_gradient))
+                m = (self.beta1 * m) + ((1 - self.beta1) * objective_gradient)
 
-                v = ((self.beta2 * v)
-                     + ((1 - self.beta2) * objective_gradient**2))
+                v = (self.beta2 * v) + ((1 - self.beta2) * objective_gradient ** 2)
 
                 # Update unbiased moving gradient averages
-                m_hat = m / (1 - self.beta1**p)
+                m_hat = m / (1 - self.beta1 ** p)
 
-                v_hat = v / (1 - self.beta2**p)
+                v_hat = v / (1 - self.beta2 ** p)
 
                 # Make the epsilon (small value) a parameter
-                objective_gradient = self.step_size * m_hat / (np.sqrt(v_hat) + self.epsilon)
+                objective_gradient = (
+                    self.step_size * m_hat / (np.sqrt(v_hat) + self.epsilon)
+                )
 
                 model.set_model_params(
-                    model.to_params(
-                        model_variables - objective_gradient
-                    )
+                    model.to_params(model_variables - objective_gradient)
                 )
 
         return model

@@ -49,7 +49,9 @@ class Swish(ActivationBaseClass):
         -------
         numpy.ndarray
         """
-        return (self.beta * _swish(x, self.beta)) + (_sgd(x, self.beta) * (1 - self.beta * _swish(x, self.beta)))
+        return (self.beta * _swish(x, self.beta)) + (
+            _sgd(x, self.beta) * (1 - self.beta * _swish(x, self.beta))
+        )
 
 
 def _sgd(x: np.ndarray, beta: int) -> np.ndarray:

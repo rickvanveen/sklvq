@@ -16,6 +16,7 @@ class SoftPlus(ActivationBaseClass):
     --------
     Identity, Sigmoid, Swish
     """
+
     def __init__(self, beta: int = 1):
         self.beta = beta
 

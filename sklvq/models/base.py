@@ -15,15 +15,24 @@ from collections.abc import Iterable
 
 def _conditional_mean(p_labels, data, d_labels):
     """ Implements the conditional mean, i.e., mean per class"""
-    return np.array([np.mean(data[p_label == d_labels, :], axis=0)
-                     for p_label in p_labels])
+    return np.array(
+        [np.mean(data[p_label == d_labels, :], axis=0) for p_label in p_labels]
+    )
 
 
 class LVQClassifier(ABC, BaseEstimator, ClassifierMixin):
 
     # Sklearn: You cannot change the value of the properties given in init.
-    def __init__(self, distance_type, distance_params, solver_type, solver_params,
-                 prototypes_per_class, prototypes, random_state):
+    def __init__(
+        self,
+        distance_type,
+        distance_params,
+        solver_type,
+        solver_params,
+        prototypes_per_class,
+        prototypes,
+        random_state,
+    ):
         self.distance_type = distance_type
         self.distance_params = distance_params
         self.solver_type = solver_type
@@ -70,7 +79,9 @@ class LVQClassifier(ABC, BaseEstimator, ClassifierMixin):
     # TODO: could also be class functions thing that can be extended by user by providing another class same for omega.
     def init_prototypes(self, data, y):
         conditional_mean = _conditional_mean(self.prototypes_labels_, data, y)
-        return conditional_mean + (1e-4 * self.random_state_.uniform(-1, 1, conditional_mean.shape))
+        return conditional_mean + (
+            1e-4 * self.random_state_.uniform(-1, 1, conditional_mean.shape)
+        )
 
     def _validate(self, data, labels):
         # SciKit-learn required check
@@ -96,7 +107,9 @@ class LVQClassifier(ABC, BaseEstimator, ClassifierMixin):
 
         # Always given by default value accepts anything
         if np.isscalar(self.prototypes_per_class):
-            self.prototypes_labels_ = np.repeat(unique_labels(labels), self.prototypes_per_class)
+            self.prototypes_labels_ = np.repeat(
+                unique_labels(labels), self.prototypes_per_class
+            )
 
         # If prototypes is not already set initialize them to the class conditional mean.
         if self.prototypes is None:
