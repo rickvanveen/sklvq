@@ -15,13 +15,22 @@ ModelParamsType = Tuple[np.ndarray, np.ndarray]
 
 
 class GMLVQClassifier(LVQClassifier):
-
-    def __init__(self,
-                 distance_type='adaptive-squared-euclidean', distance_params=None,
-                 activation_type='identity', activation_params=None,
-                 discriminant_type='relative-distance', discriminant_params=None,
-                 solver_type='steepest-gradient-descent', solver_params=None, verbose=False,
-                 prototypes=None, prototypes_per_class=1, omega=None, random_state=None):
+    def __init__(
+        self,
+        distance_type="adaptive-squared-euclidean",
+        distance_params=None,
+        activation_type="identity",
+        activation_params=None,
+        discriminant_type="relative-distance",
+        discriminant_params=None,
+        solver_type="steepest-gradient-descent",
+        solver_params=None,
+        verbose=False,
+        prototypes=None,
+        prototypes_per_class=1,
+        omega=None,
+        random_state=None,
+    ):
         self.activation_type = activation_type
         self.activation_params = activation_params
         self.discriminant_type = discriminant_type
@@ -29,9 +38,15 @@ class GMLVQClassifier(LVQClassifier):
         self.omega = omega
         self.verbose = verbose
 
-        super(GMLVQClassifier, self).__init__(distance_type, distance_params,
-                                              solver_type, solver_params,
-                                              prototypes_per_class, prototypes, random_state)
+        super(GMLVQClassifier, self).__init__(
+            distance_type,
+            distance_params,
+            solver_type,
+            solver_params,
+            prototypes_per_class,
+            prototypes,
+            random_state,
+        )
 
     # Get's called in fit.
     def initialize(self, data, labels):
@@ -48,21 +63,21 @@ class GMLVQClassifier(LVQClassifier):
         # Depends also on local (per class/prototype) global omega # TODO: implement local per class and prototype
         self.variables_size_ = self.prototypes_.size + self.omega_.size
 
-        activation = activations.grab(self.activation_type,
-                                      self.activation_params)
+        activation = activations.grab(self.activation_type, self.activation_params)
 
-        discriminant = discriminants.grab(self.discriminant_type,
-                                          self.discriminant_params)
+        discriminant = discriminants.grab(
+            self.discriminant_type, self.discriminant_params
+        )
 
-        objective = GeneralizedLearningObjective(activation=activation,
-                                                 discriminant=discriminant)
+        objective = GeneralizedLearningObjective(
+            activation=activation, discriminant=discriminant
+        )
 
         return objective
 
     def set_model_params(self, model_params: ModelParamsType) -> None:
         (self.prototypes_, omega) = model_params
         self.omega_ = self._normalise_omega(omega)
-
 
     def get_model_params(self) -> ModelParamsType:
         return self.prototypes_, self.omega_
@@ -75,8 +90,10 @@ class GMLVQClassifier(LVQClassifier):
         omega_indices = range(self.prototypes_.size, variables.size)
 
         # Return tuple of correctly reshaped prototypes and omegas
-        return (np.reshape(np.take(variables, prototype_indices), self.prototypes_.shape),
-                np.reshape(np.take(variables, omega_indices), self.omega_.shape))
+        return (
+            np.reshape(np.take(variables, prototype_indices), self.prototypes_.shape),
+            np.reshape(np.take(variables, omega_indices), self.omega_.shape),
+        )
 
     @staticmethod
     def _normalise_omega(omega: np.ndarray) -> np.ndarray:
@@ -85,10 +102,11 @@ class GMLVQClassifier(LVQClassifier):
     @staticmethod
     def normalize_params(model_params: ModelParamsType) -> ModelParamsType:
         (prototypes, omega) = model_params
-        normalized_prototypes = prototypes / np.linalg.norm(prototypes, axis=1, keepdims=True)
+        normalized_prototypes = prototypes / np.linalg.norm(
+            prototypes, axis=1, keepdims=True
+        )
         normalized_omega = GMLVQClassifier._normalise_omega(omega)
-        return (normalized_prototypes,
-                normalized_omega)
+        return (normalized_prototypes, normalized_omega)
 
     def fit_transform(self, data: np.ndarray, y: np.ndarray) -> np.ndarray:
         return self.fit(data, y).transform(data)
@@ -109,23 +127,6 @@ class GMLVQClassifier(LVQClassifier):
 
         return data_new
 
-    # def predict(self, X):
-    #     D = self.decision_function(X)
-    #     return self.classes_[np.argmax(D, axis=1)]
-    # return self.prototypes_labels_.take(self.distance_(data, self).argmin(axis=1))
-
-    # array-like of shape (n_samples,) or (n_samples, n_classes)
-    #         Target scores. In the binary and multilabel cases, these can be either
-    #         probability estimates or non-thresholded decision values (as returned
-    #         by `decision_function` on some classifiers). In the multiclass case,
-    #         these must be probability estimates which sum to 1. The binary
-    #         case expects a shape (n_samples,), and the scores must be the scores of
-    #         the class with the greater label. The multiclass and multilabel
-    #         cases expect a shape (n_samples, n_classes). In the multiclass case,
-    #         the order of the class scores must correspond to the order of
-    #         ``labels``, if provided, or else to the numerical or lexicographical
-    #         order of the labels in ``y_true``.
-
     def dist_function(self, data):
         # SciKit-learn list of checked params before predict
         check_is_fitted(self)
@@ -140,7 +141,13 @@ class GMLVQClassifier(LVQClassifier):
         runner_up = distances[list(range(0, distances.shape[0])), min_args[:, 1]]
 
         return np.abs(winner - runner_up) / (
-                    2 * np.linalg.norm(self.prototypes_[min_args[:, 0], :] - self.prototypes_[min_args[:, 1], :]) ** 2)
+            2
+            * np.linalg.norm(
+                self.prototypes_[min_args[:, 0], :]
+                - self.prototypes_[min_args[:, 1], :]
+            )
+            ** 2
+        )
 
     def rel_dist_function(self, data):
         # SciKit-learn list of checked params before predict
@@ -170,12 +177,12 @@ class GMLVQClassifier(LVQClassifier):
         return -1 * winner
 
     @staticmethod
-    def mul_params(model_params: ModelParamsType, other: Tuple[int, float, np.ndarray]) -> ModelParamsType:
+    def mul_params(
+        model_params: ModelParamsType, other: Tuple[int, float, np.ndarray]
+    ) -> ModelParamsType:
         (prots, omegs) = model_params
         if isinstance(other, np.ndarray):
             if other.size >= 2:
-                return (prots * other[0],
-                        omegs * other[1])
+                return (prots * other[0], omegs * other[1])
         # Scalar int or float
-        return (prots * other,
-                omegs * other)
+        return (prots * other, omegs * other)

@@ -1,13 +1,13 @@
 from .base import DiscriminativeBaseClass
-# from .relative_distance import RelativeDistance
-#
-# __all__ = ['DiscriminativeBaseClass', 'RelativeDistance']
+from .relative_distance import RelativeDistance
+
+__all__ = ["DiscriminativeBaseClass", "RelativeDistance"]
 
 from ..misc import utils
 
-ALIASES = {'reldist': 'relative-distance'}
+ALIASES = {"reldist": "relative-distance"}
 BASE_CLASS = DiscriminativeBaseClass
-PACKAGE = 'sklvq.discriminants'
+PACKAGE = "sklvq.discriminants"
 
 
 def grab(class_type, class_params):

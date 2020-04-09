@@ -10,8 +10,7 @@ if TYPE_CHECKING:
 
 
 class AdaptiveEuclidean(DistanceBaseClass):
-
-    def __call__(self, data: np.ndarray, model: 'LVQClassifier') -> np.ndarray:
+    def __call__(self, data: np.ndarray, model: "LVQClassifier") -> np.ndarray:
         """ Implements a weighted variant of the euclidean distance:
             .. math::
                 d^{\\Lambda}(w, x) = \\sqrt{(x - w)^T \\Lambda (x - w)}
@@ -32,8 +31,11 @@ class AdaptiveEuclidean(DistanceBaseClass):
         ndarray
             The adaptive squared euclidean distance for every sample to every prototype stored row-wise.
         """
-        return sp.spatial.distance.cdist(data, model.prototypes_, 'mahalanobis',
-                                         VI=model.omega_.T.dot(model.omega_))
+        return sp.spatial.distance.cdist(
+            data, model.prototypes_, "mahalanobis", VI=model.omega_.T.dot(model.omega_)
+        )
 
-    def gradient(self, data: np.ndarray, model: 'LVQClassifier', i_prototype: int) -> np.ndarray:
+    def gradient(
+        self, data: np.ndarray, model: "LVQClassifier", i_prototype: int
+    ) -> np.ndarray:
         pass
