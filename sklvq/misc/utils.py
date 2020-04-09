@@ -8,10 +8,6 @@ import inspect
 
 # TODO: when wrong parameters are provided all the defaults will be used without warnings.... this is not really nice.
 
-<<<<<<< HEAD
-=======
-
->>>>>>> release
 def grab(class_type, class_params, aliases, package, base_class):
     if inspect.isclass(class_type):
         try:
