@@ -48,9 +48,8 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
         for i_prototype in range(0, model.prototypes_labels_.size):
             # Find for which samples it is the closest/winner AND has the same label
             ii_winner_same = i_prototype == i_dist_same
-            if any(
-                ii_winner_same
-            ):  # Only if these cases exist we can compute an update
+            if any(ii_winner_same):
+                # Only if these cases exist we can compute an update
                 # Computes the following partial derivative: df/du
                 activation_gradient = self.activation.gradient(
                     discriminant_score[ii_winner_same]
