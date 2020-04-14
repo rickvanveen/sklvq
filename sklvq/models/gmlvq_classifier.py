@@ -58,8 +58,6 @@ class GMLVQClassifier(LVQClassifier):
 
         self.omega_ = self._normalise_omega(self.omega_)
 
-        self._number_of_params = 2
-
         # Depends also on local (per class/prototype) global omega # TODO: implement local per class and prototype
         self.variables_size_ = self.prototypes_.size + self.omega_.size
 

@@ -6,7 +6,6 @@ from .adaptive_euclidean import AdaptiveEuclidean
 from .euclidean import Euclidean
 from .squared_euclidean import SquaredEuclidean
 from .cosine_distance import CosineDistance
-from .cumulative_residual_entropy import CumulativeResidualEntropy
 
 __all__ = [
     "DistanceBaseClass",
