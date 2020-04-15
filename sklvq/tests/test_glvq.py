@@ -42,7 +42,6 @@ def test_glvq_with_multiple_prototypes_per_class():
     print("\nIris accuracy: {}".format(accuracy))
 
 
-# TODO: Have to look into scoring of CV and if they now provide the testing or training scores....
 def test_glvq_pipeline_iris():
     iris = datasets.load_iris()
 
