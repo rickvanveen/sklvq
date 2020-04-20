@@ -1,19 +1,29 @@
-import scipy as sp
 import numpy as np
+from sklearn.metrics.pairwise import pairwise_distances
 
 from . import DistanceBaseClass
 
 from typing import TYPE_CHECKING
+from typing import Dict
 
 if TYPE_CHECKING:
     from sklvq.models import LVQClassifier
 
 
 class SquaredEuclidean(DistanceBaseClass):
-    def __call__(self, data: np.ndarray, model: "LVQClassifier") -> np.ndarray:
-        """ Wrapper function for scipy's cdist(x, y, 'sqeuclidean') function
+    def __init__(self, other_kwargs: Dict = None):
+        self.metric_kwargs = {
+            "metric": "euclidean",
+            "metric_kwargs": {"squared": True},
+        }
 
-            See scipy.spatial.distance.cdist for full documentation.
+        if other_kwargs is not None:
+            self.metric_kwargs.update(other_kwargs)
+
+    def __call__(self, data: np.ndarray, model: "LVQClassifier") -> np.ndarray:
+        """ Wrapper function for sklearn pairwise_distances ("euclidean") function
+
+            See sklearn.metrics.pairwise for full documentation.
 
             Note that any custom function should still accept and return the same.
 
@@ -30,7 +40,11 @@ class SquaredEuclidean(DistanceBaseClass):
                 The dist(u=XA[i], v=XB[j]) is computed and stored in the
                 ij-th entry.
         """
-        return sp.spatial.distance.cdist(data, model.prototypes_, "sqeuclidean")
+        return pairwise_distances(
+            data,
+            model.prototypes_,
+            **self.metric_kwargs
+        )
 
     def gradient(
         self, data: np.ndarray, model: "LVQClassifier", i_prototype: int
