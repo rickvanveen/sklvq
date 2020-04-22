@@ -62,13 +62,11 @@ class SquaredEuclidean(DistanceBaseClass):
             gradient : ndarray, shape = [n_observations, n_features]
                         The gradient with respect to the prototype and every observation in data.
         """
-        # TODO: Provide common function to reshape the variables, so it doesn't need to be copied.
-        shape = [data.shape[0], *model.prototypes_.shape]
+        shape = [data.shape[0], *model._prototypes_shape]
         gradient = np.zeros(shape)
 
         gradient[:, i_prototype, :] = np.atleast_2d(
             -2 * (data - model.prototypes_[i_prototype, :])
         )
 
-        # TODO: model.to_params(variables)?
         return gradient.reshape(shape[0], shape[1] * shape[2])
