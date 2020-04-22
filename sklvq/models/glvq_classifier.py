@@ -47,7 +47,7 @@ class GLVQClassifier(LVQClassifier):
 
     def initialize(self, data, labels):
         """ . """
-
+        print('sklearn')
         # Get the size of the variables (1D vector) of the model that need to be optimized.
         self.variables_size_ = self.prototypes_.size
         self._number_of_params = 1

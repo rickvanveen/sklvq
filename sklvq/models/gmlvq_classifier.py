@@ -82,20 +82,25 @@ class GMLVQClassifier(LVQClassifier):
 
     def to_params(self, variables: np.ndarray) -> ModelParamsType:
         # First part of the variables are the prototypes
-        prototype_indices = range(self.prototypes_.size)
+        # prototype_indices = range(self.prototypes_.size)
 
         # Second part are the omegas
-        omega_indices = range(self.prototypes_.size, variables.size)
+        # omega_indices = range(self.prototypes_.size, variables.size)
 
         # Return tuple of correctly reshaped prototypes and omegas
+        # return (
+        #     np.reshape(np.take(variables, prototype_indices), self.prototypes_.shape),
+        #     np.reshape(np.take(variables, omega_indices), self.omega_.shape),
+        # )
         return (
-            np.reshape(np.take(variables, prototype_indices), self.prototypes_.shape),
-            np.reshape(np.take(variables, omega_indices), self.omega_.shape),
+            np.reshape(variables[0:self.prototypes_.size], self.prototypes_.shape),
+            np.reshape(variables[self.prototypes_.size:], self.omega_.shape)
         )
 
     @staticmethod
     def _normalise_omega(omega: np.ndarray) -> np.ndarray:
-        return omega / np.sqrt(np.sum(np.diagonal(omega.T.dot(omega))))
+        return omega / np.sqrt(np.einsum("ij, ij", omega, omega))
+        # return omega / np.sqrt(np.sum(np.diagonal(omega.T.dot(omega))))
 
     @staticmethod
     def normalize_params(model_params: ModelParamsType) -> ModelParamsType:
@@ -147,32 +152,32 @@ class GMLVQClassifier(LVQClassifier):
             ** 2
         )
 
-    def rel_dist_function(self, data):
-        # SciKit-learn list of checked params before predict
-        check_is_fitted(self)
-
-        # Input validation
-        data = check_array(data)
-
-        distances = np.sort(self.distance_(data, self))
-
-        winner = distances[:, 0]
-        runner_up = distances[:, 1]
-
-        return (runner_up - winner) / (winner + runner_up)
-
-    def d_plus_function(self, data):
-        # SciKit-learn list of checked params before predict
-        check_is_fitted(self)
-
-        # Input validation
-        data = check_array(data)
-
-        distances = np.sort(self.distance_(data, self))
-
-        winner = distances[:, 0]
-
-        return -1 * winner
+    # def rel_dist_function(self, data):
+    #     # SciKit-learn list of checked params before predict
+    #     check_is_fitted(self)
+    #
+    #     # Input validation
+    #     data = check_array(data)
+    #
+    #     distances = np.sort(self.distance_(data, self))
+    #
+    #     winner = distances[:, 0]
+    #     runner_up = distances[:, 1]
+    #
+    #     return (runner_up - winner) / (winner + runner_up)
+    #
+    # def d_plus_function(self, data):
+    #     # SciKit-learn list of checked params before predict
+    #     check_is_fitted(self)
+    #
+    #     # Input validation
+    #     data = check_array(data)
+    #
+    #     distances = np.sort(self.distance_(data, self))
+    #
+    #     winner = distances[:, 0]
+    #
+    #     return -1 * winner
 
     @staticmethod
     def mul_params(

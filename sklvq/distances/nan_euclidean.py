@@ -21,7 +21,7 @@ class PartialEuclidean(DistanceBaseClass):
     def __init__(self, other_kwargs: Dict = None):
         self.metric_kwargs = {
             "metric": "nan_euclidean",
-            "metric_kwargs": {"squared": False},
+            "squared": False
         }
 
         if other_kwargs is not None:

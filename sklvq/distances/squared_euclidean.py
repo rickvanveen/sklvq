@@ -14,7 +14,7 @@ class SquaredEuclidean(DistanceBaseClass):
     def __init__(self, other_kwargs: Dict = None):
         self.metric_kwargs = {
             "metric": "euclidean",
-            "metric_kwargs": {"squared": True},
+            "squared": True
         }
 
         if other_kwargs is not None:
@@ -43,7 +43,7 @@ class SquaredEuclidean(DistanceBaseClass):
         return pairwise_distances(
             data,
             model.prototypes_,
-            **self.metric_kwargs
+            **self.metric_kwargs,
         )
 
     def gradient(
@@ -70,4 +70,5 @@ class SquaredEuclidean(DistanceBaseClass):
             -2 * (data - model.prototypes_[i_prototype, :])
         )
 
+        # TODO: model.to_params(variables)?
         return gradient.reshape(shape[0], shape[1] * shape[2])

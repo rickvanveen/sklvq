@@ -1,15 +1,24 @@
 from . import DistanceBaseClass
 
 import numpy as np
-import scipy as sp
+from sklearn.metrics.pairwise import pairwise_distances
 
 from typing import TYPE_CHECKING
+from typing import Dict
 
 if TYPE_CHECKING:
     from sklvq.models import LVQClassifier
 
 
 class AdaptiveSquaredEuclidean(DistanceBaseClass):
+    def __init__(self, other_kwargs: Dict = None):
+        self.metric_kwargs = {
+            "metric": "mahalanobis",
+        }
+
+        if other_kwargs is not None:
+            self.metric_kwargs.update(other_kwargs)
+
     def __call__(self, data: np.ndarray, model: "LVQClassifier") -> np.ndarray:
         """ Implements a weighted variant of the squared euclidean distance:
             .. math::
@@ -31,15 +40,13 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
         ndarray
             The adaptive squared euclidean distance for every sample to every prototype stored row-wise.
         """
-        return (
-            sp.spatial.distance.cdist(
-                data,
-                model.prototypes_,
-                "mahalanobis",
-                VI=model.omega_.T.dot(model.omega_),
-            )
-            ** 2
-        )
+        # model.get_prototypes()
+        # model.get_omega()
+        # model.get_lambda()
+
+        self.metric_kwargs.update({"VI": np.dot(model.omega_.T, model.omega_)})
+
+        return pairwise_distances(data, model.prototypes_, **self.metric_kwargs) ** 2
 
     def gradient(
         self, data: np.ndarray, model: "LVQClassifier", i_prototype: int
@@ -73,6 +80,7 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
             _omega_gradient(data, model.prototypes_[i_prototype, :], model.omega_)
         )
 
+        # TODO In variables form and reshaped by model.to_params(variables)
         return np.hstack(
             (prototype_gradient.reshape(shape[0], shape[1] * shape[2]), omega_gradient)
         )
@@ -81,17 +89,20 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
 def _prototype_gradient(
     data: np.ndarray, prototype: np.ndarray, omega: np.ndarray
 ) -> np.ndarray:
-    difference = (-2 * (data - prototype)).T
-    relevance = omega.T.dot(omega)
-    return np.matmul(relevance, difference).T
+    # difference = (-2 * (data - prototype)).T
+    # relevance = omega.T.dot(omega)
+    # return np.matmul(relevance, difference).T
+    return np.einsum("ji,ik ->jk", -2 * (data - prototype), np.dot(omega.T, omega))
+    # return np.atleast_2d(
+    #     np.einsum("ji, ik, kj -> i", omega, omega, -2 * (data - prototype))
+    # )
 
 
 def _omega_gradient(
     data: np.ndarray, prototype: np.ndarray, omega: np.ndarray
 ) -> np.ndarray:
     difference = data - prototype
-    scaled_omega = omega.dot(difference.T)
-    scaled_diff = 2 * difference
-    return np.einsum("ij,jk->jik", scaled_omega, scaled_diff).reshape(
+    scaled_omega = np.dot(omega, difference.T)
+    return np.einsum("ij,jk->jik", scaled_omega, (2 * difference)).reshape(
         data.shape[0], omega.shape[0] * omega.shape[1]
     )

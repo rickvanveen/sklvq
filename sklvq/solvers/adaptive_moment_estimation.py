@@ -45,6 +45,7 @@ class AdaptiveMomentEstimation(SolverBaseClass):
                 range(0, labels.size), random_state=model.random_state_
             )
 
+            # TODO: Mini batch?
             for i_sample in range(0, len(shuffled_indices)):
 
                 # Update power

@@ -35,6 +35,7 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
         labels: np.ndarray,
     ) -> np.ndarray:
         model.set_model_params(model.to_params(variables))
+        # model._variables = model_variables # we need this for scipy solvers probably?
 
         dist_same, dist_diff, i_dist_same, i_dist_diff = _compute_distance(
             data, labels, model

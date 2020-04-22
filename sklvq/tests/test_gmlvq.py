@@ -3,19 +3,20 @@ from sklearn import datasets
 from sklearn import preprocessing
 from sklearn.model_selection import cross_val_score, GridSearchCV
 from sklearn.pipeline import make_pipeline
+from sklearn import set_config
+
 
 from sklvq import GMLVQClassifier
 
 
 def test_gmlvq_iris():
-    iris = datasets.load_iris()
+    set_config(assume_finite=True)
+    iris = datasets.load_digits()
 
     iris.data = preprocessing.scale(iris.data)
 
-    classifier = GMLVQClassifier(solver_type='lbfgs',
-                                 solver_params={'max_runs': 20, 'k':2, 'step_size': np.array([0.2, 0.01])},
-                                 activation_type='swish',
-                                 activation_params={'beta': 4})
+    classifier = GMLVQClassifier(solver_type='steepest-gradient-descent',
+                                 activation_type='identity')
     classifier = classifier.fit(iris.data, iris.target)
 
     predicted = classifier.predict(iris.data)
