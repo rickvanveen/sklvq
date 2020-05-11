@@ -47,12 +47,7 @@ class GLVQClassifier(LVQClassifier):
 
     def initialize(self, data, labels):
         """ . """
-        print('sklearn')
-        # Get the size of the variables (1D vector) of the model that need to be optimized.
-        self.variables_size_ = self.prototypes_.size
-        self._number_of_params = 1
-
-        # Grab the chosen activation, and discriminant functions and initialize with set parameters.
+        # Grab the chosen activation, and discriminant functions and initialize with parameters.
         activation = activations.grab(self.activation_type, self.activation_params)
 
         discriminant = discriminants.grab(
@@ -75,6 +70,9 @@ class GLVQClassifier(LVQClassifier):
 
     def to_params(self, variables):
         return np.reshape(variables, self.prototypes_.shape)
+
+    def to_variables(self, model_params: ModelParamsType) -> np.ndarray:
+        return model_params.ravel()
 
     @staticmethod
     def normalize_params(model_params):

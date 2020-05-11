@@ -36,10 +36,6 @@ class Euclidean(DistanceBaseClass):
 
             with :math:`\\vec{w}` a prototype and :math:`\\vec{x}` a sample.
 
-        .. note::
-            Makes use of the scipy's cdist(x, y, 'euclidean') function, see scipy.spatial.distance.cdist
-            for full documentation.
-
         Parameters
         ----------
         data : numpy.ndarray with shape (n_samples, n_features)
@@ -75,14 +71,16 @@ class Euclidean(DistanceBaseClass):
             The gradient with respect to the prototype and every sample in data.
 
         """
-        shape = [data.shape[0], *model.prototypes_.shape]
-        gradient = np.zeros(shape)
+        prototypes = model.get_model_params()
+        (num_samples, num_features) = data.shape
 
-        difference = data - model.prototypes_[i_prototype, :]
+        distance_gradient = np.zeros((num_samples, prototypes.size))
 
-        # np.sqrt(np.dot(difference.T, difference)) == np.sqrt(np.sum(difference ** 2))
-        gradient[:, i_prototype, :] = np.atleast_2d(
-            (-1 * difference) / np.sqrt(np.dot(difference.T, difference))
-        )
+        ip_start = i_prototype * num_features
+        ip_end = ip_start + num_features
 
-        return gradient.reshape(shape[0], shape[1] * shape[2])
+        difference = data - prototypes[i_prototype, :]
+
+        distance_gradient[:, ip_start:ip_end] = (-1 * difference) / np.sqrt(np.dot(difference.T, difference))
+
+        return distance_gradient

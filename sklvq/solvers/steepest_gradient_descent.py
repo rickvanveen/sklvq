@@ -33,11 +33,15 @@ class SteepestGradientDescent(SolverBaseClass):
                 range(0, labels.size), random_state=model.random_state_
             )
 
+            batch_size = self.batch_size
+            if batch_size <= 0:
+                batch_size = data.shape[0]
+
             # Divide the shuffled indices into batches (not necessarily equal size,
             # see documentation of numpy.array_split). batch_size set to 1 equals the stochastic variant
             batches = np.array_split(
                 shuffled_indices,
-                list(range(self.batch_size, labels.size, self.batch_size)),
+                list(range(batch_size, labels.size, batch_size)),
                 axis=0,
             )
 
@@ -48,21 +52,18 @@ class SteepestGradientDescent(SolverBaseClass):
 
                 # Get model params variable shape (flattened)
                 model_variables = model.to_variables(model.get_model_params())
-                # model_variables = model._variables
 
                 # Transform the objective gradient to model_params form
                 objective_gradient = model.to_params(
                     # Compute the objective gradient
                     objective.gradient(model_variables, model, batch, batch_labels)
                 )
-                # objective_gradient = objective.gradient(model_variables, model, batch, batch_labels)
 
                 # Transform objective gradient to variables form
                 objective_gradient = model.to_variables(
                     # Apply the step size to the model parameters
                     model.mul_params(objective_gradient, step_size)
                 )
-                # model.scale_params(objective_gradient, step_size)
 
                 # Update the model
                 model.set_model_params(
@@ -70,7 +71,6 @@ class SteepestGradientDescent(SolverBaseClass):
                     # and transform back to parameters form.
                     model.to_params(model_variables - objective_gradient)
                 )
-                # model.set_model_variables(model_variables - objective_gradient)
 
             # Update step size using an annealing strategy
             step_size = self.step_size / (1 + i_run / self.max_runs)

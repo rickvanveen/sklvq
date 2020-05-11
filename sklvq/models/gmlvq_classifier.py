@@ -58,9 +58,6 @@ class GMLVQClassifier(LVQClassifier):
 
         self.omega_ = self._normalise_omega(self.omega_)
 
-        # Depends also on local (per class/prototype) global omega # TODO: implement local per class and prototype
-        self.variables_size_ = self.prototypes_.size + self.omega_.size
-
         activation = activations.grab(self.activation_type, self.activation_params)
 
         discriminant = discriminants.grab(
@@ -82,25 +79,26 @@ class GMLVQClassifier(LVQClassifier):
 
     def to_params(self, variables: np.ndarray) -> ModelParamsType:
         # First part of the variables are the prototypes
-        # prototype_indices = range(self.prototypes_.size)
-
-        # Second part are the omegas
-        # omega_indices = range(self.prototypes_.size, variables.size)
-
-        # Return tuple of correctly reshaped prototypes and omegas
-        # return (
-        #     np.reshape(np.take(variables, prototype_indices), self.prototypes_.shape),
-        #     np.reshape(np.take(variables, omega_indices), self.omega_.shape),
-        # )
         return (
-            np.reshape(variables[0:self.prototypes_.size], self.prototypes_.shape),
-            np.reshape(variables[self.prototypes_.size:], self.omega_.shape)
+            np.reshape(variables[0 : self.prototypes_.size], self.prototypes_.shape),
+            np.reshape(variables[self.prototypes_.size :], self.omega_.shape),
         )
+
+    def to_variables(self, model_params: ModelParamsType) -> np.ndarray:
+        omega_size = self.omega_.size
+        prototypes_size = self.prototypes_.size
+
+        variables = np.zeros(prototypes_size + omega_size)
+
+        (variables[0:prototypes_size], variables[prototypes_size:]) = map(
+            np.ravel, model_params
+        )
+
+        return variables
 
     @staticmethod
     def _normalise_omega(omega: np.ndarray) -> np.ndarray:
-        return omega / np.sqrt(np.einsum("ij, ij", omega, omega))
-        # return omega / np.sqrt(np.sum(np.diagonal(omega.T.dot(omega))))
+        return omega / np.sqrt(np.einsum("ij, ij", omega.T, omega))
 
     @staticmethod
     def normalize_params(model_params: ModelParamsType) -> ModelParamsType:

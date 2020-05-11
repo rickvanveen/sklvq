@@ -11,11 +11,12 @@ from sklvq import GLVQClassifier
 def test_glvq_iris():
     iris = datasets.load_iris()
 
+    # iris.data[np.random.choice(150, 50, replace=False), 2] = np.nan
     iris.data = preprocessing.scale(iris.data)
 
     classifier = GLVQClassifier(solver_type='steepest-gradient-descent',
-                                solver_params={'batch_size': 1},
-                                distance_type='sqeuclidean',
+                                solver_params={'batch_size': 12},
+                                distance_type='squared-euclidean',
                                 activation_type='sigmoid')
     classifier = classifier.fit(iris.data, iris.target)
 

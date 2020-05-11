@@ -6,6 +6,7 @@ from sklearn.metrics.pairwise import pairwise_distances
 from typing import TYPE_CHECKING
 from typing import Dict
 
+
 if TYPE_CHECKING:
     from sklvq.models import LVQClassifier
 
@@ -24,9 +25,6 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
             .. math::
                 d^{\\Lambda}(w, x) = (x - w)^T \\Lambda (x - w)
 
-        .. note::
-            Uses scipy.spatial.distance.cdist, see scipy documentation for more detail.
-
         Parameters
         ----------
         data : ndarray
@@ -40,13 +38,11 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
         ndarray
             The adaptive squared euclidean distance for every sample to every prototype stored row-wise.
         """
-        # model.get_prototypes()
-        # model.get_omega()
-        # model.get_lambda()
+        (prototypes, omega) = model.get_model_params()
 
-        self.metric_kwargs.update({"VI": np.dot(model.omega_.T, model.omega_)})
+        self.metric_kwargs.update({"VI": np.dot(omega.T, omega)})
 
-        return pairwise_distances(data, model.prototypes_, **self.metric_kwargs) ** 2
+        return pairwise_distances(data, prototypes, **self.metric_kwargs) ** 2
 
     def gradient(
         self, data: np.ndarray, model: "LVQClassifier", i_prototype: int
@@ -70,32 +66,32 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
             The gradient for every feature/dimension. Returned in one 1D vector. The non-relevant prototype's
             gradient is set to 0, but is still included in the output.
         """
-        shape = [data.shape[0], *model.prototypes_.shape]
-        prototype_gradient = np.zeros(shape)
 
-        prototype_gradient[:, i_prototype, :] = np.atleast_2d(
-            _prototype_gradient(data, model.prototypes_[i_prototype, :], model.omega_)
-        )
-        omega_gradient = np.atleast_2d(
-            _omega_gradient(data, model.prototypes_[i_prototype, :], model.omega_)
+        (prototypes, omega) = model.get_model_params()
+        (num_samples, num_features) = data.shape
+
+        distance_gradient = np.zeros((num_samples, prototypes.size + omega.size))
+
+        ip_start = i_prototype * num_features
+        ip_end = ip_start + num_features
+
+        distance_gradient[:, ip_start:ip_end] = _prototype_gradient(
+            data, prototypes[i_prototype, :], omega
         )
 
-        # TODO In variables form and reshaped by model.to_params(variables)
-        return np.hstack(
-            (prototype_gradient.reshape(shape[0], shape[1] * shape[2]), omega_gradient)
-        )
+        io_start = prototypes.size
+
+        distance_gradient[:, io_start:] = _omega_gradient(
+            data, prototypes[i_prototype, :], omega
+        ).reshape(num_samples, omega.size)
+
+        return distance_gradient
 
 
 def _prototype_gradient(
     data: np.ndarray, prototype: np.ndarray, omega: np.ndarray
 ) -> np.ndarray:
-    # difference = (-2 * (data - prototype)).T
-    # relevance = omega.T.dot(omega)
-    # return np.matmul(relevance, difference).T
     return np.einsum("ji,ik ->jk", -2 * (data - prototype), np.dot(omega.T, omega))
-    # return np.atleast_2d(
-    #     np.einsum("ji, ik, kj -> i", omega, omega, -2 * (data - prototype))
-    # )
 
 
 def _omega_gradient(
@@ -103,6 +99,5 @@ def _omega_gradient(
 ) -> np.ndarray:
     difference = data - prototype
     scaled_omega = np.dot(omega, difference.T)
-    return np.einsum("ij,jk->jik", scaled_omega, (2 * difference)).reshape(
-        data.shape[0], omega.shape[0] * omega.shape[1]
-    )
+    return np.einsum("ij,jk->jik", scaled_omega, (2 * difference))
+

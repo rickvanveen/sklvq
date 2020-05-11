@@ -15,7 +15,7 @@ ModelParamsType = Tuple[np.ndarray, np.ndarray]
 class LGMLVQClassifier(LVQClassifier):
     def __init__(
         self,
-        distance_type="adaptive-squared-euclidean",
+        distance_type="local-adaptive-squared-euclidean",
         distance_params=None,
         activation_type="identity",
         activation_params=None,
@@ -51,13 +51,14 @@ class LGMLVQClassifier(LVQClassifier):
     # Should be private (cannot be used without calling fit of LVQClassifier)
     def initialize(self, data, y):
         """ . """
-
         # Initialize omega
         if self.omega is None:
             if self.localization == "p":
                 self._num_omega = self.prototypes_.shape[0]
+                # self._omega_labels = np.arange(self.prototypes_.size) # Corresponding to index of prototype
             elif self.localization == "c":
-                self._num_classes = self.classes_.size
+                self._num_omega = self.classes_.size
+                # self._omega_labels = np.arange(self.classes_.size)
             self.omega_ = np.array(
                 [np.eye(data.shape[1]) for _ in range(self._num_omega)]
             )
@@ -65,7 +66,7 @@ class LGMLVQClassifier(LVQClassifier):
             self.omega_ = self.omega
 
         # Add some check
-        self.omega_ = np.array([self._normalise_omega(omega) for omega in self.omega_])
+        self.omega_ = self._normalise_omega(self.omega_)
 
         activation = activations.grab(self.activation_type, self.activation_params)
 
@@ -81,23 +82,30 @@ class LGMLVQClassifier(LVQClassifier):
 
     def set_model_params(self, model_params):
         (self.prototypes_, omega) = model_params
-        self.omega_ = np.array([self._normalise_omega(omega) for omega in self.omega_])
+        # TODO Without the list thing just like the prototypes....
+        self.omega_ = self._normalise_omega(omega)
 
     def get_model_params(self):
         return self.prototypes_, self.omega_
 
     def to_params(self, variables):
-        # First part of the variables are the prototypes
-        prototype_indices = range(self.prototypes_.size)
-
-        # Second part are the omegas
-        omega_indices = range(self.prototypes_.size, variables.size)
-
         # Return tuple of correctly reshaped prototypes and omegas
         return (
-            np.reshape(np.take(variables, prototype_indices), self.prototypes_.shape),
-            np.reshape(np.take(variables, omega_indices), self.omega_.shape),
+            np.reshape(variables[0 : self.prototypes_.size], self.prototypes_.shape),
+            np.reshape(variables[self.prototypes_.size :], self.omega_.shape),
         )
+
+    def to_variables(self, model_params: ModelParamsType) -> np.ndarray:
+        omega_size = self.omega_.size
+        prototypes_size = self.prototypes_.size
+
+        variables = np.zeros(prototypes_size + omega_size)
+
+        (variables[0:prototypes_size], variables[prototypes_size:]) = map(
+            np.ravel, model_params
+        )
+
+        return variables
 
     @staticmethod
     def normalize_params(model_params: ModelParamsType) -> ModelParamsType:
@@ -105,7 +113,7 @@ class LGMLVQClassifier(LVQClassifier):
         normalized_prototypes = prototypes / np.linalg.norm(
             prototypes, axis=1, keepdims=True
         )
-        normalized_omega = np.array([LGMLVQClassifier._normalise_omega(o) for o in omega])
+        normalized_omega = LGMLVQClassifier._normalise_omega(omega)
         return (normalized_prototypes, normalized_omega)
 
     @staticmethod
@@ -115,10 +123,14 @@ class LGMLVQClassifier(LVQClassifier):
         (prots, omegs) = model_params
         if isinstance(other, np.ndarray):
             if other.size >= 2:
-                return (prots * other[0], omegs * other[1])
+                return prots * other[0], omegs * other[1]
         # Scalar int or float
-        return (prots * other, omegs * other)
+        return prots * other, omegs * other
 
-    @staticmethod
+    @staticmethod # Wrong TODO: switch off normalization... as option, normalize all of them or none.
     def _normalise_omega(omega: np.ndarray) -> np.ndarray:
-        return omega / np.sqrt(np.sum(np.diagonal(omega.T.dot(omega))))
+        denominator = np.sqrt(np.einsum("ijk,ijk->i", omega, omega)).reshape(
+            omega.shape[0], 1, 1
+        )
+        denominator[denominator == 0] = 1.0
+        return omega / denominator

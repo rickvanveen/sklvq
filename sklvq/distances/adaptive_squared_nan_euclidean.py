@@ -3,6 +3,8 @@ from . import DistanceBaseClass
 import numpy as np
 from sklearn.metrics.pairwise import pairwise_distances
 
+from functools import partial
+
 from typing import TYPE_CHECKING
 from typing import Dict
 
@@ -10,11 +12,9 @@ if TYPE_CHECKING:
     from sklvq.models import LVQClassifier
 
 
-class NanAdaptiveSquaredEuclidean(DistanceBaseClass):
+class AdaptiveSquaredNanEuclidean(DistanceBaseClass):
     def __init__(self, other_kwargs: Dict = None):
-        self.metric_kwargs = {
-            "metric": "mahalanobis",
-        }
+        self.metric_kwargs = {"force_all_finite": "allow-nan"}
 
         if other_kwargs is not None:
             self.metric_kwargs.update(other_kwargs)
@@ -23,9 +23,6 @@ class NanAdaptiveSquaredEuclidean(DistanceBaseClass):
         """ Implements a weighted variant of the squared euclidean distance:
             .. math::
                 d^{\\Lambda}(w, x) = (x - w)^T \\Lambda (x - w)
-
-        .. note::
-            Uses scipy.spatial.distance.cdist, see scipy documentation for more detail.
 
         Parameters
         ----------
@@ -38,11 +35,16 @@ class NanAdaptiveSquaredEuclidean(DistanceBaseClass):
         Returns
         -------
         ndarray
+
+
             The adaptive squared euclidean distance for every sample to every prototype stored row-wise.
         """
-        self.metric_kwargs.update(
-            {"VI": model.omega_.T.dot(model.omega_)}
+        _adaptive_squared_nan_euclidean_callable = partial(
+            _adaptive_squared_nan_euclidean,
+            lambda_matrix=model.omega_.T.dot(model.omega_),
         )
+
+        self.metric_kwargs.update({"metric": _adaptive_squared_nan_euclidean_callable})
 
         return pairwise_distances(data, model.prototypes_, **self.metric_kwargs) ** 2
 
@@ -68,36 +70,45 @@ class NanAdaptiveSquaredEuclidean(DistanceBaseClass):
             The gradient for every feature/dimension. Returned in one 1D vector. The non-relevant prototype's
             gradient is set to 0, but is still included in the output.
         """
-        shape = [data.shape[0], *model.prototypes_.shape]
-        prototype_gradient = np.zeros(shape)
+        (prototypes, omega) = model.get_model_params()
+        (num_samples, num_features) = data.shape
 
-        prototype_gradient[:, i_prototype, :] = np.atleast_2d(
-            _prototype_gradient(data, model.prototypes_[i_prototype, :], model.omega_)
-        )
-        omega_gradient = np.atleast_2d(
-            _omega_gradient(data, model.prototypes_[i_prototype, :], model.omega_)
+        distance_gradient = np.zeros((num_samples, prototypes.size + omega.size))
+
+        ip_start = i_prototype * num_features
+        ip_end = ip_start + num_features
+
+        distance_gradient[:, ip_start:ip_end] = _prototype_gradient(
+            data, prototypes[i_prototype, :], omega
         )
 
-        return np.hstack(
-            (prototype_gradient.reshape(shape[0], shape[1] * shape[2]), omega_gradient)
-        )
+        io_start = prototypes.size
+
+        distance_gradient[:, io_start:] = _omega_gradient(
+            data, prototypes[i_prototype, :], omega
+        ).reshape(num_samples, omega.size)
+
+        return distance_gradient
 
 
 def _prototype_gradient(
     data: np.ndarray, prototype: np.ndarray, omega: np.ndarray
 ) -> np.ndarray:
-    # TODO: no temp variables and use atleast_2d and einsum... or dot...
-
-    difference = (-2 * (data - prototype)).T
-    relevance = omega.T.dot(omega)
-    return np.matmul(relevance, difference).T
+    difference = -2 * (data - prototype)
+    difference[np.isnan(difference)] = 0
+    return np.einsum("ji,ik ->jk", difference, np.dot(omega.T, omega))
 
 
 def _omega_gradient(
     data: np.ndarray, prototype: np.ndarray, omega: np.ndarray
 ) -> np.ndarray:
     difference = data - prototype
+    difference[np.isnan(difference)] = 0
     scaled_omega = omega.dot(difference.T)
-    return np.einsum("ij,jk->jik", scaled_omega, (2 * difference)).reshape(
-        data.shape[0], omega.shape[0] * omega.shape[1]
-    )
+    return np.einsum("ij,jk->jik", scaled_omega, (2 * difference))
+
+
+def _adaptive_squared_nan_euclidean(sample, prototype, lambda_matrix=None):
+    difference = sample - prototype
+    difference[np.isnan(difference)] = 0
+    return difference.dot(lambda_matrix).dot(difference)

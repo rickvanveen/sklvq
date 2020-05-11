@@ -23,10 +23,6 @@ class SquaredEuclidean(DistanceBaseClass):
     def __call__(self, data: np.ndarray, model: "LVQClassifier") -> np.ndarray:
         """ Wrapper function for sklearn pairwise_distances ("euclidean") function
 
-            See sklearn.metrics.pairwise for full documentation.
-
-            Note that any custom function should still accept and return the same.
-
             Parameters
             ----------
             data       : ndarray, shape = [n_obervations, n_features]
@@ -62,11 +58,14 @@ class SquaredEuclidean(DistanceBaseClass):
             gradient : ndarray, shape = [n_observations, n_features]
                         The gradient with respect to the prototype and every observation in data.
         """
-        shape = [data.shape[0], *model._prototypes_shape]
-        gradient = np.zeros(shape)
+        prototypes = model.get_model_params()
+        (num_samples, num_features) = data.shape
 
-        gradient[:, i_prototype, :] = np.atleast_2d(
-            -2 * (data - model.prototypes_[i_prototype, :])
-        )
+        distance_gradient = np.zeros((num_samples, prototypes.size))
 
-        return gradient.reshape(shape[0], shape[1] * shape[2])
+        ip_start = i_prototype * num_features
+        ip_end = ip_start + num_features
+
+        distance_gradient[:, ip_start:ip_end] = -2 * (data - prototypes[i_prototype, :])
+
+        return distance_gradient

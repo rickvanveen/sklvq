@@ -1,8 +1,8 @@
 from .base import SolverBaseClass, ScipyBaseSolver
 from .steepest_gradient_descent import SteepestGradientDescent
 from .waypoint_gradient_descent import WaypointGradientDescent
-from .lbfgs_solver import LbfgsSolver
-from .bfgs_solver import BfgsSolver
+from .limited_memory_bfgs import LimitedMemoryBfgs
+from .broyden_fletcher_goldfarb_shanno import BroydenFletcherGoldfarbShanno
 from .adaptive_moment_estimation import AdaptiveMomentEstimation
 from ..misc import utils
 
@@ -13,14 +13,14 @@ __all__ = [
     "SteepestGradientDescent",
     "WaypointGradientDescent",
     "AdaptiveMomentEstimation",
-    "LbfgsSolver",
-    "BfgsSolver",
+    "BroydenFletcherGoldfarbShanno",
+    "LimitedMemoryBfgs",
 ]
 
 ALIASES = {
     "sgd": "steepest-gradient-descent",
-    "lbfgs": "lbfgs-solver",
-    "bfgs": "bfgs-solver",
+    "lbfgs": "limited-memory-BFGS",
+    "bfgs": "broyden-fletcher-goldfarb-shanno",
     "adadelta": "adaptive-gradient-descent",
     "adam": "adaptive-moment-estimation",
 }

@@ -16,7 +16,7 @@ from collections.abc import Iterable
 def _conditional_mean(p_labels, data, d_labels):
     """ Implements the conditional mean, i.e., mean per class"""
     return np.array(
-        [np.mean(data[p_label == d_labels, :], axis=0) for p_label in p_labels]
+        [np.nanmean(data[p_label == d_labels, :], axis=0) for p_label in p_labels]
     )
 
 
@@ -85,7 +85,7 @@ class LVQClassifier(ABC, BaseEstimator, ClassifierMixin):
 
     def _validate(self, data, labels):
         # SciKit-learn required check
-        data, labels = check_X_y(data, labels)
+        data, labels = check_X_y(data, labels, force_all_finite="allow-nan")
 
         # SciKit-learn required check
         check_classification_targets(labels)
@@ -110,6 +110,8 @@ class LVQClassifier(ABC, BaseEstimator, ClassifierMixin):
             self.prototypes_labels_ = np.repeat(
                 unique_labels(labels), self.prototypes_per_class
             )
+        else: # Might break the connection between prototypes and omegas
+            self.prototypes_labels_ = self.prototypes_per_class
 
         # If prototypes is not already set initialize them to the class conditional mean.
         if self.prototypes is None:
@@ -129,7 +131,7 @@ class LVQClassifier(ABC, BaseEstimator, ClassifierMixin):
         check_is_fitted(self)
 
         # Input validation
-        data = check_array(data)
+        data = check_array(data, force_all_finite="allow-nan")
 
         # Of shape n_observations , n_prototypes
         distances = self.distance_(data, self)
@@ -153,7 +155,7 @@ class LVQClassifier(ABC, BaseEstimator, ClassifierMixin):
         check_is_fitted(self)
 
         # Input validation
-        data = check_array(data)
+        data = check_array(data, force_all_finite="allow-nan")
 
         decision_values = self.decision_function(data)
 

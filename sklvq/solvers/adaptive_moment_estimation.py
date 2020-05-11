@@ -16,12 +16,14 @@ if TYPE_CHECKING:
 
 
 class AdaptiveMomentEstimation(SolverBaseClass):
-    def __init__(self, max_runs=20, beta1=0.9, beta2=0.999, step_size=0.001):
+    def __init__(
+        self, max_runs=20, beta1=0.9, beta2=0.999, step_size=0.001, epsilon=1e-4
+    ):
         self.max_runs = max_runs
         self.beta1 = beta1
         self.beta2 = beta2
         self.step_size = step_size
-        self.epsilon = 1e-4
+        self.epsilon = epsilon
 
     def solve(
         self,
@@ -45,7 +47,6 @@ class AdaptiveMomentEstimation(SolverBaseClass):
                 range(0, labels.size), random_state=model.random_state_
             )
 
-            # TODO: Mini batch?
             for i_sample in range(0, len(shuffled_indices)):
 
                 # Update power
@@ -74,7 +75,6 @@ class AdaptiveMomentEstimation(SolverBaseClass):
 
                 v_hat = v / (1 - self.beta2 ** p)
 
-                # Make the epsilon (small value) a parameter
                 objective_gradient = (
                     self.step_size * m_hat / (np.sqrt(v_hat) + self.epsilon)
                 )

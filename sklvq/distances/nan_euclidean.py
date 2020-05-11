@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from sklvq.models import LVQClassifier
 
 
-class PartialEuclidean(DistanceBaseClass):
+class NanEuclidean(DistanceBaseClass):
     """ Euclidean distance function
 
     See also
@@ -35,10 +35,6 @@ class PartialEuclidean(DistanceBaseClass):
                 d(\\vec{w}, \\vec{x}) = \\sqrt{(\\vec{x} - \\vec{w})^T (\\vec{x} - \\vec{w})},
 
             with :math:`\\vec{w}` a prototype and :math:`\\vec{x}` a sample.
-
-        .. note::
-            Makes use of the scipy's cdist(x, y, 'euclidean') function, see scipy.spatial.distance.cdist
-            for full documentation.
 
         Parameters
         ----------
@@ -75,15 +71,32 @@ class PartialEuclidean(DistanceBaseClass):
             The gradient with respect to the prototype and every sample in data.
 
         """
-        shape = [data.shape[0], *model.prototypes_.shape]
-        gradient = np.zeros(shape)
+        # shape = [data.shape[0], *model.prototypes_.shape]
+        # gradient = np.zeros(shape)
+        #
+        # difference = data - model.prototypes_[i_prototype, :]
+        # # np.nan - x (not nan) equals np.nan
+        # difference[np.isnan(difference)] = 0
+        #
+        # gradient[:, i_prototype, :] = np.atleast_2d(
+        #     (-1 * difference) / np.sqrt(np.sum(difference ** 2))
+        # )
+        #
+        # return gradient.reshape(shape[0], shape[1] * shape[2])
 
-        difference = data - model.prototypes_[i_prototype, :]
-        # np.nan - x (not nan) equals np.nan
+        prototypes = model.get_model_params()
+        (num_samples, num_features) = data.shape
+
+        distance_gradient = np.zeros((num_samples, prototypes.size))
+
+        ip_start = i_prototype * num_features
+        ip_end = ip_start + num_features
+
+        difference = data - prototypes[i_prototype, :]
         difference[np.isnan(difference)] = 0
 
-        gradient[:, i_prototype, :] = np.atleast_2d(
-            (-1 * difference) / np.sqrt(np.sum(difference ** 2))
-        )
+        distance_gradient[:, ip_start:ip_end] = (-1 * difference) / np.sqrt(np.dot(difference.T, difference))
 
-        return gradient.reshape(shape[0], shape[1] * shape[2])
+        return distance_gradient
+
+

@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from sklvq.models import LVQClassifier
 
 
-class PartialSquaredEuclidean(DistanceBaseClass):
+class SquaredNanEuclidean(DistanceBaseClass):
     def __init__(self, other_kwargs: Dict = None):
         self.metric_kwargs = {
             "metric": "nan_euclidean",
@@ -21,12 +21,7 @@ class PartialSquaredEuclidean(DistanceBaseClass):
             self.metric_kwargs.update(other_kwargs)
 
     def __call__(self, data: np.ndarray, model: "LVQClassifier") -> np.ndarray:
-        """ Wrapper function for scipy's cdist(x, y, 'sqeuclidean') function
-
-            See scipy.spatial.distance.cdist for full documentation.
-
-            Note that any custom function should still accept and return the same.
-
+        """
             Parameters
             ----------
             data       : ndarray, shape = [n_obervations, n_features]
@@ -58,13 +53,15 @@ class PartialSquaredEuclidean(DistanceBaseClass):
             gradient : ndarray, shape = [n_observations, n_features]
                         The gradient with respect to the prototypes and every observation in data.
         """
-        # TODO: Provide common function to reshape the variables, so it doesn't need to be copied.
-        shape = [data.shape[0], *model.prototypes_.shape]
-        gradient = np.zeros(shape)
+        prototypes = model.get_model_params()
+        (num_samples, num_features) = data.shape
 
-        difference = data - model.prototypes_[i_prototype, :]
+        distance_gradient = np.zeros((num_samples, prototypes.size))
+
+        ip_start = i_prototype * num_features
+        ip_end = ip_start + num_features
+
+        difference = data - prototypes[i_prototype, :]
         difference[np.isnan(difference)] = 0
 
-        gradient[:, i_prototype, :] = np.atleast_2d(-2 * difference)
-
-        return gradient.reshape(shape[0], shape[1] * shape[2])
+        distance_gradient[:, ip_start:ip_end] = -2 * (data - difference)
