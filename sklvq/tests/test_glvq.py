@@ -23,7 +23,7 @@ def test_glvq_iris():
     classifier = GLVQ(
         solver_type="steepest-gradient-descent",
         solver_params={"batch_size": 0, "max_runs": 20, "step_size": 0.01},
-        distance_type="squared-euclidean",
+        distance_type="euclidean",
         activation_type="sigmoid",
         activation_params={"beta": 2}
     )
@@ -73,11 +73,11 @@ def test_glvq_gridsearch_iris():
 
     param_grid = [
         {
-            "glvqclassifier__solver_type": ["steepest-gradient-descent"],
-            "glvqclassifier__distance_type": ["squared-euclidean"],
-            # 'glvqclassifier__distance_params': [{'beta': beta} for beta in list(range(2, 10, 2))],
-            "glvqclassifier__activation_type": ["sigmoid", "swish"],
-            "glvqclassifier__activation_params": [
+            "glvq__solver_type": ["steepest-gradient-descent"],
+            "glvq__distance_type": ["squared-euclidean"],
+            # 'glvq__distance_params': [{'beta': beta} for beta in list(range(2, 10, 2))],
+            "glvq__activation_type": ["sigmoid", "swish"],
+            "glvq__activation_params": [
                 {"beta": beta} for beta in list(range(2, 10, 2))
             ],
         }
@@ -118,9 +118,9 @@ def test_glvq_gridsearch_all_iris():
 
     param_grid = [
         {
-            "glvqclassifier__solver_type": solvers_types,
-            "glvqclassifier__distance_type": distance_types,
-            "glvqclassifier__activation_type": activation_types,
+            "glvq__solver_type": solvers_types,
+            "glvq__distance_type": distance_types,
+            "glvq__activation_type": activation_types,
         }
     ]
 

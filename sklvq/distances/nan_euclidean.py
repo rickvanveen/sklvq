@@ -19,10 +19,7 @@ class NanEuclidean(DistanceBaseClass):
     """
 
     def __init__(self, other_kwargs: Dict = None):
-        self.metric_kwargs = {
-            "metric": "nan_euclidean",
-            "squared": False
-        }
+        self.metric_kwargs = {"metric": "nan_euclidean", "squared": False}
 
         if other_kwargs is not None:
             self.metric_kwargs.update(other_kwargs)
@@ -48,11 +45,7 @@ class NanEuclidean(DistanceBaseClass):
             The dist(u=XA[i], v=XB[j]) is computed and stored in the
             ij-th entry.
         """
-        return pairwise_distances(
-            data,
-            model.prototypes_,
-            **self.metric_kwargs
-        )
+        return pairwise_distances(data, model.prototypes_, **self.metric_kwargs)
 
     def gradient(self, data: np.ndarray, model, i_prototype: int) -> np.ndarray:
         """ Implements the derivative of the euclidean distance, with respect to a single prototype
@@ -79,11 +72,13 @@ class NanEuclidean(DistanceBaseClass):
         ip_start = i_prototype * num_features
         ip_end = ip_start + num_features
 
-        difference = data - prototypes[i_prototype, :]
+        difference = np.atleast_2d(data - prototypes[i_prototype, :])
         difference[np.isnan(difference)] = 0
 
-        distance_gradient[:, ip_start:ip_end] = (-1 * difference) / np.sqrt(np.dot(difference.T, difference))
+        denominator = np.sqrt(np.einsum("ij, ij -> i", difference, difference))
+
+        distance_gradient[:, ip_start:ip_end] = (-1 * difference) / denominator[
+            :, np.newaxis
+        ]
 
         return distance_gradient
-
-
