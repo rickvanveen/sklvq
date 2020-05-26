@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 from typing import Dict
 
 if TYPE_CHECKING:
-    from sklvq.models import LVQClassifier
+    from sklvq.models import LVQBaseClass
 
 
 class AdaptiveSquaredNanEuclidean(DistanceBaseClass):
@@ -19,7 +19,7 @@ class AdaptiveSquaredNanEuclidean(DistanceBaseClass):
         if other_kwargs is not None:
             self.metric_kwargs.update(other_kwargs)
 
-    def __call__(self, data: np.ndarray, model: "LVQClassifier") -> np.ndarray:
+    def __call__(self, data: np.ndarray, model: "LVQBaseClass") -> np.ndarray:
         """ Implements a weighted variant of the squared euclidean distance:
             .. math::
                 d^{\\Lambda}(w, x) = (x - w)^T \\Lambda (x - w)
@@ -28,9 +28,9 @@ class AdaptiveSquaredNanEuclidean(DistanceBaseClass):
         ----------
         data : ndarray
             A matrix containing the samples on the rows.
-        model : LVQClassifier
+        model : LVQBaseClass
             In principle any LVQClassifier that calls it's relevance matrix omega.
-            Specifically here, GMLVQClassifier.
+            Specifically here, GMLVQ.
 
         Returns
         -------
@@ -49,7 +49,7 @@ class AdaptiveSquaredNanEuclidean(DistanceBaseClass):
         return pairwise_distances(data, model.prototypes_, **self.metric_kwargs) ** 2
 
     def gradient(
-        self, data: np.ndarray, model: "LVQClassifier", i_prototype: int
+        self, data: np.ndarray, model: "LVQBaseClass", i_prototype: int
     ) -> np.ndarray:
         """ The partial derivative of the adaptive squared euclidean distance function, with respect
         to a specified prototype and the matrix omega.
@@ -58,9 +58,9 @@ class AdaptiveSquaredNanEuclidean(DistanceBaseClass):
         ----------
         data : ndarray
             A matrix containing the samples on the rows.
-        model : LVQClassifier
+        model : LVQBaseClass
             In principle any LVQClassifier that calls it's relevance matrix omega.
-            Specifically here, GMLVQClassifier.
+            Specifically here, GMLVQ.
         i_prototype : int
             An integer index value of the relevant prototype
 

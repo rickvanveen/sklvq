@@ -6,23 +6,21 @@ from sklearn.pipeline import make_pipeline
 from sklearn import set_config
 
 
-from sklvq import GMLVQClassifier
+from sklvq import GMLVQ
 
 
 def test_gmlvq_iris():
     set_config(assume_finite=False)
-    iris = datasets.load_digits()
-
-    # iris.data[np.random.choice(150, 50, replace=False), 2] = np.nan
+    iris = datasets.load_iris()
 
     iris.data = preprocessing.scale(iris.data)
 
-    classifier = GMLVQClassifier(
-        solver_type="steepest-gradient-descent",
-        solver_params={"step_size": np.array([1.0, 0.05]), "max_runs": 25, "batch_size": 0},
-        activation_type="identity",
+    classifier = GMLVQ(
+        solver_type="waypoint-gradient-descent",
+        solver_params={"step_size": np.array([0.1, 0.01]), "max_runs": 20},
+        activation_type="swish",
+        activation_params={"beta": 2},
         distance_type="adaptive-squared-euclidean",
-        distance_params={"n_jobs": 2} # TODO debug why this is not working...
     )
     classifier = classifier.fit(iris.data, iris.target)
 
@@ -38,7 +36,7 @@ def test_gmlvq_with_multiple_prototypes_per_class():
 
     iris.data = preprocessing.scale(iris.data)
 
-    classifier = GMLVQClassifier(
+    classifier = GMLVQ(
         activation_type="sigmoid", activation_params={"beta": 6}, prototypes_per_class=4
     )
     classifier = classifier.fit(iris.data, iris.target)
@@ -56,7 +54,7 @@ def test_gmlvq_pipeline_iris():
 
     pipeline = make_pipeline(
         preprocessing.StandardScaler(),
-        GMLVQClassifier(activation_type="sigmoid", activation_params={"beta": 6}),
+        GMLVQ(activation_type="sigmoid", activation_params={"beta": 6}),
     )
     accuracy = cross_val_score(pipeline, iris.data, iris.target, cv=5)
     print("Cross validation (k=5): " + "{}".format(accuracy))
@@ -65,7 +63,7 @@ def test_gmlvq_pipeline_iris():
 def test_gmlvq_gridsearch_iris():
     iris = datasets.load_iris()
 
-    estimator = GMLVQClassifier()
+    estimator = GMLVQ()
     pipeline = make_pipeline(preprocessing.StandardScaler(), estimator)
 
     param_grid = [

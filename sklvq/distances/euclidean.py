@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 from typing import Dict
 
 if TYPE_CHECKING:
-    from sklvq.models import LVQClassifier
+    from sklvq.models import LVQBaseClass
 
 
 class Euclidean(DistanceBaseClass):
@@ -27,7 +27,7 @@ class Euclidean(DistanceBaseClass):
         if other_kwargs is not None:
             self.metric_kwargs.update(other_kwargs)
 
-    def __call__(self, data: np.ndarray, model: "LVQClassifier") -> np.ndarray:
+    def __call__(self, data: np.ndarray, model: "LVQBaseClass") -> np.ndarray:
         """
         Computes the Euclidean distance:
             .. math::
@@ -39,7 +39,7 @@ class Euclidean(DistanceBaseClass):
         Parameters
         ----------
         data : numpy.ndarray with shape (n_samples, n_features)
-        model : LVQClassifier
+        model : LVQBaseClass
             Can be any LVQClassifier but only prototypes will be used to compute the distance
 
         Returns
@@ -60,7 +60,7 @@ class Euclidean(DistanceBaseClass):
         Parameters
         ----------
         data : numpy.ndarray with shape (n_samples, n_features)
-        model : LVQClassifier
+        model : LVQBaseClass
             Only prototypes need to be available in the LVQClassifier
         i_prototype : int
             Index of the prototype to compute the gradient for
@@ -81,6 +81,7 @@ class Euclidean(DistanceBaseClass):
 
         difference = data - prototypes[i_prototype, :]
 
+        # TODO: broken....
         distance_gradient[:, ip_start:ip_end] = (-1 * difference) / np.sqrt(np.dot(difference.T, difference))
 
         return distance_gradient

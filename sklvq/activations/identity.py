@@ -18,11 +18,12 @@ class Identity(ActivationBaseClass):
 
         Parameters
         ----------
-        x : numpy.ndarray
+        x : ndarray
 
         Returns
         -------
-        x : numpy.ndarray
+        x : ndarray
+            Elementwise evaluation of the identity function, i.e., returns x without any modifications.
         """
         return x
 
@@ -35,11 +36,11 @@ class Identity(ActivationBaseClass):
 
         Parameters
         ----------
-        x : numpy.ndarray
+        x : ndarray
 
         Returns
         -------
-        numpy.ndarray
-            Output has the same size and shape as the input and contains only 1's.
+        ndarray of shape (x.shape)
+            Elementwise evaluation of the identity function's gradient, i.e., only returns 1s.
         """
         return np.ones(x.shape)

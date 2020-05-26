@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 from typing import Dict
 
 if TYPE_CHECKING:
-    from sklvq.models import LVQClassifier
+    from sklvq.models import LVQBaseClass
 
 
 class SquaredEuclidean(DistanceBaseClass):
@@ -20,7 +20,7 @@ class SquaredEuclidean(DistanceBaseClass):
         if other_kwargs is not None:
             self.metric_kwargs.update(other_kwargs)
 
-    def __call__(self, data: np.ndarray, model: "LVQClassifier") -> np.ndarray:
+    def __call__(self, data: np.ndarray, model: "LVQBaseClass") -> np.ndarray:
         """ Wrapper function for sklearn pairwise_distances ("euclidean") function
 
             Parameters
@@ -43,7 +43,7 @@ class SquaredEuclidean(DistanceBaseClass):
         )
 
     def gradient(
-        self, data: np.ndarray, model: "LVQClassifier", i_prototype: int
+        self, data: np.ndarray, model: "LVQBaseClass", i_prototype: int
     ) -> np.ndarray:
         """ Implements the derivative of the squared euclidean distance, , with respect to 1 prototype.
 

@@ -1,4 +1,4 @@
-from . import LVQClassifier
+from . import LVQBaseClass
 
 import numpy as np
 from sklearn.utils.validation import check_is_fitted, check_array
@@ -14,7 +14,7 @@ ModelParamsType = Tuple[np.ndarray, np.ndarray]
 # TODO: Transform function sklearn
 
 
-class GMLVQClassifier(LVQClassifier):
+class GMLVQ(LVQBaseClass):
     def __init__(
         self,
         distance_type="adaptive-squared-euclidean",
@@ -38,7 +38,7 @@ class GMLVQClassifier(LVQClassifier):
         self.omega = omega
         self.verbose = verbose
 
-        super(GMLVQClassifier, self).__init__(
+        super(GMLVQ, self).__init__(
             distance_type,
             distance_params,
             solver_type,
@@ -98,7 +98,7 @@ class GMLVQClassifier(LVQClassifier):
 
     @staticmethod
     def _normalise_omega(omega: np.ndarray) -> np.ndarray:
-        return omega / np.sqrt(np.einsum("ij, ij", omega.T, omega))
+        return omega / np.sqrt(np.einsum("ij, ij", omega, omega))
 
     @staticmethod
     def normalize_params(model_params: ModelParamsType) -> ModelParamsType:
@@ -106,13 +106,13 @@ class GMLVQClassifier(LVQClassifier):
         normalized_prototypes = prototypes / np.linalg.norm(
             prototypes, axis=1, keepdims=True
         )
-        normalized_omega = GMLVQClassifier._normalise_omega(omega)
+        normalized_omega = GMLVQ._normalise_omega(omega)
         return (normalized_prototypes, normalized_omega)
 
     def fit_transform(self, data: np.ndarray, y: np.ndarray) -> np.ndarray:
         return self.fit(data, y).transform(data)
 
-    def transform(self, data: np.ndarray) -> np.ndarray:
+    def transform(self, data: np.ndarray, scale: bool = False) -> np.ndarray:
         data = check_array(data)
 
         check_is_fitted(self)
@@ -123,8 +123,10 @@ class GMLVQClassifier(LVQClassifier):
         sorted_ii = np.argsort(eigvalues)[::-1]
         eigenvectors = eigenvectors[:, sorted_ii]
 
-        # data_new = data.dot(np.sqrt(eigvalues) * eigenvectors)
-        data_new = data.dot(eigenvectors)
+        if scale:
+            data_new = data.dot(np.sqrt(eigvalues) * eigenvectors)
+        else:
+            data_new = data.dot(eigenvectors)
 
         return data_new
 

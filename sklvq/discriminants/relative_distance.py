@@ -6,6 +6,7 @@ class RelativeDistance(DiscriminativeBaseClass):
     """ Relative distance function
 
     """
+
     def __call__(self, dist_same: np.ndarray, dist_diff: np.ndarray) -> np.ndarray:
         """ The relative distance discriminant function:
             .. math::
@@ -27,9 +28,6 @@ class RelativeDistance(DiscriminativeBaseClass):
             The relative distance for each sample
 
         """
-        # with np.errstate(
-        #     divide="ignore", invalid="ignore"
-        # ):  # Suppresses runtime warning TODO: fix
         return (dist_same - dist_diff) / (dist_same + dist_diff)
 
     def gradient(
@@ -76,10 +74,8 @@ class RelativeDistance(DiscriminativeBaseClass):
 
 
 def _gradient_same(dist_same: np.ndarray, dist_diff: np.ndarray) -> np.ndarray:
-    with np.errstate(divide="ignore", invalid="ignore"):  # Suppresses runtime warning
-        return 2 * dist_diff / (dist_same + dist_diff) ** 2
+    return 2 * dist_diff / (dist_same + dist_diff) ** 2
 
 
 def _gradient_diff(dist_same: np.ndarray, dist_diff: np.ndarray) -> np.ndarray:
-    with np.errstate(divide="ignore", invalid="ignore"):  # Suppresses runtime warning
-        return -2 * dist_same / (dist_same + dist_diff) ** 2
+    return -2 * dist_same / (dist_same + dist_diff) ** 2

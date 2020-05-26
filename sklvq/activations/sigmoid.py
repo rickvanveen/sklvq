@@ -29,11 +29,12 @@ class Sigmoid(ActivationBaseClass):
 
         Parameters
         ----------
-        x : numpy.ndarray
+        x : ndarray
 
         Returns
         -------
-        numpy.ndarray
+        ndarray of shape (x.shape)
+            Elementwise evaluation of the sigmoid function.
         """
         return np.asarray(1 / (np.exp(-self.beta * x) + 1))
 
@@ -45,11 +46,12 @@ class Sigmoid(ActivationBaseClass):
 
         Parameters
         ----------
-         x : numpy.ndarray
+         x : ndarray
 
         Returns
         ------- 
-        numpy.ndarray
+        ndarray of shape (x.shape)
+            Elementwise evaluation of the sigmoid function's gradient.
         """
         exp = np.exp(self.beta * x)
         return np.asarray((self.beta * exp) / (exp + 1) ** 2)

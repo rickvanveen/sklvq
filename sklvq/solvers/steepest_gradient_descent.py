@@ -7,7 +7,7 @@ from sklvq.objectives import ObjectiveBaseClass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from sklvq.models import LVQClassifier
+    from sklvq.models import LVQBaseClass
 
 
 # TODO: stochastic step_size of matrix is smaller
@@ -23,8 +23,8 @@ class SteepestGradientDescent(SolverBaseClass):
         data: np.ndarray,
         labels: np.ndarray,
         objective: ObjectiveBaseClass,
-        model: "LVQClassifier",
-    ) -> "LVQClassifier":
+        model: "LVQBaseClass",
+    ) -> "LVQBaseClass":
         step_size = self.step_size
         for i_run in range(0, self.max_runs):
 

@@ -20,7 +20,7 @@ def _conditional_mean(p_labels, data, d_labels):
     )
 
 
-class LVQClassifier(ABC, BaseEstimator, ClassifierMixin):
+class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
 
     # Sklearn: You cannot change the value of the properties given in init.
     def __init__(
@@ -85,13 +85,18 @@ class LVQClassifier(ABC, BaseEstimator, ClassifierMixin):
 
     def _validate(self, data, labels):
         # SciKit-learn required check
-        data, labels = check_X_y(data, labels, force_all_finite="allow-nan")
+        # data, labels = check_X_y(data, labels, force_all_finite="allow-nan")
+        data, labels = check_X_y(data, labels)
 
         # SciKit-learn required check
         check_classification_targets(labels)
 
+        # One-label check
+        if unique_labels(labels).shape[0] <= 1:
+            raise ValueError("Classifier can't train when only one class is present.")
+
         # Scikit-learn requires classes_ which stores the labels, y is now an array of indices from classes_.
-        self.classes_, _ = np.unique(labels, return_inverse=True)
+        self.classes_, labels = np.unique(labels, return_inverse=True)
 
         return data, labels
 
@@ -136,19 +141,25 @@ class LVQClassifier(ABC, BaseEstimator, ClassifierMixin):
         # Of shape n_observations , n_prototypes
         distances = self.distance_(data, self)
 
-        # Allocation
+        # Allocation n_observations, n_classes
         min_distances = np.zeros((data.shape[0], self.classes_.size))
 
         # return n_observations, n_classes
-        for i, c in enumerate(self.classes_):
-            min_distances[:, i] = distances[:, self.prototypes_labels_ == c].min(axis=1)
+        for i, c in enumerate(self.classes_): # Correct?
+            min_distances[:, i] = distances[:, self.prototypes_labels_ == i].min(axis=1)
 
         sum_min_distances = np.sum(min_distances, axis=1)
 
-        return (1 - (min_distances / sum_min_distances[:, np.newaxis])) / 2
+        decision_values = (1 - (min_distances / sum_min_distances[:, np.newaxis])) / 2
 
-    def predict_proba(self, data):
-        return self.decision_function(data)
+        # if binary then + for positive class and - for negative class
+        if self.classes_.size == 2:
+             return np.max(decision_values, axis=1) * ((np.argmax(decision_values, axis=1) * 2) - 1)
+
+        return decision_values
+
+    # def predict_proba(self, data):
+    #     return self.decision_function(data)
 
     def predict(self, data):
         # SciKit-learn list of checked params before predict
@@ -162,4 +173,7 @@ class LVQClassifier(ABC, BaseEstimator, ClassifierMixin):
         # TODO: Reject option?
         # Prototypes labels are indices of classes_
         # return self.prototypes_labels_.take(self.distance_(data, self).argmin(axis=1))
+        if self.classes_.size == 2:
+            return self.classes_[(decision_values > 0).astype(np.int)]
+
         return self.classes_[decision_values.argmax(axis=1)]

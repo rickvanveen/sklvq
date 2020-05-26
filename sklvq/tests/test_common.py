@@ -2,13 +2,13 @@ import pytest
 
 from sklearn.utils.estimator_checks import check_estimator
 
-from .. import GLVQClassifier
-from .. import GMLVQClassifier
-from .. import LGMLVQClassifier
+from .. import GLVQ
+from .. import GMLVQ
+from .. import LGMLVQ
 
 
 @pytest.mark.parametrize(
-    "estimator", [GLVQClassifier, GMLVQClassifier, LGMLVQClassifier]
+    "estimator", [GLVQ, GMLVQ, LGMLVQ]
 )
 def test_estimators(estimator):
     return check_estimator(estimator)

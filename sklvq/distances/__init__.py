@@ -1,16 +1,25 @@
 from .base import DistanceBaseClass
 
-# from .adaptive_euclidean import
-from .adaptive_squared_euclidean import AdaptiveSquaredEuclidean
 from .euclidean import Euclidean
+from .nan_euclidean import NanEuclidean
 from .squared_euclidean import SquaredEuclidean
-from .cosine_distance import CosineDistance
+from .squared_nan_euclidean import SquaredNanEuclidean
+from .adaptive_squared_euclidean import AdaptiveSquaredEuclidean
+from .adaptive_squared_nan_euclidean import AdaptiveSquaredNanEuclidean
+from .local_adaptive_squared_euclidean import LocalAdaptiveSquaredEuclidean
+from .local_adaptive_squared_nan_euclidean import LocalAdaptiveSquaredNanEuclidean
+
 
 __all__ = [
     "DistanceBaseClass",
     "Euclidean",
+    "NanEuclidean",
     "SquaredEuclidean",
+    "SquaredNanEuclidean",
     "AdaptiveSquaredEuclidean",
+    "AdaptiveSquaredNanEuclidean",
+    "LocalAdaptiveSquaredEuclidean",
+    "LocalAdaptiveSquaredNanEuclidean",
 ]
 
 from ..misc import utils

@@ -12,7 +12,7 @@ from sklvq.objectives import ObjectiveBaseClass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from sklvq.models import LVQClassifier
+    from sklvq.models import LVQBaseClass
 
 
 class AdaptiveMomentEstimation(SolverBaseClass):
@@ -30,7 +30,7 @@ class AdaptiveMomentEstimation(SolverBaseClass):
         data: np.ndarray,
         labels: np.ndarray,
         objective: ObjectiveBaseClass,
-        model: "LVQClassifier",
+        model: "LVQBaseClass",
     ) -> "LVQCLassifier":
 
         # Administration

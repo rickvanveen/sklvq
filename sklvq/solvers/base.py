@@ -7,7 +7,7 @@ from typing import Dict
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from sklvq.models import LVQClassifier
+    from sklvq.models import LVQBaseClass
 
 
 class SolverBaseClass(ABC):
@@ -17,8 +17,8 @@ class SolverBaseClass(ABC):
         data: np.ndarray,
         labels: np.ndarray,
         objective: ObjectiveBaseClass,
-        model: "LVQClassifier",
-    ) -> "LVQClassifier":
+        model: "LVQBaseClass",
+    ) -> "LVQBaseClass":
         raise NotImplementedError("You should implement this!")
 
 
@@ -32,8 +32,8 @@ class ScipyBaseSolver(SolverBaseClass):
         data: np.ndarray,
         labels: np.ndarray,
         objective: ObjectiveBaseClass,
-        model: "LVQClassifier",
-    ) -> "LVQClassifier":
+        model: "LVQBaseClass",
+    ) -> "LVQBaseClass":
 
         params = {"jac": objective.gradient}
         if self.params is not None:

@@ -4,19 +4,19 @@ import numpy as np
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from sklvq.models import LVQClassifier
+    from sklvq.models import LVQBaseClass
 
 
 class DistanceBaseClass(ABC):
     @abstractmethod
-    def __call__(self, data: np.ndarray, model: "LVQClassifier") -> np.ndarray:
+    def __call__(self, data: np.ndarray, model: "LVQBaseClass") -> np.ndarray:
         """The distance method.
 
         Parameters
         ----------
         data : ndarray
             The data
-        model : LVQClassifier
+        model : LVQBaseClass
             The model
 
         Returns
@@ -29,7 +29,7 @@ class DistanceBaseClass(ABC):
 
     @abstractmethod
     def gradient(
-        self, data: np.ndarray, model: "LVQClassifier", i_prototype: int
+        self, data: np.ndarray, model: "LVQBaseClass", i_prototype: int
     ) -> np.ndarray:
         """ The distance gradient method.
 
@@ -37,7 +37,7 @@ class DistanceBaseClass(ABC):
         ----------
         data : ndarray
             The data
-        model : LVQClassifier
+        model : LVQBaseClass
             The model
         i_prototype : int
             The index

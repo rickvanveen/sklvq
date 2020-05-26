@@ -1,6 +1,6 @@
-from .base import LVQClassifier
-from .gmlvq_classifier import GMLVQClassifier
-from .glvq_classifier import GLVQClassifier
-from .lgmlvq_classifier import LGMLVQClassifier
+from .base import LVQBaseClass
+from .glvq import GLVQ
+from .gmlvq import GMLVQ
+from .lgmlvq import LGMLVQ
 
-__all__ = ["LVQClassifier", "GMLVQClassifier", "GLVQClassifier", "LGMLVQClassifier"]
+__all__ = ["LVQBaseClass", "GLVQ", "GMLVQ", "LGMLVQ"]

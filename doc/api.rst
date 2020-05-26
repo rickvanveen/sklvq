@@ -1,6 +1,6 @@
-####################
-project-template API
-####################
+=============
+API Reference
+=============
 
 This is an example on how to document the API of your own project.
 
@@ -13,7 +13,7 @@ Predictor
    :toctree: generated/
    :template: class.rst
 
-   GLVQClassifier
+   GLVQ
 
 Predictor and Transformer
 =========================
@@ -22,11 +22,13 @@ Predictor and Transformer
    :toctree: generated/
    :template: class.rst
 
-<<<<<<< HEAD
-   GMLVQClassifier
-=======
-<<<<<<< HEAD
-   GMLVQClassifier
+   GMLVQ
+
+.. autosummary::
+   :toctree: generated/
+   :template: class.rst
+
+   LGMLVQ
 
 Objective Functions
 ===================
@@ -80,11 +82,22 @@ Distance Functions
 ==================
 .. currentmodule:: sklvq.distances
 
+Distance functions ordered by compatible predictor.
+
+GLVQ
+----
+
 .. autosummary::
    :toctree: generated/
    :template: callable.rst
 
     Euclidean
+
+.. autosummary::
+   :toctree: generated/
+   :template: callable.rst
+
+    NanEuclidean
 
 .. autosummary::
    :toctree: generated/
@@ -96,13 +109,37 @@ Distance Functions
    :toctree: generated/
    :template: callable.rst
 
-    AdaptiveEuclidean
+    SquaredNanEuclidean
+
+GMLVQ
+-----
 
 .. autosummary::
    :toctree: generated/
    :template: callable.rst
 
     AdaptiveSquaredEuclidean
+
+.. autosummary::
+   :toctree: generated/
+   :template: callable.rst
+
+    AdaptiveSquaredNanEuclidean
+
+LGMLVQ
+--------
+
+.. autosummary::
+   :toctree: generated/
+   :template: callable.rst
+
+    LocalAdaptiveSquaredEuclidean
+
+.. autosummary::
+   :toctree: generated/
+   :template: callable.rst
+
+    LocalAdaptiveSquaredNanEuclidean
 
 Solvers
 =======
@@ -131,14 +168,11 @@ Solvers
    :toctree: generated/
    :template: callable.rst
 
-    LbfgsSolver
+    BroydenFletcherGoldfarbShanno
 
 .. autosummary::
    :toctree: generated/
    :template: callable.rst
 
-    BfgsSolver
-=======
-   GMLVQClassifier
->>>>>>> e137efd835422bc26161ea02d0bc1b488c79ef6a
->>>>>>> release
+    LimitedMemoryBfgs
+

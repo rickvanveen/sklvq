@@ -4,7 +4,7 @@ import numpy as np
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from sklvq.models import LVQClassifier
+    from sklvq.models import LVQBaseClass
 
 
 class GeneralizedLearningObjective(ObjectiveBaseClass):
@@ -16,7 +16,7 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
     def __call__(
         self,
         variables: np.ndarray,
-        model: "LVQClassifier",
+        model: "LVQBaseClass",
         data: np.ndarray,
         labels: np.ndarray,
     ) -> np.ndarray:
@@ -30,7 +30,7 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
     def gradient(
         self,
         variables: np.ndarray,
-        model: "LVQClassifier",
+        model: "LVQBaseClass",
         data: np.ndarray,
         labels: np.ndarray,
     ) -> np.ndarray:
@@ -103,7 +103,7 @@ def _find_min(indices: np.ndarray, distances: np.ndarray) -> (np.ndarray, np.nda
     return dist_temp.min(axis=1), dist_temp.argmin(axis=1)
 
 
-def _compute_distance(data: np.ndarray, labels: np.ndarray, model: "LVQClassifier"):
+def _compute_distance(data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass"):
     """ Computes the distances between each prototype and each observation and finds all indices where the shortest
     distance is that of the prototype with the same label and with a different label. """
 

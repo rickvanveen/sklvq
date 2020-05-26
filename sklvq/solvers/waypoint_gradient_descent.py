@@ -7,7 +7,7 @@ from sklvq.objectives import ObjectiveBaseClass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from sklvq.models import LVQClassifier
+    from sklvq.models import LVQBaseClass
 
 
 class WaypointGradientDescent(SolverBaseClass):
@@ -25,8 +25,8 @@ class WaypointGradientDescent(SolverBaseClass):
         data: np.ndarray,
         labels: np.ndarray,
         objective: ObjectiveBaseClass,
-        model: "LVQClassifier",
-    ) -> "LVQClassifier":
+        model: "LVQBaseClass",
+    ) -> "LVQBaseClass":
 
         previous_objective_gradients = np.zeros(
             (self.k, model.to_variables(model.get_model_params()).size)

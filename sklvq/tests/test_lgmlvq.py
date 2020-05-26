@@ -6,7 +6,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn import set_config
 
 
-from sklvq import LGMLVQClassifier
+from sklvq import LGMLVQ
 
 
 def test_lgmlvq_iris():
@@ -17,12 +17,13 @@ def test_lgmlvq_iris():
 
     data = preprocessing.scale(iris.data)
 
-    classifier = LGMLVQClassifier(
-        localization="p",
+    classifier = LGMLVQ(
+        localization="c",
         prototypes_per_class=1,
         solver_type="steepest-gradient-descent",
-        solver_params={"step_size": np.array([1.0, 0.05]), "max_runs": 5, "batch_size": 0},
-        activation_type="identity",
+        solver_params={"step_size": np.array([0.01, 0.001]), "max_runs": 10, "batch_size": 0},
+        activation_type="sigmoid",
+        activation_params={"beta": 2},
         distance_type="local-adaptive-squared-euclidean",
     )
     classifier = classifier.fit(data, iris.target)

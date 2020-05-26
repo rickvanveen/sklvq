@@ -1,4 +1,4 @@
-from . import LVQClassifier
+from . import LVQBaseClass
 
 import numpy as np
 from sklearn.utils.validation import check_is_fitted, check_array
@@ -12,7 +12,7 @@ ModelParamsType = Tuple[np.ndarray, np.ndarray]
 
 
 # TODO: Could use different step-sizes for matrices
-class LGMLVQClassifier(LVQClassifier):
+class LGMLVQ(LVQBaseClass):
     def __init__(
         self,
         distance_type="local-adaptive-squared-euclidean",
@@ -38,7 +38,7 @@ class LGMLVQClassifier(LVQClassifier):
         self.localization = localization
         self.verbose = verbose
 
-        super(LGMLVQClassifier, self).__init__(
+        super(LGMLVQ, self).__init__(
             distance_type,
             distance_params,
             solver_type,
@@ -48,7 +48,7 @@ class LGMLVQClassifier(LVQClassifier):
             random_state,
         )
 
-    # Should be private (cannot be used without calling fit of LVQClassifier)
+    # Should be private (cannot be used without calling fit of LVQBaseClass)
     def initialize(self, data, y):
         """ . """
         # Initialize omega
@@ -82,8 +82,8 @@ class LGMLVQClassifier(LVQClassifier):
 
     def set_model_params(self, model_params):
         (self.prototypes_, omega) = model_params
-        # TODO Without the list thing just like the prototypes....
         self.omega_ = self._normalise_omega(omega)
+        self.omega_ = omega
 
     def get_model_params(self):
         return self.prototypes_, self.omega_
@@ -113,7 +113,7 @@ class LGMLVQClassifier(LVQClassifier):
         normalized_prototypes = prototypes / np.linalg.norm(
             prototypes, axis=1, keepdims=True
         )
-        normalized_omega = LGMLVQClassifier._normalise_omega(omega)
+        normalized_omega = LGMLVQ._normalise_omega(omega)
         return (normalized_prototypes, normalized_omega)
 
     @staticmethod
@@ -127,10 +127,10 @@ class LGMLVQClassifier(LVQClassifier):
         # Scalar int or float
         return prots * other, omegs * other
 
-    @staticmethod # Wrong TODO: switch off normalization... as option, normalize all of them or none.
+    @staticmethod #TODO: switch off normalization... as option, normalize all of them or none.
     def _normalise_omega(omega: np.ndarray) -> np.ndarray:
         denominator = np.sqrt(np.einsum("ijk,ijk->i", omega, omega)).reshape(
             omega.shape[0], 1, 1
         )
-        denominator[denominator == 0] = 1.0
+        # denominator[denominator == 0] = 1.0
         return omega / denominator

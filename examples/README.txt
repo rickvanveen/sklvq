@@ -1,6 +1,8 @@
-.. _general_examples:
+.. _how_to_fit_a_lvq_model:
 
-General examples
-================
+======================
+How to fit a LVQ Model
+======================
 
-Introductory examples.
+Example of how to train using each of the LVQ algorithms. Showcasing how to pass arguments and discussing some
+algorithm specific parameters.

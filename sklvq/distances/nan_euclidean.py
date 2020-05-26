@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 from typing import Dict
 
 if TYPE_CHECKING:
-    from sklvq.models import LVQClassifier
+    from sklvq.models import LVQBaseClass
 
 
 class NanEuclidean(DistanceBaseClass):
@@ -27,7 +27,7 @@ class NanEuclidean(DistanceBaseClass):
         if other_kwargs is not None:
             self.metric_kwargs.update(other_kwargs)
 
-    def __call__(self, data: np.ndarray, model: "LVQClassifier") -> np.ndarray:
+    def __call__(self, data: np.ndarray, model: "LVQBaseClass") -> np.ndarray:
         """
         Computes the Euclidean distance:
             .. math::
@@ -39,7 +39,7 @@ class NanEuclidean(DistanceBaseClass):
         Parameters
         ----------
         data : numpy.ndarray with shape (n_samples, n_features)
-        model : LVQClassifier
+        model : LVQBaseClass
             Can be any LVQClassifier but only prototypes will be used to compute the distance
 
         Returns
@@ -60,7 +60,7 @@ class NanEuclidean(DistanceBaseClass):
         Parameters
         ----------
         data : numpy.ndarray with shape (n_samples, n_features)
-        model : LVQClassifier
+        model : LVQBaseClass
             Only prototypes need to be available in the LVQClassifier
         i_prototype : int
             Index of the prototype to compute the gradient for
@@ -71,19 +71,6 @@ class NanEuclidean(DistanceBaseClass):
             The gradient with respect to the prototype and every sample in data.
 
         """
-        # shape = [data.shape[0], *model.prototypes_.shape]
-        # gradient = np.zeros(shape)
-        #
-        # difference = data - model.prototypes_[i_prototype, :]
-        # # np.nan - x (not nan) equals np.nan
-        # difference[np.isnan(difference)] = 0
-        #
-        # gradient[:, i_prototype, :] = np.atleast_2d(
-        #     (-1 * difference) / np.sqrt(np.sum(difference ** 2))
-        # )
-        #
-        # return gradient.reshape(shape[0], shape[1] * shape[2])
-
         prototypes = model.get_model_params()
         (num_samples, num_features) = data.shape
 

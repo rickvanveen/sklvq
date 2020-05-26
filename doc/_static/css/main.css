@@ -14,15 +14,9 @@
 .deprecated p span.versionmodified {
     font-weight: bold;
 }
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
 
 .classifier:before {
     font-style: normal;
     margin: 0.2em;
     content: ":";
 }
-=======
->>>>>>> e137efd835422bc26161ea02d0bc1b488c79ef6a
->>>>>>> release

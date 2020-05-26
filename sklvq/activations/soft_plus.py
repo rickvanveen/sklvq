@@ -28,11 +28,13 @@ class SoftPlus(ActivationBaseClass):
 
         Parameters
         ----------
-        x : numpy.ndarray
+        x : ndarray
 
         Returns
         -------
-        numpy.ndarray
+
+        ndarray of shape (x.shape)
+            Elementwise evaluation of the soft+ function.
         """
         return np.log(1 + np.exp(self.beta * x))
 
@@ -44,13 +46,12 @@ class SoftPlus(ActivationBaseClass):
 
         Parameters
         ----------
-        x : numpy.ndarray
-            The values that need to be transformed.
+        x : ndarray
 
         Returns
         -------
-        numpy.ndarray
-            The elementwise transformed input values
+        ndarray of shape (x.shape)
+            Elementwise evaluation of the soft+ function's gradient.
         """
         exp = np.exp(self.beta * x)
         return (self.beta * exp) / (1 + exp)

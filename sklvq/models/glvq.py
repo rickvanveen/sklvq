@@ -1,4 +1,4 @@
-from . import LVQClassifier
+from . import LVQBaseClass
 import numpy as np
 
 # Can be switched out by parameters to the models.
@@ -13,7 +13,7 @@ ModelParamsType = np.ndarray
 
 
 # Template (Context Implementation)
-class GLVQClassifier(LVQClassifier):
+class GLVQ(LVQBaseClass):
 
     # NOTE: Objective will be fixed. If another objective is needed a new classifier and objective should be created.
     def __init__(
@@ -35,7 +35,7 @@ class GLVQClassifier(LVQClassifier):
         self.discriminant_type = discriminant_type
         self.discriminant_params = discriminant_params
 
-        super(GLVQClassifier, self).__init__(
+        super(GLVQ, self).__init__(
             distance_type,
             distance_params,
             solver_type,
@@ -76,7 +76,7 @@ class GLVQClassifier(LVQClassifier):
 
     @staticmethod
     def normalize_params(model_params):
-        return LVQClassifier.normalize_prototypes(model_params)
+        return LVQBaseClass.normalize_prototypes(model_params)
 
     @staticmethod
     def mul_params(

@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 from typing import Dict
 
 if TYPE_CHECKING:
-    from sklvq.models import LVQClassifier
+    from sklvq.models import LVQBaseClass
 
 
 class SquaredNanEuclidean(DistanceBaseClass):
@@ -20,7 +20,7 @@ class SquaredNanEuclidean(DistanceBaseClass):
         if other_kwargs is not None:
             self.metric_kwargs.update(other_kwargs)
 
-    def __call__(self, data: np.ndarray, model: "LVQClassifier") -> np.ndarray:
+    def __call__(self, data: np.ndarray, model: "LVQBaseClass") -> np.ndarray:
         """
             Parameters
             ----------
@@ -38,7 +38,7 @@ class SquaredNanEuclidean(DistanceBaseClass):
         return pairwise_distances(data, model.prototypes_, **self.metric_kwargs)
 
     def gradient(
-        self, data: np.ndarray, model: "LVQClassifier", i_prototype: int
+        self, data: np.ndarray, model: "LVQBaseClass", i_prototype: int
     ) -> np.ndarray:
         """ Implements the derivative of the squared euclidean distance, , with respect to 1 prototype.
 

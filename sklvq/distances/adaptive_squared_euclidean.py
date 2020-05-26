@@ -8,10 +8,17 @@ from typing import Dict
 
 
 if TYPE_CHECKING:
-    from sklvq.models import LVQClassifier
+    from sklvq.models import LVQBaseClass
 
 
 class AdaptiveSquaredEuclidean(DistanceBaseClass):
+    """ Adaptive squared Euclidean function
+
+    See also
+    --------
+    Sigmoid, SoftPlus, Swish
+    """
+
     def __init__(self, other_kwargs: Dict = None):
         self.metric_kwargs = {
             "metric": "mahalanobis",
@@ -20,22 +27,20 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
         if other_kwargs is not None:
             self.metric_kwargs.update(other_kwargs)
 
-    def __call__(self, data: np.ndarray, model: "LVQClassifier") -> np.ndarray:
+    def __call__(self, data: np.ndarray, model: "LVQBaseClass") -> np.ndarray:
         """ Implements a weighted variant of the squared euclidean distance:
             .. math::
                 d^{\\Lambda}(w, x) = (x - w)^T \\Lambda (x - w)
 
         Parameters
         ----------
-        data : ndarray
+        data : numpy.ndarray
             A matrix containing the samples on the rows.
-        model : LVQClassifier
-            In principle any LVQClassifier that calls it's relevance matrix omega.
-            Specifically here, GMLVQClassifier.
+        model : LVQBaseClass, GMLVQ
 
         Returns
         -------
-        ndarray
+        numpy.ndarray
             The adaptive squared euclidean distance for every sample to every prototype stored row-wise.
         """
         (prototypes, omega) = model.get_model_params()
@@ -45,7 +50,7 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
         return pairwise_distances(data, prototypes, **self.metric_kwargs) ** 2
 
     def gradient(
-        self, data: np.ndarray, model: "LVQClassifier", i_prototype: int
+        self, data: np.ndarray, model: "LVQBaseClass", i_prototype: int
     ) -> np.ndarray:
         """ The partial derivative of the adaptive squared euclidean distance function, with respect
         to a specified prototype and the matrix omega.
@@ -54,9 +59,9 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
         ----------
         data : ndarray
             A matrix containing the samples on the rows.
-        model : LVQClassifier
+        model : LVQBaseClass
             In principle any LVQClassifier that calls it's relevance matrix omega.
-            Specifically here, GMLVQClassifier.
+            Specifically here, GMLVQ.
         i_prototype : int
             An integer index value of the relevant prototype
 
@@ -100,4 +105,3 @@ def _omega_gradient(
     difference = data - prototype
     scaled_omega = np.dot(omega, difference.T)
     return np.einsum("ij,jk->jik", scaled_omega, (2 * difference))
-
