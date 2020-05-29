@@ -2,6 +2,7 @@ from . import LVQBaseClass
 
 import numpy as np
 from sklearn.utils.validation import check_is_fitted, check_array
+from sklearn.base import TransformerMixin
 
 from sklvq import activations, discriminants, objectives
 from sklvq.objectives import GeneralizedLearningObjective
@@ -14,7 +15,7 @@ ModelParamsType = Tuple[np.ndarray, np.ndarray]
 # TODO: Transform function sklearn
 
 
-class GMLVQ(LVQBaseClass):
+class GMLVQ(LVQBaseClass, TransformerMixin):
     def __init__(
         self,
         distance_type="adaptive-squared-euclidean",
@@ -117,6 +118,8 @@ class GMLVQ(LVQBaseClass):
 
         check_is_fitted(self)
 
+        # TODO do this (store eigenvectors, eigenvalues, and lambda) at the end of fit and not everytime transform
+        #  is called....
         lambda_ = self.omega_.T.dot(self.omega_)
         # TODO: SVD for stability? and SVD flip for stable direction?
         eigvalues, eigenvectors = np.linalg.eig(lambda_)

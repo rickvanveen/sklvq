@@ -2,6 +2,7 @@ from . import LVQBaseClass
 
 import numpy as np
 from sklearn.utils.validation import check_is_fitted, check_array
+from sklearn.base import TransformerMixin
 
 from sklvq import activations, discriminants, objectives
 from sklvq.objectives import GeneralizedLearningObjective
@@ -12,7 +13,7 @@ ModelParamsType = Tuple[np.ndarray, np.ndarray]
 
 
 # TODO: Could use different step-sizes for matrices
-class LGMLVQ(LVQBaseClass):
+class LGMLVQ(LVQBaseClass, TransformerMixin):
     def __init__(
         self,
         distance_type="local-adaptive-squared-euclidean",
@@ -134,3 +135,6 @@ class LGMLVQ(LVQBaseClass):
         )
         # denominator[denominator == 0] = 1.0
         return omega / denominator
+
+    # def _get_tags(self):
+    #     return {"poor_performance"}

@@ -68,9 +68,9 @@ def test_gmlvq_gridsearch_iris():
 
     param_grid = [
         {
-            "gmlvqclassifier__solver_type": ["steepest-gradient-descent", "lbfgs"],
-            "gmlvqclassifier__activation_type": ["sigmoid"],
-            "gmlvqclassifier__activation_params": [{"beta": 2}],
+            "gmlvq__solver_type": ["steepest-gradient-descent", "lbfgs"],
+            "gmlvq__activation_type": ["sigmoid"],
+            "gmlvq__activation_params": [{"beta": 2}],
         }
     ]
 
