@@ -11,9 +11,9 @@ if TYPE_CHECKING:
 
 
 class WaypointGradientDescent(SolverBaseClass):
-    def __init__(
-        self, max_runs=10, step_size=np.array([1, 2]), loss=2 / 3, gain=1.1, k=5
-    ):
+    def __init__(self, objective: ObjectiveBaseClass, max_runs=10, step_size=np.array([1, 2]),
+                 loss=2 / 3, gain=1.1, k=5):
+        super().__init__(objective)
         self.max_runs = max_runs
         self.step_size = step_size
         self.loss = loss
@@ -24,7 +24,6 @@ class WaypointGradientDescent(SolverBaseClass):
         self,
         data: np.ndarray,
         labels: np.ndarray,
-        objective: ObjectiveBaseClass,
         model: "LVQBaseClass",
     ) -> "LVQBaseClass":
 
@@ -47,7 +46,7 @@ class WaypointGradientDescent(SolverBaseClass):
 
             # Gradient in model_param form so can be prototypes or tuple(prototypes, omega)
             objective_gradient = model.to_params(
-                objective.gradient(model_variables, model, batch, batch_labels)
+                self.objective.gradient(model_variables, model, batch, batch_labels)
             )
 
             # Normalize the gradient by gradient/norm(gradient)
@@ -55,7 +54,7 @@ class WaypointGradientDescent(SolverBaseClass):
 
             # Multiply params by step_size and transform to variables shape
             objective_gradient = model.to_variables(
-                model.mul_params(objective_gradient, step_size)
+                self.multiply_model_params(step_size, objective_gradient)
             )
 
             # Store the previous objective_gradients in variables shape
@@ -80,7 +79,7 @@ class WaypointGradientDescent(SolverBaseClass):
 
             # Gradient in model_param form so can be prototypes or tuple(prototypes, omega)
             objective_gradient = model.to_params(
-                objective.gradient(model_variables, model, batch, batch_labels)
+                self.objective.gradient(model_variables, model, batch, batch_labels)
             )
 
             # Normalize the gradient by gradient/norm(gradient)
@@ -88,7 +87,7 @@ class WaypointGradientDescent(SolverBaseClass):
 
             # Multiply params by step_size and transform to variables shape
             objective_gradient = model.to_variables(
-                model.mul_params(objective_gradient, step_size)
+                self.multiply_model_params(step_size, objective_gradient)
             )
 
             # Tentative update step cost
@@ -100,12 +99,12 @@ class WaypointGradientDescent(SolverBaseClass):
             new_model_params = model.to_params(model_variables - objective_gradient)
 
             # Compute cost of tentative update step
-            tentative_cost = objective(
+            tentative_cost = self.objective(
                 model.to_variables(tentative_model_params), model, batch, batch_labels
             )  # Note: Objective updates the model to the tentative_model_params
 
             # New update step cost
-            new_cost = objective(
+            new_cost = self.objective(
                 model.to_variables(new_model_params),
                 model,
                 data[shuffled_indices, :],

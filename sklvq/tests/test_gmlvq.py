@@ -21,6 +21,7 @@ def test_gmlvq_iris():
         activation_type="swish",
         activation_params={"beta": 2},
         distance_type="adaptive-squared-euclidean",
+        normalized_omega=False
     )
     classifier = classifier.fit(iris.data, iris.target)
 

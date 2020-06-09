@@ -20,12 +20,14 @@ def test_glvq_iris():
 
     labels = np.asarray(iris.target, str)
 
+
     classifier = GLVQ(
         solver_type="steepest-gradient-descent",
-        solver_params={"batch_size": 0, "max_runs": 20, "step_size": 0.01},
-        distance_type="euclidean",
-        activation_type="sigmoid",
-        activation_params={"beta": 2}
+        solver_params={"batch_size": 1, "max_runs": 20, "step_size": 0.01},
+        distance_type="squared-euclidean",
+        activation_type="swish",
+        activation_params={"beta": 4},
+        random_state=31415,
     )
     classifier = classifier.fit(iris.data, labels)
 

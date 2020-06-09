@@ -17,8 +17,15 @@ if TYPE_CHECKING:
 
 class AdaptiveMomentEstimation(SolverBaseClass):
     def __init__(
-        self, max_runs=20, beta1=0.9, beta2=0.999, step_size=0.001, epsilon=1e-4
+        self,
+        objective: ObjectiveBaseClass,
+        max_runs=20,
+        beta1=0.9,
+        beta2=0.999,
+        step_size=0.001,
+        epsilon=1e-4,
     ):
+        super().__init__(objective)
         self.max_runs = max_runs
         self.beta1 = beta1
         self.beta2 = beta2
@@ -26,11 +33,7 @@ class AdaptiveMomentEstimation(SolverBaseClass):
         self.epsilon = epsilon
 
     def solve(
-        self,
-        data: np.ndarray,
-        labels: np.ndarray,
-        objective: ObjectiveBaseClass,
-        model: "LVQBaseClass",
+        self, data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass",
     ) -> "LVQCLassifier":
 
         # Administration
@@ -61,7 +64,7 @@ class AdaptiveMomentEstimation(SolverBaseClass):
                 model_variables = model.to_variables(model.get_model_params())
 
                 # Gradient in variables form
-                objective_gradient = objective.gradient(
+                objective_gradient = self.objective.gradient(
                     model_variables, model, sample, sample_label
                 )
 

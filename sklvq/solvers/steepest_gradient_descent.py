@@ -13,7 +13,8 @@ if TYPE_CHECKING:
 # TODO: stochastic step_size of matrix is smaller
 # TODO: batch step_size of matrix is larger (potentially, maybe)
 class SteepestGradientDescent(SolverBaseClass):
-    def __init__(self, max_runs=10, batch_size=1, step_size=0.2):
+    def __init__(self, objective: ObjectiveBaseClass, max_runs=10, batch_size=1, step_size=0.2):
+        super().__init__(objective)
         self.max_runs = max_runs
         self.batch_size = batch_size
         self.step_size = step_size
@@ -22,7 +23,6 @@ class SteepestGradientDescent(SolverBaseClass):
         self,
         data: np.ndarray,
         labels: np.ndarray,
-        objective: ObjectiveBaseClass,
         model: "LVQBaseClass",
     ) -> "LVQBaseClass":
         step_size = self.step_size
@@ -56,13 +56,13 @@ class SteepestGradientDescent(SolverBaseClass):
                 # Transform the objective gradient to model_params form
                 objective_gradient = model.to_params(
                     # Compute the objective gradient
-                    objective.gradient(model_variables, model, batch, batch_labels)
+                    self.objective.gradient(model_variables, model, batch, batch_labels)
                 )
 
                 # Transform objective gradient to variables form
                 objective_gradient = model.to_variables(
                     # Apply the step size to the model parameters
-                    model.mul_params(objective_gradient, step_size)
+                    self.multiply_model_params(step_size, objective_gradient)
                 )
 
                 # Update the model

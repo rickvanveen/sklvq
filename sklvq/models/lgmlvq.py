@@ -108,25 +108,13 @@ class LGMLVQ(LVQBaseClass, TransformerMixin):
 
         return variables
 
-    @staticmethod
-    def normalize_params(model_params: ModelParamsType) -> ModelParamsType:
+    def normalize_params(self, model_params: ModelParamsType) -> ModelParamsType:
         (prototypes, omega) = model_params
         normalized_prototypes = prototypes / np.linalg.norm(
             prototypes, axis=1, keepdims=True
         )
         normalized_omega = LGMLVQ._normalise_omega(omega)
         return (normalized_prototypes, normalized_omega)
-
-    @staticmethod
-    def mul_params(
-        model_params: ModelParamsType, other: Tuple[int, float, np.ndarray]
-    ) -> ModelParamsType:
-        (prots, omegs) = model_params
-        if isinstance(other, np.ndarray):
-            if other.size >= 2:
-                return prots * other[0], omegs * other[1]
-        # Scalar int or float
-        return prots * other, omegs * other
 
     @staticmethod #TODO: switch off normalization... as option, normalize all of them or none.
     def _normalise_omega(omega: np.ndarray) -> np.ndarray:

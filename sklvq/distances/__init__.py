@@ -1,14 +1,22 @@
 from .base import DistanceBaseClass
 
-from .euclidean import Euclidean
-from .nan_euclidean import NanEuclidean
-from .squared_euclidean import SquaredEuclidean
-from .squared_nan_euclidean import SquaredNanEuclidean
-from .adaptive_squared_euclidean import AdaptiveSquaredEuclidean
-from .adaptive_squared_nan_euclidean import AdaptiveSquaredNanEuclidean
-from .local_adaptive_squared_euclidean import LocalAdaptiveSquaredEuclidean
-from .local_adaptive_squared_nan_euclidean import LocalAdaptiveSquaredNanEuclidean
+from sklvq.distances.euclidean import Euclidean
+from sklvq.distances.nan_euclidean import NanEuclidean
+from sklvq.distances.squared_euclidean import SquaredEuclidean
+from sklvq.distances.squared_nan_euclidean import SquaredNanEuclidean
+from sklvq.distances.adaptive_squared_euclidean import AdaptiveSquaredEuclidean
+from sklvq.distances.adaptive_squared_nan_euclidean import AdaptiveSquaredNanEuclidean
+from sklvq.distances.local_adaptive_squared_euclidean import (
+    LocalAdaptiveSquaredEuclidean,
+)
+from sklvq.distances.local_adaptive_squared_nan_euclidean import (
+    LocalAdaptiveSquaredNanEuclidean,
+)
 
+from typing import Union
+from typing import List
+
+from ..misc import utils
 
 __all__ = [
     "DistanceBaseClass",
@@ -22,12 +30,18 @@ __all__ = [
     "LocalAdaptiveSquaredNanEuclidean",
 ]
 
-from ..misc import utils
-
-ALIASES = {"sqeuclidean": "squared-euclidean", "cre": "cumulative-residual-entropy"}
+ALIASES = {"sqeuclidean": "squared-euclidean"}
 BASE_CLASS = DistanceBaseClass
 PACKAGE = "sklvq.distances"
 
 
-def grab(class_type, class_params):
-    return utils.grab(class_type, class_params, ALIASES, PACKAGE, BASE_CLASS)
+def grab(
+    class_type: Union[str, type],
+        class_args=None,
+        class_kwargs=None,
+        whitelist=None,
+) -> Union[DistanceBaseClass, object]:
+
+    return utils.grab(
+        class_type, class_args, class_kwargs, ALIASES, whitelist, PACKAGE, BASE_CLASS
+    )

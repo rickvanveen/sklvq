@@ -10,5 +10,7 @@ BASE_CLASS = DiscriminativeBaseClass
 PACKAGE = "sklvq.discriminants"
 
 
-def grab(class_type, class_params):
-    return utils.grab(class_type, class_params, ALIASES, PACKAGE, BASE_CLASS)
+def grab(class_type, class_args=[], class_kwargs={}, whitelist=[]):
+    return utils.grab(
+        class_type, class_args, class_kwargs, ALIASES, whitelist, PACKAGE, BASE_CLASS
+    )
