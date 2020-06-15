@@ -10,7 +10,6 @@ def grab(
     aliases,
     whitelist,
     package,
-    base_class,
 ):
     if not (isinstance(class_type, str) or isclass(class_type)):
         raise ValueError("Type parameter should either be a class or string")
@@ -21,6 +20,9 @@ def grab(
 
     if class_kwargs is None:
         class_kwargs = {}
+
+    if aliases is None:
+        aliases = {}
 
     if whitelist is None:
         whitelist = []
@@ -42,18 +44,19 @@ def grab(
     if class_type in aliases.keys():
         class_type = aliases[class_type]
 
-    # When grab is called a list of 'compatible' methods needs to be provided, aka the whitelist.
-    if class_type not in whitelist:
-        raise ValueError(
-            "Provided type parameters value is not present in models whitelist"
-        )
+    # When grab is called a list of 'compatible' methods needs to be provided, aka the whiteliste
+    if whitelist:
+        if class_type not in whitelist:
+            raise ValueError(
+                "Provided type parameters value is compatible with this model"
+            )
 
     module_name, class_name = parse_class_type(class_type)
 
-    return find(package, module_name, class_name, class_args, class_kwargs, base_class)
+    return find_and_init(package, module_name, class_name, class_args, class_kwargs)
 
 
-def find(package, module_name, class_name, class_args, class_kwargs, base_class):
+def find_and_init(package, module_name, class_name, class_args, class_kwargs):
     try:
         module = import_module("." + module_name, package=package)
         path_to_class = getattr(module, class_name)

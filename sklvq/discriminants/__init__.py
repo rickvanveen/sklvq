@@ -7,7 +7,6 @@ from sklvq.misc import utils
 __all__ = ["DiscriminativeBaseClass", "RelativeDistance"]
 
 ALIASES = {"reldist": "relative-distance"}
-BASE_CLASS = DiscriminativeBaseClass
 PACKAGE = "sklvq.discriminants"
 
 
@@ -18,5 +17,5 @@ def grab(
     whitelist: list = None,
 ) -> Union[DiscriminativeBaseClass, object]:
     return utils.grab(
-        class_type, class_args, class_kwargs, ALIASES, whitelist, PACKAGE, BASE_CLASS
+        class_type, class_args, class_kwargs, ALIASES, whitelist, PACKAGE
     )

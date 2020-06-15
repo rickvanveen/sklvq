@@ -14,7 +14,6 @@ from sklvq.misc import utils
 __all__ = ["ActivationBaseClass", "Identity", "Sigmoid", "SoftPlus", "Swish"]
 
 ALIASES = {"soft+": "soft-plus"}
-BASE_CLASS = ActivationBaseClass
 PACKAGE = "sklvq.activations"
 
 
@@ -25,5 +24,5 @@ def grab(
     whitelist: list = None,
 ) -> Union[ActivationBaseClass, object]:
     return utils.grab(
-        class_type, class_args, class_kwargs, ALIASES, whitelist, PACKAGE, BASE_CLASS
+        class_type, class_args, class_kwargs, ALIASES, whitelist, PACKAGE
     )

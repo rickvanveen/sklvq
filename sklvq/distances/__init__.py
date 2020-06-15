@@ -31,7 +31,6 @@ __all__ = [
 ]
 
 ALIASES = {"sqeuclidean": "squared-euclidean"}
-BASE_CLASS = DistanceBaseClass
 PACKAGE = "sklvq.distances"
 
 
@@ -43,5 +42,5 @@ def grab(
 ) -> Union[DistanceBaseClass, object]:
 
     return utils.grab(
-        class_type, class_args, class_kwargs, ALIASES, whitelist, PACKAGE, BASE_CLASS
+        class_type, class_args, class_kwargs, ALIASES, whitelist, PACKAGE
     )

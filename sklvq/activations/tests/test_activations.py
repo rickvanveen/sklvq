@@ -17,7 +17,7 @@ from sklearn.utils._testing import assert_array_almost_equal
 
 # Check if grab returns correct class, defaults of init (if any), basic workings are correct.
 def test_identity():
-    identity = activations.grab('identity', None)
+    identity = activations.grab("identity", None)
     # Test if grab returns the correct class
     assert isinstance(identity, Identity)
 
@@ -35,46 +35,46 @@ def test_sigmoid():
     other_beta = 10
 
     # Check if defaults are set using grab method
-    sigmoid = activations.grab('sigmoid', None)
+    sigmoid = activations.grab("sigmoid", None)
     assert isinstance(sigmoid, Sigmoid)
     assert sigmoid.beta == default_beta
 
-    assert (sigmoid(np.array([0])) == pytest.approx(0.5))
-    assert (sigmoid.gradient(np.array([0])) == pytest.approx(0.25))
+    assert sigmoid(np.array([0])) == pytest.approx(0.5)
+    assert sigmoid.gradient(np.array([0])) == pytest.approx(0.25)
 
     # Always positive
-    assert (sigmoid(np.array([-1]) > 0))
-    assert (sigmoid(np.array([1]) > 0))
+    assert sigmoid(np.array([-1]) > 0)
+    assert sigmoid(np.array([1]) > 0)
 
     # Symmetry
-    assert (1 - sigmoid(np.array([-1])) == pytest.approx(sigmoid(np.array([1]))))
+    assert 1 - sigmoid(np.array([-1])) == pytest.approx(sigmoid(np.array([1])))
 
     # Check if parameters are passed to sigmoid class when using grab
-    sigmoid = activations.grab('sigmoid', {'beta': other_beta})
+    sigmoid = activations.grab("sigmoid", class_kwargs={"beta": other_beta})
     assert isinstance(sigmoid, Sigmoid)
     assert sigmoid.beta == other_beta
 
-    assert (sigmoid(np.array([0])) == pytest.approx(0.5))
-    assert (sigmoid.gradient(np.array([0])) == pytest.approx(2.5))
+    assert sigmoid(np.array([0])) == pytest.approx(0.5)
+    assert sigmoid.gradient(np.array([0])) == pytest.approx(2.5)
 
 
 def test_soft_plus():
     default_beta = 1
     other_beta = 10
 
-    soft_plus = activations.grab('soft+', None)
+    soft_plus = activations.grab("soft+", None)
     assert isinstance(soft_plus, SoftPlus)
     assert soft_plus.beta == default_beta
 
-    soft_plus = activations.grab('soft-plus', None)
+    soft_plus = activations.grab("soft-plus", None)
     assert isinstance(soft_plus, SoftPlus)
     assert soft_plus.beta == default_beta
 
-    soft_plus = activations.grab('soft+', {'beta': other_beta})
+    soft_plus = activations.grab("soft+", class_kwargs={"beta": other_beta})
     assert isinstance(soft_plus, SoftPlus)
     assert soft_plus.beta == other_beta
 
-    soft_plus = activations.grab('soft-plus', {'beta': other_beta})
+    soft_plus = activations.grab("soft-plus", class_kwargs={"beta": other_beta})
     assert isinstance(soft_plus, SoftPlus)
     assert soft_plus.beta == other_beta
 
@@ -83,10 +83,10 @@ def test_swish():
     default_beta = 1
     other_beta = 10
 
-    swift = activations.grab('swish', None)
+    swift = activations.grab("swish", None)
     assert isinstance(swift, Swish)
     assert swift.beta == default_beta
 
-    swift = activations.grab('swish', {'beta': other_beta})
+    swift = activations.grab("swish", class_kwargs={"beta": other_beta})
     assert isinstance(swift, Swish)
     assert swift.beta == other_beta

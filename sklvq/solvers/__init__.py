@@ -24,11 +24,10 @@ ALIASES = {
     "adadelta": "adaptive-gradient-descent",
     "adam": "adaptive-moment-estimation",
 }
-BASE_CLASS = SolverBaseClass
 PACKAGE = "sklvq.solvers"
 
 
 def grab(class_type, class_args=[], class_kwargs={}, whitelist=[]):
     return utils.grab(
-        class_type, class_args, class_kwargs, ALIASES, whitelist, PACKAGE, BASE_CLASS
+        class_type, class_args, class_kwargs, ALIASES, whitelist, PACKAGE
     )
