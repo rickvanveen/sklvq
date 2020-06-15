@@ -6,10 +6,7 @@ from sklvq.activations.sigmoid import Sigmoid
 from sklvq.activations.soft_plus import SoftPlus
 from sklvq.activations.swish import Swish
 
-from sklvq import activations
-
 from sklvq.misc.common_checks import has_call_method, has_gradient_method
-from sklearn.utils._testing import assert_array_equal
 
 
 @pytest.mark.parametrize(

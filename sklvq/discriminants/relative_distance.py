@@ -17,14 +17,14 @@ class RelativeDistance(DiscriminativeBaseClass):
 
         Parameters
         ----------
-        dist_same : numpy.ndarray with shape (n_samples, 1)
+        dist_same : ndarray with shape (n_samples, 1)
             The distance from at least one sample to the closest prototype with the same label.
-        dist_diff : numpy.ndarray with shape (n_samples, 1)
+        dist_diff : ndarray with shape (n_samples, 1)
             The distance from at least one sample to the closest prototype with a different label.
 
         Returns
         -------
-        numpy.ndarray
+        ndarray
             The relative distance for each sample
 
         """
@@ -54,9 +54,9 @@ class RelativeDistance(DiscriminativeBaseClass):
 
         Parameters
         ----------
-        dist_same : numpy.ndarray with shape (n_samples, 1)
+        dist_same : ndarray with shape (n_samples, 1)
             The distance from at least one sample to the closest prototype with the same label.
-        dist_diff : numpy.ndarray with shape (n_samples, 1)
+        dist_diff : ndarray with shape (n_samples, 1)
             The distance from at least one sample to the closest prototype with a different label.
         winner_same : bool
             Indicating if the derivative with respect to a prototype with the same label (True) or a different label
@@ -64,7 +64,7 @@ class RelativeDistance(DiscriminativeBaseClass):
 
         Returns
         -------
-        numpy.ndarray
+        ndarray
             The relative distance per sample
 
         """
