@@ -38,7 +38,7 @@ NAN_DISTANCE_FUNCTIONS = [
 SOLVERS = [
     "adaptive-moment-estimation",
     "broyden-fletcher-goldfarb-shanno",
-    "limited-memory-BFGS",
+    "limited-memory-bfgs",
     "steepest-gradient-descent",
     "waypoint-gradient-descent",
 ]
@@ -160,7 +160,7 @@ class GLVQ(LVQBaseClass):
             implementation.
 
         """
-        return self.normalize_prototypes(model_params)
+        return LVQBaseClass.normalize_prototypes(model_params)
 
     ###########################################################################################
     # Initialization required functions

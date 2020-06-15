@@ -22,11 +22,9 @@ def test_glvq_iris():
 
 
     classifier = GLVQ(
-        solver_type="steepest-gradient-descent",
-        solver_params={"batch_size": 1, "max_runs": 20, "step_size": 0.01},
+        solver_type="waypoint-gradient-descent",
         distance_type="squared-euclidean",
         activation_type="swish",
-        activation_params={"beta": 4},
         random_state=31415,
     )
     classifier = classifier.fit(iris.data, labels)
@@ -75,9 +73,8 @@ def test_glvq_gridsearch_iris():
 
     param_grid = [
         {
-            "glvq__solver_type": ["steepest-gradient-descent"],
+            "glvq__solver_type": ["adam"],
             "glvq__distance_type": ["squared-euclidean"],
-            # 'glvq__distance_params': [{'beta': beta} for beta in list(range(2, 10, 2))],
             "glvq__activation_type": ["sigmoid", "swish"],
             "glvq__activation_params": [
                 {"beta": beta} for beta in list(range(2, 10, 2))

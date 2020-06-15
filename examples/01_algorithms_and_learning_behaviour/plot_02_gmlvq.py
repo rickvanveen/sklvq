@@ -61,13 +61,13 @@ print(classification_report(labels, predicted_labels))
 
 
 ###############################################################################
-# Plotting the Relevance Matrix
-# .............................
+# Extracting the Relevance Matrix
+# ...............................
 # In addition to the prototypes (see GLVQ example), GMLVQ learns a "relevance matrix" which can
 # tell us something about which features are most relevant for the classification.
 
 # The relevance matrix is computed as follows from the models parameter "omega_"
-relevance_matrix = model.omega_.T.dot(model.omega_)
+relevance_matrix = model.lambda_
 
 # Plot the diagonal of the relevance matrix
 fig, ax = plt.subplots()
@@ -115,7 +115,7 @@ for cls, i in enumerate(model.classes_):
         label=iris.target_names[model.prototypes_labels_[i]],
     )
 ax.scatter(x_m, y_m, c=colors, s=180, alpha=0.8, edgecolors="black", linewidth=2.0)
-ax.set_xlabel("First eigenvector of the relevance matrix")
-ax.set_ylabel("Second eigenvector of the relevance matrix")
+ax.set_xlabel("First eigenvector")
+ax.set_ylabel("Second eigenvector")
 ax.legend()
 ax.grid(True)

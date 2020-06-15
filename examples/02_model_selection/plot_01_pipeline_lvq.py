@@ -3,8 +3,9 @@
 Preprocessing
 =============
 
-In these examples GMLVQ is used but the same applies to all the other algorithms. Also this feature is provided by
-scikit-learn and we therefore also refer any interested reader to scikit-learn's documentation.
+In these examples GMLVQ is used but the same applies to all the other algorithms.
+Also this feature is provided by scikit-learn and we therefore also refer any interested
+reader to scikit-learn's documentation.
 """
 import numpy as np
 
@@ -20,8 +21,8 @@ data, labels = load_iris(return_X_y=True)
 ###############################################################################
 # Pipelines
 # .........
-# Sklearn provides a very handy way of creating a processing pipeline. A pipeline can be used in the same way as any
-# sklearn and sklvq estimator.
+# Sklearn provides a very handy way of creating a processing pipeline. A pipeline can
+# be used in the same way as any sklearn and sklvq estimator.
 
 scaler = StandardScaler()
 
@@ -36,11 +37,13 @@ model = GMLVQ(
 
 pipeline = make_pipeline(scaler, model)
 
-# As with the algorithm examples. However, the pipeline now first scales the data and then passes it to GMLVQ.
+# As with the algorithm examples. However, the pipeline now first scales the data and then
+# passes it to GMLVQ.
 pipeline.fit(data, labels)
 
-# Predict the labels using the trained pipeline. The pipeline will use the mean and standard deviation it found when
-# fit was called and applies it to the data. Which is in this case the same data.
+# Predict the labels using the trained pipeline. The pipeline will use the
+# mean and standard deviation it found when fit was called and applies it to the data.
+# Which is in this case the same data.
 predicted_labels = pipeline.predict(data)
 
 # Print a classification report (sklearn)

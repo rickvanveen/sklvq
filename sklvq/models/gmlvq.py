@@ -39,7 +39,7 @@ NAN_DISTANCE_FUNCTIONS = [
 SOLVERS = [
     "adaptive-moment-estimation",
     "broyden-fletcher-goldfarb-shanno",
-    "limited-memory-BFGS",
+    "limited-memory-bfgs",
     "steepest-gradient-descent",
     "waypoint-gradient-descent",
 ]
@@ -104,7 +104,7 @@ class GMLVQ(LVQBaseClass, TransformerMixin):
         (self.prototypes_, omega) = model_params
 
         if self.normalized_omega:
-            self.omega_ = self.normalise_omega(omega)
+            self.omega_ = GMLVQ.normalise_omega(omega)
         else:
             self.omega_ = omega
 
@@ -189,10 +189,8 @@ class GMLVQ(LVQBaseClass, TransformerMixin):
 
         """
         (prototypes, omega) = model_params
-        normalized_prototypes = prototypes / np.linalg.norm(
-            prototypes, axis=1, keepdims=True
-        )
-        normalized_omega = self.normalise_omega(omega)
+        normalized_prototypes = LVQBaseClass.normalize_prototypes(prototypes)
+        normalized_omega = GMLVQ.normalise_omega(omega)
         return normalized_prototypes, normalized_omega
 
     ###########################################################################################
@@ -261,8 +259,10 @@ class GMLVQ(LVQBaseClass, TransformerMixin):
     # Algorithm specific functions
     ###########################################################################################
 
-    def normalise_omega(self, omega: np.ndarray) -> np.ndarray:
-        return omega / np.sqrt(np.einsum("ij, ij", omega, omega))
+    @staticmethod
+    def normalise_omega(omega: np.ndarray) -> np.ndarray:
+        norm_omega = omega / np.sqrt(np.einsum("ji, ji", omega, omega))
+        return norm_omega
 
     def initialize_omega(self, data):
         if isinstance(self.initial_omega, np.ndarray):
@@ -274,7 +274,7 @@ class GMLVQ(LVQBaseClass, TransformerMixin):
             raise ValueError("The provided value for the parameter 'omega' is invalid.")
 
         if self.normalized_omega:
-            self.omega_ = self.normalise_omega(self.omega_)
+            self.omega_ = GMLVQ.normalise_omega(self.omega_)
 
     ###########################################################################################
     # Transformer related functions

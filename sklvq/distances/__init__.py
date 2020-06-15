@@ -16,7 +16,7 @@ from sklvq.distances.local_adaptive_squared_nan_euclidean import (
 from typing import Union
 from typing import List
 
-from ..misc import utils
+from sklvq.misc import utils
 
 __all__ = [
     "DistanceBaseClass",
@@ -37,9 +37,9 @@ PACKAGE = "sklvq.distances"
 
 def grab(
     class_type: Union[str, type],
-        class_args=None,
-        class_kwargs=None,
-        whitelist=None,
+    class_args: list = None,
+    class_kwargs: dict = None,
+    whitelist: list = None,
 ) -> Union[DistanceBaseClass, object]:
 
     return utils.grab(

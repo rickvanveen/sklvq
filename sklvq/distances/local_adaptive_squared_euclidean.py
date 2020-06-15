@@ -41,7 +41,7 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
         pdists = np.zeros((data.shape[0], model.prototypes_.shape[0]))
 
         # distance depends on prototype and localizaton setting....
-        if model.localization == "p":
+        if model.localization == "prototype":
             for i, (prototype, omega) in enumerate(
                 zip(model.prototypes_, model.omega_)
             ):
@@ -52,7 +52,7 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
                     VI=omega.T.dot(omega),
                 ).ravel()
 
-        if model.localization == "c":
+        if model.localization == "class":
             for i, omega in enumerate(model.omega_):
                 pdists[:, i == model.prototypes_labels_] = pairwise_distances(
                     np.atleast_2d(data),

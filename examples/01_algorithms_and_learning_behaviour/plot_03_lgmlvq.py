@@ -28,8 +28,8 @@ labels = iris.target
 ###############################################################################
 # Fitting the Model
 # .................
-# Create a LGMLVQ object and pass it a distance function, activation function and solver. See the API reference
-# under documentation for defaults.
+# Create a LGMLVQ object and pass it a distance function, activation function and solver.
+# See the API reference under documentation for defaults.
 
 # Object to perform z-transform
 scaler = StandardScaler()
@@ -39,7 +39,7 @@ data = scaler.fit_transform(data)
 
 # Initialize GMLVQ object
 model = LGMLVQ(
-    localization="p",
+    localization="class", # Can either be per "class" or "prototype"
     distance_type="local-adaptive-squared-euclidean",
     activation_type="swish",
     activation_params={"beta": 2},
@@ -56,22 +56,22 @@ predicted_labels = model.predict(data)
 print(classification_report(labels, predicted_labels))
 
 ###############################################################################
-# Plotting the Relevance Matrices
-# ...............................
-# GMLVQ learns a "relevance matrix" which can tell us something about which features are most relevant for
-# the classification.
+# Extracting the Relevance Matrices
+# .................................
+# GMLVQ learns a "relevance matrix" which can tell us something about which features
+# are most relevant for the classification.
 
 colors = ["blue", "red", "green"]
 num_prototypes = model.prototypes_.shape[0]
 num_features = model.prototypes_.shape[1]
 
 fig, ax = plt.subplots(num_prototypes, 1)
-fig.suptitle("Relevance Diagnoal of each Prototype")
+fig.suptitle("Relevance Diagonal of each Prototype's lambda matrix")
 
-for i, omega in enumerate(model.omega_):
+for i, lambda_ in enumerate(model.lambda_):
     ax[i].bar(
         range(num_features),
-        np.diagonal(omega.T.dot(omega)),
+        np.diagonal(lambda_),
         color=colors[i],
         label=iris.target_names[model.prototypes_labels_[i]],
     )
@@ -81,11 +81,8 @@ for i, omega in enumerate(model.omega_):
     else:
         ax[i].set_xticklabels([], visible=False)
         ax[i].tick_params(
-            axis='x',
-            which='both',
-            bottom=False,
-            top=False,
-            labelbottom=False)
+            axis="x", which="both", bottom=False, top=False, labelbottom=False
+        )
     ax[i].set_ylabel("Weight")
     ax[i].legend()
 
@@ -93,6 +90,47 @@ for i, omega in enumerate(model.omega_):
 ###############################################################################
 # Transforming the Data
 # .....................
-# In addition to making predictions GMLVQ can transform the data using the eigenvectors of the relevance matrix.
+# In addition to making predictions GMLVQ can transform the data using the eigenvectors of the
+# relevance matrix. And we can do this for every relevance matrix attached to the prototypes.
 
-# Coming soon...
+# This will return a 3D shape with the first axis the different relevance matrices'
+# transformations of the data. The 2nd and 3rd axes represent the data within in this new space.
+t_d = model.transform(data, omega_hat_index=[0, 1, 2])[:, :, :2]
+t_m = model.transform(model.prototypes_, omega_hat_index=[0, 1, 2])[:, :, :2]
+
+fig, ax = plt.subplots(num_prototypes, 1, figsize=(6.4, 14.4))
+fig.tight_layout(pad=6.0)
+
+colors = ["blue", "red", "green"]
+for i, xy_dm in enumerate(zip(t_d, t_m)):
+    xy_d = xy_dm[0]
+    xy_m = xy_dm[1]
+    for cls, j in enumerate(model.classes_):
+        ii = cls == labels
+        ax[i].scatter(
+            xy_d[ii, 0],
+            xy_d[ii, 1],
+            c=colors[j],
+            s=100,
+            alpha=0.7,
+            edgecolors="white",
+            label=iris.target_names[model.prototypes_labels_[j]],
+        )
+    ax[i].scatter(
+        xy_m[:, 0],
+        xy_m[:, 1],
+        c=colors,
+        s=180,
+        alpha=0.8,
+        edgecolors="black",
+        linewidth=2.0,
+    )
+    ax[i].title.set_text(
+        "Relevance projection w.r.t. {}".format(
+            iris.target_names[model.prototypes_labels_[i]]
+        )
+    )
+    ax[i].set_xlabel("First eigenvector")
+    ax[i].set_ylabel("Second eigenvector")
+    ax[i].legend()
+    ax[i].grid(True)

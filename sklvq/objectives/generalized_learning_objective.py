@@ -12,7 +12,6 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
         self.activation = activation
         self.discriminant = discriminant
 
-    # Note: Objective changes the model... and does not copy it...
     def __call__(
         self,
         variables: np.ndarray,
@@ -26,7 +25,6 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
 
         return np.sum(self.activation(self.discriminant(dist_same, dist_diff)))
 
-    # Note: Gradient function changes the model... and does not copy it...
     def gradient(
         self,
         variables: np.ndarray,
@@ -35,7 +33,6 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
         labels: np.ndarray,
     ) -> np.ndarray:
         model.set_model_params(model.to_params(variables))
-        # model._variables = model_variables # we need this for scipy solvers probably?
 
         dist_same, dist_diff, i_dist_same, i_dist_diff = _compute_distance(
             data, labels, model
@@ -66,7 +63,8 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
                     data[ii_winner_same], model, i_prototype
                 )
 
-                # The distance vectors weighted by the activation and discriminant partial derivatives.
+                # The distance vectors weighted by the activation and discriminant partial
+                # derivatives.
                 gradient += (activation_gradient * discriminant_gradient).dot(
                     distance_gradient
                 )
@@ -89,7 +87,8 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
                     data[ii_winner_diff], model, i_prototype
                 )
 
-                # The distance vectors weighted by the activation and discriminant partial derivatives.
+                # The distance vectors weighted by the activation and discriminant partial
+                # derivatives.
                 gradient += (activation_gradient * discriminant_gradient).dot(
                     distance_gradient
                 )
@@ -104,14 +103,15 @@ def _find_min(indices: np.ndarray, distances: np.ndarray) -> (np.ndarray, np.nda
 
 
 def _compute_distance(data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass"):
-    """ Computes the distances between each prototype and each observation and finds all indices where the shortest
-    distance is that of the prototype with the same label and with a different label. """
+    """ Computes the distances between each prototype and each observation and finds all indices
+    where the shortest distance is that of the prototype with the same label and with a different label. """
 
-    # Step 1: Compute distances between data and the model (how is depending on model and coupled distance function)
+    # Step 1: Compute distances between data and the model (how is depending on model and coupled
+    # distance function)
     distances = model.distance_(data, model)
 
-    # Step 2: Find for all samples the distance between closest prototype with same label (d1) and different
-    # label (d2). ii_same marks for all samples the prototype with the same label.
+    # Step 2: Find for all samples the distance between closest prototype with same label (d1)
+    # and different label (d2). ii_same marks for all samples the prototype with the same label.
     ii_same = np.transpose(
         np.array(
             [labels == prototype_label for prototype_label in model.prototypes_labels_]
@@ -121,10 +121,12 @@ def _compute_distance(data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass
     # For each prototype mark the samples that have a different label
     ii_diff = ~ii_same
 
-    # For each sample find the closest prototype with the same label. Returns distance and index of prototype
+    # For each sample find the closest prototype with the same label. Returns distance and index
+    # of prototype
     dist_same, i_dist_same = _find_min(ii_same, distances)
 
-    # For each sample find the closest prototype with a different label. Returns distance and index of prototype
+    # For each sample find the closest prototype with a different label. Returns distance and
+    # index of prototype
     dist_diff, i_dist_diff = _find_min(ii_diff, distances)
 
     return dist_same, dist_diff, i_dist_same, i_dist_diff

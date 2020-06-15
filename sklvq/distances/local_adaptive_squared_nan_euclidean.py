@@ -43,7 +43,7 @@ class LocalAdaptiveSquaredNanEuclidean(DistanceBaseClass):
         pdists = np.zeros((data.shape[0], model.prototypes_.shape[0]))
 
         # distance depends on prototype and localizaton setting....
-        if model.localization == "p":
+        if model.localization == "prototype":
             for i, (prototype, omega) in enumerate(
                 zip(model.prototypes_, model.omega_)
             ):
@@ -57,7 +57,7 @@ class LocalAdaptiveSquaredNanEuclidean(DistanceBaseClass):
                     **self.metric_kwargs
                 ).ravel()
 
-        if model.localization == "c":
+        if model.localization == "class":
             for i, omega in enumerate(model.omega_):
                 _adaptive_squared_nan_euclidean_callable = partial(
                     _adaptive_squared_nan_euclidean, lambda_matrix=omega.dot(omega),

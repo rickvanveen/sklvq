@@ -17,9 +17,7 @@ def test_gmlvq_iris():
 
     classifier = GMLVQ(
         solver_type="waypoint-gradient-descent",
-        solver_params={"step_size": np.array([0.1, 0.01]), "max_runs": 20},
         activation_type="swish",
-        activation_params={"beta": 2},
         distance_type="adaptive-squared-euclidean",
         normalized_omega=False
     )
@@ -69,7 +67,7 @@ def test_gmlvq_gridsearch_iris():
 
     param_grid = [
         {
-            "gmlvq__solver_type": ["steepest-gradient-descent", "lbfgs"],
+            "gmlvq__solver_type": ["waypoint-gradient-descent", "lbfgs"],
             "gmlvq__activation_type": ["sigmoid"],
             "gmlvq__activation_params": [{"beta": 2}],
         }

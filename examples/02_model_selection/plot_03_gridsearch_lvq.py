@@ -40,8 +40,8 @@ solvers_types = [
 
 distance_types = ["adaptive-squared-euclidean"]
 
-# We are using a pipeline so we need to prepend the parameters with the name of the class we want to provide
-# the arguments to.
+# We are using a pipeline so we need to prepend the parameters with the name of the
+# class we want to provide the arguments to.
 param_grid = [
     {
         "gmlvq__solver_type": solvers_types,

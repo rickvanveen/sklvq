@@ -166,7 +166,8 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
     # LVQ specific functions
     ###########################################################################################
 
-    def normalize_prototypes(self, prototypes: np.ndarray) -> np.ndarray:
+    @staticmethod
+    def normalize_prototypes(prototypes: np.ndarray) -> np.ndarray:
         """
 
         Parameters

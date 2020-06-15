@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 
 class WaypointGradientDescent(SolverBaseClass):
-    def __init__(self, objective: ObjectiveBaseClass, max_runs=10, step_size=np.array([1, 2]),
+    def __init__(self, objective: ObjectiveBaseClass, max_runs=10, step_size=0.1,
                  loss=2 / 3, gain=1.1, k=5):
         super().__init__(objective)
         self.max_runs = max_runs
