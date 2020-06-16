@@ -24,6 +24,7 @@ class AdaptiveMomentEstimation(SolverBaseClass):
         beta2=0.999,
         step_size=0.001,
         epsilon=1e-4,
+        callback=None
     ):
         super().__init__(objective)
         self.max_runs = max_runs
@@ -31,6 +32,7 @@ class AdaptiveMomentEstimation(SolverBaseClass):
         self.beta2 = beta2
         self.step_size = step_size
         self.epsilon = epsilon
+        self.callback = callback
 
     def solve(
         self, data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass",
@@ -85,5 +87,9 @@ class AdaptiveMomentEstimation(SolverBaseClass):
                 model.set_model_params(
                     model.to_params(model_variables - objective_gradient)
                 )
+
+            if self.callback is not None:
+                if self.callback(data, labels, model):
+                    return model
 
         return model

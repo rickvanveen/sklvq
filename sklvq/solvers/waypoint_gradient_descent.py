@@ -11,20 +11,26 @@ if TYPE_CHECKING:
 
 
 class WaypointGradientDescent(SolverBaseClass):
-    def __init__(self, objective: ObjectiveBaseClass, max_runs=10, step_size=0.1,
-                 loss=2 / 3, gain=1.1, k=5):
+    def __init__(
+        self,
+        objective: ObjectiveBaseClass,
+        max_runs=10,
+        step_size=0.1,
+        loss=2 / 3,
+        gain=1.1,
+        k=5,
+        callback=None,
+    ):
         super().__init__(objective)
         self.max_runs = max_runs
         self.step_size = step_size
         self.loss = loss
         self.gain = gain
         self.k = k
+        self.callback = callback
 
     def solve(
-        self,
-        data: np.ndarray,
-        labels: np.ndarray,
-        model: "LVQBaseClass",
+        self, data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass",
     ) -> "LVQBaseClass":
 
         previous_objective_gradients = np.zeros(
@@ -122,5 +128,9 @@ class WaypointGradientDescent(SolverBaseClass):
             previous_objective_gradients[np.mod(i_run, self.k), :] = model.to_variables(
                 model.get_model_params()
             )
+
+            if self.callback is not None:
+                if self.callback(data, labels, model):
+                    return model
 
         return model

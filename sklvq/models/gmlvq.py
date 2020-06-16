@@ -13,7 +13,7 @@ from typing import Tuple
 
 from sklvq.solvers import SolverBaseClass
 
-ModelParamsType = Tuple[np.ndarray, np.ndarray]
+ModelParamsType = tuple(np.ndarray, np.ndarray)
 
 # TODO: Transform (inverse_transform) function sklearn
 
@@ -242,13 +242,13 @@ class GMLVQ(LVQBaseClass, TransformerMixin):
         )
 
         # The objective is fixed as this determines what else to initialize.
-        objective = GeneralizedLearningObjective(
+        self.objective_ = GeneralizedLearningObjective(
             activation=activation, discriminant=discriminant
         )
 
         solver = solvers.grab(
             self.solver_type,
-            class_args=[objective],
+            class_args=[self.objective_],
             class_kwargs=self.solver_params,
             whitelist=SOLVERS,
         )

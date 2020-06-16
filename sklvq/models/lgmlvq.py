@@ -11,7 +11,7 @@ from typing import Tuple, Union, List
 
 from ..solvers import SolverBaseClass
 
-ModelParamsType = Tuple[np.ndarray, np.ndarray]
+ModelParamsType = tuple(np.ndarray, np.ndarray)
 
 ACTIVATION_FUNCTIONS = [
     "identity",
@@ -245,13 +245,13 @@ class LGMLVQ(LVQBaseClass, TransformerMixin):
         )
 
         # The objective is fixed as this determines what else to initialize.
-        objective = GeneralizedLearningObjective(
+        self.objective_ = GeneralizedLearningObjective(
             activation=activation, discriminant=discriminant
         )
 
         solver = solvers.grab(
             self.solver_type,
-            class_args=[objective],
+            class_args=[self.objective_],
             class_kwargs=self.solver_params,
             whitelist=SOLVERS,
         )

@@ -209,13 +209,13 @@ class GLVQ(LVQBaseClass):
         )
 
         # The objective is fixed as this determines what else to initialize.
-        objective = GeneralizedLearningObjective(
+        self.objective_ = GeneralizedLearningObjective(
             activation=activation, discriminant=discriminant
         )
 
         solver = solvers.grab(
             self.solver_type,
-            class_args=[objective],
+            class_args=[self.objective_],
             class_kwargs=self.solver_params,
             whitelist=SOLVERS,
         )

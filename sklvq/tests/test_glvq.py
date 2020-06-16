@@ -1,40 +1,55 @@
-# import numpy as np
-#
-# from sklearn import datasets
-# from sklearn import preprocessing
-# from sklearn.model_selection import (
-#     cross_val_score,
-#     GridSearchCV,
-#     RepeatedStratifiedKFold,
-# )
-# from sklearn.pipeline import make_pipeline
-#
-# from sklvq import GLVQ
-#
-#
-# def test_glvq_iris():
-#     iris = datasets.load_iris()
-#
-#     # iris.data[np.random.choice(150, 50, replace=False), 2] = np.nan
-#     iris.data = preprocessing.scale(iris.data)
-#
-#     labels = np.asarray(iris.target, str)
-#
-#
-#     classifier = GLVQ(
-#         solver_type="waypoint-gradient-descent",
-#         distance_type="squared-euclidean",
-#         activation_type="swish",
-#         random_state=31415,
-#     )
-#     classifier = classifier.fit(iris.data, labels)
-#
-#     predicted = classifier.predict(iris.data)
-#
-#     accuracy = np.count_nonzero(predicted == labels) / labels.size
-#
-#     print("\nIris accuracy: {}".format(accuracy))
-#
+import numpy as np
+
+from sklearn import datasets
+from sklearn import preprocessing
+from sklearn.model_selection import (
+    cross_val_score,
+    GridSearchCV,
+    RepeatedStratifiedKFold,
+)
+from sklearn.pipeline import make_pipeline
+
+from sklvq import GLVQ
+
+
+class ProgressLogger:
+    def __init__(self):
+        self.costs = np.zeros((12, 1))
+        self.iteration = 0
+
+    def __call__(self, data: np.ndarray, labels: np.ndarray, model: GLVQ) -> bool:
+        variables = model.to_variables(model.get_model_params())
+        self.costs[self.iteration] = model.objective_(variables, model, data, labels)
+        self.iteration += 1
+        return False
+
+
+def test_glvq_iris():
+    iris = datasets.load_iris()
+
+    # iris.data[np.random.choice(150, 50, replace=False), 2] = np.nan
+    iris.data = preprocessing.scale(iris.data)
+
+    labels = np.asarray(iris.target, str)
+
+    progress_logger = ProgressLogger()
+
+    classifier = GLVQ(
+        solver_type="steepest-gradient-descent",
+        solver_params={"callback": progress_logger, "max_runs": 12, "step_size": 0.3},
+        distance_type="squared-euclidean",
+        activation_type="swish",
+        random_state=31415,
+    )
+    classifier = classifier.fit(iris.data, labels)
+
+    predicted = classifier.predict(iris.data)
+
+    accuracy = np.count_nonzero(predicted == labels) / labels.size
+
+    print(progress_logger.costs)
+    print("\nIris accuracy: {}".format(accuracy))
+
 #
 # def test_glvq_with_multiple_prototypes_per_class():
 #     iris = datasets.load_iris()

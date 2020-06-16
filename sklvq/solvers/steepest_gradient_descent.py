@@ -9,21 +9,27 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sklvq.models import LVQBaseClass
 
+# TODO: stochastic step_size of matrix is smaller?
+# TODO: batch step_size of matrix is larger?
 
-# TODO: stochastic step_size of matrix is smaller
-# TODO: batch step_size of matrix is larger (potentially, maybe)
+
 class SteepestGradientDescent(SolverBaseClass):
-    def __init__(self, objective: ObjectiveBaseClass, max_runs=10, batch_size=1, step_size=0.2):
+    def __init__(
+        self,
+        objective: ObjectiveBaseClass,
+        max_runs=10,
+        batch_size=1,
+        step_size=0.2,
+        callback=None,
+    ):
         super().__init__(objective)
         self.max_runs = max_runs
         self.batch_size = batch_size
         self.step_size = step_size
+        self.callback = callback
 
     def solve(
-        self,
-        data: np.ndarray,
-        labels: np.ndarray,
-        model: "LVQBaseClass",
+        self, data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass",
     ) -> "LVQBaseClass":
         step_size = self.step_size
         for i_run in range(0, self.max_runs):
@@ -38,7 +44,8 @@ class SteepestGradientDescent(SolverBaseClass):
                 batch_size = data.shape[0]
 
             # Divide the shuffled indices into batches (not necessarily equal size,
-            # see documentation of numpy.array_split). batch_size set to 1 equals the stochastic variant
+            # see documentation of numpy.array_split). batch_size set to 1 equals the stochastic
+            # variant
             batches = np.array_split(
                 shuffled_indices,
                 list(range(batch_size, labels.size, batch_size)),
@@ -74,5 +81,9 @@ class SteepestGradientDescent(SolverBaseClass):
 
             # Update step size using an annealing strategy
             step_size = self.step_size / (1 + i_run / self.max_runs)
+
+            if self.callback is not None:
+                if self.callback(data, labels, model):
+                    return model
 
         return model

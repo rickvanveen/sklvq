@@ -141,7 +141,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
     ###########################################################################################
 
     @abstractmethod
-    def initialize(self, data: np.ndarray, y:np.ndarray) -> SolverBaseClass:
+    def initialize(self, data: np.ndarray, y: np.ndarray) -> SolverBaseClass:
         """
         Functions should be implemented by every specific model. Must do the following two things
         in order to work:

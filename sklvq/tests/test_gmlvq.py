@@ -1,35 +1,55 @@
-# import numpy as np
-# from sklearn import datasets
-# from sklearn import preprocessing
-# from sklearn.model_selection import cross_val_score, GridSearchCV
-# from sklearn.pipeline import make_pipeline
-# from sklearn import set_config
-#
-#
-# from sklvq import GMLVQ
-#
-#
-# def test_gmlvq_iris():
-#     set_config(assume_finite=False)
-#     iris = datasets.load_iris()
-#
-#     iris.data = preprocessing.scale(iris.data)
-#
-#     classifier = GMLVQ(
-#         solver_type="waypoint-gradient-descent",
-#         activation_type="swish",
-#         distance_type="adaptive-squared-euclidean",
-#         normalized_omega=False
-#     )
-#     classifier = classifier.fit(iris.data, iris.target)
-#
-#     predicted = classifier.predict(iris.data)
-#
-#     accuracy = np.count_nonzero(predicted == iris.target) / iris.target.size
-#
-#     print("Iris accuracy: {}".format(accuracy))
-#
-#
+import numpy as np
+from sklearn import datasets
+from sklearn import preprocessing
+from sklearn.model_selection import cross_val_score, GridSearchCV
+from sklearn.pipeline import make_pipeline
+from sklearn import set_config
+
+
+from sklvq import GMLVQ
+
+
+class ProgressLogger:
+    def __init__(self):
+        self.costs = np.zeros((20, 1))
+        self.iteration = 0
+
+    def __call__(self, data: np.ndarray, labels: np.ndarray, model: GMLVQ) -> bool:
+        variables = model.to_variables(model.get_model_params())
+        self.costs[self.iteration] = model.objective_(variables, model, data, labels)
+        self.iteration += 1
+        return False
+
+
+def test_gmlvq_iris():
+    set_config(assume_finite=False)
+    iris = datasets.load_iris()
+
+    iris.data = preprocessing.scale(iris.data)
+
+    progress_logger = ProgressLogger()
+
+    classifier = GMLVQ(
+        solver_type="adaptive-moment-estimation",
+        solver_params={
+            "callback": progress_logger,
+            "max_runs": 20,
+            "step_size": 0.01,
+        },
+        activation_type="swish",
+        distance_type="adaptive-squared-euclidean",
+        normalized_omega=False,
+    )
+    classifier = classifier.fit(iris.data, iris.target)
+
+    predicted = classifier.predict(iris.data)
+
+    accuracy = np.count_nonzero(predicted == iris.target) / iris.target.size
+
+    print(progress_logger.costs)
+    print("Iris accuracy: {}".format(accuracy))
+
+
 # def test_gmlvq_with_multiple_prototypes_per_class():
 #     iris = datasets.load_iris()
 #
