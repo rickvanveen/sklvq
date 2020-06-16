@@ -1,8 +1,8 @@
-.. _real_world_applications:
+.. _sklearn_integration:
 
-=======================
-Real World Applications
-=======================
+===================
+Sklearn Integration
+===================
 
 These examples show how to use sklvq with sklearn's pipeline, cross validation, and grids search
 methods.

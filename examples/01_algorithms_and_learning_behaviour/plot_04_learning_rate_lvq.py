@@ -79,7 +79,7 @@ iteration, fun = zip(
 fig = plt.figure()
 ax = plt.axes()
 
-ax.set_title("Learning Curve")
+ax.set_title("Learning Curve (Less is better)")
 ax.plot(iteration, fun)
 _ = ax.legend(["Cost per iteration"])
 
@@ -95,7 +95,7 @@ tfun, nfun = zip(
 fig = plt.figure()
 ax = plt.axes()
 
-ax.set_title("Learning Curves")
+ax.set_title("Learning Curves (Less is better)")
 ax.plot(iteration, nfun)
 ax.plot(iteration, tfun)
-_ = ax.legend(["Regular cost per iteration", "Average cost per iteration"])
+_ = ax.legend(["Cost of regular gradient update", "Cost of average gradient update"])
