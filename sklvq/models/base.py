@@ -8,6 +8,7 @@ from sklearn.utils.validation import check_X_y, check_is_fitted, check_array
 
 from sklvq.distances import DistanceBaseClass
 from sklvq.solvers import SolverBaseClass
+from sklvq.objectives import GeneralizedLearningObjective
 
 from typing import Tuple, Union
 
@@ -20,6 +21,7 @@ from sklvq import distances, solvers
 class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
     prototypes_: np.ndarray
     distance_: Union[DistanceBaseClass, object]
+    objective_: GeneralizedLearningObjective
 
     def __init__(
         self,

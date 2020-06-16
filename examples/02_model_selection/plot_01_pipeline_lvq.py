@@ -1,11 +1,11 @@
 """
-=============
-Preprocessing
-=============
+=========
+Pipelines
+=========
 
 In these examples GMLVQ is used but the same applies to all the other algorithms.
-Also this feature is provided by scikit-learn and we therefore also refer any interested
-reader to scikit-learn's documentation.
+Also this feature is provided by scikit-learn and we therefore also refer to scikit-learn's
+documentation.
 """
 import numpy as np
 
@@ -19,9 +19,7 @@ from sklvq import GMLVQ
 data, labels = load_iris(return_X_y=True)
 
 ###############################################################################
-# Pipelines
-# .........
-# Sklearn provides a very handy way of creating a processing pipeline. A pipeline can
+# Sklearn provides a very handy way of creating a pipeline for, e.g., preprocessing. A pipeline can
 # be used in the same way as any sklearn and sklvq estimator.
 
 scaler = StandardScaler()

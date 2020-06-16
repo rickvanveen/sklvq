@@ -11,7 +11,7 @@ from typing import Tuple, Union, List
 
 from ..solvers import SolverBaseClass
 
-ModelParamsType = tuple(np.ndarray, np.ndarray)
+ModelParamsType = Tuple[np.ndarray, np.ndarray]
 
 ACTIVATION_FUNCTIONS = [
     "identity",

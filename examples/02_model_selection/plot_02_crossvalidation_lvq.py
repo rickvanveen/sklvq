@@ -1,11 +1,11 @@
 """
 ================
-Generalizability
+Cross validation
 ================
 
-In all previous examples we looked at the training performance of the models. However,
+In all previous examples we showed the training performance of the models. However,
 in practice it is much more interesting how wel a model performs on
-unseen data (generalizability of the model).
+unseen data, i.e., the generalizability of the model.
 """
 
 import numpy as np
@@ -23,8 +23,6 @@ from sklvq import GMLVQ
 data, labels = load_iris(return_X_y=True)
 
 ###############################################################################
-# Cross validation
-# ................
 # Sklearn provides a very handy way of performing cross validation. For this
 # purpose we firstly create a pipeline and initiate an sklearn object that will
 # repeatedly create k folds for us.

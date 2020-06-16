@@ -26,6 +26,12 @@ class SolverBaseClass(ABC):
         raise NotImplementedError("You should implement this!")
 
     @staticmethod
+    def create_state(state_keys, **kwargs) -> dict:
+        state = dict.fromkeys(state_keys)
+        state.update(**kwargs)
+        return state
+
+    @staticmethod
     def multiply_model_params(
         step_sizes: Union[int, float, np.ndarray],
         model_params: Union[tuple, np.ndarray],

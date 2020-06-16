@@ -9,8 +9,11 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sklvq.models import LVQBaseClass
 
+
 # TODO: stochastic step_size of matrix is smaller?
 # TODO: batch step_size of matrix is larger?
+
+STATE_KEYS = ["variables", "nit", "fun", "jac", "step_size"]
 
 
 class SteepestGradientDescent(SolverBaseClass):
@@ -31,9 +34,21 @@ class SteepestGradientDescent(SolverBaseClass):
     def solve(
         self, data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass",
     ) -> "LVQBaseClass":
-        step_size = self.step_size
-        for i_run in range(0, self.max_runs):
 
+        if self.callback is not None:
+            variables = model.to_variables(model.get_model_params())
+            state = self.create_state(
+                STATE_KEYS,
+                variables=variables,
+                nit=0,
+                fun=self.objective(variables, model, data, labels),
+            )
+            if self.callback(model, state):
+                return model
+
+        objective_gradient = None
+
+        for i_run in range(0, self.max_runs):
             # Randomize order of samples
             shuffled_indices = shuffle(
                 range(0, labels.size), random_state=model.random_state_
@@ -51,6 +66,9 @@ class SteepestGradientDescent(SolverBaseClass):
                 list(range(batch_size, labels.size, batch_size)),
                 axis=0,
             )
+
+            # Update step size using a simple annealing strategy
+            step_size = self.step_size / (1 + i_run / self.max_runs)
 
             for i_batch in range(0, len(batches)):
                 # Select the batch
@@ -79,11 +97,16 @@ class SteepestGradientDescent(SolverBaseClass):
                     model.to_params(model_variables - objective_gradient)
                 )
 
-            # Update step size using an annealing strategy
-            step_size = self.step_size / (1 + i_run / self.max_runs)
-
             if self.callback is not None:
-                if self.callback(data, labels, model):
+                variables = model.to_variables(model.get_model_params())
+                state = self.create_state(
+                    variables=variables,
+                    nit=i_run,
+                    fun=self.objective(variables, model, data, labels),
+                    jac=objective_gradient,
+                    step_size=step_size,
+                )
+                if self.callback(model, state):
                     return model
 
         return model

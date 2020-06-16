@@ -48,7 +48,8 @@ def grab(
     if whitelist:
         if class_type not in whitelist:
             raise ValueError(
-                "Provided type parameters value is compatible with this model"
+                "Provided type parameters value is not compatible with this model or does not "
+                "exist."
             )
 
     module_name, class_name = parse_class_type(class_type)

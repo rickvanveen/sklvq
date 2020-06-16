@@ -11,13 +11,10 @@ from sklvq import GMLVQ
 
 class ProgressLogger:
     def __init__(self):
-        self.costs = np.zeros((20, 1))
-        self.iteration = 0
+        self.states = np.array([])
 
-    def __call__(self, data: np.ndarray, labels: np.ndarray, model: GMLVQ) -> bool:
-        variables = model.to_variables(model.get_model_params())
-        self.costs[self.iteration] = model.objective_(variables, model, data, labels)
-        self.iteration += 1
+    def __call__(self, model: GMLVQ, state: dict) -> bool:
+        self.states = np.append(self.states, state)
         return False
 
 
@@ -30,7 +27,7 @@ def test_gmlvq_iris():
     progress_logger = ProgressLogger()
 
     classifier = GMLVQ(
-        solver_type="adaptive-moment-estimation",
+        solver_type="waypoint-gradient-descent",
         solver_params={
             "callback": progress_logger,
             "max_runs": 20,
@@ -46,7 +43,6 @@ def test_gmlvq_iris():
 
     accuracy = np.count_nonzero(predicted == iris.target) / iris.target.size
 
-    print(progress_logger.costs)
     print("Iris accuracy: {}".format(accuracy))
 
 

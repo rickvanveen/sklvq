@@ -13,7 +13,7 @@ from typing import Tuple
 
 from sklvq.solvers import SolverBaseClass
 
-ModelParamsType = tuple(np.ndarray, np.ndarray)
+ModelParamsType = Tuple[np.ndarray, np.ndarray]
 
 # TODO: Transform (inverse_transform) function sklearn
 

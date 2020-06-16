@@ -1,7 +1,7 @@
 """
-===============
-Model Selection
-===============
+===========
+Grid Search
+===========
 """
 
 ###############################################################################
@@ -19,8 +19,6 @@ from sklvq import GMLVQ
 data, labels = load_iris(return_X_y=True)
 
 ###############################################################################
-# Grid search
-# ............
 # We first need to create a pipeline and initialize a parameter grid we want to search.
 
 # Initialize the standardScaler (z-transform) object
