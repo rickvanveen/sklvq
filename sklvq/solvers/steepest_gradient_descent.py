@@ -100,6 +100,7 @@ class SteepestGradientDescent(SolverBaseClass):
             if self.callback is not None:
                 variables = model.to_variables(model.get_model_params())
                 state = self.create_state(
+                    STATE_KEYS,
                     variables=variables,
                     nit=i_run,
                     fun=self.objective(variables, model, data, labels),

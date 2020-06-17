@@ -1,16 +1,44 @@
-from . import ObjectiveBaseClass
+from sklvq.objectives import ObjectiveBaseClass
+from sklvq import activations, discriminants
+
 import numpy as np
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 
 if TYPE_CHECKING:
     from sklvq.models import LVQBaseClass
 
+ACTIVATION_FUNCTIONS = [
+    "identity",
+    "sigmoid",
+    "soft-plus",
+    "swish",
+]
+
+DISCRIMINANT_FUNCTIONS = [
+    "relative-distance",
+]
+
 
 class GeneralizedLearningObjective(ObjectiveBaseClass):
-    def __init__(self, activation, discriminant):
-        self.activation = activation
-        self.discriminant = discriminant
+    def __init__(
+        self,
+        activation_type: Union[type, str],
+        activation_params: dict,
+        discriminant_type: Union[type, str],
+        discriminant_params: dict,
+    ):
+        self.activation = activations.grab(
+            activation_type,
+            class_kwargs=activation_params,
+            whitelist=ACTIVATION_FUNCTIONS,
+        )
+
+        self.discriminant = discriminants.grab(
+            discriminant_type,
+            class_kwargs=discriminant_params,
+            whitelist=DISCRIMINANT_FUNCTIONS,
+        )
 
     def __call__(
         self,

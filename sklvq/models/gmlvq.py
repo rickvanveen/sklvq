@@ -17,17 +17,6 @@ ModelParamsType = Tuple[np.ndarray, np.ndarray]
 
 # TODO: Transform (inverse_transform) function sklearn
 
-ACTIVATION_FUNCTIONS = [
-    "identity",
-    "sigmoid",
-    "soft-plus",
-    "swish",
-]
-
-DISCRIMINANT_FUNCTIONS = [
-    "relative-distance",
-]
-
 DISTANCE_FUNCTIONS = [
     "adaptive-squared-euclidean",
 ]
@@ -229,21 +218,12 @@ class GMLVQ(LVQBaseClass, TransformerMixin):
             whitelist=DISTANCE_FUNCTIONS + NAN_DISTANCE_FUNCTIONS,
         )
 
-        activation = activations.grab(
-            self.activation_type,
-            class_kwargs=self.activation_params,
-            whitelist=ACTIVATION_FUNCTIONS,
-        )
-
-        discriminant = discriminants.grab(
-            self.discriminant_type,
-            class_kwargs=self.discriminant_params,
-            whitelist=DISCRIMINANT_FUNCTIONS,
-        )
-
         # The objective is fixed as this determines what else to initialize.
         self.objective_ = GeneralizedLearningObjective(
-            activation=activation, discriminant=discriminant
+            self.activation_type,
+            self.activation_params,
+            self.discriminant_type,
+            self.discriminant_params,
         )
 
         solver = solvers.grab(
