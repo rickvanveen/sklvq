@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 
 class SquaredEuclidean(DistanceBaseClass):
-    def __init__(self, other_kwargs: Dict = None):
+    def __init__(self, **other_kwargs):
         self.metric_kwargs = {
             "metric": "euclidean",
             "squared": True

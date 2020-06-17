@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class AdaptiveSquaredNanEuclidean(DistanceBaseClass):
-    def __init__(self, other_kwargs: Dict = None):
+    def __init__(self, **other_kwargs):
         self.metric_kwargs = {"force_all_finite": "allow-nan"}
 
         if other_kwargs is not None:

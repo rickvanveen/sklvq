@@ -22,7 +22,7 @@ class ProgressLogger:
 
 
 def test_glvq_iris():
-    iris = datasets.load_iris()
+    iris = datasets.load_digits()
 
     iris.data = preprocessing.scale(iris.data)
 
@@ -34,6 +34,7 @@ def test_glvq_iris():
         solver_type="steepest-gradient-descent",
         solver_params={"callback": progress_logger},
         distance_type="squared-euclidean",
+        distance_params={"n_jobs": 1},
         activation_type="swish",
         random_state=31415,
     )

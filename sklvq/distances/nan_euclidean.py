@@ -18,7 +18,7 @@ class NanEuclidean(DistanceBaseClass):
     SquaredEuclidean, AdaptiveEuclidean, AdaptiveSquaredEuclidean
     """
 
-    def __init__(self, other_kwargs: Dict = None):
+    def __init__(self, **other_kwargs):
         self.metric_kwargs = {"metric": "nan_euclidean", "squared": False}
 
         if other_kwargs is not None:

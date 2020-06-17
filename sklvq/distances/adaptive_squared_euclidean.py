@@ -16,10 +16,9 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
 
     See also
     --------
-    Sigmoid, SoftPlus, Swish
     """
 
-    def __init__(self, other_kwargs: Dict = None):
+    def __init__(self, **other_kwargs):
         self.metric_kwargs = {
             "metric": "mahalanobis",
         }
