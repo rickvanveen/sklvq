@@ -10,8 +10,7 @@ if TYPE_CHECKING:
     from sklvq.models import LVQBaseClass
 
 
-# TODO: stochastic step_size of matrix is smaller?
-# TODO: batch step_size of matrix is larger?
+# TODO: Smart initialization based on algorithm and solver
 
 STATE_KEYS = ["variables", "nit", "fun", "jac", "step_size"]
 

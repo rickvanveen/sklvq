@@ -213,7 +213,7 @@ html_static_path = ["_static"]
 # html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = "project-templatedoc"
+htmlhelp_basename = "sklvqdoc"
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -232,9 +232,9 @@ latex_elements = {
 latex_documents = [
     (
         "index",
-        "project-template.tex",
-        u"project-template Documentation",
-        u"Vighnesh Birodkar",
+        "sklvq.tex",
+        u"sklvq Documentation",
+        u"Rick van Veen",
         "manual",
     ),
 ]
@@ -267,9 +267,9 @@ latex_documents = [
 man_pages = [
     (
         "index",
-        "project-template",
-        u"project-template Documentation",
-        [u"Vighnesh Birodkar"],
+        "sklvq",
+        u"sklvq Documentation",
+        [u"Rick van Veen"],
         1,
     )
 ]
@@ -286,10 +286,10 @@ man_pages = [
 texinfo_documents = [
     (
         "index",
-        "project-template",
-        u"project-template Documentation",
-        u"Vighnesh Birodkar",
-        "project-template",
+        "sklvq",
+        u"sklvq Documentation",
+        u"Rick van Veen",
+        "sklvq",
         "One line description of project.",
         "Miscellaneous",
     ),

@@ -7,8 +7,6 @@ Example of how to use GMLVQ on the classic iris dataset.
 """
 
 import numpy as np
-
-
 import matplotlib
 import matplotlib.pyplot as plt
 

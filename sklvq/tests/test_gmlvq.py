@@ -27,15 +27,17 @@ def test_gmlvq_iris():
     progress_logger = ProgressLogger()
 
     classifier = GMLVQ(
-        solver_type="waypoint-gradient-descent",
+        solver_type="steepest-gradient-descent",
         solver_params={
             "callback": progress_logger,
             "max_runs": 20,
+            "batch_size": 5,
             "step_size": 0.01,
         },
         activation_type="swish",
         distance_type="adaptive-squared-euclidean",
         normalized_omega=False,
+        force_all_finite=True
     )
     classifier = classifier.fit(iris.data, iris.target)
 

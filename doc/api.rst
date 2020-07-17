@@ -97,19 +97,7 @@ GLVQ
    :toctree: generated/
    :template: callable.rst
 
-    NanEuclidean
-
-.. autosummary::
-   :toctree: generated/
-   :template: callable.rst
-
     SquaredEuclidean
-
-.. autosummary::
-   :toctree: generated/
-   :template: callable.rst
-
-    SquaredNanEuclidean
 
 GMLVQ
 -----
@@ -120,12 +108,6 @@ GMLVQ
 
     AdaptiveSquaredEuclidean
 
-.. autosummary::
-   :toctree: generated/
-   :template: callable.rst
-
-    AdaptiveSquaredNanEuclidean
-
 LGMLVQ
 --------
 
@@ -134,12 +116,6 @@ LGMLVQ
    :template: callable.rst
 
     LocalAdaptiveSquaredEuclidean
-
-.. autosummary::
-   :toctree: generated/
-   :template: callable.rst
-
-    LocalAdaptiveSquaredNanEuclidean
 
 Solvers
 =======

@@ -33,8 +33,7 @@ def test_glvq_iris():
     classifier = GLVQ(
         solver_type="steepest-gradient-descent",
         solver_params={"callback": progress_logger},
-        distance_type="squared-euclidean",
-        distance_params={"n_jobs": 1},
+        distance_type="euclidean",
         activation_type="swish",
         random_state=31415,
     )

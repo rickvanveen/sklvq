@@ -17,10 +17,6 @@ DISTANCE_FUNCTIONS = [
     "local-adaptive-squared-euclidean",
 ]
 
-NAN_DISTANCE_FUNCTIONS = [
-    "local-adaptive-squared-nan-euclidean",
-]
-
 SOLVERS = [
     "adaptive-moment-estimation",
     "broyden-fletcher-goldfarb-shanno",
@@ -54,6 +50,7 @@ class LGMLVQ(LVQBaseClass, TransformerMixin):
         initial_omega_shape="square",
         normalized_omega=True,
         random_state=None,
+        force_all_finite=True,
     ):
         self.activation_type = activation_type
         self.activation_params = activation_params
@@ -73,6 +70,7 @@ class LGMLVQ(LVQBaseClass, TransformerMixin):
             prototypes_per_class,
             initial_prototypes,
             random_state,
+            force_all_finite,
         )
 
     ###########################################################################################
@@ -182,7 +180,7 @@ class LGMLVQ(LVQBaseClass, TransformerMixin):
 
         return (
             LVQBaseClass.normalize_prototypes(prototypes),
-            LGMLVQ.normalise_omega(omega),
+            LGMLVQ.normalize_omega(omega),
         )
 
     ###########################################################################################
@@ -215,10 +213,15 @@ class LGMLVQ(LVQBaseClass, TransformerMixin):
         """
         self.initialize_omega(data)
 
+        distance_params = {"force_all_finite": self.force_all_finite}
+
+        if self.distance_params is not None:
+            distance_params.update(self.distance_params)
+
         self.distance_ = distances.grab(
             self.distance_type,
-            class_kwargs=self.distance_params,
-            whitelist=DISTANCE_FUNCTIONS + NAN_DISTANCE_FUNCTIONS,
+            class_kwargs=distance_params,
+            whitelist=DISTANCE_FUNCTIONS,
         )
 
         # The objective is fixed as this determines what else to initialize.
@@ -296,7 +299,10 @@ class LGMLVQ(LVQBaseClass, TransformerMixin):
         return self.fit(data, y).transform(data)
 
     def transform(
-        self, data: np.ndarray, scale: bool = False, omega_hat_index: Union[int, List[int]] = 0,
+        self,
+        data: np.ndarray,
+        scale: bool = False,
+        omega_hat_index: Union[int, List[int]] = 0,
     ) -> np.ndarray:
         check_is_fitted(self)
 

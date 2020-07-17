@@ -76,9 +76,17 @@ or simply by passing them at the same time (note the lack of whitespace)::
 Running Tests
 -------------
 
-TODO
+Every module contains its own test folder. Where every file is prepended with `test_`. The tests
+can be run by using the following command when in the sklvq module folder::
+
+    pytest .
 
 Building Docs
 -------------
 
-TODO
+The html docs can be build using the following command (in the docs folder)::
+
+    make html
+
+This will generate a build folder from which the index.html can be opened locally. Other options
+are also available see the 'Makefile' in the doc folder.

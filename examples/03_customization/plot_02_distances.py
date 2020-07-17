@@ -34,7 +34,7 @@ if TYPE_CHECKING:
 class CustomSquaredEuclidean(DistanceBaseClass):
 
     # The distance implementations use the sklearn pairwise distance function.
-    def __init__(self, other_kwargs: Dict = None):
+    def __init__(self, **other_kwargs):
         self.metric_kwargs = {"metric": "euclidean", "squared": True}
 
         if other_kwargs is not None:

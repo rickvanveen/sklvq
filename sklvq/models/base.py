@@ -25,10 +25,10 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
 
     def __init__(
         self,
-        distance_type,
-        distance_params,
-        solver_type,
-        solver_params,
+        distance_type="squared-euclidean",
+        distance_params=None,
+        solver_type="steepest-gradient-descent",
+        solver_params=None,
         prototypes_per_class=1,
         initial_prototypes="class-conditional-mean",
         random_state=None,
