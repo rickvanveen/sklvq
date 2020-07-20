@@ -259,12 +259,17 @@ class GMLVQ(LVQBaseClass, TransformerMixin):
         if self.normalized_omega:
             self.omega_ = GMLVQ.normalise_omega(self.omega_)
 
+    @staticmethod
+    def compute_lambda_(omega):
+        # Equivalent to omega.T.dot(omega)
+        return np.einsum("ji, jk -> ik", omega, omega)
     ###########################################################################################
     # Transformer related functions
     ###########################################################################################
 
     def after_fit(self, data: np.ndarray, y: np.ndarray):
-        self.lambda_ = self.omega_.T.dot(self.omega_)
+        # self.lambda_ = self.omega_.T.dot(self.omega_)
+        self.lambda_ = GMLVQ.compute_lambda_(self.omega_)
 
         eigenvalues, omega_hat = np.linalg.eig(self.lambda_)
         sorted_indices = np.argsort(eigenvalues)[::-1]

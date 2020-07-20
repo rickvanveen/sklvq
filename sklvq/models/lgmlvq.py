@@ -280,8 +280,14 @@ class LGMLVQ(LVQBaseClass, TransformerMixin):
     # Transformer related functions
     ###########################################################################################
 
+    @staticmethod
+    def compute_lambdas_(omegas):
+        # Equivalent to omega.T.dot(omega) per omega
+        return np.einsum("ikj, ikl -> ijl", omegas, omegas)
+
     def after_fit(self, data: np.ndarray, y: np.ndarray):
-        self.lambda_ = np.einsum("ikj, ikl -> ijl", self.omega_, self.omega_)
+        self.lambda_ = LGMLVQ.compute_lambdas_(self.omega_)
+        # self.lambda_ = np.einsum("ikj, ikl -> ijl", self.omega_, self.omega_)
 
         eigenvalues, omega_hat = np.linalg.eig(self.lambda_)
 

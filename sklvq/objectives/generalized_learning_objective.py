@@ -127,6 +127,7 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
 def _find_min(indices: np.ndarray, distances: np.ndarray) -> (np.ndarray, np.ndarray):
     """ Helper function to find the minimum distance and the index of this distance. """
     dist_temp = np.where(indices, distances, np.inf)
+    # TODO: Optimize, finds min value/index twice.
     return dist_temp.min(axis=1), dist_temp.argmin(axis=1)
 
 

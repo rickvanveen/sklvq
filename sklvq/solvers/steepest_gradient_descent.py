@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from sklvq.models import LVQBaseClass
 
 
-# TODO: Smart initialization based on algorithm and solver
+# TODO: Smarter initialization based on algorithm and solver
 
 STATE_KEYS = ["variables", "nit", "fun", "jac", "step_size"]
 

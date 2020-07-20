@@ -3,6 +3,8 @@ from . import DistanceBaseClass
 import numpy as np
 from sklearn.metrics.pairwise import pairwise_distances
 
+import pytest
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -98,15 +100,12 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
             difference[np.isnan(difference)] = 0.0
 
         # Prototype gradient
-        distance_gradient[:, ip_start:ip_end] = np.einsum(
-            "ji,ik ->jk", -2.0 * difference, np.dot(omega.T, omega)
-        )
+        distance_gradient[:, ip_start:ip_end] = _prototype_gradient(difference, omega)
 
         # Omega gradient
-        scaled_omega = np.dot(omega, difference.T)
-        distance_gradient[:, io_start:] = (
-            np.einsum("ij,jk->jik", scaled_omega, (2.0 * difference))
-        ).reshape(num_samples, omega.size)
+        distance_gradient[:, io_start:] = _omega_gradient(difference, omega).reshape(
+            num_samples, omega.size
+        )
 
         return distance_gradient
 
@@ -116,3 +115,14 @@ def _nan_mahalanobis(sample, prototype, VI=None):
     difference[np.isnan(difference)] = 0.0
     # Equal to difference.dot(VI).dot(difference)
     return np.einsum("i, ij, i ->", difference, VI, difference)
+
+
+def _prototype_gradient(difference: np.ndarray, omega: np.ndarray) -> np.ndarray:
+    # np.dot(-2.0 * difference.dot(omega.T.dot(omega))
+    return np.einsum("ji,ik ->jk", -2.0 * difference, np.dot(omega.T, omega))
+    # return np.einsum("ij, kj, kl -> il", -2.0 * difference, omega, omega) this is slower
+
+
+def _omega_gradient(difference: np.ndarray, omega: np.ndarray) -> np.ndarray:
+    return np.einsum("ij,jk->jik", np.dot(omega, difference.T), (2.0 * difference))
+    # return np.einsum("ij, kj, kl -> kil", omega, difference, (2.0 * difference)) this is slower

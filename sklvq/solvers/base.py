@@ -12,16 +12,16 @@ if TYPE_CHECKING:
     from sklvq.models import LVQBaseClass
 
 
+# TODO: Optimize, Get rid of to_variables and to_params in custom solvers.
+#  Probably, this can be done by wrapping some functionallity around scipy solvers that unifies
+#  the way the solvers are called, but removes the variables from the call to the objective.
 class SolverBaseClass(ABC):
     def __init__(self, objective: ObjectiveBaseClass):
         self.objective = objective
 
     @abstractmethod
     def solve(
-        self,
-        data: np.ndarray,
-        labels: np.ndarray,
-        model: "LVQBaseClass",
+        self, data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass",
     ) -> "LVQBaseClass":
         raise NotImplementedError("You should implement this!")
 
@@ -53,18 +53,16 @@ class SolverBaseClass(ABC):
 
 
 class ScipyBaseSolver(SolverBaseClass):
-    def __init__(self, objective, method: str = "L-BFGS-B", params: Dict = None, **kwargs):
+    def __init__(
+        self, objective, method: str = "L-BFGS-B", params: Dict = None, **kwargs
+    ):
         self.method = method
         self.params = params
         super().__init__(objective)
 
     def solve(
-        self,
-        data: np.ndarray,
-        labels: np.ndarray,
-        model: "LVQBaseClass",
+        self, data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass",
     ) -> "LVQBaseClass":
-
         params = {"jac": self.objective.gradient}
         if self.params is not None:
             params.update(self.params)

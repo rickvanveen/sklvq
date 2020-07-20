@@ -20,7 +20,7 @@ class ProgressLogger:
 
 def test_gmlvq_iris():
     set_config(assume_finite=False)
-    iris = datasets.load_iris()
+    iris = datasets.load_digits()
 
     iris.data = preprocessing.scale(iris.data)
 
@@ -31,7 +31,7 @@ def test_gmlvq_iris():
         solver_params={
             "callback": progress_logger,
             "max_runs": 20,
-            "batch_size": 5,
+            "batch_size": 1,
             "step_size": 0.01,
         },
         activation_type="swish",
