@@ -230,7 +230,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
     # Data and label validation
     ###########################################################################################
 
-    def _check_data_labels(
+    def _validate_data_labels(
         self, data: np.ndarray, labels: np.ndarray
     ) -> Tuple[np.ndarray, np.ndarray]:
         """
@@ -263,7 +263,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
 
         """
         # Check data
-        data, labels = check_X_y(data, labels, force_all_finite=self.force_all_finite)
+        data, labels = self._validate_data(data, labels, force_all_finite=self.force_all_finite)
 
         # Check classification targets
         check_classification_targets(labels)
@@ -280,7 +280,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
 
     def fit(self, data, y):
         # Check data and check and transform labels.
-        data, labels = self._check_data_labels(data, y)
+        data, labels = self._validate_data_labels(data, y)
 
         # Initialize random_state_ that should be used to perform any rng.
         self.random_state_ = check_random_state(self.random_state)
@@ -357,7 +357,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         check_is_fitted(self)
 
         # Input validation
-        data = check_array(data, force_all_finite=self.force_all_finite)
+        data = self._validate_data(data, force_all_finite=self.force_all_finite)
 
         decision_values = self.decision_function(data)
 

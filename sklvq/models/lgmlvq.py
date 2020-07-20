@@ -325,3 +325,6 @@ class LGMLVQ(LVQBaseClass, TransformerMixin):
         transformed_data = np.einsum("jk, ikl -> ijl", data, transformation_matrix)
 
         return np.squeeze(transformed_data)
+
+    def _more_tags(self):
+        return {"poor_score": True}
