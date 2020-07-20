@@ -1,14 +1,21 @@
-from .base import DiscriminativeBaseClass
-from .relative_distance import RelativeDistance
+from sklvq.discriminants.base import DiscriminativeBaseClass
+from sklvq.discriminants.relative_distance import RelativeDistance
+
+from typing import Union
+from sklvq.misc import utils
 
 __all__ = ["DiscriminativeBaseClass", "RelativeDistance"]
 
-from ..misc import utils
-
 ALIASES = {"reldist": "relative-distance"}
-BASE_CLASS = DiscriminativeBaseClass
 PACKAGE = "sklvq.discriminants"
 
 
-def grab(class_type, class_params):
-    return utils.grab(class_type, class_params, ALIASES, PACKAGE, BASE_CLASS)
+def grab(
+    class_type: Union[str, type],
+    class_args: list = None,
+    class_kwargs: dict = None,
+    whitelist: list = None,
+) -> Union[DiscriminativeBaseClass, object]:
+    return utils.grab(
+        class_type, class_args, class_kwargs, ALIASES, whitelist, PACKAGE
+    )

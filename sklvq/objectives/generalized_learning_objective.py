@@ -1,22 +1,49 @@
-from . import ObjectiveBaseClass
+from sklvq.objectives import ObjectiveBaseClass
+from sklvq import activations, discriminants
+
 import numpy as np
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 
 if TYPE_CHECKING:
-    from sklvq.models import LVQClassifier
+    from sklvq.models import LVQBaseClass
+
+ACTIVATION_FUNCTIONS = [
+    "identity",
+    "sigmoid",
+    "soft-plus",
+    "swish",
+]
+
+DISCRIMINANT_FUNCTIONS = [
+    "relative-distance",
+]
 
 
 class GeneralizedLearningObjective(ObjectiveBaseClass):
-    def __init__(self, activation, discriminant):
-        self.activation = activation
-        self.discriminant = discriminant
+    def __init__(
+        self,
+        activation_type: Union[type, str],
+        activation_params: dict,
+        discriminant_type: Union[type, str],
+        discriminant_params: dict,
+    ):
+        self.activation = activations.grab(
+            activation_type,
+            class_kwargs=activation_params,
+            whitelist=ACTIVATION_FUNCTIONS,
+        )
 
-    # Note: Objective changes the model... and does not copy it...
+        self.discriminant = discriminants.grab(
+            discriminant_type,
+            class_kwargs=discriminant_params,
+            whitelist=DISCRIMINANT_FUNCTIONS,
+        )
+
     def __call__(
         self,
         variables: np.ndarray,
-        model: "LVQClassifier",
+        model: "LVQBaseClass",
         data: np.ndarray,
         labels: np.ndarray,
     ) -> np.ndarray:
@@ -26,11 +53,10 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
 
         return np.sum(self.activation(self.discriminant(dist_same, dist_diff)))
 
-    # Note: Gradient function changes the model... and does not copy it...
     def gradient(
         self,
         variables: np.ndarray,
-        model: "LVQClassifier",
+        model: "LVQBaseClass",
         data: np.ndarray,
         labels: np.ndarray,
     ) -> np.ndarray:
@@ -65,7 +91,8 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
                     data[ii_winner_same], model, i_prototype
                 )
 
-                # The distance vectors weighted by the activation and discriminant partial derivatives.
+                # The distance vectors weighted by the activation and discriminant partial
+                # derivatives.
                 gradient += (activation_gradient * discriminant_gradient).dot(
                     distance_gradient
                 )
@@ -88,7 +115,8 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
                     data[ii_winner_diff], model, i_prototype
                 )
 
-                # The distance vectors weighted by the activation and discriminant partial derivatives.
+                # The distance vectors weighted by the activation and discriminant partial
+                # derivatives.
                 gradient += (activation_gradient * discriminant_gradient).dot(
                     distance_gradient
                 )
@@ -99,18 +127,20 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
 def _find_min(indices: np.ndarray, distances: np.ndarray) -> (np.ndarray, np.ndarray):
     """ Helper function to find the minimum distance and the index of this distance. """
     dist_temp = np.where(indices, distances, np.inf)
+    # TODO: Optimize, finds min value/index twice.
     return dist_temp.min(axis=1), dist_temp.argmin(axis=1)
 
 
-def _compute_distance(data: np.ndarray, labels: np.ndarray, model: "LVQClassifier"):
-    """ Computes the distances between each prototype and each observation and finds all indices where the shortest
-    distance is that of the prototype with the same label and with a different label. """
+def _compute_distance(data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass"):
+    """ Computes the distances between each prototype and each observation and finds all indices
+    where the shortest distance is that of the prototype with the same label and with a different label. """
 
-    # Step 1: Compute distances between data and the model (how is depending on model and coupled distance function)
+    # Step 1: Compute distances between data and the model (how is depending on model and coupled
+    # distance function)
     distances = model.distance_(data, model)
 
-    # Step 2: Find for all samples the distance between closest prototype with same label (d1) and different
-    # label (d2). ii_same marks for all samples the prototype with the same label.
+    # Step 2: Find for all samples the distance between closest prototype with same label (d1)
+    # and different label (d2). ii_same marks for all samples the prototype with the same label.
     ii_same = np.transpose(
         np.array(
             [labels == prototype_label for prototype_label in model.prototypes_labels_]
@@ -120,10 +150,12 @@ def _compute_distance(data: np.ndarray, labels: np.ndarray, model: "LVQClassifie
     # For each prototype mark the samples that have a different label
     ii_diff = ~ii_same
 
-    # For each sample find the closest prototype with the same label. Returns distance and index of prototype
+    # For each sample find the closest prototype with the same label. Returns distance and index
+    # of prototype
     dist_same, i_dist_same = _find_min(ii_same, distances)
 
-    # For each sample find the closest prototype with a different label. Returns distance and index of prototype
+    # For each sample find the closest prototype with a different label. Returns distance and
+    # index of prototype
     dist_diff, i_dist_diff = _find_min(ii_diff, distances)
 
     return dist_same, dist_diff, i_dist_same, i_dist_diff

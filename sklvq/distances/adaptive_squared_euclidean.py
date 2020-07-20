@@ -1,48 +1,64 @@
 from . import DistanceBaseClass
 
 import numpy as np
-import scipy as sp
+from sklearn.metrics.pairwise import pairwise_distances
+
+import pytest
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from sklvq.models import LVQClassifier
+    from sklvq.models import LVQBaseClass
 
 
 class AdaptiveSquaredEuclidean(DistanceBaseClass):
-    def __call__(self, data: np.ndarray, model: "LVQClassifier") -> np.ndarray:
+    """ Adaptive squared Euclidean function
+
+    See also
+    --------
+    """
+
+    def __init__(self, **other_kwargs):
+        self.metric_kwargs = {
+            "metric": "mahalanobis",
+        }
+
+        if other_kwargs is not None:
+            self.metric_kwargs.update(other_kwargs)
+
+        if "force_all_finite" in self.metric_kwargs:
+            if self.metric_kwargs["force_all_finite"] == "allow-nan":
+                self.metric_kwargs.update({"metric": _nan_mahalanobis})
+
+    def __call__(self, data: np.ndarray, model: "LVQBaseClass") -> np.ndarray:
         """ Implements a weighted variant of the squared euclidean distance:
             .. math::
                 d^{\\Lambda}(w, x) = (x - w)^T \\Lambda (x - w)
 
-        .. note::
-            Uses scipy.spatial.distance.cdist, see scipy documentation for more detail.
-
         Parameters
         ----------
-        data : ndarray
+        data : numpy.ndarray
             A matrix containing the samples on the rows.
-        model : LVQClassifier
-            In principle any LVQClassifier that calls it's relevance matrix omega.
-            Specifically here, GMLVQClassifier.
+        model : LVQBaseClass, GMLVQ
 
         Returns
         -------
-        ndarray
+        numpy.ndarray
             The adaptive squared euclidean distance for every sample to every prototype stored row-wise.
         """
-        return (
-            sp.spatial.distance.cdist(
-                data,
-                model.prototypes_,
-                "mahalanobis",
-                VI=model.omega_.T.dot(model.omega_),
-            )
-            ** 2
-        )
+        (prototypes, omega) = model.get_model_params()
+
+        self.metric_kwargs.update(dict(VI=np.dot(omega.T, omega)))
+
+        pdists = pairwise_distances(data, prototypes, **self.metric_kwargs)
+
+        if self.metric_kwargs["metric"] == "mahalanobis":
+            return pdists ** 2
+
+        return pdists
 
     def gradient(
-        self, data: np.ndarray, model: "LVQClassifier", i_prototype: int
+        self, data: np.ndarray, model: "LVQBaseClass", i_prototype: int
     ) -> np.ndarray:
         """ The partial derivative of the adaptive squared euclidean distance function, with respect
         to a specified prototype and the matrix omega.
@@ -51,9 +67,9 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
         ----------
         data : ndarray
             A matrix containing the samples on the rows.
-        model : LVQClassifier
+        model : LVQBaseClass
             In principle any LVQClassifier that calls it's relevance matrix omega.
-            Specifically here, GMLVQClassifier.
+            Specifically here, GMLVQ.
         i_prototype : int
             An integer index value of the relevant prototype
 
@@ -63,35 +79,50 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
             The gradient for every feature/dimension. Returned in one 1D vector. The non-relevant prototype's
             gradient is set to 0, but is still included in the output.
         """
-        shape = [data.shape[0], *model.prototypes_.shape]
-        prototype_gradient = np.zeros(shape)
 
-        prototype_gradient[:, i_prototype, :] = np.atleast_2d(
-            _prototype_gradient(data, model.prototypes_[i_prototype, :], model.omega_)
+        (prototypes, omega) = model.get_model_params()
+        (num_samples, num_features) = data.shape
+
+        force_all_finite = self.metric_kwargs.get("force_all_finite", None)
+
+        distance_gradient = np.zeros((num_samples, prototypes.size + omega.size))
+
+        # Start and end indices prototype
+        ip_start = i_prototype * num_features
+        ip_end = ip_start + num_features
+
+        # Start index omega
+        io_start = prototypes.size
+
+        # If nans are allowed remove them from the difference and replace it with 0.0
+        difference = data - prototypes[i_prototype, :]
+        if force_all_finite == "allow-nan":
+            difference[np.isnan(difference)] = 0.0
+
+        # Prototype gradient
+        distance_gradient[:, ip_start:ip_end] = _prototype_gradient(difference, omega)
+
+        # Omega gradient
+        distance_gradient[:, io_start:] = _omega_gradient(difference, omega).reshape(
+            num_samples, omega.size
         )
-        omega_gradient = np.atleast_2d(
-            _omega_gradient(data, model.prototypes_[i_prototype, :], model.omega_)
-        )
 
-        return np.hstack(
-            (prototype_gradient.reshape(shape[0], shape[1] * shape[2]), omega_gradient)
-        )
+        return distance_gradient
 
 
-def _prototype_gradient(
-    data: np.ndarray, prototype: np.ndarray, omega: np.ndarray
-) -> np.ndarray:
-    difference = (-2 * (data - prototype)).T
-    relevance = omega.T.dot(omega)
-    return np.matmul(relevance, difference).T
+def _nan_mahalanobis(sample, prototype, VI=None):
+    difference = sample - prototype
+    difference[np.isnan(difference)] = 0.0
+    # Equal to difference.dot(VI).dot(difference)
+    return np.einsum("i, ij, i ->", difference, VI, difference)
 
 
-def _omega_gradient(
-    data: np.ndarray, prototype: np.ndarray, omega: np.ndarray
-) -> np.ndarray:
-    difference = data - prototype
-    scaled_omega = omega.dot(difference.T)
-    scaled_diff = 2 * difference
-    return np.einsum("ij,jk->jik", scaled_omega, scaled_diff).reshape(
-        data.shape[0], omega.shape[0] * omega.shape[1]
-    )
+def _prototype_gradient(difference: np.ndarray, omega: np.ndarray) -> np.ndarray:
+    # np.dot(-2.0 * difference.dot(omega.T.dot(omega))
+    return np.einsum("ji,ik ->jk", -2.0 * difference, np.dot(omega.T, omega))
+    # return np.einsum("ij, kj, kl -> il", -2.0 * difference, omega, omega) this is slower
+
+
+def _omega_gradient(difference: np.ndarray, omega: np.ndarray) -> np.ndarray:
+    return np.einsum("ij,jk->jik", np.dot(omega, difference.T), (2.0 * difference))
+    # return np.einsum("ij, kj, kl -> kil", omega, difference, (2.0 * difference)) this is slower

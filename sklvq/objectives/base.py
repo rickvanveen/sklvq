@@ -4,7 +4,7 @@ import numpy as np
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from sklvq.models import LVQClassifier
+    from sklvq.models import LVQBaseClass
 
 
 class ObjectiveBaseClass(ABC):
@@ -12,9 +12,9 @@ class ObjectiveBaseClass(ABC):
     def __call__(
         self,
         variables: np.ndarray,
+        model: "LVQBaseClass",
         data: np.ndarray,
         labels: np.ndarray,
-        model: "LVQClassifier",
     ):
         raise NotImplementedError("You should implement this!")
 
@@ -22,8 +22,8 @@ class ObjectiveBaseClass(ABC):
     def gradient(
         self,
         variables: np.ndarray,
+        model: "LVQBaseClass",
         data: np.ndarray,
         labels: np.ndarray,
-        model: "LVQClassifier",
     ):
         raise NotImplementedError("You should implement this!")

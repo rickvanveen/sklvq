@@ -26,11 +26,11 @@ class Swish(ActivationBaseClass):
 
         Parameters
         ----------
-        x : numpy.ndarray
+        x : ndarray
 
         Returns
         -------
-        numpy.ndarray
+        ndarray
         """
         return _swish(x, self.beta)
 
@@ -42,11 +42,11 @@ class Swish(ActivationBaseClass):
 
         Parameters
         ----------
-        x : numpy.ndarray
+        x : ndarray
 
         Returns
         -------
-        numpy.ndarray
+        ndarray
         """
         return (self.beta * _swish(x, self.beta)) + (
             _sgd(x, self.beta) * (1 - self.beta * _swish(x, self.beta))

@@ -1,21 +1,32 @@
-import scipy as sp
 import numpy as np
+from sklearn.metrics.pairwise import pairwise_distances
 
 from . import DistanceBaseClass
 
 from typing import TYPE_CHECKING
+from typing import Dict
 
 if TYPE_CHECKING:
-    from sklvq.models import LVQClassifier
+    from sklvq.models import LVQBaseClass
 
 
 class SquaredEuclidean(DistanceBaseClass):
-    def __call__(self, data: np.ndarray, model: "LVQClassifier") -> np.ndarray:
-        """ Wrapper function for scipy's cdist(x, y, 'sqeuclidean') function
+    def __init__(self, **other_kwargs):
+        # Default just use euclidean
+        self.metric_kwargs = {"metric": "euclidean", "squared": True}
 
-            See scipy.spatial.distance.cdist for full documentation.
+        # Should contain other kwargs for sklearn.metrics.pairwise_distances
+        if other_kwargs is not None:
+            self.metric_kwargs.update(other_kwargs)
 
-            Note that any custom function should still accept and return the same.
+        # This might include force_all_finite which if it is set to "allow-nan" should switch the
+        # metric used to nan_euclidean else euclidean is fine.
+        if "force_all_finite" in self.metric_kwargs:
+            if self.metric_kwargs["force_all_finite"] == "allow-nan":
+                self.metric_kwargs.update({"metric": "nan_euclidean"})
+
+    def __call__(self, data: np.ndarray, model: "LVQBaseClass") -> np.ndarray:
+        """ Wrapper function for sklearn pairwise_distances ("euclidean") function
 
             Parameters
             ----------
@@ -30,10 +41,10 @@ class SquaredEuclidean(DistanceBaseClass):
                 The dist(u=XA[i], v=XB[j]) is computed and stored in the
                 ij-th entry.
         """
-        return sp.spatial.distance.cdist(data, model.prototypes_, "sqeuclidean")
+        return pairwise_distances(data, model.prototypes_, **self.metric_kwargs,)
 
     def gradient(
-        self, data: np.ndarray, model: "LVQClassifier", i_prototype: int
+        self, data: np.ndarray, model: "LVQBaseClass", i_prototype: int
     ) -> np.ndarray:
         """ Implements the derivative of the squared euclidean distance, , with respect to 1 prototype.
 
@@ -48,12 +59,26 @@ class SquaredEuclidean(DistanceBaseClass):
             gradient : ndarray, shape = [n_observations, n_features]
                         The gradient with respect to the prototype and every observation in data.
         """
-        # TODO: Provide common function to reshape the variables, so it doesn't need to be copied.
-        shape = [data.shape[0], *model.prototypes_.shape]
-        gradient = np.zeros(shape)
+        prototypes = model.get_model_params()
+        (num_samples, num_features) = data.shape
 
-        gradient[:, i_prototype, :] = np.atleast_2d(
-            -2 * (data - model.prototypes_[i_prototype, :])
-        )
+        # Can also always replace all nans in difference with 0.0, but maybe this is better.
+        force_all_finite = self.metric_kwargs.get("force_all_finite", None)
 
-        return gradient.reshape(shape[0], shape[1] * shape[2])
+        distance_gradient = np.zeros((num_samples, prototypes.size))
+
+        ip_start = i_prototype * num_features
+        ip_end = ip_start + num_features
+
+        # distance_gradient[:, ip_start:ip_end] = -2 * (data - prototypes[i_prototype, :])
+        difference = data - prototypes[i_prototype, :]
+
+        # Only check for nans if allow-nan is set else it should not happen...
+        if force_all_finite == "allow-nan":
+            difference[np.isnan(difference)] = 0.0
+
+        distance_gradient[:, ip_start:ip_end] = -2 * difference
+
+        # distance_gradient[np.isnan(distance_gradient)] = 0.0
+
+        return distance_gradient

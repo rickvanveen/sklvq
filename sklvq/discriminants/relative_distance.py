@@ -6,6 +6,7 @@ class RelativeDistance(DiscriminativeBaseClass):
     """ Relative distance function
 
     """
+
     def __call__(self, dist_same: np.ndarray, dist_diff: np.ndarray) -> np.ndarray:
         """ The relative distance discriminant function:
             .. math::
@@ -16,23 +17,19 @@ class RelativeDistance(DiscriminativeBaseClass):
 
         Parameters
         ----------
-        dist_same : numpy.ndarray with shape (n_samples, 1)
+        dist_same : ndarray with shape (n_samples, 1)
             The distance from at least one sample to the closest prototype with the same label.
-        dist_diff : numpy.ndarray with shape (n_samples, 1)
+        dist_diff : ndarray with shape (n_samples, 1)
             The distance from at least one sample to the closest prototype with a different label.
 
         Returns
         -------
-        numpy.ndarray
+        ndarray
             The relative distance for each sample
 
         """
-        with np.errstate(
-            divide="ignore", invalid="ignore"
-        ):  # Suppresses runtime warning TODO: fix
-            return (dist_same - dist_diff) / (dist_same + dist_diff)
+        return (dist_same - dist_diff) / (dist_same + dist_diff)
 
-    # TODO: Maybe winner_same should be an array that indicates if its the same or different label for every sample...
     def gradient(
         self, dist_same: np.ndarray, dist_diff: np.ndarray, winner_same: bool
     ) -> np.ndarray:
@@ -57,9 +54,9 @@ class RelativeDistance(DiscriminativeBaseClass):
 
         Parameters
         ----------
-        dist_same : numpy.ndarray with shape (n_samples, 1)
+        dist_same : ndarray with shape (n_samples, 1)
             The distance from at least one sample to the closest prototype with the same label.
-        dist_diff : numpy.ndarray with shape (n_samples, 1)
+        dist_diff : ndarray with shape (n_samples, 1)
             The distance from at least one sample to the closest prototype with a different label.
         winner_same : bool
             Indicating if the derivative with respect to a prototype with the same label (True) or a different label
@@ -67,7 +64,7 @@ class RelativeDistance(DiscriminativeBaseClass):
 
         Returns
         -------
-        numpy.ndarray
+        ndarray
             The relative distance per sample
 
         """
@@ -77,10 +74,8 @@ class RelativeDistance(DiscriminativeBaseClass):
 
 
 def _gradient_same(dist_same: np.ndarray, dist_diff: np.ndarray) -> np.ndarray:
-    with np.errstate(divide="ignore", invalid="ignore"):  # Suppresses runtime warning
-        return 2 * dist_diff / (dist_same + dist_diff) ** 2
+    return 2 * dist_diff / (dist_same + dist_diff) ** 2
 
 
 def _gradient_diff(dist_same: np.ndarray, dist_diff: np.ndarray) -> np.ndarray:
-    with np.errstate(divide="ignore", invalid="ignore"):  # Suppresses runtime warning
-        return -2 * dist_same / (dist_same + dist_diff) ** 2
+    return -2 * dist_same / (dist_same + dist_diff) ** 2

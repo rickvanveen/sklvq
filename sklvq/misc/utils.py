@@ -1,69 +1,96 @@
 from importlib import import_module
-import inspect
+from inspect import isclass
+from typing import Tuple, Union
 
-# TODO: Documentation
-# TODO: Look into how to restrict access to certain LVQ classifiers... e.g., not all distance measures are suitable for
-#  every classifier
-# TODO: look into how to deal with custom objects
 
-# TODO: when wrong parameters are provided all the defaults will be used without warnings.... this is not really nice.
+def grab(
+    class_type: Union[type, str],
+    class_args,
+    class_kwargs,
+    aliases,
+    whitelist,
+    package,
+):
+    if not (isinstance(class_type, str) or isclass(class_type)):
+        raise ValueError("Type parameter should either be a class or string")
 
-def grab(class_type, class_params, aliases, package, base_class):
-    if inspect.isclass(class_type):
+    # Set args and kwargs to empty iterables if they are None
+    if class_args is None:
+        class_args = []
+
+    if class_kwargs is None:
+        class_kwargs = {}
+
+    if aliases is None:
+        aliases = {}
+
+    if whitelist is None:
+        whitelist = []
+
+    # Check if class_type is actually a custom class
+    if not isinstance(class_type, str):
+        # If this fails the wrong args and or kwargs were provided. If None, i.e.,
+        # empty iterables are provided this should just work.
         try:
-            instance = class_type(**class_params)
+            return class_type(*class_args, **class_kwargs)
         except TypeError:
-            instance = class_type()
-        return instance
+            raise ValueError(
+                "{} does not accept the provided arguments.".format(
+                    class_type)
+            )
 
+    # If an alias is used (this must be a key in the aliases constant of the package) get the
+    # actual name of the callable.
     if class_type in aliases.keys():
         class_type = aliases[class_type]
 
-    module_name, class_name = process(class_type)
-
-    return find(package, module_name, class_name, class_params, base_class)
-
-
-# PACKAGE, module_name, class_name, class_params, BASE_CLASS
-def find(package, module_name, class_name, class_params, base_class):
-    try:
-        object_module = import_module("." + module_name, package=package)
-        object_class = getattr(object_module, class_name)
-
-        try:
-            instance = object_class(**class_params)
-        except TypeError:
-            instance = object_class()
-
-    except (AttributeError, ModuleNotFoundError):
-        raise ImportError(
-            "{} is not part of our collection or "
-            "an alias needs to be created!".format(module_name.replace("_", "-"))
-        )
-    else:
-        if not issubclass(object_class, base_class):
-            raise ImportError(
-                "We currently don't have {}, "
-                "but you are welcome to send in the request for it!".format(
-                    module_name.replace("_", "-")
-                )
+    # When grab is called a list of 'compatible' methods needs to be provided, aka the whiteliste
+    if whitelist:
+        if class_type not in whitelist:
+            raise ValueError(
+                "Provided type parameters value is not compatible with this model or does not "
+                "exist."
             )
 
-    return instance
+    module_name, class_name = parse_class_type(class_type)
+
+    return find_and_init(package, module_name, class_name, class_args, class_kwargs)
 
 
-def process(object_type_argument):
-    # RULE: argument given as parameter to LVQ equals 'squared-euclidean' this will look for the SquaredEuclidean
-    # object in the squared_euclidean module in the provided package.
+def find_and_init(package, module_name, class_name, class_args, class_kwargs):
+    try:
+        module = import_module("." + module_name, package=package)
+        path_to_class = getattr(module, class_name)
+    except (AttributeError, ModuleNotFoundError):
+        raise ImportError(
+            "{} is not part of our collection or ".format(module_name.replace("_", "-"))
+        )
 
-    # Construct default module name
-    object_type_argument = object_type_argument.casefold()
-    module_name = object_type_argument.replace("-", "_")
+    try:
+        return path_to_class(*class_args, **class_kwargs)
+    except TypeError:
+        raise ValueError(
+            "{} does not accept the provided arguments".format(
+                path_to_class)
+        )
 
-    # Construct default class name
+
+def parse_class_type(class_type: str) -> Tuple[str, str]:
+    #     The string "squared-euclidean" will result in module_name "squared_euclidean" and
+    #     class_name "SquaredEuclidean"
+
+    # Convert to lowercase
+    class_type = class_type.casefold()
+
+    # Transform - in _ to get the module name
+    module_name = class_type.replace("-", "_")
+
     class_name = ""
-    object_type_parts = object_type_argument.rsplit("-")
-    for part in object_type_parts:
-        class_name += part.capitalize()
+    # Split the class_type string based on "-"
+    class_type_parts = class_type.rsplit("-")
+
+    # Concat every part but capitalize the first letter
+    for class_type_part in class_type_parts:
+        class_name += class_type_part.capitalize()
 
     return module_name, class_name

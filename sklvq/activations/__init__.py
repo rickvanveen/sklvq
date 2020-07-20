@@ -1,21 +1,28 @@
 """ Package containing activation functions
 """
 
-from .base import ActivationBaseClass
-from .identity import Identity
-from .sigmoid import Sigmoid
-from .soft_plus import SoftPlus
-from .swish import Swish
+from sklvq.activations.base import ActivationBaseClass
+from sklvq.activations.identity import Identity
+from sklvq.activations.sigmoid import Sigmoid
+from sklvq.activations.soft_plus import SoftPlus
+from sklvq.activations.swish import Swish
 
-# TODO: Doest the base class need to be public?
+from typing import Union
+
+from sklvq.misc import utils
+
 __all__ = ["ActivationBaseClass", "Identity", "Sigmoid", "SoftPlus", "Swish"]
 
-from ..misc import utils
-
 ALIASES = {"soft+": "soft-plus"}
-BASE_CLASS = ActivationBaseClass
 PACKAGE = "sklvq.activations"
 
 
-def grab(class_type, class_params):
-    return utils.grab(class_type, class_params, ALIASES, PACKAGE, BASE_CLASS)
+def grab(
+    class_type: Union[str, type],
+    class_args: list = None,
+    class_kwargs: dict = None,
+    whitelist: list = None,
+) -> Union[ActivationBaseClass, object]:
+    return utils.grab(
+        class_type, class_args, class_kwargs, ALIASES, whitelist, PACKAGE
+    )

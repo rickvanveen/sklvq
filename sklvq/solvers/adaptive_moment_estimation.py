@@ -12,32 +12,54 @@ from sklvq.objectives import ObjectiveBaseClass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from sklvq.models import LVQClassifier
+    from sklvq.models import LVQBaseClass
+
+STATE_KEYS = ["variables", "nit", "fun", "jac", "m_hat", "v_hat"]
 
 
 class AdaptiveMomentEstimation(SolverBaseClass):
-    def __init__(self, max_runs=20, beta1=0.9, beta2=0.999, step_size=0.001):
+    def __init__(
+        self,
+        objective: ObjectiveBaseClass,
+        max_runs=20,
+        beta1=0.9,
+        beta2=0.999,
+        step_size=0.001,
+        epsilon=1e-4,
+        callback=None
+    ):
+        super().__init__(objective)
         self.max_runs = max_runs
         self.beta1 = beta1
         self.beta2 = beta2
         self.step_size = step_size
-        self.epsilon = 1e-4
+        self.epsilon = epsilon
+        self.callback = callback
 
     def solve(
-        self,
-        data: np.ndarray,
-        labels: np.ndarray,
-        objective: ObjectiveBaseClass,
-        model: "LVQClassifier",
+        self, data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass",
     ) -> "LVQCLassifier":
 
         # Administration
-        variables_size = model.to_variables(model.get_model_params()).size
+        variables = model.to_variables(model.get_model_params())
+        variables_size = variables.size
 
         # Init/allocation of moving averages (m and v in literature)
         m = np.zeros(variables_size)
         v = np.zeros(variables_size)
         p = 0
+
+        if self.callback is not None:
+            state = self.create_state(
+                STATE_KEYS,
+                variables=variables,
+                nit=0,
+                fun=self.objective(variables, model, data, labels),
+            )
+            if self.callback(model, state):
+                return model
+
+        objective_gradient = None
 
         for i_run in range(0, self.max_runs):
             # Randomize order of data
@@ -59,7 +81,7 @@ class AdaptiveMomentEstimation(SolverBaseClass):
                 model_variables = model.to_variables(model.get_model_params())
 
                 # Gradient in variables form
-                objective_gradient = objective.gradient(
+                objective_gradient = self.objective.gradient(
                     model_variables, model, sample, sample_label
                 )
 
@@ -73,7 +95,6 @@ class AdaptiveMomentEstimation(SolverBaseClass):
 
                 v_hat = v / (1 - self.beta2 ** p)
 
-                # Make the epsilon (small value) a parameter
                 objective_gradient = (
                     self.step_size * m_hat / (np.sqrt(v_hat) + self.epsilon)
                 )
@@ -81,5 +102,19 @@ class AdaptiveMomentEstimation(SolverBaseClass):
                 model.set_model_params(
                     model.to_params(model_variables - objective_gradient)
                 )
+
+            if self.callback is not None:
+                variables = model.to_variables(model.get_model_params())
+                state = self.create_state(
+                    STATE_KEYS,
+                    variables=variables,
+                    nit=i_run + 1,
+                    fun=self.objective(variables, model, data, labels),
+                    jac=objective_gradient,
+                    m_hat=m_hat,
+                    v_hat=v_hat
+                )
+                if self.callback(model, state):
+                    return model
 
         return model
