@@ -28,7 +28,7 @@ class LVQModel:
         self.prototypes_ = prototypes
         self.omega_ = omega
 
-    def get_model_params(self):
+    def _get_model_params(self):
         if self.omega_ is None:
             return self.prototypes_
         else:

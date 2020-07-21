@@ -37,7 +37,7 @@ class GLVQ(LVQBaseClass):
     distance_type : {"squared-euclidean", "euclidean"} or Class, default="squared-euclidean"
         The distance function.
 
-    distance_params : Dict, default=None
+    distance_params : Dict, optional, default=None
         Parameters passed to init of distance callable
 
     activation_type : {"identity", "sigmoid", "soft+", "swish"} or Class, default="sigmoid"
@@ -75,11 +75,11 @@ class GLVQ(LVQBaseClass):
         Parameters passed to init of solvers. See the documentation of the solver
         functions for relevant parameters and defaults.
 
-    initial_prototypes : {"class-conditional-mean"} or np.ndarray, default="class-conditional-mean"
+    initial_prototypes : "class-conditional-mean" or np.ndarray, default="class-conditional-mean"
         Default will initiate the prototypes to the class conditional mean with a small random
         offset. Custom numpy array can be passed to change the initial positions of the prototypes.
 
-    prototypes_per_class : int or np.ndarray of length=n_prototypes, default=1
+    prototypes_per_class : int or np.ndarray, optional, default=1
         Number of prototypes per class. Default will generate single prototype per class. In the
         case of unequal number of prototypes per class is preferable provide the labels as
         np.ndarray. Example prototypes_per_class = np.array([0, 0, 1, 2, 2, 2]) this will match
@@ -87,7 +87,8 @@ class GLVQ(LVQBaseClass):
         and three with class index 2. Note: labels are indexes to classes\_ attribute.
 
     random_state : int, RandomState instance, default=None
-        Determines random number generation.
+        Determines random number generation. Used in random offset of prototypes and shuffling of
+        the data in the solvers.
 
     force_all_finite : {True, "allow-nan"}, default=True
         Whether to raise an error on np.inf, np.nan, pd.NA in array. The possibilities are:
