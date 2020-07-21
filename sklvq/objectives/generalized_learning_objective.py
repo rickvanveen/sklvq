@@ -47,7 +47,7 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
         data: np.ndarray,
         labels: np.ndarray,
     ) -> np.ndarray:
-        model.set_model_params(model.to_params(variables))
+        model._set_model_params(model._to_params(variables))
 
         dist_same, dist_diff, _, _ = _compute_distance(data, labels, model)
 
@@ -60,7 +60,7 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
         data: np.ndarray,
         labels: np.ndarray,
     ) -> np.ndarray:
-        model.set_model_params(model.to_params(variables))
+        model._set_model_params(model._to_params(variables))
 
         dist_same, dist_diff, i_dist_same, i_dist_diff = _compute_distance(
             data, labels, model
@@ -87,7 +87,7 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
                 )
 
                 # Computes the following partial derivatives: ddi/dwi, with i = 1
-                distance_gradient = model.distance_.gradient(
+                distance_gradient = model._distance.gradient(
                     data[ii_winner_same], model, i_prototype
                 )
 
@@ -111,7 +111,7 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
                 )
 
                 # Computes the following partial derivatives: ddi/dwi, with i = 2
-                distance_gradient = model.distance_.gradient(
+                distance_gradient = model._distance.gradient(
                     data[ii_winner_diff], model, i_prototype
                 )
 
@@ -137,7 +137,7 @@ def _compute_distance(data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass
 
     # Step 1: Compute distances between data and the model (how is depending on model and coupled
     # distance function)
-    distances = model.distance_(data, model)
+    distances = model._distance(data, model)
 
     # Step 2: Find for all samples the distance between closest prototype with same label (d1)
     # and different label (d2). ii_same marks for all samples the prototype with the same label.

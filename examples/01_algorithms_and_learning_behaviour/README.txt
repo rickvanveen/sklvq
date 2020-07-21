@@ -1,8 +1,8 @@
-.. _learning_vector_quantization:
+.. _the_algorithms:
 
-============================
-Learning Vector Quantization
-============================
+==============
+The Algorithms
+==============
 
 Example of how to train using each of the LVQ algorithms. Showcasing how to pass arguments and showing some
 algorithm specific parameters.

@@ -18,10 +18,10 @@ __all__ = [
 ]
 
 ALIASES = {
+    "wgd": "waypoint-gradient-descent",
     "sgd": "steepest-gradient-descent",
     "lbfgs": "limited-memory-bfgs",
     "bfgs": "broyden-fletcher-goldfarb-shanno",
-    "adadelta": "adaptive-gradient-descent",
     "adam": "adaptive-moment-estimation",
 }
 PACKAGE = "sklvq.solvers"

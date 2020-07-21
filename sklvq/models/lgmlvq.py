@@ -27,7 +27,143 @@ SOLVERS = [
 
 
 # TODO: Could use different step-sizes for matrices
-class LGMLVQ(LVQBaseClass, TransformerMixin):
+class LGMLVQ(LVQBaseClass):
+    """Localized Generalized Matrix Learning Vector Quantization
+
+    This model optimizes the generalized learning objective introduced by Sato and Yamada (
+    1996). Additionally, it learns a relevance matrix (lambda_ = omega_.T.dot(omega_)) in a local
+    setting. This can either be per class or per prototype. The relevant omega per prototype is
+    considered when computing the adaptive distance as introduced by Schneider et al. 2009.
+
+    Parameters
+    ----------
+    distance_type : "local-adaptive-squared-euclidean" or Class
+        Distance function that employs multiple relevance matrix in its calculation. This is
+        controlled by the localization setting.
+
+    distance_params : Dict, default=None
+        Parameters passed to init of distance callable
+
+    activation_type : {"identity", "sigmoid", "soft+", "swish"} or Class, default="sigmoid"
+        The activation function used in the objective function.
+
+    activation_params : Dict, default=None
+        Parameters passed to init of activation function. See the documentation of activation
+        functions for function dependent parameters and defaults.
+
+    discriminant_type : "relative-distance" or Class
+        The discriminant function.
+
+    discriminant_params : Dict, default=None
+        Parameters passed to init of discriminant callable
+
+    solver_type : {"sgd", "wgd", "adam", "lbfgs", "bfgs"},
+        The solver used for optimization
+
+        - "sgd" is an alias for the steepest gradient descent solver. Implements both the
+            stochastic  and (mini) batch variants. Depending on chosen batch size.
+
+        - "wgd" or waypoint gradient descent optimization (Papari et al. 2011)
+
+        - "adam" also known as adaptive moment estimation. Implementation based on description
+            by Lekander et al (2017)
+
+        - "bfgs" or the broyden-fletcher-goldfarb-shanno optimization algorithm. Uses the scipy
+            implementation.
+
+        - "lbfgs" is an alias for limited-memory-bfgs with bfgs the same as above. Uses the
+            scipy implementation.
+
+    solver_params : Dict, default=None
+        Parameters passed to init of solvers. See the documentation of the solver
+        functions for relevant parameters and defaults.
+
+    initial_prototypes : "class-conditional-mean" or np.ndarray, default="class-conditional-mean"
+        Default will initiate the prototypes to the class conditional mean with a small random
+        offset. Custom numpy array can be passed to change the initial positions of the prototypes.
+
+    prototypes_per_class : int or np.ndarray of length=n_prototypes, default=1
+        Number of prototypes per class. Default will generate single prototype per class. In the
+        case of unequal number of prototypes per class is preferable provide the labels as
+        np.ndarray. Example prototypes_per_class = np.array([0, 0, 1, 2, 2, 2]) this will match
+        with a total of 6 prototypes with first two class with index 0, then one with class index 1,
+        and three with class index 2. Note: labels are indexes to classes_ attribute.
+
+    initial_omega : "identity" or np.ndarray, default="identity"
+        Default will initiate the omega matrices to be the identity matrix. Other behaviour can
+        be implemented by providing a custom omega as numpy array. E.g. a randomly initialized
+        square matrix (n_features, n_features). The rank of the matrix can be reduced by
+        providing a square matrix of shape ([1, n_features), n_features) (Bunte et al. 2012).
+
+    localization : {"prototype", "class"}, default="prototype"
+        Setting that controls the localization of the relevance matrices. Either per prototypes,
+        where each prototype has its own relevance matrix. Or per class where each class has its
+        own relevance matrix and if more then a single prototype per class is used it would be
+        shared between these prototypes.
+
+    normalized_omega : {True, False}, default=True
+        Flag to indicate whether to normalize omega such that the trace of the relevance matrix
+        is (approximately) equal to 1.
+
+    random_state : int, RandomState instance, default=None
+        Determines random number generation.
+
+    force_all_finite : {True, "allow-nan"}, default=True
+        Whether to raise an error on np.inf, np.nan, pd.NA in array. The possibilities are:
+
+        - True: Force all values of array to be finite.
+        - "allow-nan": accepts only np.nan and pd.NA values in array. Values cannot be infinite.
+
+    Attributes
+    ----------
+    classes_ : np.ndarray of shape (n_classes,)
+        Class labels for each output.
+
+    prototypes_ : np.ndarray of shape (n_protoypes, n_features)
+        Positions of the prototypes after fit(data, labels) has been called.
+
+    prototypes_labels_ : np.ndarray of shape (n_prototypes)
+        Labels for each prototypes. Labels are indexes to classes_
+
+    omega_: np.ndarray with size depending on initialization, default (n_features, n_features)
+        Omega matrices that were found during training and define the relevance matrices lambda_.
+
+    lambda_: np.ndarray of size (n_features, n_features)
+        The relevance matrices (omega_.T.dot(omega) per omega)
+
+    omega_hat_: np.ndarray
+        The omega matrices found by the eigenvalue decomposition of the relevance matrices lambda_.
+        The eigenvectors (columns of omega_hat) can be used to transform the data (Bunte et al.
+        2012). This results in multiple possible transformations one per relevance matrix.
+
+    eigenvalues_: np.ndarray
+        The corresponding eigenvalues to omega_hat_ found by the eigenvalue decomposition of
+        the relevance matrix lambda_
+
+    References
+    ----------
+    Sato, A., and Yamada, K. (1996) "Generalized Learning Vector Quantization."
+    Advances in Neural Network Information Processing Systems, 423–429, 1996.
+
+    Schneider, P., Biehl, M., & Hammer, B. (2009). "Adaptive Relevance Matrices in Learning Vector
+    Quantization" Neural Computation, 21(12), 3532–3561, 2009.
+
+    Papari, G., and Bunte, K., and Biehl, M. (2011) "Waypoint averaging and step size control in
+    learning by gradient descent" Mittweida Workshop on Computational Intelligence (MIWOCI) 2011.
+
+    LeKander, M., Biehl, M., & De Vries, H. (2017). "Empirical evaluation of gradient methods for
+    matrix learning vector quantization." 12th International Workshop on Self-Organizing Maps and
+    Learning Vector Quantization, Clustering and Data Visualization, WSOM 2017.
+
+    Bunte, K., Schneider, P., Hammer, B., Schleif, F.-M., Villmann, T., & Biehl, M. (2012).
+    "Limited Rank Matrix Learning, discriminative dimension reduction and visualization." Neural
+    Networks, 26, 159–173, 2012.
+"""
+
+    classes_: np.ndarray
+    prototypes_: np.ndarray
+    prototypes_labels_: np.ndarray
+    omega_: np.ndarray
     lambda_: np.ndarray
     omega_hat_: np.ndarray
     eigenvalues_: np.ndarray
@@ -42,12 +178,11 @@ class LGMLVQ(LVQBaseClass, TransformerMixin):
         discriminant_params=None,
         solver_type="steepest-gradient-descent",
         solver_params=None,
-        localization="prototype",
-        verbose=False,
         initial_prototypes="class-conditional-mean",
         prototypes_per_class=1,
         initial_omega="identity",
         initial_omega_shape="square",
+        localization="prototype",
         normalized_omega=True,
         random_state=None,
         force_all_finite=True,
@@ -60,7 +195,6 @@ class LGMLVQ(LVQBaseClass, TransformerMixin):
         self.initial_omega_shape = initial_omega_shape
         self.normalized_omega = normalized_omega
         self.localization = localization
-        self.verbose = verbose
 
         super(LGMLVQ, self).__init__(
             distance_type,
@@ -77,7 +211,7 @@ class LGMLVQ(LVQBaseClass, TransformerMixin):
     # The "Getter" and "Setter" that are used by the solvers to set and get model params.
     ###########################################################################################
 
-    def set_model_params(self, model_params: ModelParamsType) -> None:
+    def _set_model_params(self, model_params: ModelParamsType) -> None:
         """
         Changes the model's internal parameters.
 
@@ -91,11 +225,11 @@ class LGMLVQ(LVQBaseClass, TransformerMixin):
         (self.prototypes_, omega) = model_params
 
         if self.normalized_omega:
-            self.omega_ = LGMLVQ.normalize_omega(omega)
+            self.omega_ = LGMLVQ._normalize_omega(omega)
         else:
             self.omega_ = omega
 
-    def get_model_params(self) -> ModelParamsType:
+    def _get_model_params(self) -> ModelParamsType:
         """
 
         Returns
@@ -110,7 +244,7 @@ class LGMLVQ(LVQBaseClass, TransformerMixin):
     # Transformation (Params to variables and back) functions
     ###########################################################################################
 
-    def to_variables(self, model_params: ModelParamsType) -> np.ndarray:
+    def _to_variables(self, model_params: ModelParamsType) -> np.ndarray:
         """
 
         Parameters
@@ -136,7 +270,7 @@ class LGMLVQ(LVQBaseClass, TransformerMixin):
 
         return variables
 
-    def to_params(self, variables: np.ndarray) -> ModelParamsType:
+    def _to_params(self, variables: np.ndarray) -> ModelParamsType:
         """
 
         Parameters
@@ -161,7 +295,7 @@ class LGMLVQ(LVQBaseClass, TransformerMixin):
     # Other functions (used in waypoint-gradient-descent solver only)
     ###########################################################################################
 
-    def normalize_params(self, model_params: ModelParamsType) -> ModelParamsType:
+    def _normalize_params(self, model_params: ModelParamsType) -> ModelParamsType:
         """
 
         Parameters
@@ -179,19 +313,19 @@ class LGMLVQ(LVQBaseClass, TransformerMixin):
         (prototypes, omega) = model_params
 
         return (
-            LVQBaseClass.normalize_prototypes(prototypes),
-            LGMLVQ.normalize_omega(omega),
+            LVQBaseClass._normalize_prototypes(prototypes),
+            LGMLVQ._normalize_omega(omega),
         )
 
     ###########################################################################################
     # Initialization functions
     ###########################################################################################
 
-    def initialize(self, data: np.ndarray, y: np.ndarray) -> SolverBaseClass:
+    def _initialize(self, data: np.ndarray, y: np.ndarray) -> SolverBaseClass:
         """
         Initialize is called by the LVQ base class and is required to do two things in order to
         work:
-            1. It must initialize the distance functions and store it in 'self.distance_'
+            1. It must initialize the distance functions and store it in 'self._distance'
             2. It must initialize the solver and return it.
 
         Besides these two things this is the function that should initialize any other algorithm
@@ -211,7 +345,7 @@ class LGMLVQ(LVQBaseClass, TransformerMixin):
             the required functions (see SolverBaseClass documentation).
 
         """
-        self.initialize_omega(data)
+        self._initialize_omega(data)
 
         distance_params = {"force_all_finite": self.force_all_finite}
 
@@ -246,13 +380,13 @@ class LGMLVQ(LVQBaseClass, TransformerMixin):
     ###########################################################################################
 
     @staticmethod
-    def normalize_omega(omega: np.ndarray) -> np.ndarray:
+    def _normalize_omega(omega: np.ndarray) -> np.ndarray:
         denominator = np.sqrt(np.einsum("ikj, ikj -> i", omega, omega)).reshape(
             omega.shape[0], 1, 1
         )
         return omega / denominator
 
-    def initialize_omega(self, data: np.ndarray):
+    def _initialize_omega(self, data: np.ndarray):
         # Custom omega?
         if self.initial_omega == "identity":
             if self.localization == "prototype":
@@ -274,19 +408,19 @@ class LGMLVQ(LVQBaseClass, TransformerMixin):
             # raise ValueError("The provided value for the parameter 'omega' is invalid.")
 
         if self.normalized_omega:
-            self.omega_ = LGMLVQ.normalize_omega(self.omega_)
+            self.omega_ = LGMLVQ._normalize_omega(self.omega_)
 
     ###########################################################################################
     # Transformer related functions
     ###########################################################################################
 
     @staticmethod
-    def compute_lambdas_(omegas):
+    def _compute_lambdas(omegas):
         # Equivalent to omega.T.dot(omega) per omega
         return np.einsum("ikj, ikl -> ijl", omegas, omegas)
 
-    def after_fit(self, data: np.ndarray, y: np.ndarray):
-        self.lambda_ = LGMLVQ.compute_lambdas_(self.omega_)
+    def _after_fit(self, data: np.ndarray, y: np.ndarray):
+        self.lambda_ = LGMLVQ._compute_lambdas(self.omega_)
         # self.lambda_ = np.einsum("ikj, ikl -> ijl", self.omega_, self.omega_)
 
         eigenvalues, omega_hat = np.linalg.eig(self.lambda_)
@@ -301,8 +435,26 @@ class LGMLVQ(LVQBaseClass, TransformerMixin):
         self.eigenvalues_ = np.array(eigenvalues)
         self.omega_hat_ = np.array(omega_hat)
 
-    def fit_transform(self, data: np.ndarray, y: np.ndarray) -> np.ndarray:
-        return self.fit(data, y).transform(data)
+    def fit_transform(
+        self, data: np.ndarray, y: np.ndarray, **trans_params
+    ) -> np.ndarray:
+        """
+
+        Parameters
+        ----------
+        data : np.ndarray with shape (n_samples, n_features)
+            Data used for fit and that will be transformed.
+        y : np.ndarray with length (n_samples)
+            Labels corresponding to the data samples.
+        trans_params :
+            Parameters passed to transform function
+
+        Returns
+        -------
+        The data projected on columns of each omega_hat_ with shape (n_omegas, n_samples, n_columns)
+
+        """
+        return self.fit(data, y).transform(data, **trans_params)
 
     def transform(
         self,
@@ -310,6 +462,23 @@ class LGMLVQ(LVQBaseClass, TransformerMixin):
         scale: bool = False,
         omega_hat_index: Union[int, List[int]] = 0,
     ) -> np.ndarray:
+        """
+
+        Parameters
+        ----------
+        data : np.ndarray with shape (n_samples, n_features)
+            Data that needs to be transformed
+        scale : {True, False}, default = False
+            Controls if the eigenvectors the data is projected on are scaled by the square root
+            of their eigenvalues.
+        omega_hat_index : int or list
+            The indices of the omega_hats_ the transformation should be computed for.
+
+        Returns
+        -------
+        The data projected on columns of each omega_hat_ with shape (n_omegas, n_samples, n_columns)
+
+        """
         check_is_fitted(self)
 
         data = check_array(data)

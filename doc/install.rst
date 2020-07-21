@@ -14,9 +14,9 @@ Dependencies
 
 The sklvq toolbox requires the following packages to be installed:
 
-* numpy (>=1.11)
-* scipy (>=0.17)
-* scikit-learn (>=0.22)
+* numpy (>=1.18.2)
+* scipy (>=1.4.1)
+* scikit-learn (>=0.23.1)
 
 Installation
 ------------

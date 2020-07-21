@@ -36,14 +36,14 @@ class WaypointGradientDescent(SolverBaseClass):
     ) -> "LVQBaseClass":
 
         previous_objective_gradients = np.zeros(
-            (self.k, model.to_variables(model.get_model_params()).size)
+            (self.k, model._to_variables(model._get_model_params()).size)
         )
 
         step_size = self.step_size
         objective_gradient = None
 
         if self.callback is not None:
-            variables = model.to_variables(model.get_model_params())
+            variables = model._to_variables(model._get_model_params())
             cost = self.objective(variables, model, data, labels)
             state = self.create_state(
                 STATE_KEYS,
@@ -65,18 +65,18 @@ class WaypointGradientDescent(SolverBaseClass):
             batch_labels = labels[shuffled_indices]
 
             # Get model params variable shape (flattened)
-            model_variables = model.to_variables(model.get_model_params())
+            model_variables = model._to_variables(model._get_model_params())
 
             # Gradient in model_param form so can be prototypes or tuple(prototypes, omega)
-            objective_gradient = model.to_params(
+            objective_gradient = model._to_params(
                 self.objective.gradient(model_variables, model, batch, batch_labels)
             )
 
             # Normalize the gradient by gradient/norm(gradient)
-            objective_gradient = model.normalize_params(objective_gradient)
+            objective_gradient = model._normalize_params(objective_gradient)
 
             # Multiply params by step_size and transform to variables shape
-            objective_gradient = model.to_variables(
+            objective_gradient = model._to_variables(
                 self.multiply_model_params(step_size, objective_gradient)
             )
 
@@ -84,12 +84,12 @@ class WaypointGradientDescent(SolverBaseClass):
             previous_objective_gradients[np.mod(i_run, self.k), :] = objective_gradient
 
             # Update the model
-            model.set_model_params(
-                model.to_params(model_variables - objective_gradient)
+            model._set_model_params(
+                model._to_params(model_variables - objective_gradient)
             )
 
             if self.callback is not None:
-                variables = model.to_variables(model.get_model_params())
+                variables = model._to_variables(model._get_model_params())
                 cost = self.objective(variables, model, data, labels)
                 state = self.create_state(
                     STATE_KEYS,
@@ -113,18 +113,18 @@ class WaypointGradientDescent(SolverBaseClass):
             batch_labels = labels[shuffled_indices]
 
             # Get model params variable shape (flattened)
-            model_variables = model.to_variables(model.get_model_params())
+            model_variables = model._to_variables(model._get_model_params())
 
             # Gradient in model_param form so can be prototypes or tuple(prototypes, omega)
-            objective_gradient = model.to_params(
+            objective_gradient = model._to_params(
                 self.objective.gradient(model_variables, model, batch, batch_labels)
             )
 
             # Normalize the gradient by gradient/norm(gradient)
-            objective_gradient = model.normalize_params(objective_gradient)
+            objective_gradient = model._normalize_params(objective_gradient)
 
             # Multiply params by step_size and transform to variables shape
-            objective_gradient = model.to_variables(
+            objective_gradient = model._to_variables(
                 self.multiply_model_params(step_size, objective_gradient)
             )
 
@@ -132,26 +132,26 @@ class WaypointGradientDescent(SolverBaseClass):
                 previous_objective_gradients, axis=0
             )
             # Tentative update step cost
-            tentative_model_params = model.to_params(mean_previous_objective_gradients)
+            tentative_model_params = model._to_params(mean_previous_objective_gradients)
 
             # Update the model using normalized update step
-            new_model_params = model.to_params(model_variables - objective_gradient)
+            new_model_params = model._to_params(model_variables - objective_gradient)
 
             # Compute cost of tentative update step
             tentative_cost = self.objective(
-                model.to_variables(tentative_model_params), model, batch, batch_labels
+                model._to_variables(tentative_model_params), model, batch, batch_labels
             )  # Note: Objective updates the model to the tentative_model_params
 
             # New update step cost
             new_cost = self.objective(
-                model.to_variables(new_model_params),
+                model._to_variables(new_model_params),
                 model,
                 data[shuffled_indices, :],
                 labels[shuffled_indices],
             )  # Note: Objective updates the model to the new_model_params
 
             if tentative_cost < new_cost:
-                model.set_model_params(tentative_model_params)
+                model._set_model_params(tentative_model_params)
                 step_size = self.loss * step_size
                 accepted_cost = tentative_cost
             else:
@@ -160,12 +160,12 @@ class WaypointGradientDescent(SolverBaseClass):
                 # We keep the model currently containing the new update
 
             # Administration. Store the models parameters.
-            previous_objective_gradients[np.mod(i_run, self.k), :] = model.to_variables(
-                model.get_model_params()
+            previous_objective_gradients[np.mod(i_run, self.k), :] = model._to_variables(
+                model._get_model_params()
             )
 
             if self.callback is not None:
-                variables = model.to_variables(model.get_model_params())
+                variables = model._to_variables(model._get_model_params())
                 state = self.create_state(
                     STATE_KEYS,
                     variables=variables,

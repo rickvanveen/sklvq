@@ -1,8 +1,8 @@
-=============
-API Reference
-=============
+===============
+General Use API
+===============
 
-This is an example on how to document the API of your own project.
+API of included algorithms in sklvq.
 
 .. currentmodule:: sklvq
 
@@ -29,6 +29,10 @@ Predictor and Transformer
    :template: class.rst
 
    LGMLVQ
+
+===============
+Development API
+===============
 
 Objective Functions
 ===================

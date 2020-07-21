@@ -25,7 +25,6 @@ from sklearn.metrics.pairwise import pairwise_distances
 from sklvq.distances import DistanceBaseClass
 
 from typing import TYPE_CHECKING
-from typing import Dict
 
 if TYPE_CHECKING:
     from sklvq.models import LVQBaseClass
@@ -55,7 +54,7 @@ class CustomSquaredEuclidean(DistanceBaseClass):
     def gradient(
         self, data: np.ndarray, model: "LVQBaseClass", i_prototype: int
     ) -> np.ndarray:
-        prototypes = model.get_model_params()
+        prototypes = model._get_model_params()
         (num_samples, num_features) = data.shape
 
         distance_gradient = np.zeros((num_samples, prototypes.size))

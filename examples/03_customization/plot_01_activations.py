@@ -7,8 +7,6 @@ Activation Functions
 from sklearn.datasets import load_iris
 from sklearn.metrics import classification_report
 
-from sklvq import GLVQ
-
 data, labels = load_iris(return_X_y=True)
 
 ###############################################################################
@@ -21,6 +19,7 @@ data, labels = load_iris(return_X_y=True)
 import numpy as np
 from typing import Union
 
+from sklvq import GLVQ
 from sklvq.activations import ActivationBaseClass
 
 

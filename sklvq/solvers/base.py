@@ -69,12 +69,12 @@ class ScipyBaseSolver(SolverBaseClass):
 
         result = sp.optimize.minimize(
             self.objective,
-            model.to_variables(model.get_model_params()),
+            model._to_variables(model._get_model_params()),
             method=self.method,
             args=(model, data, labels),
             **params
         )
 
         # Update model
-        model.set_model_params(model.to_params(result.x))
+        model._set_model_params(model._to_params(result.x))
         return model

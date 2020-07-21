@@ -20,11 +20,14 @@ class ProgressLogger:
 
 def test_gmlvq_iris():
     set_config(assume_finite=False)
-    iris = datasets.load_digits()
+    iris = datasets.load_iris()
 
     iris.data = preprocessing.scale(iris.data)
 
     progress_logger = ProgressLogger()
+
+    init_omega = np.eye(iris.data.shape[1])
+    init_omega = init_omega[0:2, :]
 
     classifier = GMLVQ(
         solver_type="steepest-gradient-descent",
@@ -37,6 +40,7 @@ def test_gmlvq_iris():
         activation_type="swish",
         distance_type="adaptive-squared-euclidean",
         normalized_omega=False,
+        initial_omega=init_omega,
         force_all_finite=True
     )
     classifier = classifier.fit(iris.data, iris.target)

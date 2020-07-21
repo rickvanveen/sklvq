@@ -59,7 +59,7 @@ class SquaredEuclidean(DistanceBaseClass):
             gradient : ndarray, shape = [n_observations, n_features]
                         The gradient with respect to the prototype and every observation in data.
         """
-        prototypes = model.get_model_params()
+        prototypes = model._get_model_params()
         (num_samples, num_features) = data.shape
 
         # Can also always replace all nans in difference with 0.0, but maybe this is better.

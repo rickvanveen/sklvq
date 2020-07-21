@@ -41,7 +41,7 @@ class AdaptiveMomentEstimation(SolverBaseClass):
     ) -> "LVQCLassifier":
 
         # Administration
-        variables = model.to_variables(model.get_model_params())
+        variables = model._to_variables(model._get_model_params())
         variables_size = variables.size
 
         # Init/allocation of moving averages (m and v in literature)
@@ -78,7 +78,7 @@ class AdaptiveMomentEstimation(SolverBaseClass):
                 sample_label = np.atleast_1d(labels[shuffled_indices[i_sample]])
 
                 # Get model params variable shape (flattened)
-                model_variables = model.to_variables(model.get_model_params())
+                model_variables = model._to_variables(model._get_model_params())
 
                 # Gradient in variables form
                 objective_gradient = self.objective.gradient(
@@ -99,12 +99,12 @@ class AdaptiveMomentEstimation(SolverBaseClass):
                     self.step_size * m_hat / (np.sqrt(v_hat) + self.epsilon)
                 )
 
-                model.set_model_params(
-                    model.to_params(model_variables - objective_gradient)
+                model._set_model_params(
+                    model._to_params(model_variables - objective_gradient)
                 )
 
             if self.callback is not None:
-                variables = model.to_variables(model.get_model_params())
+                variables = model._to_variables(model._get_model_params())
                 state = self.create_state(
                     STATE_KEYS,
                     variables=variables,

@@ -35,7 +35,7 @@ class SteepestGradientDescent(SolverBaseClass):
     ) -> "LVQBaseClass":
 
         if self.callback is not None:
-            variables = model.to_variables(model.get_model_params())
+            variables = model._to_variables(model._get_model_params())
             state = self.create_state(
                 STATE_KEYS,
                 variables=variables,
@@ -75,29 +75,29 @@ class SteepestGradientDescent(SolverBaseClass):
                 batch_labels = labels[batches[i_batch]]
 
                 # Get model params variable shape (flattened)
-                model_variables = model.to_variables(model.get_model_params())
+                model_variables = model._to_variables(model._get_model_params())
 
                 # Transform the objective gradient to model_params form
-                objective_gradient = model.to_params(
+                objective_gradient = model._to_params(
                     # Compute the objective gradient
                     self.objective.gradient(model_variables, model, batch, batch_labels)
                 )
 
                 # Transform objective gradient to variables form
-                objective_gradient = model.to_variables(
+                objective_gradient = model._to_variables(
                     # Apply the step size to the model parameters
                     self.multiply_model_params(step_size, objective_gradient)
                 )
 
                 # Update the model
-                model.set_model_params(
+                model._set_model_params(
                     # Subtract objective gradient of model params in variables form
                     # and transform back to parameters form.
-                    model.to_params(model_variables - objective_gradient)
+                    model._to_params(model_variables - objective_gradient)
                 )
 
             if self.callback is not None:
-                variables = model.to_variables(model.get_model_params())
+                variables = model._to_variables(model._get_model_params())
                 state = self.create_state(
                     STATE_KEYS,
                     variables=variables,

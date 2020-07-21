@@ -20,8 +20,8 @@ from sklvq import distances, solvers
 
 class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
     prototypes_: np.ndarray
-    distance_: Union[DistanceBaseClass, object]
-    objective_: GeneralizedLearningObjective
+    _distance: Union[DistanceBaseClass, object]
+    _objective: GeneralizedLearningObjective
 
     def __init__(
         self,
@@ -48,7 +48,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
     ###########################################################################################
 
     @abstractmethod
-    def set_model_params(self, model_params: Union[Tuple, np.ndarray]) -> None:
+    def _set_model_params(self, model_params: Union[Tuple, np.ndarray]) -> None:
         """
         Changes the model object's internal parameters.
 
@@ -62,7 +62,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         raise NotImplementedError("You should implement this!")
 
     @abstractmethod
-    def get_model_params(self) -> Union[Tuple, np.ndarray]:
+    def _get_model_params(self) -> Union[Tuple, np.ndarray]:
         """
 
         Returns
@@ -78,7 +78,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
     # Functions to transform the 1D variables array to model parameters and back
     ###########################################################################################
 
-    def to_variables(self, model_params: Union[Tuple, np.ndarray]) -> np.ndarray:
+    def _to_variables(self, model_params: Union[Tuple, np.ndarray]) -> np.ndarray:
         """
 
         Parameters
@@ -96,7 +96,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         raise NotImplementedError("You should implement this!")
 
     @abstractmethod
-    def to_params(self, variables: np.ndarray) -> Union[Tuple, np.ndarray]:
+    def _to_params(self, variables: np.ndarray) -> Union[Tuple, np.ndarray]:
         """
 
         Parameters
@@ -119,7 +119,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
     ###########################################################################################
 
     @abstractmethod
-    def normalize_params(
+    def _normalize_params(
         self, model_params: Union[Tuple, np.ndarray]
     ) -> Union[Tuple, np.ndarray]:
         """
@@ -143,11 +143,11 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
     ###########################################################################################
 
     @abstractmethod
-    def initialize(self, data: np.ndarray, y: np.ndarray) -> SolverBaseClass:
+    def _initialize(self, data: np.ndarray, y: np.ndarray) -> SolverBaseClass:
         """
         Functions should be implemented by every specific model. Must do the following two things
         in order to work:
-            1. Must initialize the distance functions and store it in 'self.distance_'
+            1. Must initialize the distance functions and store it in 'self._distance'
             2. Must initialize the solver and return it.
 
         Parameters
@@ -169,7 +169,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
     ###########################################################################################
 
     @staticmethod
-    def normalize_prototypes(prototypes: np.ndarray) -> np.ndarray:
+    def _normalize_prototypes(prototypes: np.ndarray) -> np.ndarray:
         """
 
         Parameters
@@ -185,7 +185,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         """
         return prototypes / np.linalg.norm(prototypes, axis=1, keepdims=True)
 
-    def initialize_prototypes(self, data: np.ndarray, y: np.ndarray):
+    def _initialize_prototypes(self, data: np.ndarray, y: np.ndarray):
         """
         Initialized the prototypes, with a small random offset, to the class conditional mean.
 
@@ -196,7 +196,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
 
         """
         if isinstance(self.initial_prototypes, np.ndarray):
-            # Checks
+            # TODO: Checks
             self.prototypes_ = self.initial_prototypes
         elif self.initial_prototypes == "class-conditional-mean":
             conditional_mean = _conditional_mean(self.prototypes_labels_, data, y)
@@ -209,7 +209,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
                 "The provided value for the parameter 'prototypes' is invalid."
             )
 
-    def initialize_prototype_labels(self):
+    def _initialize_prototype_labels(self):
         # Assumes that if prototypes_per_class is an array this is meant to be the labeling for the
         # prototypes.
         if isinstance(self.prototypes_per_class, np.ndarray):
@@ -286,23 +286,23 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         self.random_state_ = check_random_state(self.random_state)
 
         # Common LVQ steps -> move to specific model...
-        # self.distance_ = distances.grab(self.distance_type, self.distance_params)
+        # self._distance = distances.grab(self.distance_type, self.distance_params)
 
         # Initialize prototype labels stored in self.prototypes_labels_
-        self.initialize_prototype_labels()
+        self._initialize_prototype_labels()
 
         # Using the now initialized (or checked custom prototype labels), we can initialize the
         # prototypes. Stored in self.prototypes_
-        self.initialize_prototypes(data, labels)
+        self._initialize_prototypes(data, labels)
 
         # Initialize algorithm specific stuff
-        solver = self.initialize(data, labels)
+        solver = self._initialize(data, labels)
 
         model = solver.solve(data, labels, self)
 
         # Useful for models such as GMLVQ, e.g., to compute lambda and it's eigenvectors/values
         # in order to transform the data.
-        self.after_fit(data, labels)
+        self._after_fit(data, labels)
 
         return model
 
@@ -310,7 +310,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
     # After fit function
     ###########################################################################################
 
-    def after_fit(self, data: np.ndarray, y: np.ndarray):
+    def _after_fit(self, data: np.ndarray, y: np.ndarray):
         """
         Method that by default does nothing but can be used by methods that need to compute
         transformation matrices, such that this does not need to be checked or done everytime
@@ -331,7 +331,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         data = check_array(data, force_all_finite=self.force_all_finite)
 
         # Of shape n_observations , n_prototypes
-        distances = self.distance_(data, self)
+        distances = self._distance(data, self)
 
         # Allocation n_observations, n_classes
         min_distances = np.zeros((data.shape[0], self.classes_.size))
@@ -363,7 +363,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
 
         # TODO: Reject option?
         # Prototypes labels are indices of classes_
-        # return self.prototypes_labels_.take(self.distance_(data, self).argmin(axis=1))
+        # return self.prototypes_labels_.take(self._distance(data, self).argmin(axis=1))
         if self.classes_.size == 2:
             return self.classes_[(decision_values > 0).astype(np.int)]
 

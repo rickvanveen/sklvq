@@ -14,7 +14,6 @@ Welcome to scikit-learning vector quantization's documentation!
    :hidden:
    :caption: Documentation
 
-   user_guide
    api
 
 .. toctree::
