@@ -34,7 +34,7 @@ class GMLVQ(LVQBaseClass):
     """Generalized Matrix Learning Vector Quantization
 
     This model optimizes the generalized learning objective introduced by Sato and Yamada (
-    1996). Additionally, it learns a relevance matrix (lambda_ = omega_.T.dot(omega_)) that is
+    1996). Additionally, it learns a relevance matrix (lambda\_ = omega\_.T.dot(omega\_)) that is
     used in its distance functions as introduced by Schneider et al. (2009)
 
     Parameters
@@ -88,7 +88,7 @@ class GMLVQ(LVQBaseClass):
         case of unequal number of prototypes per class is preferable provide the labels as
         np.ndarray. Example prototypes_per_class = np.array([0, 0, 1, 2, 2, 2]) this will match
         with a total of 6 prototypes with first two class with index 0, then one with class index 1,
-        and three with class index 2. Note: labels are indexes to classes_ attribute.
+        and three with class index 2. Note: labels are indexes to classes\_ attribute.
 
     initial_omega : {"identity"} or np.ndarray, default="identity"
         Default will initiate the omega matrices to be the identity matrix. Other behaviour can
@@ -118,22 +118,22 @@ class GMLVQ(LVQBaseClass):
         Positions of the prototypes after fit(data, labels) has been called.
 
     prototypes_labels_ : np.ndarray of shape (n_prototypes)
-        Labels for each prototypes. Labels are indexes to classes_
+        Labels for each prototypes. Labels are indexes to classes\_
 
     omega_: np.ndarray with size depending on initialization, default (n_features, n_features)
-        Omega matrix that was found during training and defines the relevance matrix lambda_.
+        Omega matrix that was found during training and defines the relevance matrix lambda\_.
 
     lambda_: np.ndarray of size (n_features, n_features)
-        The relevance matrix = omega_.T.dot(omega)
+        The relevance matrix = omega\_.T.dot(omega\_)
 
     omega_hat_: np.ndarray
-        The omega matrix found by the eigenvalue decomposition of the relevance matrix lambda_.
-        The eigenvectors (columns of omega_hat) can be used to transform the data (Bunte et al.
+        The omega matrix found by the eigenvalue decomposition of the relevance matrix lambda\_.
+        The eigenvectors (columns of omega_hat\_) can be used to transform the data (Bunte et al.
         2012).
 
     eigenvalues_: np.ndarray
-        The corresponding eigenvalues to omega_hat_ found by the eigenvalue decomposition of
-        the relevance matrix lambda_
+        The corresponding eigenvalues to omega_hat\_ found by the eigenvalue decomposition of
+        the relevance matrix lambda\_
 
     References
     ----------

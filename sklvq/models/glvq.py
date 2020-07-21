@@ -30,7 +30,7 @@ SOLVERS = [
 class GLVQ(LVQBaseClass):
     """Generalized Learning Vector Quantization
 
-    This model optimizes the generalized learning objective introduced by Sato and Yamada (1996).
+    This model optimizes the generalized learning objective introduced in [1]_.
 
     Parameters
     ----------
@@ -56,19 +56,20 @@ class GLVQ(LVQBaseClass):
     solver_type : {"sgd", "wgd", "adam", "lbfgs", "bfgs"},
         The solver used for optimization
 
-        - "sgd" is an alias for the steepest gradient descent solver. Implements both the
-            stochastic  and (mini) batch variants. Depending on chosen batch size.
+        - "sgd" or "steepest-gradient-descent"
+            Refers to the stochastic and (mini) batch steepest descent optimizers.
 
-        - "wgd" or waypoint gradient descent optimization Papari et al. (2011)
+        - "wgd" or "waypoint-gradient-descent"
+            Implementation based on [2]_
 
-        - "adam" also known as adaptive moment estimation. Implementation based on description
-            by Lekander et al (2017)
+        - "adam" or "adaptive-moment-estimation"
+            Implementation based on description by [3]_
 
-        - "bfgs" or the broyden-fletcher-goldfarb-shanno optimization algorithm. Uses the scipy
-            implementation.
+        - "bfgs" or "broyden-fletcher-goldfarb-shanno"
+            Implementation from scipy package.
 
-        - "lbfgs" is an alias for limited-memory-bfgs with bfgs the same as above. Uses the
-            scipy implementation.
+        - "lbfgs" or "limited-memory-bfgs"
+            Implementation from scipy package.
 
     solver_params : Dict, default=None
         Parameters passed to init of solvers. See the documentation of the solver
@@ -83,7 +84,7 @@ class GLVQ(LVQBaseClass):
         case of unequal number of prototypes per class is preferable provide the labels as
         np.ndarray. Example prototypes_per_class = np.array([0, 0, 1, 2, 2, 2]) this will match
         with a total of 6 prototypes with first two class with index 0, then one with class index 1,
-        and three with class index 2. Note: labels are indexes to classes_ attribute.
+        and three with class index 2. Note: labels are indexes to classes\_ attribute.
 
     random_state : int, RandomState instance, default=None
         Determines random number generation.
@@ -103,19 +104,21 @@ class GLVQ(LVQBaseClass):
         Positions of the prototypes after fit(data, labels) has been called.
 
     prototypes_labels_ : ndarray of shape (n_prototypes)
-        Labels for each prototypes. Labels are indexes to classes_
+        Labels for each prototypes. Labels are indexes to classes\_
 
     References
     ----------
-    Sato, A., and Yamada, K. (1996) "Generalized Learning Vector Quantization."
-    Advances in Neural Network Information Processing Systems, 423–429, 1996.
+    .. [1] Sato, A., and Yamada, K. (1996) "Generalized Learning Vector Quantization."
+        Advances in Neural Network Information Processing Systems, 423–429, 1996.
 
-    Papari, G., and Bunte, K., and Biehl, M. (2011) "Waypoint averaging and step size control in
-    learning by gradient descent" Mittweida Workshop on Computational Intelligence (MIWOCI) 2011.
+    .. [2] Papari, G., and Bunte, K., and Biehl, M. (2011) "Waypoint averaging and step size
+        control in learning by gradient descent" Mittweida Workshop on Computational
+        Intelligence (MIWOCI) 2011.
 
-    LeKander, M., Biehl, M., & De Vries, H. (2017). "Empirical evaluation of gradient methods for
-    matrix learning vector quantization." 12th International Workshop on Self-Organizing Maps and
-    Learning Vector Quantization, Clustering and Data Visualization, WSOM 2017.
+    .. [3] LeKander, M., Biehl, M., & De Vries, H. (2017). "Empirical evaluation of gradient
+        methods for matrix learning vector quantization." 12th International Workshop on
+        Self-Organizing Maps and Learning Vector Quantization, Clustering and Data
+        Visualization, WSOM 2017.
     """
 
     classes_: np.ndarray

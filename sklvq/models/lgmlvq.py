@@ -31,7 +31,7 @@ class LGMLVQ(LVQBaseClass):
     """Localized Generalized Matrix Learning Vector Quantization
 
     This model optimizes the generalized learning objective introduced by Sato and Yamada (
-    1996). Additionally, it learns a relevance matrix (lambda_ = omega_.T.dot(omega_)) in a local
+    1996). Additionally, it learns a relevance matrix (lambda\_ = omega\_.T.dot(omega\_)) in a local
     setting. This can either be per class or per prototype. The relevant omega per prototype is
     considered when computing the adaptive distance as introduced by Schneider et al. 2009.
 
@@ -87,7 +87,7 @@ class LGMLVQ(LVQBaseClass):
         case of unequal number of prototypes per class is preferable provide the labels as
         np.ndarray. Example prototypes_per_class = np.array([0, 0, 1, 2, 2, 2]) this will match
         with a total of 6 prototypes with first two class with index 0, then one with class index 1,
-        and three with class index 2. Note: labels are indexes to classes_ attribute.
+        and three with class index 2. Note: labels are indexes to classes\_ attribute.
 
     initial_omega : "identity" or np.ndarray, default="identity"
         Default will initiate the omega matrices to be the identity matrix. Other behaviour can
@@ -123,22 +123,22 @@ class LGMLVQ(LVQBaseClass):
         Positions of the prototypes after fit(data, labels) has been called.
 
     prototypes_labels_ : np.ndarray of shape (n_prototypes)
-        Labels for each prototypes. Labels are indexes to classes_
+        Labels for each prototypes. Labels are indexes to classes\_
 
     omega_: np.ndarray with size depending on initialization, default (n_features, n_features)
-        Omega matrices that were found during training and define the relevance matrices lambda_.
+        Omega\_ matrices that were found during training and define the relevance matrices lambda\_.
 
     lambda_: np.ndarray of size (n_features, n_features)
-        The relevance matrices (omega_.T.dot(omega) per omega)
+        The relevance matrices (omega\_.T.dot(omega\_) per omega\_)
 
     omega_hat_: np.ndarray
-        The omega matrices found by the eigenvalue decomposition of the relevance matrices lambda_.
-        The eigenvectors (columns of omega_hat) can be used to transform the data (Bunte et al.
+        The omega matrices found by the eigenvalue decomposition of the relevance matrices lambda\_.
+        The eigenvectors (columns of omega_hat\_) can be used to transform the data (Bunte et al.
         2012). This results in multiple possible transformations one per relevance matrix.
 
     eigenvalues_: np.ndarray
-        The corresponding eigenvalues to omega_hat_ found by the eigenvalue decomposition of
-        the relevance matrix lambda_
+        The corresponding eigenvalues to omega_hat\_ found by the eigenvalue decomposition of
+        the relevance matrix lambda\_
 
     References
     ----------
@@ -352,14 +352,14 @@ class LGMLVQ(LVQBaseClass):
         if self.distance_params is not None:
             distance_params.update(self.distance_params)
 
-        self.distance_ = distances.grab(
+        self._distance = distances.grab(
             self.distance_type,
             class_kwargs=distance_params,
             whitelist=DISTANCE_FUNCTIONS,
         )
 
         # The objective is fixed as this determines what else to initialize.
-        self.objective_ = GeneralizedLearningObjective(
+        self._objective = GeneralizedLearningObjective(
             self.activation_type,
             self.activation_params,
             self.discriminant_type,
@@ -368,7 +368,7 @@ class LGMLVQ(LVQBaseClass):
 
         solver = solvers.grab(
             self.solver_type,
-            class_args=[self.objective_],
+            class_args=[self._objective],
             class_kwargs=self.solver_params,
             whitelist=SOLVERS,
         )
