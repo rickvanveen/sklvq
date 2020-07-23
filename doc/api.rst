@@ -82,6 +82,12 @@ Discriminant Functions
    :toctree: generated/
    :template: callable.rst
 
+    DiscriminativeBaseClass
+
+.. autosummary::
+   :toctree: generated/
+   :template: callable.rst
+
     RelativeDistance
 
 Distance Functions

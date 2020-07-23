@@ -16,6 +16,4 @@ def grab(
     class_kwargs: dict = None,
     whitelist: list = None,
 ) -> Union[DiscriminativeBaseClass, object]:
-    return utils.grab(
-        class_type, class_args, class_kwargs, ALIASES, whitelist, PACKAGE
-    )
+    return utils.grab(class_type, class_args, class_kwargs, ALIASES, whitelist, PACKAGE)

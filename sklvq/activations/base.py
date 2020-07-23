@@ -6,7 +6,7 @@ class ActivationBaseClass(ABC):
     """ ActivationBaseClass
 
     Abstract class for implementing activation functions. It provides abstract methods with
-    correct call signatures.
+    expected call signatures.
 
     When developing a custom activation function '__init__' should accept any parameters as
     key-value pairs.
@@ -23,7 +23,7 @@ class ActivationBaseClass(ABC):
         Returns
         -------
         ndarray of shape (x.shape)
-            Some elementwise transformation of x.
+            Elementwise evaluation of an activation function.
 
         """
         raise NotImplementedError("You should implement this!")
@@ -39,7 +39,7 @@ class ActivationBaseClass(ABC):
         Returns
         -------
         ndarray of shape (x.shape)
-            Derivative evaluated at each value in x.
+            Elementwise evaluation of an activation function's gradient.
 
         """
         raise NotImplementedError("You should implement this!")
