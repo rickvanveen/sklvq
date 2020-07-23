@@ -70,7 +70,7 @@ class RelativeDistance(DiscriminativeBaseClass):
         Returns
         -------
         ndarray
-            Per sample evaluation of the relative distance discriminative function.
+            Per sample evaluation of the relative distance discriminative function's gradient.
 
         """
         if same_label:
