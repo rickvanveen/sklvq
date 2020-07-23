@@ -28,7 +28,7 @@ SOLVERS = [
 
 # TODO: Could use different step-sizes for matrices
 class LGMLVQ(LVQBaseClass):
-    """Localized Generalized Matrix Learning Vector Quantization
+    r"""Localized Generalized Matrix Learning Vector Quantization
 
     This model optimizes the generalized learning objective introduced by Sato and Yamada (
     1996). Additionally, it learns a relevance matrix (lambda\_ = omega\_.T.dot(omega\_)) in a local
@@ -201,8 +201,8 @@ class LGMLVQ(LVQBaseClass):
             distance_params,
             solver_type,
             solver_params,
-            prototypes_per_class,
             initial_prototypes,
+            prototypes_per_class,
             random_state,
             force_all_finite,
         )

@@ -31,11 +31,11 @@ SOLVERS = [
 
 
 class GMLVQ(LVQBaseClass):
-    """Generalized Matrix Learning Vector Quantization
+    r"""Generalized Matrix Learning Vector Quantization
 
     This model optimizes the generalized learning objective introduced by Sato and Yamada (
-    1996). Additionally, it learns a relevance matrix (lambda\_ = omega\_.T.dot(omega\_)) that is
-    used in its distance functions as introduced by Schneider et al. (2009)
+    1996). Additionally, it learns a relevance matrix that is used in the distance functions as
+    introduced by Schneider et al. (2009)
 
     Parameters
     ----------
@@ -192,8 +192,8 @@ class GMLVQ(LVQBaseClass):
             distance_params,
             solver_type,
             solver_params,
-            prototypes_per_class,
             initial_prototypes,
+            prototypes_per_class,
             random_state,
             force_all_finite,
         )

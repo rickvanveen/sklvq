@@ -7,15 +7,22 @@ from typing import Union
 class Sigmoid(ActivationBaseClass):
     """ Sigmoid function
 
+    Function and derivatives as discussed in [1]_
+
     Parameters
     ----------
-    beta : int, float, default=1
+    beta : int or float, optional, default=1
            Parameter that can be set during instantiation in order to control the steepness
            of the constructed callable instance.
 
     See also
     --------
     Identity, SoftPlus, Swish
+
+    References
+    ----------
+    .. [1] Villmann, T., Ravichandran, J., Villmann, A., Nebel, D., & Kaden, M. (2019). "Activation
+        Functions for Generalized Learning Vector Quantization - A Performance Comparison", 2019.
     """
 
     def __init__(self, beta: Union[int, float] = 1):

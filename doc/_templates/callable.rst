@@ -5,7 +5,7 @@
 
 .. autoclass:: {{ objname }}
     :members:
-    :special-members: __init__, __call__
+    :special-members: __call__
 
 .. include:: {{module}}.{{objname}}.examples
 

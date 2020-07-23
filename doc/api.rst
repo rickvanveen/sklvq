@@ -1,6 +1,6 @@
-===============
-General Use API
-===============
+=============
+API Reference
+=============
 
 API of included algorithms in sklvq.
 
@@ -30,10 +30,6 @@ Predictor and Transformer
 
    LGMLVQ
 
-===============
-Development API
-===============
-
 Objective Functions
 ===================
 .. currentmodule:: sklvq.objectives
@@ -47,6 +43,12 @@ Objective Functions
 Activation Functions
 ====================
 .. currentmodule:: sklvq.activations
+
+.. autosummary::
+    :toctree: generated/
+    :template: callable.rst
+
+    ActivationBaseClass
 
 .. autosummary::
    :toctree: generated/

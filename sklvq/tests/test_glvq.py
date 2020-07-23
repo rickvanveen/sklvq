@@ -22,7 +22,7 @@ class ProgressLogger:
 
 
 def test_glvq_iris():
-    iris = datasets.load_digits()
+    iris = datasets.load_iris()
 
     iris.data = preprocessing.scale(iris.data)
 
@@ -35,6 +35,7 @@ def test_glvq_iris():
         solver_params={"callback": progress_logger},
         distance_type="euclidean",
         activation_type="swish",
+        force_all_finite=True,
         random_state=31415,
     )
     classifier = classifier.fit(iris.data, labels)
@@ -45,6 +46,8 @@ def test_glvq_iris():
 
     # print(progress_logger.costs)
     print("\nIris accuracy: {}".format(accuracy))
+
+    
 
 #
 # def test_glvq_with_multiple_prototypes_per_class():

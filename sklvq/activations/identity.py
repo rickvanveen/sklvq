@@ -11,7 +11,8 @@ class Identity(ActivationBaseClass):
     """
 
     def __call__(self, x: np.ndarray) -> np.ndarray:
-        """ Implements the identity function:
+        """
+        Implements the identity function:
             .. math::
 
                 f(x) = x
@@ -23,7 +24,7 @@ class Identity(ActivationBaseClass):
         Returns
         -------
         x : ndarray
-            Elementwise evaluation of the identity function, i.e., returns x without any modifications.
+            Elementwise evaluation of the identity function.
         """
         return x
 
@@ -41,6 +42,6 @@ class Identity(ActivationBaseClass):
         Returns
         -------
         ndarray of shape (x.shape)
-            Elementwise evaluation of the identity function's gradient, i.e., only returns 1s.
+            Elementwise evaluation of the identity function's gradient.
         """
         return np.ones(x.shape)

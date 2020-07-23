@@ -5,6 +5,8 @@ import numpy as np
 class Swish(ActivationBaseClass):
     """ Swish function
 
+    Function and derivatives as discussed in [1]_
+
     Parameters
     ----------
     beta : int, float, default=1
@@ -14,7 +16,13 @@ class Swish(ActivationBaseClass):
     See also
     --------
     Identity, Sigmoid, SoftPlus
+
+    References
+    ----------
+    .. [1] Villmann, T., Ravichandran, J., Villmann, A., Nebel, D., & Kaden, M. (2019). "Activation
+        Functions for Generalized Learning Vector Quantization - A Performance Comparison", 2019.
     """
+
     def __init__(self, beta: int = 1):
         self.beta = beta
 
@@ -30,7 +38,8 @@ class Swish(ActivationBaseClass):
 
         Returns
         -------
-        ndarray
+        ndarray of shape (x.shape)
+            Elementwise evaluation of the swish function.
         """
         return _swish(x, self.beta)
 
@@ -46,7 +55,8 @@ class Swish(ActivationBaseClass):
 
         Returns
         -------
-        ndarray
+        ndarray of shape (x.shape)
+            Elementwise evaluation of the swish function's gradient.
         """
         return (self.beta * _swish(x, self.beta)) + (
             _sgd(x, self.beta) * (1 - self.beta * _swish(x, self.beta))

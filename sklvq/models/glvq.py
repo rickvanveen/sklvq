@@ -2,11 +2,14 @@ from . import LVQBaseClass
 import numpy as np
 
 # Can be switched out by parameters to the models.
-from sklvq import activations, discriminants, distances, solvers
+from sklvq import distances, solvers
 
 # Typing
+from typing import Union
+from typing import Dict
+
+
 from sklvq.solvers import SolverBaseClass
-from sklvq.distances import DistanceBaseClass
 
 # Cannot be switched out by parameters to the models.
 from sklvq.objectives import GeneralizedLearningObjective
@@ -28,26 +31,27 @@ SOLVERS = [
 
 
 class GLVQ(LVQBaseClass):
-    """Generalized Learning Vector Quantization
+    r"""Generalized Learning Vector Quantization
 
-    This model optimizes the generalized learning objective introduced in [1]_.
+    This model optimizes the generalized learning objective introduced in [1]_. The 
 
     Parameters
     ----------
     distance_type : {"squared-euclidean", "euclidean"} or Class, default="squared-euclidean"
-        The distance function.
+        The distance function. Can be one from the list above or a custom class.
 
     distance_params : Dict, optional, default=None
-        Parameters passed to init of distance callable
+        Parameters passed to init of distance class.
 
     activation_type : {"identity", "sigmoid", "soft+", "swish"} or Class, default="sigmoid"
-        The activation function used in the objective function.
+        The activation function used in the objective function. Can be any of the activation
+        function in the list or custom class.
 
     activation_params : Dict, default=None
         Parameters passed to init of activation function. See the documentation of activation
         functions for function dependent parameters and defaults.
 
-    discriminant_type : {"relative-distance"} or Class, default = "relative-distance"
+    discriminant_type : "relative-distance" or Class
         The discriminant function.
 
     discriminant_params : Dict, default=None
@@ -75,11 +79,11 @@ class GLVQ(LVQBaseClass):
         Parameters passed to init of solvers. See the documentation of the solver
         functions for relevant parameters and defaults.
 
-    initial_prototypes : "class-conditional-mean" or np.ndarray, default="class-conditional-mean"
+    initial_prototypes : "class-conditional-mean" or ndarray, default="class-conditional-mean"
         Default will initiate the prototypes to the class conditional mean with a small random
         offset. Custom numpy array can be passed to change the initial positions of the prototypes.
 
-    prototypes_per_class : int or np.ndarray, optional, default=1
+    prototypes_per_class : int or ndarray, optional, default=1
         Number of prototypes per class. Default will generate single prototype per class. In the
         case of unequal number of prototypes per class is preferable provide the labels as
         np.ndarray. Example prototypes_per_class = np.array([0, 0, 1, 2, 2, 2]) this will match
@@ -128,18 +132,18 @@ class GLVQ(LVQBaseClass):
 
     def __init__(
         self,
-        distance_type="squared-euclidean",
-        distance_params=None,
-        activation_type="sigmoid",
-        activation_params=None,
-        discriminant_type="relative-distance",
-        discriminant_params=None,
-        solver_type="steepest-gradient-descent",
-        solver_params=None,
-        initial_prototypes="class-conditional-mean",
-        prototypes_per_class=1,
-        random_state=None,
-        force_all_finite=True,
+        distance_type: Union[str, type] = "squared-euclidean",
+        distance_params: Dict = None,
+        activation_type: Union[str, type] = "sigmoid",
+        activation_params: Dict = None,
+        discriminant_type: Union[str, type] = "relative-distance",
+        discriminant_params: Dict = None,
+        solver_type: Union[str, type] = "steepest-gradient-descent",
+        solver_params: Dict = None,
+        initial_prototypes: Union[str, np.ndarray] = "class-conditional-mean",
+        prototypes_per_class: Union[int, np.ndarray] = 1,
+        random_state: Union[int, np.random.RandomState] = None,
+        force_all_finite: Union[str, bool] = True,
     ):
         self.activation_type = activation_type
         self.activation_params = activation_params
@@ -151,8 +155,8 @@ class GLVQ(LVQBaseClass):
             distance_params,
             solver_type,
             solver_params,
-            prototypes_per_class,
             initial_prototypes,
+            prototypes_per_class,
             random_state,
             force_all_finite,
         )

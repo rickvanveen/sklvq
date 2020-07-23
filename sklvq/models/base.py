@@ -10,7 +10,7 @@ from sklvq.distances import DistanceBaseClass
 from sklvq.solvers import SolverBaseClass
 from sklvq.objectives import GeneralizedLearningObjective
 
-from typing import Tuple, Union
+from typing import Tuple, Union, Dict
 
 ModelParamsType = np.ndarray
 
@@ -25,14 +25,14 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
 
     def __init__(
         self,
-        distance_type="squared-euclidean",
-        distance_params=None,
-        solver_type="steepest-gradient-descent",
-        solver_params=None,
-        prototypes_per_class=1,
-        initial_prototypes="class-conditional-mean",
-        random_state=None,
-        force_all_finite=True,
+        distance_type: Union[str, type] = "squared-euclidean",
+        distance_params: Dict = None,
+        solver_type: Union[str, type] = "steepest-gradient-descent",
+        solver_params: Dict = None,
+        initial_prototypes: Union[str, np.ndarray] = "class-conditional-mean",
+        prototypes_per_class: Union[int, np.ndarray] = 1,
+        random_state: Union[int, np.random.RandomState] = None,
+        force_all_finite: Union[str, bool] = True,
     ):
         self.distance_type = distance_type
         self.distance_params = distance_params
@@ -48,7 +48,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
     ###########################################################################################
 
     @abstractmethod
-    def _set_model_params(self, model_params: Union[Tuple, np.ndarray]) -> None:
+    def _set_model_params(self, model_params: Union[tuple, np.ndarray]) -> None:
         """
         Changes the model object's internal parameters.
 
@@ -78,7 +78,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
     # Functions to transform the 1D variables array to model parameters and back
     ###########################################################################################
 
-    def _to_variables(self, model_params: Union[Tuple, np.ndarray]) -> np.ndarray:
+    def _to_variables(self, model_params: Union[tuple, np.ndarray]) -> np.ndarray:
         """
 
         Parameters
@@ -96,7 +96,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         raise NotImplementedError("You should implement this!")
 
     @abstractmethod
-    def _to_params(self, variables: np.ndarray) -> Union[Tuple, np.ndarray]:
+    def _to_params(self, variables: np.ndarray) -> Union[tuple, np.ndarray]:
         """
 
         Parameters
@@ -120,7 +120,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
 
     @abstractmethod
     def _normalize_params(
-        self, model_params: Union[Tuple, np.ndarray]
+        self, model_params: Union[tuple, np.ndarray]
     ) -> Union[Tuple, np.ndarray]:
         """
 
@@ -263,7 +263,9 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
 
         """
         # Check data
-        data, labels = self._validate_data(data, labels, force_all_finite=self.force_all_finite)
+        data, labels = self._validate_data(
+            data, labels, force_all_finite=self.force_all_finite
+        )
 
         # Check classification targets
         check_classification_targets(labels)
@@ -278,7 +280,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
 
         return data, labels
 
-    def fit(self, data, y):
+    def fit(self, data: np.ndarray, y: np.ndarray):
         # Check data and check and transform labels.
         data, labels = self._validate_data_labels(data, y)
 
@@ -323,7 +325,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         """
         pass
 
-    def decision_function(self, data):
+    def decision_function(self, data: np.ndarray):
         # SciKit-learn list of checked params before predict
         check_is_fitted(self)
 
@@ -352,7 +354,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
 
         return decision_values
 
-    def predict(self, data):
+    def predict(self, data: np.ndarray):
         # SciKit-learn list of checked params before predict
         check_is_fitted(self)
 
@@ -370,7 +372,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         return self.classes_[decision_values.argmax(axis=1)]
 
 
-def _conditional_mean(p_labels, data, d_labels):
+def _conditional_mean(p_labels: np.ndarray, data: np.ndarray, d_labels: np.ndarray):
     """ Implements the conditional mean, i.e., mean per class"""
     return np.array(
         [np.nanmean(data[p_label == d_labels, :], axis=0) for p_label in p_labels]
