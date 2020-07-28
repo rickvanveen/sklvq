@@ -3,12 +3,9 @@ from . import DistanceBaseClass
 import numpy as np
 from sklearn.metrics.pairwise import pairwise_distances
 
-import pytest
-
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
-    from sklvq.models import LVQBaseClass
+    from sklvq.models import GMLVQ
 
 
 class AdaptiveSquaredEuclidean(DistanceBaseClass):
@@ -30,7 +27,7 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
             if self.metric_kwargs["force_all_finite"] == "allow-nan":
                 self.metric_kwargs.update({"metric": _nan_mahalanobis})
 
-    def __call__(self, data: np.ndarray, model: "LVQBaseClass") -> np.ndarray:
+    def __call__(self, data: np.ndarray, model: "GMLVQ") -> np.ndarray:
         """ Implements a weighted variant of the squared euclidean distance:
             .. math::
                 d^{\\Lambda}(w, x) = (x - w)^T \\Lambda (x - w)
@@ -58,7 +55,7 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
         return pdists
 
     def gradient(
-        self, data: np.ndarray, model: "LVQBaseClass", i_prototype: int
+        self, data: np.ndarray, model: "GMLVQ", i_prototype: int
     ) -> np.ndarray:
         """ The partial derivative of the adaptive squared euclidean distance function, with respect
         to a specified prototype and the matrix omega.

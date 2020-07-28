@@ -7,8 +7,8 @@ from sklvq.distances.adaptive_squared_euclidean import (
     _prototype_gradient,
     _omega_gradient,
 )
-from typing import TYPE_CHECKING
 
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sklvq.models import LGMLVQ
 

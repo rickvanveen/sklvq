@@ -10,10 +10,10 @@ Predictor
 =========
 
 .. autosummary::
-   :toctree: generated/
-   :template: class.rst
+    :toctree: generated/
+    :template: class.rst
 
-   GLVQ
+    GLVQ
 
 Predictor and Transformer
 =========================
@@ -95,6 +95,12 @@ Distance Functions
 .. currentmodule:: sklvq.distances
 
 Distance functions ordered by compatible predictor.
+
+.. autosummary::
+   :toctree: generated/
+   :template: callable.rst
+
+    DistanceBaseClass
 
 GLVQ
 ----

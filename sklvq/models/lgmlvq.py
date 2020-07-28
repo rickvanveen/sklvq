@@ -170,22 +170,22 @@ class LGMLVQ(LVQBaseClass):
 
     def __init__(
         self,
-        distance_type="local-adaptive-squared-euclidean",
-        distance_params=None,
-        activation_type="identity",
-        activation_params=None,
-        discriminant_type="relative-distance",
-        discriminant_params=None,
-        solver_type="steepest-gradient-descent",
-        solver_params=None,
-        initial_prototypes="class-conditional-mean",
-        prototypes_per_class=1,
-        initial_omega="identity",
-        initial_omega_shape="square",
-        localization="prototype",
-        normalized_omega=True,
-        random_state=None,
-        force_all_finite=True,
+        distance_type: Union[str, type] = "local-adaptive-squared-euclidean",
+        distance_params: dict = None,
+        activation_type: Union[str, type] = "identity",
+        activation_params: dict = None,
+        discriminant_type: Union[str, type] = "relative-distance",
+        discriminant_params: dict = None,
+        solver_type: Union[str, type] = "steepest-gradient-descent",
+        solver_params: dict = None,
+        initial_prototypes: Union[str, np.ndarray] = "class-conditional-mean",
+        prototypes_per_class: Union[int, np.ndarray] = 1,
+        initial_omega: Union[str, np.ndarray] = "identity",
+        initial_omega_shape: Union[str, Tuple[int, int]] = "square",
+        localization: str = "prototype",
+        normalized_omega: bool = True,
+        random_state: Union[int, np.random.RandomState] = None,
+        force_all_finite: Union[str, int] = True,
     ):
         self.activation_type = activation_type
         self.activation_params = activation_params
@@ -211,9 +211,8 @@ class LGMLVQ(LVQBaseClass):
     # The "Getter" and "Setter" that are used by the solvers to set and get model params.
     ###########################################################################################
 
-    def _set_model_params(self, model_params: ModelParamsType) -> None:
-        """
-        Changes the model's internal parameters.
+    def _set_model_params(self, model_params: ModelParamsType):
+        """ Changes the model's internal parameters.
 
         Parameters
         ----------
@@ -322,8 +321,7 @@ class LGMLVQ(LVQBaseClass):
     ###########################################################################################
 
     def _initialize(self, data: np.ndarray, y: np.ndarray) -> SolverBaseClass:
-        """
-        Initialize is called by the LVQ base class and is required to do two things in order to
+        """ Initialize is called by the LVQ base class and is required to do two things in order to
         work:
             1. It must initialize the distance functions and store it in 'self._distance'
             2. It must initialize the solver and return it.
@@ -438,7 +436,7 @@ class LGMLVQ(LVQBaseClass):
     def fit_transform(
         self, data: np.ndarray, y: np.ndarray, **trans_params
     ) -> np.ndarray:
-        """
+        r"""
 
         Parameters
         ----------
@@ -451,7 +449,8 @@ class LGMLVQ(LVQBaseClass):
 
         Returns
         -------
-        The data projected on columns of each omega_hat_ with shape (n_omegas, n_samples, n_columns)
+        The data projected on columns of each omega\_hat\_ with shape (n_omegas, n_samples,
+        n_columns)
 
         """
         return self.fit(data, y).transform(data, **trans_params)
@@ -462,7 +461,7 @@ class LGMLVQ(LVQBaseClass):
         scale: bool = False,
         omega_hat_index: Union[int, List[int]] = 0,
     ) -> np.ndarray:
-        """
+        r"""
 
         Parameters
         ----------
@@ -472,11 +471,12 @@ class LGMLVQ(LVQBaseClass):
             Controls if the eigenvectors the data is projected on are scaled by the square root
             of their eigenvalues.
         omega_hat_index : int or list
-            The indices of the omega_hats_ the transformation should be computed for.
+            The indices of the omega\_hats\_ the transformation should be computed for.
 
         Returns
         -------
-        The data projected on columns of each omega_hat_ with shape (n_omegas, n_samples, n_columns)
+        The data projected on columns of each omega\_hat\_ with shape (n_omegas, n_samples,
+        n_columns)
 
         """
         check_is_fitted(self)
@@ -496,4 +496,6 @@ class LGMLVQ(LVQBaseClass):
         return np.squeeze(transformed_data)
 
     def _more_tags(self):
+        # For some reason lgmlvq does not perform well on one of the test cases build into
+        # sklearn's test cases.
         return {"poor_score": True}

@@ -165,20 +165,20 @@ class GMLVQ(LVQBaseClass):
 
     def __init__(
         self,
-        distance_type="adaptive-squared-euclidean",
-        distance_params=None,
-        activation_type="identity",
-        activation_params=None,
-        discriminant_type="relative-distance",
-        discriminant_params=None,
-        solver_type="steepest-gradient-descent",
-        solver_params=None,
-        initial_prototypes="class-conditional-mean",
-        prototypes_per_class=1,
-        initial_omega="identity",
-        normalized_omega=True,
-        random_state=None,
-        force_all_finite=True,
+        distance_type: Union[str, type] = "adaptive-squared-euclidean",
+        distance_params: dict = None,
+        activation_type: Union[str, type] = "identity",
+        activation_params: dict = None,
+        discriminant_type: Union[str, type] = "relative-distance",
+        discriminant_params: dict = None,
+        solver_type: Union[str, type] = "steepest-gradient-descent",
+        solver_params: dict = None,
+        initial_prototypes: Union[str, np.ndarray] = "class-conditional-mean",
+        prototypes_per_class: Union[int, np.ndarray] = 1,
+        initial_omega: Union[str, np.ndarray] = "identity",
+        normalized_omega: bool = True,
+        random_state: Union[int, np.random.RandomState] = None,
+        force_all_finite: Union[str, bool] = True,
     ):
         self.activation_type = activation_type
         self.activation_params = activation_params
@@ -202,9 +202,8 @@ class GMLVQ(LVQBaseClass):
     # The "Getter" and "Setter" that are used by the solvers to set and get model params.
     ###########################################################################################
 
-    def _set_model_params(self, model_params: ModelParamsType) -> None:
-        """
-        Changes the model's internal parameters.
+    def _set_model_params(self, model_params: ModelParamsType):
+        """ Changes the model's internal parameters.
 
         Parameters
         ----------
@@ -310,8 +309,7 @@ class GMLVQ(LVQBaseClass):
     ###########################################################################################
 
     def _initialize(self, data: np.ndarray, y: np.ndarray) -> SolverBaseClass:
-        """
-        Initialize is called by the LVQ base class and is required to do two things in order to
+        """ Initialize is called by the LVQ base class and is required to do two things in order to
         work:
             1. It must initialize the distance functions and store it in 'self._distance'
             2. It must initialize the solver and return it.
@@ -403,7 +401,7 @@ class GMLVQ(LVQBaseClass):
         self.omega_hat_ = omega_hat[:, sorted_indices]
 
     def fit_transform(self, data: np.ndarray, y: np.ndarray, **trans_params) -> np.ndarray:
-        """
+        r"""
 
         Parameters
         ----------
@@ -416,13 +414,13 @@ class GMLVQ(LVQBaseClass):
 
         Returns
         -------
-        The data projected on columns of omega_hat_ with shape (n_samples, n_columns)
+        The data projected on columns of omega\_hat\_ with shape (n_samples, n_columns)
 
         """
         return self.fit(data, y).transform(data, **trans_params)
 
     def transform(self, data: np.ndarray, scale: bool = False) -> np.ndarray:
-        """
+        r"""
 
         Parameters
         ----------
@@ -434,7 +432,7 @@ class GMLVQ(LVQBaseClass):
 
         Returns
         -------
-        The data projected on columns of omega_hat_ with shape (n_samples, n_columns)
+        The data projected on columns of omega\_hat\_ with shape (n_samples, n_columns)
 
         """
         data = check_array(data)

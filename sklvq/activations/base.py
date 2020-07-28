@@ -10,6 +10,10 @@ class ActivationBaseClass(ABC):
 
     When developing a custom activation function '__init__' should accept any parameters as
     key-value pairs.
+
+    See also
+    --------
+    Identity, Sigmoid, SoftPlus, Swish
     """
 
     @abstractmethod

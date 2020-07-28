@@ -10,7 +10,7 @@ from sklvq.distances import DistanceBaseClass
 from sklvq.solvers import SolverBaseClass
 from sklvq.objectives import GeneralizedLearningObjective
 
-from typing import Tuple, Union, Dict
+from typing import Tuple, Union
 
 ModelParamsType = np.ndarray
 
@@ -26,9 +26,9 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
     def __init__(
         self,
         distance_type: Union[str, type] = "squared-euclidean",
-        distance_params: Dict = None,
+        distance_params: dict = None,
         solver_type: Union[str, type] = "steepest-gradient-descent",
-        solver_params: Dict = None,
+        solver_params: dict = None,
         initial_prototypes: Union[str, np.ndarray] = "class-conditional-mean",
         prototypes_per_class: Union[int, np.ndarray] = 1,
         random_state: Union[int, np.random.RandomState] = None,
@@ -62,7 +62,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         raise NotImplementedError("You should implement this!")
 
     @abstractmethod
-    def _get_model_params(self) -> Union[Tuple, np.ndarray]:
+    def _get_model_params(self) -> Union[tuple, np.ndarray]:
         """
 
         Returns
@@ -121,7 +121,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
     @abstractmethod
     def _normalize_params(
         self, model_params: Union[tuple, np.ndarray]
-    ) -> Union[Tuple, np.ndarray]:
+    ) -> Union[tuple, np.ndarray]:
         """
 
         Parameters
@@ -281,6 +281,17 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         return data, labels
 
     def fit(self, data: np.ndarray, y: np.ndarray):
+        """ Fit function
+
+        Parameters
+        ----------
+        data
+        y
+
+        Returns
+        -------
+
+        """
         # Check data and check and transform labels.
         data, labels = self._validate_data_labels(data, y)
 
@@ -326,6 +337,16 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         pass
 
     def decision_function(self, data: np.ndarray):
+        """ Decision function
+
+        Parameters
+        ----------
+        data
+
+        Returns
+        -------
+
+        """
         # SciKit-learn list of checked params before predict
         check_is_fitted(self)
 
@@ -355,6 +376,16 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         return decision_values
 
     def predict(self, data: np.ndarray):
+        """ Predict function
+
+        Parameters
+        ----------
+        data
+
+        Returns
+        -------
+
+        """
         # SciKit-learn list of checked params before predict
         check_is_fitted(self)
 

@@ -11,8 +11,7 @@ class Identity(ActivationBaseClass):
     """
 
     def __call__(self, x: np.ndarray) -> np.ndarray:
-        """
-        Implements the identity function:
+        """ Implements the identity function:
             .. math::
 
                 f(x) = x
@@ -29,8 +28,7 @@ class Identity(ActivationBaseClass):
         return x
 
     def gradient(self, x: np.ndarray) -> np.ndarray:
-        """
-        Implements the identity function's derivative:
+        """ Implements the identity function's derivative:
             .. math::
 
                 \\frac{\\partial f}{\\partial x} = 1

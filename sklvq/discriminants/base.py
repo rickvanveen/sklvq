@@ -8,8 +8,12 @@ class DiscriminativeBaseClass(ABC):
     Abstract class for implementing discriminant functions. It provides abstract methods with
     expected call signatures.
 
-    When developing a custom activation function '__init__' should accept any parameters as
+    When developing a custom discriminative function '__init__' should accept any parameters as
     key-value pairs.
+
+    See also
+    --------
+    RelativeDistance
     """
 
     @abstractmethod

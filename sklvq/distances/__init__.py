@@ -8,8 +8,6 @@ from sklvq.distances.local_adaptive_squared_euclidean import (
 )
 
 from typing import Union
-from typing import List
-
 from sklvq.misc import utils
 
 __all__ = [

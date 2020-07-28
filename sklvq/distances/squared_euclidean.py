@@ -4,10 +4,9 @@ from sklearn.metrics.pairwise import pairwise_distances
 from . import DistanceBaseClass
 
 from typing import TYPE_CHECKING
-from typing import Dict
 
 if TYPE_CHECKING:
-    from sklvq.models import LVQBaseClass
+    from sklvq.models import GLVQ
 
 
 class SquaredEuclidean(DistanceBaseClass):
@@ -25,39 +24,49 @@ class SquaredEuclidean(DistanceBaseClass):
             if self.metric_kwargs["force_all_finite"] == "allow-nan":
                 self.metric_kwargs.update({"metric": "nan_euclidean"})
 
-    def __call__(self, data: np.ndarray, model: "LVQBaseClass") -> np.ndarray:
-        """ Wrapper function for sklearn pairwise_distances ("euclidean") function
+    def __call__(self, data: np.ndarray, model: "GLVQ") -> np.ndarray:
+        """
+         Computes the Euclidean distance:
+            .. math::
 
-            Parameters
-            ----------
-            data       : ndarray, shape = [n_obervations, n_features]
-                         Inputs are converted to float type.
-            prototypes : ndarray, shape = [n_prototypes, n_features]
-                         Inputs are converted to float type.
+                d(\\vec{w}, \\vec{x}) = (\\vec{x} - \\vec{w})^T (\\vec{x} - \\vec{w}),
 
-            Returns
-            -------
-            distances : ndarray, shape = [n_observations, n_prototypes]
-                The dist(u=XA[i], v=XB[j]) is computed and stored in the
-                ij-th entry.
+            with :math:`\\vec{w}` a prototype and :math:`\\vec{x}` a sample.
+
+        Parameters
+        ----------
+        data : ndarray with shape (n_samples, n_features)
+            The data for which the distance gradient to the prototypes of the model need to be
+            computed.
+        model : GLVQ
+            The model instance.
+
+        Returns
+        -------
+        ndarray with shape (n_samples, n_prototypes)
+            Evaluation of the distance between each sample and prototype of the model.
         """
         return pairwise_distances(data, model.prototypes_, **self.metric_kwargs,)
 
-    def gradient(
-        self, data: np.ndarray, model: "LVQBaseClass", i_prototype: int
-    ) -> np.ndarray:
-        """ Implements the derivative of the squared euclidean distance, , with respect to 1 prototype.
+    def gradient(self, data: np.ndarray, model: "GLVQ", i_prototype: int) -> np.ndarray:
+        """ Implements the derivative of the squared euclidean distance, with respect to a single
+        prototype for the euclidean and nan_euclidean setting.
 
-            Parameters
-            ----------
-            model
-            data       : ndarray, shape = [n_observations, n_features]
+        Parameters
+        ----------
+        data : ndarray with shape (n_samples, n_features)
+            The data for which the distance gradient to the prototypes of the model need to be
+            computed.
+        model : GLVQ
+            The model instance.
+        i_prototype : int
+            Index of the prototype to compute the gradient for.
 
-            prototype  : ndarray, shape = [n_features,]
+        Returns
+        -------
+        gradient : ndarray with shape (n_samples, n_features)
+            The gradient with respect to the prototype and every sample in the data.
 
-            -------
-            gradient : ndarray, shape = [n_observations, n_features]
-                        The gradient with respect to the prototype and every observation in data.
         """
         prototypes = model._get_model_params()
         (num_samples, num_features) = data.shape
@@ -78,7 +87,5 @@ class SquaredEuclidean(DistanceBaseClass):
             difference[np.isnan(difference)] = 0.0
 
         distance_gradient[:, ip_start:ip_end] = -2 * difference
-
-        # distance_gradient[np.isnan(distance_gradient)] = 0.0
 
         return distance_gradient

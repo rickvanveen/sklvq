@@ -6,7 +6,7 @@ from . import DistanceBaseClass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from sklvq.models import LVQBaseClass
+    from sklvq.models import GLVQ
 
 
 class Euclidean(DistanceBaseClass):
@@ -14,28 +14,24 @@ class Euclidean(DistanceBaseClass):
 
     See also
     --------
-    SquaredEuclidean, AdaptiveEuclidean, AdaptiveSquaredEuclidean
+    SquaredEuclidean, AdaptiveEuclidean, AdaptiveSquaredEuclidean, LocalAdaptiveSquaredEuclidean
     """
-
-    # Euclidean or nan_euclidean if "force_all_finite == 'allow-nan'
-
     def __init__(self, **other_kwargs):
         # Default euclidean
         self.metric_kwargs = {"metric": "euclidean", "squared": False}
 
-        # Should contain other kwargs for sklearn.metrics.pairwise_distances
+        # Could contain other kwargs for sklearn.metrics.pairwise_distances
         if other_kwargs is not None:
             self.metric_kwargs.update(other_kwargs)
 
         # This might include force_all_finite which if it is set to "allow-nan" should switch the
-        # metric used to nan_euclidean else euclidean is fine.
+        # metric used to nan_euclidean else euclidean is fine. It works.
         if "force_all_finite" in self.metric_kwargs:
             if self.metric_kwargs["force_all_finite"] == "allow-nan":
                 self.metric_kwargs.update({"metric": "nan_euclidean"})
 
-    def __call__(self, data: np.ndarray, model: "LVQBaseClass") -> np.ndarray:
-        """
-        Computes the Euclidean distance:
+    def __call__(self, data: np.ndarray, model: "GLVQ") -> np.ndarray:
+        """ Computes the Euclidean distance:
             .. math::
 
                 d(\\vec{w}, \\vec{x}) = \\sqrt{(\\vec{x} - \\vec{w})^T (\\vec{x} - \\vec{w})},
@@ -44,34 +40,37 @@ class Euclidean(DistanceBaseClass):
 
         Parameters
         ----------
-        data : numpy.ndarray with shape (n_samples, n_features)
-        model : LVQBaseClass
-            Can be any LVQClassifier but only prototypes will be used to compute the distance
+        data : ndarray with shape (n_samples, n_features)
+            The data for which the distance gradient to the prototypes of the model need to be
+            computed.
+        model : GLVQ
+            The model instance.
 
         Returns
         -------
-        distances : numpy.ndarray with shape (n_observations, n_prototypes)
-            The dist(u=XA[i], v=XB[j]) is computed and stored in the
-            ij-th entry.
+        ndarray with shape (n_samples, n_prototypes)
+            Evaluation of the distance between each sample and prototype of the model.
         """
         return pairwise_distances(data, model.prototypes_, **self.metric_kwargs)
 
-    def gradient(self, data: np.ndarray, model, i_prototype: int) -> np.ndarray:
+    def gradient(self, data: np.ndarray, model: "GLVQ", i_prototype: int) -> np.ndarray:
         """ Implements the derivative of the euclidean distance, with respect to a single
         prototype for the euclidean and nan_euclidean setting.
 
         Parameters
         ----------
-        data : numpy.ndarray with shape (n_samples, n_features)
-        model : LVQBaseClass
-            Only prototypes need to be available in the LVQClassifier
+        data : ndarray with shape (n_samples, n_features)
+            The data for which the distance gradient to the prototypes of the model need to be
+            computed.
+        model : GLVQ
+            The model instance.
         i_prototype : int
-            Index of the prototype to compute the gradient for
+            Index of the prototype to compute the gradient for.
 
         Returns
         -------
         gradient : ndarray with shape (n_samples, n_features)
-            The gradient with respect to the prototype and every sample in data.
+            The gradient with respect to the prototype and every sample in the data.
 
         """
         prototypes = model._get_model_params()
@@ -93,8 +92,9 @@ class Euclidean(DistanceBaseClass):
 
         denominator = np.sqrt(np.einsum("ij, ij -> i", difference, difference))
 
-        # If data is exactly equal to prototype the denominator will be zero.
-        denominator[denominator == 0.0] = 1.0
+        # If data is exactly equal to prototype the denominator will be zero. This happens mostly
+        # when nan differences are replaced by zero distance
+        denominator[denominator == 0.0] = 1.0 # TODO: huh?
 
         distance_gradient[:, ip_start:ip_end] = (-1 * difference) / denominator[
             :, np.newaxis

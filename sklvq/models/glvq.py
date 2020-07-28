@@ -6,8 +6,6 @@ from sklvq import distances, solvers
 
 # Typing
 from typing import Union
-from typing import Dict
-
 
 from sklvq.solvers import SolverBaseClass
 
@@ -40,21 +38,21 @@ class GLVQ(LVQBaseClass):
     distance_type : {"squared-euclidean", "euclidean"} or Class, default="squared-euclidean"
         The distance function. Can be one from the list above or a custom class.
 
-    distance_params : Dict, optional, default=None
+    distance_params : dict, optional, default=None
         Parameters passed to init of distance class.
 
     activation_type : {"identity", "sigmoid", "soft+", "swish"} or Class, default="sigmoid"
         The activation function used in the objective function. Can be any of the activation
         function in the list or custom class.
 
-    activation_params : Dict, default=None
+    activation_params : dict, default=None
         Parameters passed to init of activation function. See the documentation of activation
         functions for function dependent parameters and defaults.
 
     discriminant_type : "relative-distance" or Class
         The discriminant function.
 
-    discriminant_params : Dict, default=None
+    discriminant_params : dict, default=None
         Parameters passed to init of discriminant callable
 
     solver_type : {"sgd", "wgd", "adam", "lbfgs", "bfgs"},
@@ -75,7 +73,7 @@ class GLVQ(LVQBaseClass):
         - "lbfgs" or "limited-memory-bfgs"
             Implementation from scipy package.
 
-    solver_params : Dict, default=None
+    solver_params : dict, default=None
         Parameters passed to init of solvers. See the documentation of the solver
         functions for relevant parameters and defaults.
 
@@ -133,13 +131,13 @@ class GLVQ(LVQBaseClass):
     def __init__(
         self,
         distance_type: Union[str, type] = "squared-euclidean",
-        distance_params: Dict = None,
+        distance_params: dict = None,
         activation_type: Union[str, type] = "sigmoid",
-        activation_params: Dict = None,
+        activation_params: dict = None,
         discriminant_type: Union[str, type] = "relative-distance",
-        discriminant_params: Dict = None,
+        discriminant_params: dict = None,
         solver_type: Union[str, type] = "steepest-gradient-descent",
-        solver_params: Dict = None,
+        solver_params: dict = None,
         initial_prototypes: Union[str, np.ndarray] = "class-conditional-mean",
         prototypes_per_class: Union[int, np.ndarray] = 1,
         random_state: Union[int, np.random.RandomState] = None,
@@ -165,7 +163,7 @@ class GLVQ(LVQBaseClass):
     # The "Getter" and "Setter" that are used by the solvers to set and get model params.
     ###########################################################################################
 
-    def _set_model_params(self, model_params: ModelParamsType) -> None:
+    def _set_model_params(self, model_params: ModelParamsType):
         """
         Changes the model's internal parameters.
 
