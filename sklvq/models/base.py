@@ -311,6 +311,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         # Initialize algorithm specific stuff
         solver = self._initialize(data, labels)
 
+        # model is equal to self... which is a bit weird?
         model = solver.solve(data, labels, self)
 
         # Useful for models such as GMLVQ, e.g., to compute lambda and it's eigenvectors/values
@@ -336,12 +337,12 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         """
         pass
 
-    def decision_function(self, data: np.ndarray):
-        """ Decision function
+    def decision_function(self, X: np.ndarray):
+        """ Evaluates the decision function for the samples in X.
 
         Parameters
         ----------
-        data
+        X : ndarray
 
         Returns
         -------
@@ -351,7 +352,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         check_is_fitted(self)
 
         # Input validation
-        data = check_array(data, force_all_finite=self.force_all_finite)
+        data = check_array(X, force_all_finite=self.force_all_finite)
 
         # Of shape n_observations , n_prototypes
         distances = self._distance(data, self)
@@ -394,9 +395,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
 
         decision_values = self.decision_function(data)
 
-        # TODO: Reject option?
         # Prototypes labels are indices of classes_
-        # return self.prototypes_labels_.take(self._distance(data, self).argmin(axis=1))
         if self.classes_.size == 2:
             return self.classes_[(decision_values > 0).astype(np.int)]
 

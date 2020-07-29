@@ -384,7 +384,7 @@ class GMLVQ(LVQBaseClass):
 
     @staticmethod
     def _compute_lambda(omega):
-        # Equivalent to omega.T.dot(omega)
+        # Equivalent to omega.T.dot(omega), but faster (?)
         return np.einsum("ji, jk -> ik", omega, omega)
 
     ###########################################################################################
