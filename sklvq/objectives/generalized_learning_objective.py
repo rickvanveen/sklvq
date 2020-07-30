@@ -23,9 +23,9 @@ DISCRIMINANT_FUNCTIONS = [
 class GeneralizedLearningObjective(ObjectiveBaseClass):
     def __init__(
         self,
-        activation_type: Union[type, str],
+        activation_type: Union[str, type],
         activation_params: dict,
-        discriminant_type: Union[type, str],
+        discriminant_type: Union[str, type],
         discriminant_params: dict,
     ):
         self.activation = activations.grab(
@@ -47,6 +47,34 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
         data: np.ndarray,
         labels: np.ndarray,
     ) -> np.ndarray:
+        """ Computes the cost function
+            .. math::
+
+                S = \\Sigma_{i=1}^{N} f(\\mu(x_i))
+
+        with :math:`\\mu(\\cdot)` the discriminative function and :math:`f(\\cdot)` the activation
+        function.
+
+        Parameters
+        ----------
+        variables: ndarray with shape depending on model parameters
+            Flattened 1D array of the variables that are changed
+
+        model : LVQBaseClass
+            The model which can be any LVQBaseClass compatible with this objective function.
+
+        data: ndarray with shape (n_samples, n_features)
+            The data
+
+        labels: ndarray with shape (n_samples)
+
+        Returns
+        -------
+        float:
+            The cost
+
+
+        """
         model._set_model_params(model._to_params(variables))
 
         dist_same, dist_diff, _, _ = _compute_distance(data, labels, model)
