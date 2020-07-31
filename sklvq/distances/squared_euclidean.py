@@ -10,6 +10,13 @@ if TYPE_CHECKING:
 
 
 class SquaredEuclidean(DistanceBaseClass):
+    """ Squared Euclidean distance
+
+    See also
+    --------
+    Euclidean, AdaptiveSquaredEuclidean, LocalAdaptiveSquaredEuclidean
+
+    """
     def __init__(self, **other_kwargs):
         # Default just use euclidean
         self.metric_kwargs = {"metric": "euclidean", "squared": True}
@@ -29,7 +36,7 @@ class SquaredEuclidean(DistanceBaseClass):
          Computes the Euclidean distance:
             .. math::
 
-                d(\\vec{w}, \\vec{x}) = (\\vec{x} - \\vec{w})^T (\\vec{x} - \\vec{w}),
+                d(\\vec{w}, \\vec{x}) = (\\vec{x} - \\vec{w})^{\\top} (\\vec{x} - \\vec{w}),
 
             with :math:`\\vec{w}` a prototype and :math:`\\vec{x}` a sample.
 
@@ -50,7 +57,10 @@ class SquaredEuclidean(DistanceBaseClass):
 
     def gradient(self, data: np.ndarray, model: "GLVQ", i_prototype: int) -> np.ndarray:
         """ Implements the derivative of the squared euclidean distance, with respect to a single
-        prototype for the euclidean and nan_euclidean setting.
+        prototype for the euclidean and nan_euclidean distance:
+
+            .. math::
+                \\frac{\\partial d}{\\partial \\vec{w}} = -2 \\cdot (\\vec{x} - \\vec{w})
 
         Parameters
         ----------
@@ -79,7 +89,6 @@ class SquaredEuclidean(DistanceBaseClass):
         ip_start = i_prototype * num_features
         ip_end = ip_start + num_features
 
-        # distance_gradient[:, ip_start:ip_end] = -2 * (data - prototypes[i_prototype, :])
         difference = data - prototypes[i_prototype, :]
 
         # Only check for nans if allow-nan is set else it should not happen...

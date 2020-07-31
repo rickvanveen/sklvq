@@ -4,15 +4,18 @@ import numpy as np
 from sklearn.metrics.pairwise import pairwise_distances
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from sklvq.models import GMLVQ
 
 
 class AdaptiveSquaredEuclidean(DistanceBaseClass):
-    """ Adaptive squared Euclidean function
+    """ Adaptive squared Euclidean distance
 
     See also
     --------
+    Euclidean, SquaredEuclidean, LocalAdaptiveSquaredEuclidean
+
     """
 
     def __init__(self, **other_kwargs):
@@ -28,19 +31,25 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
                 self.metric_kwargs.update({"metric": _nan_mahalanobis})
 
     def __call__(self, data: np.ndarray, model: "GMLVQ") -> np.ndarray:
-        """ Implements a weighted variant of the squared euclidean distance:
+        """ Implements the adaptive squared euclidean distance:
+
             .. math::
-                d^{\\Lambda}(w, x) = (x - w)^T \\Lambda (x - w)
+                d^{\\Lambda}(\\vec{w}, \\vec{x}) = (\\vec{x} - \\vec{w})^{\\top}
+                \\Omega^{\\top} \\Omega (\\vec{x} - \\vec{w})
+
+        with :math:`\\Lambda = \\Omega^{\\top} \\Omega`.
 
         Parameters
         ----------
-        data : numpy.ndarray
-            A matrix containing the samples on the rows.
-        model : LVQBaseClass, GMLVQ
+        data : ndarray with shape (n_samples, n_features)
+            The data for which the distance gradient to the prototypes of the model need to be
+            computed.
+        model : GMLVQ
+            The model instance.
 
         Returns
         -------
-        numpy.ndarray
+        ndarray
             The adaptive squared euclidean distance for every sample to every prototype stored row-wise.
         """
         (prototypes, omega) = model._get_model_params()
@@ -60,13 +69,17 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
         """ The partial derivative of the adaptive squared euclidean distance function, with respect
         to a specified prototype and the matrix omega.
 
+            .. math::
+                \\frac{\\partial d}{\\partial \\vec{w_i}} = -2 \\cdot \\Lambda \cdot (\\vec{x} -
+                \\vec{w_i})
+
         Parameters
         ----------
-        data : ndarray
-            A matrix containing the samples on the rows.
-        model : LVQBaseClass
-            In principle any LVQClassifier that calls it's relevance matrix omega.
-            Specifically here, GMLVQ.
+        data : ndarray with shape (n_samples, n_features)
+            The data for which the distance gradient to the prototypes of the model need to be
+            computed.
+        model : GMLVQ
+            The model instance.
         i_prototype : int
             An integer index value of the relevant prototype
 

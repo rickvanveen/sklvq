@@ -9,11 +9,20 @@ from sklvq.distances.adaptive_squared_euclidean import (
 )
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from sklvq.models import LGMLVQ
 
 
 class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
+    """ Local adaptive squared Euclidean distance
+
+    See also
+    --------
+    Euclidean, SquaredEuclidean, AdaptiveSquaredEuclidean
+
+    """
+
     def __init__(self, **other_kwargs):
         self.metric_kwargs = {
             "metric": "mahalanobis",
@@ -28,16 +37,21 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
 
     def __call__(self, data: np.ndarray, model: "LGMLVQ") -> np.ndarray:
         """ Implements a weighted variant of the squared euclidean distance:
+
             .. math::
-                d^{\\Lambda}(w, x) = (x - w)^T \\Lambda (x - w)
+                d^{\\Lambda}(\\vec{w}, \\vec{x}) = (\\vec{x} - \\vec{w})^{\\top}
+                \\Omega_j^{\\top} \\Omega_j (\\vec{x} - \\vec{w})
+
+        with :math:`\\Omega_j` depending on the localization setting of the model and
+        :math:`\\Lambda_j = \\Omega_j^{\\top} \\Omega_j`
 
         Parameters
         ----------
-        data : ndarray
-            A matrix containing the samples on the rows.
+        data : ndarray with shape (n_samples, n_features)
+            The data for which the distance gradient to the prototypes of the model need to be
+            computed.
         model : LGMLVQ
-            In principle any LVQBaseClass with relevant properties (omega, localization),
-            but specifically here: LGMLVQ.
+            The model instance.
 
         Returns
         -------
@@ -51,9 +65,7 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
         prototypes_labels_ = model.prototypes_labels_
 
         if model.localization == "prototype":
-            for i, (prototype, omega) in enumerate(
-                zip(prototypes_, omega_)
-            ):
+            for i, (prototype, omega) in enumerate(zip(prototypes_, omega_)):
                 self.metric_kwargs.update(dict(VI=omega.T.dot(omega)))
 
                 pdists[:, i] = pairwise_distances(
@@ -79,13 +91,20 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
         """ The partial derivative of the adaptive squared euclidean distance function, with respect
         to a specified prototype and the matrix omega.
 
+            .. math::
+                \\frac{\\partial d}{\\partial \\vec{w_i}} = -2 \\cdot \\Lambda_j \cdot (\\vec{x} -
+                \\vec{w_i})
+
+        with :math:`\\Lambda_j` the matrix matched to the prototype. This depends on the
+        localization setting of the model.
+
         Parameters
         ----------
-        data : ndarray
-            A matrix containing the samples on the rows.
+        data : ndarray with shape (n_samples, n_features)
+            The data for which the distance gradient to the prototypes of the model need to be
+            computed.
         model : LGMLVQ
-            In principle any LVQBaseClass with relevant properties (omega, localization),
-            but specifically here: LGMLVQ.
+            The model instance.
         i_prototype : int
             An integer index value of the relevant prototype
 

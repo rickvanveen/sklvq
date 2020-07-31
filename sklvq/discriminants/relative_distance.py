@@ -38,16 +38,14 @@ class RelativeDistance(DiscriminativeBaseClass):
 
         Two possible scenarios that change based on same_label being True or False:
 
-            1. The partial derivative with respect to the closest prototypes with the same
-                label (same_label=True):
+            1. The partial derivative with respect to the closest prototypes with the same label (same_label=True):
 
             .. math::
 
                 \\frac{\\partial \\mu}{\\partial w_1} = \\frac{2 \\cdot d(x, w_0))}{(d(x,
                 w_1) + d(x, w_0))^2}.
 
-            2. The partial derivative with respect to the closest prototypes with a different
-                label (same_label=False):
+            2. The partial derivative with respect to the closest prototypes with a different label (same_label=False):
 
             .. math::
 
