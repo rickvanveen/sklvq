@@ -60,7 +60,7 @@ class SquaredEuclidean(DistanceBaseClass):
         prototype for the euclidean and nan_euclidean distance:
 
             .. math::
-                \\frac{\\partial d}{\\partial \\vec{w}} = -2 \\cdot (\\vec{x} - \\vec{w})
+                \\frac{\\partial d}{\\partial \\vec{w_i}} = -2 \\cdot (\\vec{x} - \\vec{w_i})
 
         Parameters
         ----------
