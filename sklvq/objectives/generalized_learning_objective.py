@@ -47,10 +47,10 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
         data: np.ndarray,
         labels: np.ndarray,
     ) -> np.ndarray:
-        """ Computes the cost function
+        """ Computes the Generalized Learning Objective function
             .. math::
 
-                S = \\Sigma_{i=1}^{N} f(\\mu(x_i))
+                E_{GLVQ} = \\Sigma_{i=1}^{N} f(\\mu(x_i))
 
         with :math:`\\mu(\\cdot)` the discriminative function and :math:`f(\\cdot)` the activation
         function.
@@ -58,7 +58,7 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
         Parameters
         ----------
         variables: ndarray with shape depending on model parameters
-            Flattened 1D array of the variables that are changed
+            Flattened 1D array of the variables that are changed, i.e., the model parameters
 
         model : LVQBaseClass
             The model which can be any LVQBaseClass compatible with this objective function.
@@ -72,8 +72,6 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
         -------
         float:
             The cost
-
-
         """
         model._set_model_params(model._to_params(variables))
 
@@ -88,6 +86,40 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
         data: np.ndarray,
         labels: np.ndarray,
     ) -> np.ndarray:
+        """ Computes the Generalized Learning Objective function's gradient
+            .. math::
+                \\frac{\\partial E_{GLVQ}}{\\partial w_0} = \\frac{\\partial f}{\\partial \\mu}
+                \\frac{\\partial \\mu}{\\partial d_0} \\frac{\\partial d_0}{\\partial w_0}
+
+        with :math:`w_0` the prototype with a different label than the data and :math:`d_0`
+        the distance to that prototype.
+
+            .. math::
+                 \\frac{\\partial E_{GLVQ}}{\\partial w_1} = \\frac{\\partial f}{\\partial \\mu}
+                 \\frac{\\partial \\mu}{\\partial d_1} \\frac{\\partial d_1}{\\partial w_1}
+
+        with :math:`w_1` the prototype with the same label as the data and :math:`d_1`
+        the distance to that prototype.
+
+        Parameters
+        ----------
+        variables: ndarray with shape depending on model parameters
+            Flattened 1D array of the variables that are changed, i.e., the model parameters
+
+        model : LVQBaseClass
+            The model which can be any LVQBaseClass compatible with this objective function.
+
+        data: ndarray with shape (n_samples, n_features)
+            The data
+
+        labels: ndarray with shape (n_samples)
+
+        Returns
+        -------
+
+
+        """
+
         model._set_model_params(model._to_params(variables))
 
         dist_same, dist_diff, i_dist_same, i_dist_diff = _compute_distance(

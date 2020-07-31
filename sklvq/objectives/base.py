@@ -27,7 +27,7 @@ class ObjectiveBaseClass(ABC):
         Parameters
         ----------
         variables: ndarray with shape depending on model parameters
-            Flattened 1D array of the variables that are changed
+            Flattened 1D array of the variables that are changed, i.e., the model parameters
 
         model : LVQBaseClass
             The model which can be any LVQBaseClass compatible with this objective function.
@@ -60,7 +60,7 @@ class ObjectiveBaseClass(ABC):
         Parameters
         ----------
         variables: ndarray with shape depending on model parameters
-            Flattened 1D array of the variables that are changed
+            Flattened 1D array of the variables that are changed, i.e., the model parameters
 
         model : LVQBaseClass
             The model which can be any LVQBaseClass compatible with this objective function.
