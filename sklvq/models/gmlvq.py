@@ -202,7 +202,7 @@ class GMLVQ(LVQBaseClass):
     # The "Getter" and "Setter" that are used by the solvers to set and get model params.
     ###########################################################################################
 
-    def _set_model_params(self, model_params: ModelParamsType):
+    def set_model_params(self, model_params: ModelParamsType):
         """ Changes the model's internal parameters.
 
         Parameters
@@ -219,7 +219,7 @@ class GMLVQ(LVQBaseClass):
         else:
             self.omega_ = omega
 
-    def _get_model_params(self) -> ModelParamsType:
+    def get_model_params(self) -> ModelParamsType:
         """
 
         Returns
@@ -234,7 +234,7 @@ class GMLVQ(LVQBaseClass):
     # Transformation (Params to variables and back) functions
     ###########################################################################################
 
-    def _to_variables(self, model_params: ModelParamsType) -> np.ndarray:
+    def to_variables(self, model_params: ModelParamsType) -> np.ndarray:
         """
 
         Parameters
@@ -260,7 +260,7 @@ class GMLVQ(LVQBaseClass):
 
         return variables
 
-    def _to_params(self, variables: np.ndarray) -> ModelParamsType:
+    def to_params(self, variables: np.ndarray) -> ModelParamsType:
         """
 
         Parameters
@@ -284,7 +284,7 @@ class GMLVQ(LVQBaseClass):
     # Other required functions (used in certain solvers)
     ###########################################################################################
 
-    def _normalize_params(self, model_params: ModelParamsType) -> ModelParamsType:
+    def normalize_params(self, model_params: ModelParamsType) -> ModelParamsType:
         """
 
         Parameters
@@ -300,7 +300,7 @@ class GMLVQ(LVQBaseClass):
 
         """
         (prototypes, omega) = model_params
-        normalized_prototypes = LVQBaseClass._normalize_prototypes(prototypes)
+        normalized_prototypes = LVQBaseClass.normalize_prototypes(prototypes)
         normalized_omega = GMLVQ._normalise_omega(omega)
         return normalized_prototypes, normalized_omega
 

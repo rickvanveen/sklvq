@@ -211,7 +211,7 @@ class LGMLVQ(LVQBaseClass):
     # The "Getter" and "Setter" that are used by the solvers to set and get model params.
     ###########################################################################################
 
-    def _set_model_params(self, model_params: ModelParamsType):
+    def set_model_params(self, model_params: ModelParamsType):
         """ Changes the model's internal parameters.
 
         Parameters
@@ -228,7 +228,7 @@ class LGMLVQ(LVQBaseClass):
         else:
             self.omega_ = omega
 
-    def _get_model_params(self) -> ModelParamsType:
+    def get_model_params(self) -> ModelParamsType:
         """
 
         Returns
@@ -243,7 +243,7 @@ class LGMLVQ(LVQBaseClass):
     # Transformation (Params to variables and back) functions
     ###########################################################################################
 
-    def _to_variables(self, model_params: ModelParamsType) -> np.ndarray:
+    def to_variables(self, model_params: ModelParamsType) -> np.ndarray:
         """
 
         Parameters
@@ -269,7 +269,7 @@ class LGMLVQ(LVQBaseClass):
 
         return variables
 
-    def _to_params(self, variables: np.ndarray) -> ModelParamsType:
+    def to_params(self, variables: np.ndarray) -> ModelParamsType:
         """
 
         Parameters
@@ -294,7 +294,7 @@ class LGMLVQ(LVQBaseClass):
     # Other functions (used in waypoint-gradient-descent solver only)
     ###########################################################################################
 
-    def _normalize_params(self, model_params: ModelParamsType) -> ModelParamsType:
+    def normalize_params(self, model_params: ModelParamsType) -> ModelParamsType:
         """
 
         Parameters
@@ -312,7 +312,7 @@ class LGMLVQ(LVQBaseClass):
         (prototypes, omega) = model_params
 
         return (
-            LVQBaseClass._normalize_prototypes(prototypes),
+            LVQBaseClass.normalize_prototypes(prototypes),
             LGMLVQ._normalize_omega(omega),
         )
 

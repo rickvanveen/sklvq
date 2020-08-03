@@ -82,7 +82,7 @@ class SteepestGradientDescent(SolverBaseClass):
         """
 
         if self.callback is not None:
-            variables = model._to_variables(model._get_model_params())
+            variables = model.to_variables(model.get_model_params())
             state = self.create_state(
                 STATE_KEYS,
                 variables=variables,
@@ -123,16 +123,16 @@ class SteepestGradientDescent(SolverBaseClass):
                 batch_labels = labels[batches[i_batch]]
 
                 # Get model params variable shape (flattened)
-                model_variables = model._to_variables(model._get_model_params())
+                model_variables = model.to_variables(model.get_model_params())
 
                 # Transform the objective gradient to model_params form
-                objective_gradient = model._to_params(
+                objective_gradient = model.to_params(
                     # Compute the objective gradient
                     self.objective.gradient(model_variables, model, batch, batch_labels)
                 )
 
                 # Transform objective gradient to variables form
-                objective_gradient = model._to_variables(
+                objective_gradient = model.to_variables(
                     # Apply the step size to the model parameters
                     self.multiply_model_params(step_size, objective_gradient)
                 )
@@ -141,7 +141,7 @@ class SteepestGradientDescent(SolverBaseClass):
                 new_model_variables = model_variables - objective_gradient
 
                 # Transform back to parameters form and update the model
-                model._set_model_params(model._to_params(new_model_variables))
+                model.set_model_params(model.to_params(new_model_variables))
 
             if self.callback is not None:
                 state = self.create_state(

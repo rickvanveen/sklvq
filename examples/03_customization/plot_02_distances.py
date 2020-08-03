@@ -54,7 +54,7 @@ class CustomSquaredEuclidean(DistanceBaseClass):
     def gradient(
         self, data: np.ndarray, model: "LVQBaseClass", i_prototype: int
     ) -> np.ndarray:
-        prototypes = model._get_model_params()
+        prototypes = model.get_model_params()
         (num_samples, num_features) = data.shape
 
         distance_gradient = np.zeros((num_samples, prototypes.size))

@@ -163,7 +163,7 @@ class GLVQ(LVQBaseClass):
     # The "Getter" and "Setter" that are used by the solvers to set and get model params.
     ###########################################################################################
 
-    def _set_model_params(self, model_params: ModelParamsType):
+    def set_model_params(self, model_params: ModelParamsType):
         """
         Changes the model's internal parameters.
 
@@ -176,7 +176,7 @@ class GLVQ(LVQBaseClass):
         """
         self.prototypes_ = model_params
 
-    def _get_model_params(self) -> ModelParamsType:
+    def get_model_params(self) -> ModelParamsType:
         """
 
         Returns
@@ -191,7 +191,7 @@ class GLVQ(LVQBaseClass):
     # Transformation (Params to variables and back) functions
     ###########################################################################################
 
-    def _to_variables(self, model_params: ModelParamsType) -> np.ndarray:
+    def to_variables(self, model_params: ModelParamsType) -> np.ndarray:
         """
 
         Parameters
@@ -208,7 +208,7 @@ class GLVQ(LVQBaseClass):
         """
         return model_params.ravel()
 
-    def _to_params(self, variables: np.ndarray) -> ModelParamsType:
+    def to_params(self, variables: np.ndarray) -> ModelParamsType:
         """
 
         Parameters
@@ -229,7 +229,7 @@ class GLVQ(LVQBaseClass):
     # Other required functions (used in certain solvers)
     ###########################################################################################
 
-    def _normalize_params(self, model_params: ModelParamsType) -> ModelParamsType:
+    def normalize_params(self, model_params: ModelParamsType) -> ModelParamsType:
         """
 
         Parameters
@@ -244,7 +244,7 @@ class GLVQ(LVQBaseClass):
             implementation.
 
         """
-        return LVQBaseClass._normalize_prototypes(model_params)
+        return LVQBaseClass.normalize_prototypes(model_params)
 
     ###########################################################################################
     # Initialization required functions

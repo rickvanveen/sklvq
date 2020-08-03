@@ -73,7 +73,7 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
         float:
             The cost
         """
-        model._set_model_params(model._to_params(variables))
+        model.set_model_params(model.to_params(variables))
 
         dist_same, dist_diff, _, _ = _compute_distance(data, labels, model)
 
@@ -121,7 +121,7 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
 
         """
 
-        model._set_model_params(model._to_params(variables))
+        model.set_model_params(model.to_params(variables))
 
         dist_same, dist_diff, i_dist_same, i_dist_diff = _compute_distance(
             data, labels, model

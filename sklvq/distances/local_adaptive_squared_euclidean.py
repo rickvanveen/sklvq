@@ -61,7 +61,7 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
 
         pdists = np.zeros((data.shape[0], model.prototypes_.shape[0]))
 
-        prototypes_, omega_ = model._get_model_params()
+        prototypes_, omega_ = model.get_model_params()
         prototypes_labels_ = model.prototypes_labels_
 
         if model.localization == "prototype":
@@ -114,7 +114,7 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
             The gradient for every feature/dimension. Returned in one 1D vector. The non-relevant prototype's
             gradient is set to 0, but is still included in the output.
         """
-        (prototypes, omegas) = model._get_model_params()
+        (prototypes, omegas) = model.get_model_params()
         (num_samples, num_features) = data.shape
 
         force_all_finite = self.metric_kwargs.get("force_all_finite", None)

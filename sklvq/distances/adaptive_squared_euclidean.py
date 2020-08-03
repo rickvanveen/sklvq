@@ -52,7 +52,7 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
         ndarray
             The adaptive squared euclidean distance for every sample to every prototype stored row-wise.
         """
-        (prototypes, omega) = model._get_model_params()
+        (prototypes, omega) = model.get_model_params()
 
         self.metric_kwargs.update(dict(VI=np.dot(omega.T, omega)))
 
@@ -90,7 +90,7 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
             gradient is set to 0, but is still included in the output.
         """
 
-        (prototypes, omega) = model._get_model_params()
+        (prototypes, omega) = model.get_model_params()
         (num_samples, num_features) = data.shape
 
         force_all_finite = self.metric_kwargs.get("force_all_finite", None)

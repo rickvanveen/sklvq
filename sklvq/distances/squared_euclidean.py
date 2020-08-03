@@ -78,7 +78,7 @@ class SquaredEuclidean(DistanceBaseClass):
             The gradient with respect to the prototype and every sample in the data.
 
         """
-        prototypes = model._get_model_params()
+        prototypes = model.get_model_params()
         (num_samples, num_features) = data.shape
 
         # Can also always replace all nans in difference with 0.0, but maybe this is better.

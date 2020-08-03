@@ -48,7 +48,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
     ###########################################################################################
 
     @abstractmethod
-    def _set_model_params(self, model_params: Union[tuple, np.ndarray]) -> None:
+    def set_model_params(self, model_params: Union[tuple, np.ndarray]) -> None:
         """
         Changes the model's internal parameters.
 
@@ -62,7 +62,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         raise NotImplementedError("You should implement this!")
 
     @abstractmethod
-    def _get_model_params(self) -> Union[tuple, np.ndarray]:
+    def get_model_params(self) -> Union[tuple, np.ndarray]:
         """
 
         Returns
@@ -78,7 +78,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
     # Functions to transform the 1D variables array to model parameters and back
     ###########################################################################################
 
-    def _to_variables(self, model_params: Union[tuple, np.ndarray]) -> np.ndarray:
+    def to_variables(self, model_params: Union[tuple, np.ndarray]) -> np.ndarray:
         """
 
         Parameters
@@ -96,7 +96,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         raise NotImplementedError("You should implement this!")
 
     @abstractmethod
-    def _to_params(self, variables: np.ndarray) -> Union[tuple, np.ndarray]:
+    def to_params(self, variables: np.ndarray) -> Union[tuple, np.ndarray]:
         """
 
         Parameters
@@ -119,7 +119,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
     ###########################################################################################
 
     @abstractmethod
-    def _normalize_params(
+    def normalize_params(
         self, model_params: Union[tuple, np.ndarray]
     ) -> Union[tuple, np.ndarray]:
         """
@@ -169,7 +169,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
     ###########################################################################################
 
     @staticmethod
-    def _normalize_prototypes(prototypes: np.ndarray) -> np.ndarray:
+    def normalize_prototypes(prototypes: np.ndarray) -> np.ndarray:
         """
 
         Parameters
