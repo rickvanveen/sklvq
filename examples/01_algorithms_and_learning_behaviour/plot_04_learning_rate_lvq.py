@@ -54,7 +54,8 @@ model = GMLVQ(
     solver_params={
         "max_runs": 10,
         "k": 3,
-        "step_size": np.array([0.1, 0.05]),
+        "step_size": np.array([0.75, 0.85]), # Note we chose very large step_sizes here to show
+        # the usefulness of waypoint averaging.
         "callback": logger,
     },
     random_state=1428,
@@ -70,7 +71,9 @@ predicted_labels = pipeline.predict(data)
 print(classification_report(labels, predicted_labels))
 
 ###############################################################################
-# Additionally we can study the cost at each iteration of the solvers progress.
+# Additionally we can study the cost at each iteration of the solvers progress. Which doesn't
+# look very smooth and even gets worse. This is because of the chosen step_size, which is too
+# large.
 
 iteration, fun = zip(
     *[(state["nit"], state["fun"]) for state in logger.states]

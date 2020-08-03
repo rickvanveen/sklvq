@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sklvq.models import LVQBaseClass
 
-STATE_KEYS = ["variables", "nit", "fun", "jac", "m_hat", "v_hat"]
+STATE_KEYS = ["variables", "nit", "fun", "m_hat", "v_hat"]
 
 
 class AdaptiveMomentEstimation(SolverBaseClass):
@@ -43,8 +43,6 @@ class AdaptiveMomentEstimation(SolverBaseClass):
             The current iteration counter
         - "fun"
             The objective cost
-        - "jac"
-            The objective gradient
         - "m_hat"
             Unbiased moving average of the gradient
         - "v_hat"
@@ -110,8 +108,6 @@ class AdaptiveMomentEstimation(SolverBaseClass):
             if self.callback(model, state):
                 return
 
-        objective_gradient = None
-
         for i_run in range(0, self.max_runs):
             # Randomize order of data
             shuffled_indices = shuffle(
@@ -162,7 +158,6 @@ class AdaptiveMomentEstimation(SolverBaseClass):
                     variables=new_model_variables,
                     nit=i_run + 1,
                     fun=self.objective(new_model_variables, model, data, labels),
-                    jac=objective_gradient,
                     m_hat=m_hat,
                     v_hat=v_hat,
                 )

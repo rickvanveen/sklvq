@@ -16,7 +16,7 @@ class ProgressLogger:
     def __init__(self):
         self.states = np.array([])
 
-    def __call__(self, state) -> bool:
+    def __call__(self, model, state) -> bool:
         self.states = np.append(self.states, state)
         return False
 
@@ -31,7 +31,7 @@ def test_glvq_iris():
     progress_logger = ProgressLogger()
 
     classifier = GLVQ(
-        solver_type="bfgs",
+        solver_type="waypoint-gradient-descent",
         solver_params={"callback": progress_logger},
         distance_type="squared-euclidean",
         activation_type="swish",

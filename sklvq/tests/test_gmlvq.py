@@ -30,12 +30,11 @@ def test_gmlvq_iris():
     init_omega = init_omega[0:2, :]
 
     classifier = GMLVQ(
-        solver_type="steepest-gradient-descent",
+        solver_type="waypoint-gradient-descent",
         solver_params={
             "callback": progress_logger,
             "max_runs": 20,
-            "batch_size": 1,
-            "step_size": 0.01,
+            "step_size": np.array([0.001, 0.1]),
         },
         activation_type="swish",
         distance_type="adaptive-squared-euclidean",

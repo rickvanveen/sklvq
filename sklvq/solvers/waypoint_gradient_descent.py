@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sklvq.models import LVQBaseClass
 
-STATE_KEYS = ["variables", "nit", "fun", "nfun", "tfun", "njac", "tjac", "step_size"]
+STATE_KEYS = ["variables", "nit", "fun", "nfun", "tfun", "step_size"]
 
 
 # TODO: its wrong should store average of past points not gradients....
@@ -49,10 +49,6 @@ class WaypointGradientDescent(SolverBaseClass):
             The cost of the regular update step.
         - "tfun"
             The cost of the "tentative" update, i.e., the average of the past k updates.
-        - "njac"
-            The gradient update of the regular update.
-        - "tjac",
-            The average gradient update.
         - "step_size"
             The current step_size(s)
 
@@ -100,7 +96,8 @@ class WaypointGradientDescent(SolverBaseClass):
             The initial model that will be changed and holds the results at the end
 
         """
-        previous_objective_gradients = np.zeros(
+        # previous_waypoints
+        previous_waypoints = np.zeros(
             (self.k, model.to_variables(model.get_model_params()).size)
         )
 
@@ -140,13 +137,13 @@ class WaypointGradientDescent(SolverBaseClass):
             objective_gradient = model.to_variables(
                 self.multiply_model_params(step_size, objective_gradient)
             )
-
-            # Store the previous objective_gradients in variables shape
-            previous_objective_gradients[np.mod(i_run, self.k), :] = objective_gradient
-
             # Subtract objective gradient of model params in variables form
             # and
             new_model_variables = model_variables - objective_gradient
+
+            # Store the previous objective_gradients in variables shape
+            # previous_objective_gradients[np.mod(i_run, self.k), :] = objective_gradient
+            previous_waypoints[np.mod(i_run, self.k), :] = new_model_variables
 
             # Transform back to parameters form and update the model
             model.set_model_params(model.to_params(new_model_variables))
@@ -159,7 +156,6 @@ class WaypointGradientDescent(SolverBaseClass):
                     nit=i_run + 1,
                     nfun=cost,
                     fun=cost,
-                    njac=objective_gradient,  # scaled with the step_size
                     step_size=step_size,
                 )
                 if self.callback(model, state):
@@ -191,10 +187,10 @@ class WaypointGradientDescent(SolverBaseClass):
             )
 
             # Tentative update step cost
-            tentative_objective_gradient = np.mean(previous_objective_gradients, axis=0)
+            # tentative_objective_gradient = np.mean(previous_objective_gradients, axis=0)
+            tentative_model_variables = np.mean(previous_waypoints, axis=0)
 
-            tentative_model_variables = model_variables - tentative_objective_gradient
-            # tentative_model_variables = mean_previous_objective_gradients
+            # tentative_model_variables = model_variables - tentative_objective_gradient
 
             # Update the model using normalized update step
             new_model_variables = model_variables - objective_gradient
@@ -216,18 +212,16 @@ class WaypointGradientDescent(SolverBaseClass):
                 model.set_model_params(model.to_params(tentative_model_variables))
                 step_size = self.loss * step_size
                 accepted_cost = tentative_cost
-                accepted_gradient = tentative_objective_gradient
                 accepted_variables = tentative_model_variables
             else:
                 step_size = self.gain * step_size
                 accepted_cost = new_cost
-                accepted_gradient = objective_gradient
                 accepted_variables = new_model_variables
                 # We keep the model currently containing the new update -> because objective
                 # updates the model and was called last...
 
             # Administration. Store the models parameters.
-            previous_objective_gradients[np.mod(i_run, self.k), :] = accepted_gradient
+            previous_waypoints[np.mod(i_run, self.k), :] = accepted_variables
 
             if self.callback is not None:
                 state = self.create_state(
@@ -237,8 +231,6 @@ class WaypointGradientDescent(SolverBaseClass):
                     tfun=tentative_cost,
                     nfun=new_cost,
                     fun=accepted_cost,
-                    # tjac=mean_previous_objective_gradients,
-                    njac=objective_gradient,  # scaled with the step_size
                     step_size=step_size,
                 )
                 if self.callback(model, state):

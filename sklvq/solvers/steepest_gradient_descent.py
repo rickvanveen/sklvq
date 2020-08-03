@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sklvq.models import LVQBaseClass
 
-STATE_KEYS = ["variables", "nit", "fun", "jac", "step_size"]
+STATE_KEYS = ["variables", "nit", "fun", "step_size"]
 
 
 class SteepestGradientDescent(SolverBaseClass):
@@ -42,8 +42,6 @@ class SteepestGradientDescent(SolverBaseClass):
             The current iteration counter
         - "fun"
             The objective cost
-        - "jac"
-            The objective gradient
         - "step_size"
             The current step_size(s)
 
@@ -145,7 +143,6 @@ class SteepestGradientDescent(SolverBaseClass):
                     variables=new_model_variables,
                     nit=i_run,
                     fun=self.objective(new_model_variables, model, data, labels),
-                    jac=objective_gradient,
                     step_size=step_size,
                 )
                 if self.callback(model, state):
