@@ -13,6 +13,19 @@ STATE_KEYS = ["variables", "nit", "fun", "nfun", "tfun", "njac", "tjac", "step_s
 
 
 class WaypointGradientDescent(SolverBaseClass):
+    """ WaypointGradientDescent
+
+    Parameters
+    ----------
+    objective
+    max_runs
+    step_size
+    loss
+    gain
+    k
+    callback
+
+    """
     def __init__(
         self,
         objective: ObjectiveBaseClass,
@@ -34,13 +47,24 @@ class WaypointGradientDescent(SolverBaseClass):
     def solve(
         self, data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass",
     ) -> "LVQBaseClass":
+        """
 
+        Parameters
+        ----------
+        data
+        labels
+        model
+
+        Returns
+        -------
+
+        """
         previous_objective_gradients = np.zeros(
             (self.k, model._to_variables(model._get_model_params()).size)
         )
 
         step_size = self.step_size
-        objective_gradient = None
+        # objective_gradient = None
 
         if self.callback is not None:
             variables = model._to_variables(model._get_model_params())
@@ -83,17 +107,20 @@ class WaypointGradientDescent(SolverBaseClass):
             # Store the previous objective_gradients in variables shape
             previous_objective_gradients[np.mod(i_run, self.k), :] = objective_gradient
 
-            # Update the model
+            # Subtract objective gradient of model params in variables form
+            # and
+            new_model_variables = model_variables - objective_gradient
+
+            # Transform back to parameters form and update the model
             model._set_model_params(
-                model._to_params(model_variables - objective_gradient)
+                model._to_params(new_model_variables)
             )
 
             if self.callback is not None:
-                variables = model._to_variables(model._get_model_params())
-                cost = self.objective(variables, model, data, labels)
+                cost = self.objective(new_model_variables, model, data, labels)
                 state = self.create_state(
                     STATE_KEYS,
-                    variables=variables,
+                    variables=new_model_variables,
                     nit=i_run + 1,
                     nfun=cost,
                     fun=cost,
@@ -128,52 +155,56 @@ class WaypointGradientDescent(SolverBaseClass):
                 self.multiply_model_params(step_size, objective_gradient)
             )
 
-            mean_previous_objective_gradients = np.mean(
+            # Tentative update step cost
+            tentative_objective_gradient = np.mean(
                 previous_objective_gradients, axis=0
             )
-            # Tentative update step cost
-            tentative_model_params = model._to_params(mean_previous_objective_gradients)
+
+            tentative_model_variables = model_variables - tentative_objective_gradient
+            # tentative_model_variables = mean_previous_objective_gradients
 
             # Update the model using normalized update step
-            new_model_params = model._to_params(model_variables - objective_gradient)
+            new_model_variables = model_variables - objective_gradient
 
             # Compute cost of tentative update step
             tentative_cost = self.objective(
-                model._to_variables(tentative_model_params), model, batch, batch_labels
+                tentative_model_variables, model, batch, batch_labels
             )  # Note: Objective updates the model to the tentative_model_params
 
             # New update step cost
             new_cost = self.objective(
-                model._to_variables(new_model_params),
+                new_model_variables,
                 model,
                 data[shuffled_indices, :],
                 labels[shuffled_indices],
             )  # Note: Objective updates the model to the new_model_params
 
             if tentative_cost < new_cost:
-                model._set_model_params(tentative_model_params)
+                model._set_model_params(model._to_params(tentative_model_variables))
                 step_size = self.loss * step_size
                 accepted_cost = tentative_cost
+                accepted_gradient = tentative_objective_gradient
+                accepted_variables = tentative_model_variables
             else:
                 step_size = self.gain * step_size
                 accepted_cost = new_cost
-                # We keep the model currently containing the new update
+                accepted_gradient = objective_gradient
+                accepted_variables = new_model_variables
+                # We keep the model currently containing the new update -> because objective
+                # updates the model and was called last...
 
             # Administration. Store the models parameters.
-            previous_objective_gradients[np.mod(i_run, self.k), :] = model._to_variables(
-                model._get_model_params()
-            )
+            previous_objective_gradients[np.mod(i_run, self.k), :] = accepted_gradient
 
             if self.callback is not None:
-                variables = model._to_variables(model._get_model_params())
                 state = self.create_state(
                     STATE_KEYS,
-                    variables=variables,
+                    variables=accepted_variables,
                     nit=i_run + 1,
                     tfun=tentative_cost,
                     nfun=new_cost,
                     fun=accepted_cost,
-                    tjac=mean_previous_objective_gradients,
+                    # tjac=mean_previous_objective_gradients,
                     njac=objective_gradient,  # scaled with the step_size
                     step_size=step_size,
                 )

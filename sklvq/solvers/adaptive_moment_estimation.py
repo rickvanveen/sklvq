@@ -18,6 +18,19 @@ STATE_KEYS = ["variables", "nit", "fun", "jac", "m_hat", "v_hat"]
 
 
 class AdaptiveMomentEstimation(SolverBaseClass):
+    """
+
+    Parameters
+    ----------
+    objective
+    max_runs
+    beta1
+    beta2
+    step_size
+    epsilon
+    callback
+
+    """
     def __init__(
         self,
         objective: ObjectiveBaseClass,
@@ -38,7 +51,7 @@ class AdaptiveMomentEstimation(SolverBaseClass):
 
     def solve(
         self, data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass",
-    ) -> "LVQCLassifier":
+    ) -> "LVQBaseClass":
 
         # Administration
         variables = model._to_variables(model._get_model_params())
@@ -99,17 +112,20 @@ class AdaptiveMomentEstimation(SolverBaseClass):
                     self.step_size * m_hat / (np.sqrt(v_hat) + self.epsilon)
                 )
 
+                # Subtract objective gradient of model params in variables form
+                new_model_variables = model_variables - objective_gradient
+
+                # Transform back to parameters form to update the model
                 model._set_model_params(
-                    model._to_params(model_variables - objective_gradient)
+                    model._to_params(new_model_variables)
                 )
 
             if self.callback is not None:
-                variables = model._to_variables(model._get_model_params())
                 state = self.create_state(
                     STATE_KEYS,
-                    variables=variables,
+                    variables=new_model_variables,
                     nit=i_run + 1,
-                    fun=self.objective(variables, model, data, labels),
+                    fun=self.objective(new_model_variables, model, data, labels),
                     jac=objective_gradient,
                     m_hat=m_hat,
                     v_hat=v_hat

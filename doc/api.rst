@@ -6,17 +6,14 @@ API of included algorithms in sklvq.
 
 .. currentmodule:: sklvq
 
-Predictor
-=========
+Predictors and Transformers
+===========================
 
 .. autosummary::
     :toctree: generated/
     :template: class.rst
 
     GLVQ
-
-Predictor and Transformer
-=========================
 
 .. autosummary::
    :toctree: generated/
@@ -139,6 +136,12 @@ Solvers
 =======
 
 .. currentmodule:: sklvq.solvers
+
+.. autosummary::
+   :toctree: generated/
+   :template: callable.rst
+
+    SolverBaseClass
 
 .. autosummary::
    :toctree: generated/

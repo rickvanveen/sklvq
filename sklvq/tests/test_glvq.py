@@ -31,9 +31,9 @@ def test_glvq_iris():
     progress_logger = ProgressLogger()
 
     classifier = GLVQ(
-        solver_type="steepest-gradient-descent",
+        solver_type="waypoint-gradient-descent",
         solver_params={"callback": progress_logger},
-        distance_type="euclidean",
+        distance_type="squared-euclidean",
         activation_type="swish",
         force_all_finite=True,
         random_state=31415,

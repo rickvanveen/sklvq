@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 import numpy as np
 from sklvq.objectives import ObjectiveBaseClass
 import scipy as sp
-from typing import Dict
 
 from itertools import repeat
 from typing import TYPE_CHECKING
@@ -12,10 +11,10 @@ if TYPE_CHECKING:
     from sklvq.models import LVQBaseClass
 
 
-# TODO: Optimize, Get rid of to_variables and to_params in custom solvers.
-#  Probably, this can be done by wrapping some functionallity around scipy solvers that unifies
-#  the way the solvers are called, but removes the variables from the call to the objective.
 class SolverBaseClass(ABC):
+    """ SolverBaseClass
+
+    """
     def __init__(self, objective: ObjectiveBaseClass):
         self.objective = objective
 
@@ -23,6 +22,18 @@ class SolverBaseClass(ABC):
     def solve(
         self, data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass",
     ) -> "LVQBaseClass":
+        """
+
+        Parameters
+        ----------
+        data
+        labels
+        model
+
+        Returns
+        -------
+
+        """
         raise NotImplementedError("You should implement this!")
 
     @staticmethod
@@ -36,7 +47,6 @@ class SolverBaseClass(ABC):
         step_sizes: Union[int, float, np.ndarray],
         model_params: Union[tuple, np.ndarray],
     ) -> Union[tuple, np.ndarray]:
-
         if isinstance(model_params, np.ndarray):
             return step_sizes * model_params
 
@@ -54,7 +64,7 @@ class SolverBaseClass(ABC):
 
 class ScipyBaseSolver(SolverBaseClass):
     def __init__(
-        self, objective, method: str = "L-BFGS-B", params: Dict = None, **kwargs
+        self, objective, method: str = "L-BFGS-B", params: dict = None, **kwargs
     ):
         self.method = method
         self.params = params
@@ -63,6 +73,18 @@ class ScipyBaseSolver(SolverBaseClass):
     def solve(
         self, data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass",
     ) -> "LVQBaseClass":
+        """
+
+        Parameters
+        ----------
+        data
+        labels
+        model
+
+        Returns
+        -------
+
+        """
         params = {"jac": self.objective.gradient}
         if self.params is not None:
             params.update(self.params)

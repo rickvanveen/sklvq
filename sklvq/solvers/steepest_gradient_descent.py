@@ -5,6 +5,7 @@ from . import SolverBaseClass
 from sklvq.objectives import ObjectiveBaseClass
 
 from typing import TYPE_CHECKING
+from typing import Union
 
 if TYPE_CHECKING:
     from sklvq.models import LVQBaseClass
@@ -16,6 +17,17 @@ STATE_KEYS = ["variables", "nit", "fun", "jac", "step_size"]
 
 
 class SteepestGradientDescent(SolverBaseClass):
+    """
+
+    Parameters
+    ----------
+    objective
+    max_runs
+    batch_size
+    step_size
+    callback
+
+    """
     def __init__(
         self,
         objective: ObjectiveBaseClass,
@@ -25,14 +37,26 @@ class SteepestGradientDescent(SolverBaseClass):
         callback=None,
     ):
         super().__init__(objective)
-        self.max_runs = max_runs
-        self.batch_size = batch_size
-        self.step_size = step_size
-        self.callback = callback
+        self.max_runs: int = max_runs
+        self.batch_size: int = batch_size
+        self.step_size: Union[float, np.ndarray] = step_size
+        self.callback: callable = callback
 
     def solve(
         self, data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass",
     ) -> "LVQBaseClass":
+        """
+
+        Parameters
+        ----------
+        data
+        labels
+        model
+
+        Returns
+        -------
+
+        """
 
         if self.callback is not None:
             variables = model._to_variables(model._get_model_params())
@@ -89,20 +113,20 @@ class SteepestGradientDescent(SolverBaseClass):
                     self.multiply_model_params(step_size, objective_gradient)
                 )
 
-                # Update the model
+                # Subtract objective gradient of model params in variables form
+                new_model_variables = model_variables - objective_gradient
+
+                # Transform back to parameters form and update the model
                 model._set_model_params(
-                    # Subtract objective gradient of model params in variables form
-                    # and transform back to parameters form.
-                    model._to_params(model_variables - objective_gradient)
+                    model._to_params(new_model_variables)
                 )
 
             if self.callback is not None:
-                variables = model._to_variables(model._get_model_params())
                 state = self.create_state(
                     STATE_KEYS,
-                    variables=variables,
+                    variables=new_model_variables,
                     nit=i_run,
-                    fun=self.objective(variables, model, data, labels),
+                    fun=self.objective(new_model_variables, model, data, labels),
                     jac=objective_gradient,
                     step_size=step_size,
                 )
