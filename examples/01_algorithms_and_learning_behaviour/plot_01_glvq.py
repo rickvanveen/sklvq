@@ -45,7 +45,7 @@ model = GLVQ(
 )
 
 ###############################################################################
-# Fit the GLVQ object to the data and print the performance
+# Fit the GLVQ object to the X and print the performance
 
 # Train the model using the iris dataset
 model.fit(data, labels)

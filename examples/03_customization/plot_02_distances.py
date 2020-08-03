@@ -39,7 +39,7 @@ class CustomSquaredEuclidean(DistanceBaseClass):
         if other_kwargs is not None:
             self.metric_kwargs.update(other_kwargs)
 
-    # The call function needs to return a matrix with the number of data points on the
+    # The call function needs to return a matrix with the number of X points on the
     # rows and the columns the distance to the prototypes.
     def __call__(self, data: np.ndarray, model: "LVQBaseClass") -> np.ndarray:
         return pairwise_distances(data, model.prototypes_, **self.metric_kwargs,)

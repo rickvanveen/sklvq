@@ -35,13 +35,13 @@ model = GMLVQ(
 
 pipeline = make_pipeline(scaler, model)
 
-# As with the algorithm examples. However, the pipeline now first scales the data and then
+# As with the algorithm examples. However, the pipeline now first scales the X and then
 # passes it to GMLVQ.
 pipeline.fit(data, labels)
 
 # Predict the labels using the trained pipeline. The pipeline will use the
-# mean and standard deviation it found when fit was called and applies it to the data.
-# Which is in this case the same data.
+# mean and standard deviation it found when fit was called and applies it to the X.
+# Which is in this case the same X.
 predicted_labels = pipeline.predict(data)
 
 # Print a classification report (sklearn)

@@ -14,7 +14,7 @@ def test_identity():
     # Test if grab returns the correct class
     assert isinstance(identity, Identity)
 
-    # Random data - which is okay for the identity function
+    # Random X - which is okay for the identity function
     rng = np.random.RandomState(0)
     x = rng.random_sample((5, 4))
 

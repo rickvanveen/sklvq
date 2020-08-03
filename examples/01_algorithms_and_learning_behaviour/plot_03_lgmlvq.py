@@ -46,7 +46,7 @@ model = LGMLVQ(
     solver_type="lbfgs",
 )
 
-# Train the model using the scaled data and true labels
+# Train the model using the scaled X and true labels
 model.fit(data, labels)
 
 # Predict the labels using the trained model
@@ -90,11 +90,11 @@ for i, lambda_ in enumerate(model.lambda_):
 ###############################################################################
 # Transforming the Data
 # .....................
-# In addition to making predictions GMLVQ can transform the data using the eigenvectors of the
+# In addition to making predictions GMLVQ can transform the X using the eigenvectors of the
 # relevance matrix. And we can do this for every relevance matrix attached to the prototypes.
 
 # This will return a 3D shape with the first axis the different relevance matrices'
-# transformations of the data. The 2nd and 3rd axes represent the data within in this new space.
+# transformations of the X. The 2nd and 3rd axes represent the X within in this new space.
 t_d = model.transform(data, omega_hat_index=[0, 1, 2])[:, :, :2]
 t_m = model.transform(model.prototypes_, omega_hat_index=[0, 1, 2])[:, :, :2]
 

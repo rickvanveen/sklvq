@@ -21,7 +21,7 @@ class AdaptiveMomentEstimation(SolverBaseClass):
     objective: ObjectiveBaseClass, required
         This is/should be set by the algorithm.
     max_runs: int
-        Number of runs over all the data. Should be >= 1
+        Number of runs over all the X. Should be >= 1
     beta1: float
         Controls the decay rate of the moving average of the gradient. Should be less than 1.0
         and greater than 0.
@@ -109,7 +109,7 @@ class AdaptiveMomentEstimation(SolverBaseClass):
                 return
 
         for i_run in range(0, self.max_runs):
-            # Randomize order of data
+            # Randomize order of X
             shuffled_indices = shuffle(
                 range(0, labels.size), random_state=model.random_state_
             )

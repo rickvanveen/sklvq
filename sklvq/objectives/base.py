@@ -33,7 +33,7 @@ class ObjectiveBaseClass(ABC):
             The model which can be any LVQBaseClass compatible with this objective function.
 
         data: ndarray with shape (n_samples, n_features)
-            The data
+            The X
 
         labels: ndarray with shape (n_samples)
 
@@ -66,7 +66,7 @@ class ObjectiveBaseClass(ABC):
             The model which can be any LVQBaseClass compatible with this objective function.
 
         data: ndarray with shape (n_samples, n_features)
-            The data
+            The X
 
         labels: ndarray with shape (n_samples)
 

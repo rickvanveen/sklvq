@@ -42,7 +42,7 @@ class Euclidean(DistanceBaseClass):
         Parameters
         ----------
         data : ndarray with shape (n_samples, n_features)
-            The data for which the distance gradient to the prototypes of the model need to be
+            The X for which the distance gradient to the prototypes of the model need to be
             computed.
         model : GLVQ
             The model instance.
@@ -65,7 +65,7 @@ class Euclidean(DistanceBaseClass):
         Parameters
         ----------
         data : ndarray with shape (n_samples, n_features)
-            The data for which the distance gradient to the prototypes of the model need to be
+            The X for which the distance gradient to the prototypes of the model need to be
             computed.
         model : GLVQ
             The model instance.
@@ -75,7 +75,7 @@ class Euclidean(DistanceBaseClass):
         Returns
         -------
         gradient : ndarray with shape (n_samples, n_features)
-            The gradient with respect to the prototype and every sample in the data.
+            The gradient with respect to the prototype and every sample in the X.
 
         """
         prototypes = model.get_model_params()
@@ -96,10 +96,10 @@ class Euclidean(DistanceBaseClass):
             difference[np.isnan(difference)] = 0.0
 
         # Euclidean distance but only to single prototype. Equal to:
-        #       np.sqrt(np.sum((data - prototype)**2))
+        #       np.sqrt(np.sum((X - prototype)**2))
         denominator = np.sqrt(np.einsum("ij, ij -> i", difference, difference))
 
-        # If data is exactly equal to prototype the denominator will be zero. This happens mostly
+        # If X is exactly equal to prototype the denominator will be zero. This happens mostly
         # when nan differences are replaced by zero distance. It works.
         denominator[denominator == 0.0] = 1.0
 

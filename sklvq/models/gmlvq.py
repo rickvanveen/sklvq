@@ -112,7 +112,7 @@ class GMLVQ(LVQBaseClass):
         Class labels for each output.
 
     prototypes_ : np.ndarray of shape (n_protoypes, n_features)
-        Positions of the prototypes after fit(data, labels) has been called.
+        Positions of the prototypes after fit(X, labels) has been called.
 
     prototypes_labels_ : np.ndarray of shape (n_prototypes)
         Labels for each prototypes. Labels are indexes to classes\_
@@ -125,7 +125,7 @@ class GMLVQ(LVQBaseClass):
 
     omega_hat_: np.ndarray
         The omega matrix found by the eigenvalue decomposition of the relevance matrix lambda\_.
-        The eigenvectors (columns of omega_hat\_) can be used to transform the data (Bunte et al.
+        The eigenvectors (columns of omega_hat\_) can be used to transform the X (Bunte et al.
         2012).
 
     eigenvalues_: np.ndarray
@@ -305,7 +305,7 @@ class GMLVQ(LVQBaseClass):
     # Initialization functions
     ###########################################################################################
 
-    def _initialize(self, data: np.ndarray, y: np.ndarray) -> SolverBaseClass:
+    def _initialize(self, X: np.ndarray, y: np.ndarray) -> SolverBaseClass:
         """ Initialize is called by the LVQ base class and is required to do two things in order to
         work:
             1. It must initialize the distance functions and store it in 'self._distance'
@@ -316,8 +316,8 @@ class GMLVQ(LVQBaseClass):
 
         Parameters
         ----------
-        data : ndarray with shape (number of observations, number of dimensions)
-            Provided for models which require the data for initialization.
+        X : ndarray with shape (number of observations, number of dimensions)
+            Provided for models which require the X for initialization.
         y : ndarray with size equal to the number of observations
             Provided for models which require the labels for initialization.
 
@@ -328,7 +328,7 @@ class GMLVQ(LVQBaseClass):
             the required functions (see SolverBaseClass documentation).
 
         """
-        self._initialize_omega(data)
+        self._initialize_omega(X)
 
         distance_params = {"force_all_finite": self.force_all_finite}
 
@@ -388,7 +388,7 @@ class GMLVQ(LVQBaseClass):
     # Transformer related functions
     ###########################################################################################
 
-    def _after_fit(self, data: np.ndarray, y: np.ndarray):
+    def _after_fit(self, X: np.ndarray, y: np.ndarray):
         # self.lambda_ = self.omega_.T.dot(self.omega_)
         self.lambda_ = GMLVQ._compute_lambda(self.omega_)
 
@@ -405,13 +405,13 @@ class GMLVQ(LVQBaseClass):
         data : np.ndarray with shape (n_samples, n_features)
             Data used for fit and that will be transformed.
         y : np.ndarray with length (n_samples)
-            Labels corresponding to the data samples.
+            Labels corresponding to the X samples.
         trans_params :
             Parameters passed to transform function
 
         Returns
         -------
-        The data projected on columns of omega\_hat\_ with shape (n_samples, n_columns)
+        The X projected on columns of omega\_hat\_ with shape (n_samples, n_columns)
 
         """
         return self.fit(data, y).transform(data, **trans_params)
@@ -424,12 +424,12 @@ class GMLVQ(LVQBaseClass):
         data : np.ndarray with shape (n_samples, n_features)
             Data that needs to be transformed
         scale : {True, False}, default = False
-            Controls if the eigenvectors the data is projected on are scaled by the square root
+            Controls if the eigenvectors the X is projected on are scaled by the square root
             of their eigenvalues.
 
         Returns
         -------
-        The data projected on columns of omega\_hat\_ with shape (n_samples, n_columns)
+        The X projected on columns of omega\_hat\_ with shape (n_samples, n_columns)
 
         """
         data = check_array(data)
@@ -445,14 +445,14 @@ class GMLVQ(LVQBaseClass):
         return data_new
 
     # TODO: add a sklvq.plot for these things?
-    # def dist_function(self, data):
+    # def dist_function(self, X):
     #     # SciKit-learn list of checked params before predict
     #     check_is_fitted(self)
     #
     #     # Input validation
-    #     data = check_array(data)
+    #     X = check_array(X)
     #
-    #     distances = self._distance(data, self)
+    #     distances = self._distance(X, self)
     #     min_args = np.argsort(distances, axis=1)
     #
     #     winner = distances[list(range(0, distances.shape[0])), min_args[:, 0]]
@@ -467,28 +467,28 @@ class GMLVQ(LVQBaseClass):
     #         ** 2
     #     )
 
-    # def rel_dist_function(self, data):
+    # def rel_dist_function(self, X):
     #     # SciKit-learn list of checked params before predict
     #     check_is_fitted(self)
     #
     #     # Input validation
-    #     data = check_array(data)
+    #     X = check_array(X)
     #
-    #     distances = np.sort(self._distance(data, self))
+    #     distances = np.sort(self._distance(X, self))
     #
     #     winner = distances[:, 0]
     #     runner_up = distances[:, 1]
     #
     #     return (runner_up - winner) / (winner + runner_up)
     #
-    # def d_plus_function(self, data):
+    # def d_plus_function(self, X):
     #     # SciKit-learn list of checked params before predict
     #     check_is_fitted(self)
     #
     #     # Input validation
-    #     data = check_array(data)
+    #     X = check_array(X)
     #
-    #     distances = np.sort(self._distance(data, self))
+    #     distances = np.sort(self._distance(X, self))
     #
     #     winner = distances[:, 0]
     #

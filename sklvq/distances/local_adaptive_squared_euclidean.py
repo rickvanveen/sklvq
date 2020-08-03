@@ -48,7 +48,7 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
         Parameters
         ----------
         data : ndarray with shape (n_samples, n_features)
-            The data for which the distance gradient to the prototypes of the model need to be
+            The X for which the distance gradient to the prototypes of the model need to be
             computed.
         model : LGMLVQ
             The model instance.
@@ -101,7 +101,7 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
         Parameters
         ----------
         data : ndarray with shape (n_samples, n_features)
-            The data for which the distance gradient to the prototypes of the model need to be
+            The X for which the distance gradient to the prototypes of the model need to be
             computed.
         model : LGMLVQ
             The model instance.

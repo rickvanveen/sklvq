@@ -22,9 +22,9 @@ class SteepestGradientDescent(SolverBaseClass):
     objective: ObjectiveBaseClass, required
         This is/should be set by the algorithm.
     max_runs: int
-        Number of runs over all the data. Should be >= 1
+        Number of runs over all the X. Should be >= 1
     batch_size: int
-        Controls the batch size. Use 1 for stochastic, 0 for all data (batch gradient descent),
+        Controls the batch size. Use 1 for stochastic, 0 for all X (batch gradient descent),
         and any number > 1 for mini batch. For mini-batch the solver will do as many batches with
         the specified number as possible. The last batch may have less samples then specified.
     step_size: float or ndarray

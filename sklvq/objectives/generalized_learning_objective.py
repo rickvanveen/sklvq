@@ -64,7 +64,7 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
             The model which can be any LVQBaseClass compatible with this objective function.
 
         data: ndarray with shape (n_samples, n_features)
-            The data
+            The X
 
         labels: ndarray with shape (n_samples)
 
@@ -91,14 +91,14 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
                 \\frac{\\partial E_{GLVQ}}{\\partial w_0} = \\frac{\\partial f}{\\partial \\mu}
                 \\frac{\\partial \\mu}{\\partial d_0} \\frac{\\partial d_0}{\\partial w_0}
 
-        with :math:`w_0` the prototype with a different label than the data and :math:`d_0`
+        with :math:`w_0` the prototype with a different label than the X and :math:`d_0`
         the distance to that prototype.
 
             .. math::
                  \\frac{\\partial E_{GLVQ}}{\\partial w_1} = \\frac{\\partial f}{\\partial \\mu}
                  \\frac{\\partial \\mu}{\\partial d_1} \\frac{\\partial d_1}{\\partial w_1}
 
-        with :math:`w_1` the prototype with the same label as the data and :math:`d_1`
+        with :math:`w_1` the prototype with the same label as the X and :math:`d_1`
         the distance to that prototype.
 
         Parameters
@@ -110,7 +110,7 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
             The model which can be any LVQBaseClass compatible with this objective function.
 
         data: ndarray with shape (n_samples, n_features)
-            The data
+            The X
 
         labels: ndarray with shape (n_samples)
 
@@ -196,7 +196,7 @@ def _compute_distance(data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass
     """ Computes the distances between each prototype and each observation and finds all indices
     where the shortest distance is that of the prototype with the same label and with a different label. """
 
-    # Step 1: Compute distances between data and the model (how is depending on model and coupled
+    # Step 1: Compute distances between X and the model (how is depending on model and coupled
     # distance function)
     distances = model._distance(data, model)
 

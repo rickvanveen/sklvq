@@ -27,11 +27,12 @@ def test_lgmlvq_iris():
     progress_logger = ProgressLogger()
 
     classifier = LGMLVQ(
-        solver_type="waypoint-gradient-descent",
+        solver_type="steepest-gradient-descent",
         solver_params={
             "callback": progress_logger,
             "max_runs": 20,
-            "step_size": 0.01,
+            "step_size": np.array([0.001, 0.5]),
+            "batch_size": 25
         },
         activation_type="swish",
         localization="prototype",

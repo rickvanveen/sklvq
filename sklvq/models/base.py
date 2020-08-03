@@ -144,7 +144,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
     ###########################################################################################
 
     @abstractmethod
-    def _initialize(self, data: np.ndarray, y: np.ndarray) -> SolverBaseClass:
+    def _initialize(self, X: np.ndarray, y: np.ndarray) -> SolverBaseClass:
         """
         Functions should be implemented by every specific model. Must do the following two things
         in order to work:
@@ -153,8 +153,8 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
 
         Parameters
         ----------
-        data : ndarray with shape (number of observations, number of dimensions)
-            Provided for models which require the data for initialization.
+        X : ndarray with shape (number of observations, number of dimensions)
+            Provided for models which require the X for initialization.
         y : ndarray with size equal to the number of observations
             Provided for models which require the labels for initialization.
 
@@ -232,15 +232,15 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
     ###########################################################################################
 
     def _validate_data_labels(
-        self, data: np.ndarray, labels: np.ndarray
+        self, X: np.ndarray, labels: np.ndarray
     ) -> Tuple[np.ndarray, np.ndarray]:
         """
         Functions performs a series of check mostly by using sklearn util functions.
         Additionally, it transform the labels into indexes of unique labels, which are stored in
         self.classes_.
 
-        Checks data and labels for consistent length, enforces X to be 2D and labels
-        1D. By default, data is checked to be non-empty and containing only finite values. Standard
+        Checks X and labels for consistent length, enforces X to be 2D and labels
+        1D. By default, X is checked to be non-empty and containing only finite values. Standard
         input checks are also applied to labels, such as checking that labels does not have
         np.nan or np.inf targets.
             - sklearn check_X_y()
@@ -254,18 +254,18 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
 
         Parameters
         ----------
-        data : ndarray of shape (number of observations, number of dimensions)
+        X : ndarray of shape (number of observations, number of dimensions)
         labels : ndarray of size (number of observations)
 
         Returns
         -------
-        data : ndarray with same shape (and values) as input
+        X : ndarray with same shape (and values) as input
         labels : ndarray of indexes to self.classes_
 
         """
-        # Check data
-        data, labels = self._validate_data(
-            data, labels, force_all_finite=self.force_all_finite
+        # Check X
+        X, labels = self._validate_data(
+            X, labels, force_all_finite=self.force_all_finite
         )
 
         # Check classification targets
@@ -279,14 +279,14 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         if self.classes_.size <= 1:
             raise ValueError("Classifier can't train when only one class is present.")
 
-        return data, labels
+        return X, labels
 
-    def fit(self, data: np.ndarray, y: np.ndarray):
+    def fit(self, X: np.ndarray, y: np.ndarray):
         """ Fit function
 
         Parameters
         ----------
-        data : ndarray of shape (number of observations, number of dimensions)
+        X : ndarray of shape (number of observations, number of dimensions)
         y : ndarray of size (number of observations)
 
         Returns
@@ -295,8 +295,8 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
             The trained model
 
         """
-        # Check data and check and transform labels.
-        data, labels = self._validate_data_labels(data, y)
+        # Check X and check and transform labels.
+        X, y = self._validate_data_labels(X, y)
 
         # Initialize random_state_ that should be used to perform any rng.
         self.random_state_ = check_random_state(self.random_state)
@@ -306,16 +306,16 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
 
         # Using the now initialized (or checked custom prototype labels), we can initialize the
         # prototypes. Stored in self.prototypes_
-        self._initialize_prototypes(data, labels)
+        self._initialize_prototypes(X, y)
 
         # Initialize algorithm specific stuff
-        solver = self._initialize(data, labels)
+        solver = self._initialize(X, y)
 
-        solver.solve(data, labels, self)
+        solver.solve(X, y, self)
 
         # Useful for models such as GMLVQ, e.g., to compute lambda and it's eigenvectors/values
-        # in order to transform the data.
-        self._after_fit(data, labels)
+        # in order to transform the X.
+        self._after_fit(X, y)
 
         return self
 
@@ -323,7 +323,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
     # After fit function
     ###########################################################################################
 
-    def _after_fit(self, data: np.ndarray, y: np.ndarray):
+    def _after_fit(self, X: np.ndarray, y: np.ndarray):
         """
         Method that by default does nothing but can be used by methods that need to compute
         transformation matrices, such that this does not need to be checked or done everytime
@@ -331,7 +331,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
 
         Parameters
         ----------
-        data : ndarray with shape (number of observations, number of dimensions)
+        X : ndarray with shape (number of observations, number of dimensions)
         y : ndarray with size equal to the number of observations
         """
         pass
@@ -375,12 +375,12 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
 
         return decision_values
 
-    def predict(self, data: np.ndarray):
+    def predict(self, X: np.ndarray):
         """ Predict function
 
         Parameters
         ----------
-        data
+        X
 
         Returns
         -------
@@ -390,9 +390,9 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         check_is_fitted(self)
 
         # Input validation
-        data = self._validate_data(data, force_all_finite=self.force_all_finite)
+        X = self._validate_data(X, force_all_finite=self.force_all_finite)
 
-        decision_values = self.decision_function(data)
+        decision_values = self.decision_function(X)
 
         # Prototypes labels are indices of classes_
         if self.classes_.size == 2:

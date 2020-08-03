@@ -53,14 +53,14 @@ def test_glvq_iris():
 # def test_glvq_with_multiple_prototypes_per_class():
 #     iris = datasets.load_iris()
 #
-#     iris.data = preprocessing.scale(iris.data)
+#     iris.X = preprocessing.scale(iris.X)
 #
 #     classifier = GLVQ(
 #         activation_type="sigmoid", activation_params={"beta": 3}, prototypes_per_class=4
 #     )
-#     classifier = classifier.fit(iris.data, iris.target)
+#     classifier = classifier.fit(iris.X, iris.target)
 #
-#     predicted = classifier.predict(iris.data)
+#     predicted = classifier.predict(iris.X)
 #
 #     accuracy = np.count_nonzero(predicted == iris.target) / iris.target.size
 #
@@ -75,7 +75,7 @@ def test_glvq_iris():
 #         preprocessing.StandardScaler(),
 #         GLVQ(activation_type="sigmoid", activation_params={"beta": 6}),
 #     )
-#     accuracy = cross_val_score(pipeline, iris.data, iris.target, cv=5)
+#     accuracy = cross_val_score(pipeline, iris.X, iris.target, cv=5)
 #     print("\nCross validation (k=5): " + "{}".format(accuracy))
 #
 #
@@ -105,7 +105,7 @@ def test_glvq_iris():
 #         return_train_score=True,
 #     )
 #
-#     search.fit(iris.data, iris.target)
+#     search.fit(iris.X, iris.target)
 #
 #     print("\nBest parameter (CV score=%0.3f):" % search.best_score_)
 #     print(search.best_params_)
@@ -148,7 +148,7 @@ def test_glvq_iris():
 #         return_train_score=True,
 #     )
 #
-#     search.fit(iris.data, iris.target)
+#     search.fit(iris.X, iris.target)
 #
 #     print("\nBest parameter (CV score=%0.3f):" % search.best_score_)
 #     print(search.best_params_)

@@ -21,7 +21,7 @@ class WaypointGradientDescent(SolverBaseClass):
     objective: ObjectiveBaseClass, required
         This is/should be set by the algorithm.
     max_runs: int
-        Number of runs over all the data. Should be >= k
+        Number of runs over all the X. Should be >= k
     step_size: float or ndarray
         The step size to control the learning rate of the model parameters. If the same step_size
         should be used for all parameters (e.g., prototypes and omega) then a float is

@@ -27,7 +27,7 @@ standard_scaler = StandardScaler()
 # Initialize the GMLVQ model
 model = GMLVQ()
 
-# Create pipeline that first scales the data and that inputs it to the GMLVQ model
+# Create pipeline that first scales the X and that inputs it to the GMLVQ model
 pipeline = make_pipeline(standard_scaler, model)
 
 # These are some of the relevant solver, distances and activation types for GMLVQ
@@ -68,7 +68,7 @@ search = GridSearchCV(
     verbose=10,
 )
 
-# Fit the data as one would with any other estimator.
+# Fit the X as one would with any other estimator.
 search.fit(data, labels)
 
 # Print the best CV score and parameters.

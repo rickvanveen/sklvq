@@ -40,7 +40,7 @@ model = GMLVQ(
 )
 
 ###############################################################################
-# Fit the GLVQ object to the data and print the performance
+# Fit the GLVQ object to the X and print the performance
 
 # Object to perform z-transform
 scaler = StandardScaler()
@@ -48,7 +48,7 @@ scaler = StandardScaler()
 # Compute (fit) and apply (transform) z-transform
 data = scaler.fit_transform(data)
 
-# Train the model using the scaled data and true labels
+# Train the model using the scaled X and true labels
 model.fit(data, labels)
 
 # Predict the labels using the trained model
@@ -79,12 +79,12 @@ ax.grid(False)
 #   Note that the relevance diagonal adds up to one.
 
 ###############################################################################
-# Transforming the data
+# Transforming the X
 # .....................
-# In addition to making predictions GMLVQ can transform the data using the eigenvectors of the
+# In addition to making predictions GMLVQ can transform the X using the eigenvectors of the
 # relevance matrix.
 
-# Transform the data (scaled by square root of eigenvalues "scale = True")
+# Transform the X (scaled by square root of eigenvalues "scale = True")
 transformed_data = model.transform(data, scale=True)
 
 x_d = transformed_data[:, 0]
@@ -98,7 +98,7 @@ y_m = transformed_model[:, 1]
 
 # Plot
 fig, ax = plt.subplots()
-fig.suptitle("Discriminative projection Iris data and GMLVQ prototypes")
+fig.suptitle("Discriminative projection Iris X and GMLVQ prototypes")
 
 colors = ["blue", "red", "green"]
 for cls, i in enumerate(model.classes_):

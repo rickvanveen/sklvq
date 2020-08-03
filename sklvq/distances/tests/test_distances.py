@@ -66,7 +66,7 @@ def _check_distance(distfun, data, model):
         )
         assert gradient.shape == (data.shape[0], variables_size)
 
-        # Happens when data is exactly on the prototype for some distances.
+        # Happens when X is exactly on the prototype for some distances.
         assert np.all(np.logical_not(np.isnan(gradient)))
 
         # This should also not happen
@@ -78,7 +78,7 @@ def _check_distance(distfun, data, model):
 )
 def test_glvq_distance(distance_class):
     distfun = distance_class()
-    # Some data and prototypes
+    # Some X and prototypes
     data = np.array([[1, 2, 3], [-1, -2, -3]])
     p = np.array([[1, 2, 3], [-1, -2, -3], [0, 0, 0]])
 
@@ -86,7 +86,7 @@ def test_glvq_distance(distance_class):
 
     _check_distance(distfun, data, model)
 
-    # Still need to be able to deal with not-nan data.
+    # Still need to be able to deal with not-nan X.
     distfun = distance_class(force_all_finite="allow-nan")
     _check_distance(distfun, data, model)
 
@@ -96,7 +96,7 @@ def test_glvq_distance(distance_class):
 )
 def test_glvq_nan_distance(distance_class):
     distfun = distance_class(force_all_finite="allow-nan")
-    # Some data and prototypes
+    # Some X and prototypes
     data = np.array([[1, np.nan, 3], [-1, np.nan, -3]])
     p = np.array([[1, 2, 3], [-1, -2, -3], [0, 0, 0]])
 
@@ -111,7 +111,7 @@ def test_glvq_nan_distance(distance_class):
 def test_gmlvq_distance(distance_class):
     distfun = distance_class()
 
-    # Some data and prototypes
+    # Some X and prototypes
     data = np.array([[1, 2, 3], [-1, -2, -3]])
     p = np.array([[1, 2, 3], [-1, -2, -3], [0, 0, 0]])
     o = np.identity(data.shape[1])
@@ -119,7 +119,7 @@ def test_gmlvq_distance(distance_class):
     model = LVQModel(p, o)
 
     _check_distance(distfun, data, model)
-    # Still need to be able to deal with not-nan data.
+    # Still need to be able to deal with not-nan X.
     distfun = distance_class(force_all_finite="allow-nan")
     _check_distance(distfun, data, model)
 
@@ -129,7 +129,7 @@ def test_gmlvq_distance(distance_class):
 
     distfun = distance_class()
     _check_distance(distfun, data, model)
-    # Still need to be able to deal with not-nan data.
+    # Still need to be able to deal with not-nan X.
     distfun = distance_class(force_all_finite="allow-nan")
     _check_distance(distfun, data, model)
 
@@ -140,7 +140,7 @@ def test_gmlvq_distance(distance_class):
 def test_gmlvq_nan_distance(distance_class):
     distfun = distance_class(force_all_finite="allow-nan")
 
-    # Some data and prototypes
+    # Some X and prototypes
     data = np.array([[1, np.nan, 3], [-1, np.nan, -3]])
     p = np.array([[1, 2, 3], [-1, -2, -3], [0, 0, 0]])
     o = np.identity(data.shape[1])
@@ -161,7 +161,7 @@ def test_gmlvq_nan_distance(distance_class):
 def test_lgmlvq_distance(distance_class):
     distfun = distance_class()
 
-    # Some data and prototypes
+    # Some X and prototypes
     data = np.array([[1, 2, 3], [-1, -2, -3]])
     p = np.array([[1, 2, 3], [-1, -2, -3], [0, 0, 0]])
 
@@ -184,7 +184,7 @@ def test_lgmlvq_distance(distance_class):
 def test_gmlvq_nan_distance(distance_class):
     distfun = distance_class(force_all_finite="allow-nan")
 
-    # Some data and prototypes
+    # Some X and prototypes
     data = np.array([[1, np.nan, 3], [-1, np.nan, -3]])
     p = np.array([[1, 2, 3], [-1, -2, -3], [0, 0, 0]])
     o = np.identity(data.shape[1])

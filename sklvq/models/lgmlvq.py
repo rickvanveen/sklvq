@@ -119,7 +119,7 @@ class LGMLVQ(LVQBaseClass):
         Class labels for each output.
 
     prototypes_ : np.ndarray of shape (n_protoypes, n_features)
-        Positions of the prototypes after fit(data, labels) has been called.
+        Positions of the prototypes after fit(X, labels) has been called.
 
     prototypes_labels_ : np.ndarray of shape (n_prototypes)
         Labels for each prototypes. Labels are indexes to classes\_
@@ -132,7 +132,7 @@ class LGMLVQ(LVQBaseClass):
 
     omega_hat_: np.ndarray
         The omega matrices found by the eigenvalue decomposition of the relevance matrices lambda\_.
-        The eigenvectors (columns of omega_hat\_) can be used to transform the data (Bunte et al.
+        The eigenvectors (columns of omega_hat\_) can be used to transform the X (Bunte et al.
         2012). This results in multiple possible transformations one per relevance matrix.
 
     eigenvalues_: np.ndarray
@@ -319,7 +319,7 @@ class LGMLVQ(LVQBaseClass):
     # Initialization functions
     ###########################################################################################
 
-    def _initialize(self, data: np.ndarray, y: np.ndarray) -> SolverBaseClass:
+    def _initialize(self, X: np.ndarray, y: np.ndarray) -> SolverBaseClass:
         """ Initialize is called by the LVQ base class and is required to do two things in order to
         work:
             1. It must initialize the distance functions and store it in 'self._distance'
@@ -330,8 +330,8 @@ class LGMLVQ(LVQBaseClass):
 
         Parameters
         ----------
-        data : ndarray with shape (number of observations, number of dimensions)
-            Provided for models which require the data for initialization.
+        X : ndarray with shape (number of observations, number of dimensions)
+            Provided for models which require the X for initialization.
         y : ndarray with size equal to the number of observations
             Provided for models which require the labels for initialization.
 
@@ -342,7 +342,7 @@ class LGMLVQ(LVQBaseClass):
             the required functions (see SolverBaseClass documentation).
 
         """
-        self._initialize_omega(data)
+        self._initialize_omega(X)
 
         distance_params = {"force_all_finite": self.force_all_finite}
 
@@ -416,7 +416,7 @@ class LGMLVQ(LVQBaseClass):
         # Equivalent to omega.T.dot(omega) per omega
         return np.einsum("ikj, ikl -> ijl", omegas, omegas)
 
-    def _after_fit(self, data: np.ndarray, y: np.ndarray):
+    def _after_fit(self, X: np.ndarray, y: np.ndarray):
         self.lambda_ = LGMLVQ._compute_lambdas(self.omega_)
         # self.lambda_ = np.einsum("ikj, ikl -> ijl", self.omega_, self.omega_)
 
@@ -442,13 +442,13 @@ class LGMLVQ(LVQBaseClass):
         data : np.ndarray with shape (n_samples, n_features)
             Data used for fit and that will be transformed.
         y : np.ndarray with length (n_samples)
-            Labels corresponding to the data samples.
+            Labels corresponding to the X samples.
         trans_params :
             Parameters passed to transform function
 
         Returns
         -------
-        The data projected on columns of each omega\_hat\_ with shape (n_omegas, n_samples,
+        The X projected on columns of each omega\_hat\_ with shape (n_omegas, n_samples,
         n_columns)
 
         """
@@ -467,14 +467,14 @@ class LGMLVQ(LVQBaseClass):
         data : np.ndarray with shape (n_samples, n_features)
             Data that needs to be transformed
         scale : {True, False}, default = False
-            Controls if the eigenvectors the data is projected on are scaled by the square root
+            Controls if the eigenvectors the X is projected on are scaled by the square root
             of their eigenvalues.
         omega_hat_index : int or list
             The indices of the omega\_hats\_ the transformation should be computed for.
 
         Returns
         -------
-        The data projected on columns of each omega\_hat\_ with shape (n_omegas, n_samples,
+        The X projected on columns of each omega\_hat\_ with shape (n_omegas, n_samples,
         n_columns)
 
         """

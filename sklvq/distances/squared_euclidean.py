@@ -43,7 +43,7 @@ class SquaredEuclidean(DistanceBaseClass):
         Parameters
         ----------
         data : ndarray with shape (n_samples, n_features)
-            The data for which the distance gradient to the prototypes of the model need to be
+            The X for which the distance gradient to the prototypes of the model need to be
             computed.
         model : GLVQ
             The model instance.
@@ -65,7 +65,7 @@ class SquaredEuclidean(DistanceBaseClass):
         Parameters
         ----------
         data : ndarray with shape (n_samples, n_features)
-            The data for which the distance gradient to the prototypes of the model need to be
+            The X for which the distance gradient to the prototypes of the model need to be
             computed.
         model : GLVQ
             The model instance.
@@ -75,7 +75,7 @@ class SquaredEuclidean(DistanceBaseClass):
         Returns
         -------
         gradient : ndarray with shape (n_samples, n_features)
-            The gradient with respect to the prototype and every sample in the data.
+            The gradient with respect to the prototype and every sample in the X.
 
         """
         prototypes = model.get_model_params()

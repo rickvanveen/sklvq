@@ -28,7 +28,7 @@ class DistanceBaseClass(ABC):
         Parameters
         ----------
         data : ndarray with shape (n_samples, n_features)
-            The data for which the distance to the prototypes of the model need to be computed.
+            The X for which the distance to the prototypes of the model need to be computed.
         model : LVQBaseClass
             Any class extending the LVQBaseClass or depending on the type of distance function
             is implemented a class that provides the required attributes.
@@ -50,7 +50,7 @@ class DistanceBaseClass(ABC):
         Parameters
         ----------
         data : ndarray with shape (n_samples, n_features)
-            The data for which the distance gradient to the prototypes of the model need to be
+            The X for which the distance gradient to the prototypes of the model need to be
             computed.
         model : LVQBaseClass
             Any class extending the LVQBaseClass or depending on the type of distance function
@@ -61,7 +61,7 @@ class DistanceBaseClass(ABC):
         Returns
         -------
         ndarray with shape (n_samples, n_features)
-            The gradient with respect to the prototype and every sample in the data.
+            The gradient with respect to the prototype and every sample in the X.
 
         """
         raise NotImplementedError("You should implement this!")

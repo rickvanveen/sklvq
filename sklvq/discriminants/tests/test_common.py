@@ -21,7 +21,7 @@ def check_discriminant(discriminant_class):
     # Instantiate callable object
     discriminant_callable = discriminant_class()
 
-    # Generate random data
+    # Generate random X
     rng = np.random.RandomState(0)
     x = rng.random_sample((4, 3))
     y = rng.random_sample((4, 3))

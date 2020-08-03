@@ -5,7 +5,7 @@ Cross validation
 
 In all previous examples we showed the training performance of the models. However,
 in practice it is much more interesting how wel a model performs on
-unseen data, i.e., the generalizability of the model.
+unseen X, i.e., the generalizability of the model.
 """
 
 import numpy as np

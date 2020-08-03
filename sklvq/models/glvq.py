@@ -87,7 +87,7 @@ class GLVQ(LVQBaseClass):
 
     random_state : int, RandomState instance, default=None
         Determines random number generation. Used in random offset of prototypes and shuffling of
-        the data in the solvers.
+        the X in the solvers.
 
     force_all_finite : {True, "allow-nan"}, default=True
         Whether to raise an error on np.inf, np.nan, pd.NA in array. The possibilities are:
@@ -101,7 +101,7 @@ class GLVQ(LVQBaseClass):
         Class labels for each output.
 
     prototypes_ : ndarray of shape (n_protoypes, n_features)
-        Positions of the prototypes after fit(data, labels) has been called.
+        Positions of the prototypes after fit(X, labels) has been called.
 
     prototypes_labels_ : ndarray of shape (n_prototypes)
         Labels for each prototypes. Labels are indexes to classes\_
@@ -247,7 +247,7 @@ class GLVQ(LVQBaseClass):
     # Initialization required functions
     ###########################################################################################
 
-    def _initialize(self, data: np.ndarray, y: np.ndarray) -> SolverBaseClass:
+    def _initialize(self, X: np.ndarray, y: np.ndarray) -> SolverBaseClass:
         """
         Initialize is called by the LVQ base class and is required to do two things in order to
         work:
@@ -259,8 +259,8 @@ class GLVQ(LVQBaseClass):
 
         Parameters
         ----------
-        data : ndarray with shape (number of observations, number of dimensions)
-            Provided for models which require the data for initialization.
+        X : ndarray with shape (number of observations, number of dimensions)
+            Provided for models which require the X for initialization.
         y : ndarray with size equal to the number of observations
             Provided for models which require the labels for initialization.
 

@@ -47,7 +47,7 @@ model = GMLVQ(
 )
 
 ###############################################################################
-# Fit the GLVQ object to the data and print the performance
+# Fit the GLVQ object to the X and print the performance
 
 # Object to perform z-transform
 scaler = StandardScaler()
@@ -55,7 +55,7 @@ scaler = StandardScaler()
 # Compute (fit) and apply (transform) z-transform
 data = scaler.fit_transform(data)
 
-# Train the model using the scaled data and true labels
+# Train the model using the scaled X and true labels
 model.fit(data, labels)
 
 # Predict the labels using the trained model

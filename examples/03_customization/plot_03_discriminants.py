@@ -22,15 +22,15 @@ import numpy as np
 # parameters of the call and gradient. See sklvq.objective.GeneralizedLearningObjective.
 class CustomRelativeDistance(DiscriminativeBaseClass):
     def __call__(self, dist_same: np.ndarray, dist_diff: np.ndarray) -> np.ndarray:
-        # dist_same = distance to prototype with same label as data.
-        # dist_diff = distance to prototype with different label as data.
+        # dist_same = distance to prototype with same label as X.
+        # dist_diff = distance to prototype with different label as X.
         return (dist_same - dist_diff) / (dist_same + dist_diff)
 
     def gradient(
         self, dist_same: np.ndarray, dist_diff: np.ndarray, winner_same: bool
     ) -> np.ndarray:
         # Winner_same is an boolean flag to indicate if the considered prototype has the same or
-        # a different label compared to the considered data.
+        # a different label compared to the considered X.
         if winner_same:
             return _gradient_same(dist_same, dist_diff)
         return _gradient_diff(dist_same, dist_diff)

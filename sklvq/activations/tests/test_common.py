@@ -24,7 +24,7 @@ def check_activation(activation_class):
     # Instantiate callable object
     activation_callable = activation_class()
 
-    # Generate random data
+    # Generate random X
     rng = np.random.RandomState(0)
     x = rng.random_sample((3, 4))
 
