@@ -6,7 +6,7 @@ from sklearn.metrics.pairwise import pairwise_distances
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from sklvq.models import GMLVQ
+    from ..models import GMLVQ
 
 
 class AdaptiveSquaredEuclidean(DistanceBaseClass):
@@ -66,8 +66,8 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
     def gradient(
         self, data: np.ndarray, model: "GMLVQ", i_prototype: int
     ) -> np.ndarray:
-        """ The partial derivative of the adaptive squared euclidean distance function, with respect
-        to a specified prototype and the matrix omega.
+        r""" The partial derivative of the adaptive squared euclidean distance function,
+        with respect to a specified prototype and the matrix omega:
 
             .. math::
                 \\frac{\\partial d}{\\partial \\vec{w_i}} = -2 \\cdot \\Lambda \cdot (\\vec{x} -

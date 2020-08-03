@@ -1,11 +1,11 @@
 """ Package containing activation functions
 """
 
-from sklvq.activations.base import ActivationBaseClass
-from sklvq.activations.identity import Identity
-from sklvq.activations.sigmoid import Sigmoid
-from sklvq.activations.soft_plus import SoftPlus
-from sklvq.activations.swish import Swish
+from .base import ActivationBaseClass
+from .identity import Identity
+from .sigmoid import Sigmoid
+from .soft_plus import SoftPlus
+from .swish import Swish
 
 from typing import Union
 
@@ -23,6 +23,4 @@ def grab(
     class_kwargs: dict = None,
     whitelist: list = None,
 ) -> Union[ActivationBaseClass, object]:
-    return utils.grab(
-        class_type, class_args, class_kwargs, ALIASES, whitelist, PACKAGE
-    )
+    return utils.grab(class_type, class_args, class_kwargs, ALIASES, whitelist, PACKAGE)

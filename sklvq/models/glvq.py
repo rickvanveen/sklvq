@@ -1,16 +1,13 @@
-from . import LVQBaseClass
 import numpy as np
 
-# Can be switched out by parameters to the models.
-from sklvq import distances, solvers
+from . import LVQBaseClass
+from .. import distances, solvers
+from ..objectives import GeneralizedLearningObjective
+from ..solvers import SolverBaseClass
 
 # Typing
 from typing import Union
 
-from sklvq.solvers import SolverBaseClass
-
-# Cannot be switched out by parameters to the models.
-from sklvq.objectives import GeneralizedLearningObjective
 
 ModelParamsType = np.ndarray
 

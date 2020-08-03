@@ -1,4 +1,5 @@
 from . import ScipyBaseSolver
+from ..objectives import ObjectiveBaseClass
 
 
 class LimitedMemoryBfgs(ScipyBaseSolver):
@@ -14,8 +15,10 @@ class LimitedMemoryBfgs(ScipyBaseSolver):
     callback: callable
         Differently from non-scipy solvers the signature is callback(xk) with xk the current
         set of variables.
+
     """
-    def __init__(self, objective, **kwargs):
+
+    def __init__(self, objective: ObjectiveBaseClass, **kwargs):
         super(LimitedMemoryBfgs, self).__init__(
             objective, method="L-BFGS-B", **kwargs
         )

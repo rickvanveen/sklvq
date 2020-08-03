@@ -1,17 +1,14 @@
-from sklvq.distances import DistanceBaseClass
 from sklvq.models import LVQBaseClass
 
 import numpy as np
 from sklearn.utils.validation import check_is_fitted, check_array
-from sklearn.base import TransformerMixin
 
-from sklvq import activations, discriminants, objectives, distances, solvers
-from sklvq.objectives import GeneralizedLearningObjective
+from .. import distances, solvers
+from ..objectives import GeneralizedLearningObjective
+from ..solvers import SolverBaseClass
 
 from typing import Union
 from typing import Tuple
-
-from sklvq.solvers import SolverBaseClass
 
 ModelParamsType = Tuple[np.ndarray, np.ndarray]
 

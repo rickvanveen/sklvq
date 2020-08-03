@@ -1,5 +1,5 @@
-from sklvq.discriminants.base import DiscriminativeBaseClass
-from sklvq.discriminants.relative_distance import RelativeDistance
+from .base import DiscriminativeBaseClass
+from .relative_distance import RelativeDistance
 
 from typing import Union
 from sklvq.misc import utils

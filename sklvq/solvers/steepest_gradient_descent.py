@@ -1,17 +1,13 @@
-from sklearn.utils import shuffle
 import numpy as np
+from sklearn.utils import shuffle
 
 from . import SolverBaseClass
-from sklvq.objectives import ObjectiveBaseClass
+from ..objectives import ObjectiveBaseClass
 
-from typing import TYPE_CHECKING
 from typing import Union
-
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sklvq.models import LVQBaseClass
-
-
-# TODO: Smarter initialization of stepsizes based on algorithm and solver
 
 STATE_KEYS = ["variables", "nit", "fun", "jac", "step_size"]
 
@@ -56,10 +52,10 @@ class SteepestGradientDescent(SolverBaseClass):
     def __init__(
         self,
         objective: ObjectiveBaseClass,
-        max_runs=10,
-        batch_size=1,
-        step_size=0.2,
-        callback=None,
+        max_runs: int = 10,
+        batch_size: int = 1,
+        step_size: float = 0.2,
+        callback: callable = None,
     ):
         super().__init__(objective)
         self.max_runs: int = max_runs

@@ -1,12 +1,10 @@
-from sklearn.utils import shuffle
 import numpy as np
+from sklearn.utils import shuffle
 
 from . import SolverBaseClass
-from sklvq.objectives import ObjectiveBaseClass
+from ..objectives import ObjectiveBaseClass
 
 from typing import TYPE_CHECKING
-from typing import Union
-
 if TYPE_CHECKING:
     from sklvq.models import LVQBaseClass
 

@@ -1,12 +1,13 @@
+from itertools import repeat
 from abc import ABC, abstractmethod
+
 import numpy as np
-from sklvq.objectives import ObjectiveBaseClass
 import scipy as sp
 
-from itertools import repeat
-from typing import TYPE_CHECKING
-from typing import Union
+from ..objectives import ObjectiveBaseClass
 
+from typing import Union
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sklvq.models import LVQBaseClass
 

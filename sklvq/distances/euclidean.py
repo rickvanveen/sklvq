@@ -6,7 +6,7 @@ from . import DistanceBaseClass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from sklvq.models import GLVQ
+    from ..models import GLVQ
 
 
 class Euclidean(DistanceBaseClass):

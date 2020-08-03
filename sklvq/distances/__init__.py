@@ -1,9 +1,9 @@
 from .base import DistanceBaseClass
 
-from sklvq.distances.euclidean import Euclidean
-from sklvq.distances.squared_euclidean import SquaredEuclidean
-from sklvq.distances.adaptive_squared_euclidean import AdaptiveSquaredEuclidean
-from sklvq.distances.local_adaptive_squared_euclidean import (
+from .euclidean import Euclidean
+from .squared_euclidean import SquaredEuclidean
+from .adaptive_squared_euclidean import AdaptiveSquaredEuclidean
+from .local_adaptive_squared_euclidean import (
     LocalAdaptiveSquaredEuclidean,
 )
 

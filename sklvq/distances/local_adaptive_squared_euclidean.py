@@ -2,7 +2,7 @@ from . import DistanceBaseClass
 
 import numpy as np
 from sklearn.metrics.pairwise import pairwise_distances
-from sklvq.distances.adaptive_squared_euclidean import (
+from .adaptive_squared_euclidean import (
     _nan_mahalanobis,
     _prototype_gradient,
     _omega_gradient,
@@ -11,7 +11,7 @@ from sklvq.distances.adaptive_squared_euclidean import (
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from sklvq.models import LGMLVQ
+    from ..models import LGMLVQ
 
 
 class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):

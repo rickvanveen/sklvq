@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
+
 import numpy as np
 
 from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
     from sklvq.models import LVQBaseClass
 

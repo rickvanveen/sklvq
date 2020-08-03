@@ -1,14 +1,15 @@
 from abc import ABC, abstractmethod
 
 import numpy as np
+
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.utils import check_random_state
-from sklearn.utils.multiclass import unique_labels, check_classification_targets
-from sklearn.utils.validation import check_X_y, check_is_fitted, check_array
+from sklearn.utils.multiclass import check_classification_targets
+from sklearn.utils.validation import check_is_fitted, check_array
 
-from sklvq.distances import DistanceBaseClass
-from sklvq.solvers import SolverBaseClass
-from sklvq.objectives import GeneralizedLearningObjective
+from ..distances import DistanceBaseClass
+from ..solvers import SolverBaseClass
+from ..objectives import GeneralizedLearningObjective
 
 from typing import Tuple, Union
 
@@ -48,7 +49,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
     ###########################################################################################
 
     @abstractmethod
-    def set_model_params(self, model_params: Union[tuple, np.ndarray]) -> None:
+    def set_model_params(self, model_params: Union[tuple, np.ndarray]):
         """
         Changes the model's internal parameters.
 

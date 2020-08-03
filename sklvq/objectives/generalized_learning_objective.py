@@ -1,12 +1,12 @@
-from sklvq.objectives import ObjectiveBaseClass
-from sklvq import activations, discriminants
-
 import numpy as np
 
-from typing import TYPE_CHECKING, Union
+from ..objectives import ObjectiveBaseClass
+from .. import activations, discriminants
 
+from typing import Union
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from sklvq.models import LVQBaseClass
+    from ..models import LVQBaseClass
 
 ACTIVATION_FUNCTIONS = [
     "identity",
