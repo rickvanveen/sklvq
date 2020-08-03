@@ -51,7 +51,7 @@ class AdaptiveMomentEstimation(SolverBaseClass):
 
     def solve(
         self, data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass",
-    ) -> "LVQBaseClass":
+    ):
 
         # Administration
         variables = model._to_variables(model._get_model_params())
@@ -70,7 +70,7 @@ class AdaptiveMomentEstimation(SolverBaseClass):
                 fun=self.objective(variables, model, data, labels),
             )
             if self.callback(model, state):
-                return model
+                return
 
         objective_gradient = None
 
@@ -131,6 +131,4 @@ class AdaptiveMomentEstimation(SolverBaseClass):
                     v_hat=v_hat
                 )
                 if self.callback(model, state):
-                    return model
-
-        return model
+                   return

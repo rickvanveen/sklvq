@@ -5,7 +5,7 @@ class BroydenFletcherGoldfarbShanno(ScipyBaseSolver):
     """ BroydenFletcherGoldfarbShanno
 
     """
-    def __init__(self, objective, params=None):
+    def __init__(self, objective, **kwargs):
         super(BroydenFletcherGoldfarbShanno, self).__init__(
-            objective, method="BFGS", params=params
+            objective, method="BFGS", **kwargs
         )

@@ -46,7 +46,7 @@ class WaypointGradientDescent(SolverBaseClass):
 
     def solve(
         self, data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass",
-    ) -> "LVQBaseClass":
+    ):
         """
 
         Parameters
@@ -77,7 +77,7 @@ class WaypointGradientDescent(SolverBaseClass):
                 fun=cost
             )
             if self.callback(model, state):
-                return model
+                return
 
         # Initial runs to get enough gradients to average.
         for i_run in range(0, self.k):
@@ -128,7 +128,7 @@ class WaypointGradientDescent(SolverBaseClass):
                     step_size=step_size,
                 )
                 if self.callback(model, state):
-                    return model
+                    return
 
         # The remainder of the runs
         for i_run in range(self.k, self.max_runs):
@@ -209,6 +209,4 @@ class WaypointGradientDescent(SolverBaseClass):
                     step_size=step_size,
                 )
                 if self.callback(model, state):
-                    return model
-
-        return model
+                    return

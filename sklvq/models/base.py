@@ -274,7 +274,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         # that can be used to reconstruct the original labels.
         self.classes_, labels = np.unique(labels, return_inverse=True)
 
-        # Rais an error when the targets only contain a single unique class.
+        # Raise an error when the targets only contain a single unique class.
         if self.classes_.size <= 1:
             raise ValueError("Classifier can't train when only one class is present.")
 
@@ -285,11 +285,13 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
 
         Parameters
         ----------
-        data
-        y
+        data : ndarray of shape (number of observations, number of dimensions)
+        y : ndarray of size (number of observations)
 
         Returns
         -------
+        self
+            The trained model
 
         """
         # Check data and check and transform labels.
@@ -297,9 +299,6 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
 
         # Initialize random_state_ that should be used to perform any rng.
         self.random_state_ = check_random_state(self.random_state)
-
-        # Common LVQ steps -> move to specific model...
-        # self._distance = distances.grab(self.distance_type, self.distance_params)
 
         # Initialize prototype labels stored in self.prototypes_labels_
         self._initialize_prototype_labels()
@@ -311,14 +310,13 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         # Initialize algorithm specific stuff
         solver = self._initialize(data, labels)
 
-        # model is equal to self... which is a bit weird?
-        model = solver.solve(data, labels, self)
+        solver.solve(data, labels, self)
 
         # Useful for models such as GMLVQ, e.g., to compute lambda and it's eigenvectors/values
         # in order to transform the data.
         self._after_fit(data, labels)
 
-        return model
+        return self
 
     ###########################################################################################
     # After fit function

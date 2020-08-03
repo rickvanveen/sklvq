@@ -21,17 +21,19 @@ class SolverBaseClass(ABC):
     @abstractmethod
     def solve(
         self, data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass",
-    ) -> "LVQBaseClass":
+    ):
         """
 
         Parameters
         ----------
-        data
-        labels
-        model
+        data : ndarray of shape (number of observations, number of dimensions)
+        labels : ndarray of size (number of observations)
+        model : LVQBaseClass
+            The initial model that will hold the result
 
         Returns
         -------
+            The trained model
 
         """
         raise NotImplementedError("You should implement this!")
@@ -64,15 +66,15 @@ class SolverBaseClass(ABC):
 
 class ScipyBaseSolver(SolverBaseClass):
     def __init__(
-        self, objective, method: str = "L-BFGS-B", params: dict = None, **kwargs
+        self, objective, method: str = "L-BFGS-B", **kwargs
     ):
         self.method = method
-        self.params = params
+        self.params = kwargs
         super().__init__(objective)
 
     def solve(
         self, data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass",
-    ) -> "LVQBaseClass":
+    ):
         """
 
         Parameters
@@ -99,4 +101,3 @@ class ScipyBaseSolver(SolverBaseClass):
 
         # Update model
         model._set_model_params(model._to_params(result.x))
-        return model

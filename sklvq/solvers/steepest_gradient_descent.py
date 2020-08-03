@@ -44,7 +44,7 @@ class SteepestGradientDescent(SolverBaseClass):
 
     def solve(
         self, data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass",
-    ) -> "LVQBaseClass":
+    ):
         """
 
         Parameters
@@ -52,9 +52,6 @@ class SteepestGradientDescent(SolverBaseClass):
         data
         labels
         model
-
-        Returns
-        -------
 
         """
 
@@ -67,9 +64,10 @@ class SteepestGradientDescent(SolverBaseClass):
                 fun=self.objective(variables, model, data, labels),
             )
             if self.callback(model, state):
-                return model
+                return
 
         objective_gradient = None
+        new_model_variables = None
 
         for i_run in range(0, self.max_runs):
             # Randomize order of samples
@@ -131,6 +129,4 @@ class SteepestGradientDescent(SolverBaseClass):
                     step_size=step_size,
                 )
                 if self.callback(model, state):
-                    return model
-
-        return model
+                    return
