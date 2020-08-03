@@ -18,13 +18,13 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
 
     """
 
-    def __init__(self, **other_kwargs):
+    def __init__(self, **kwargs):
         self.metric_kwargs = {
             "metric": "mahalanobis",
         }
 
-        if other_kwargs is not None:
-            self.metric_kwargs.update(other_kwargs)
+        if kwargs is not None:
+            self.metric_kwargs.update(kwargs)
 
         if "force_all_finite" in self.metric_kwargs:
             if self.metric_kwargs["force_all_finite"] == "allow-nan":

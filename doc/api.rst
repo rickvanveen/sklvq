@@ -4,10 +4,15 @@ API Reference
 
 API of included algorithms in sklvq.
 
-.. currentmodule:: sklvq
-
 Predictors and Transformers
 ===========================
+.. currentmodule:: sklvq.models
+
+.. autosummary::
+    :toctree: generated/
+    :template: class.rst
+
+    LVQBaseClass
 
 .. autosummary::
     :toctree: generated/

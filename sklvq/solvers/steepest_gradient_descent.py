@@ -11,23 +11,48 @@ if TYPE_CHECKING:
     from sklvq.models import LVQBaseClass
 
 
-# TODO: Smarter initialization based on algorithm and solver
+# TODO: Smarter initialization of stepsizes based on algorithm and solver
 
 STATE_KEYS = ["variables", "nit", "fun", "jac", "step_size"]
 
 
 class SteepestGradientDescent(SolverBaseClass):
-    """
+    """ SteepestGradientDescent
+
+    Implements the stochastic, batch and mini-batch gradient descent optimization methods.
 
     Parameters
     ----------
-    objective
-    max_runs
-    batch_size
-    step_size
-    callback
+    objective: ObjectiveBaseClass, required
+        This is/should be set by the algorithm.
+    max_runs: int
+        Number of runs over all the data. Should be >= 1
+    batch_size: int
+        Controls the batch size. Use 1 for stochastic, 0 for all data (batch gradient descent),
+        and any number > 1 for mini batch. For mini-batch the solver will do as many batches with
+        the specified number as possible. The last batch may have less samples then specified.
+    step_size: float or ndarray
+        The step size to control the learning rate of the model parameters. If the same step_size
+        should be used for all parameters (e.g., prototypes and omega) then a float is
+        sufficient. If separate initial step_sizes should be used per model parameter then this
+        should be specified by using a ndarray.
+    callback: callable
+        Callable with signature callable(model, state). If the callable returns True the solver
+        will stop (early). The state object contains the following.
+
+        - "variables"
+            Concatenated 1D ndarray of the model's parameters
+        - "nit"
+            The current iteration counter
+        - "fun"
+            The objective cost
+        - "jac"
+            The objective gradient
+        - "step_size"
+            The current step_size(s)
 
     """
+
     def __init__(
         self,
         objective: ObjectiveBaseClass,
@@ -49,9 +74,10 @@ class SteepestGradientDescent(SolverBaseClass):
 
         Parameters
         ----------
-        data
-        labels
-        model
+        data : ndarray of shape (number of observations, number of dimensions)
+        labels : ndarray of size (number of observations)
+        model : LVQBaseClass
+            The initial model that will be changed and holds the results at the end
 
         """
 
@@ -115,9 +141,7 @@ class SteepestGradientDescent(SolverBaseClass):
                 new_model_variables = model_variables - objective_gradient
 
                 # Transform back to parameters form and update the model
-                model._set_model_params(
-                    model._to_params(new_model_variables)
-                )
+                model._set_model_params(model._to_params(new_model_variables))
 
             if self.callback is not None:
                 state = self.create_state(

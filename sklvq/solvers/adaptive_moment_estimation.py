@@ -1,8 +1,3 @@
-# Adam
-# Stochastic gradient descent based
-# Maintains two moving averages for the gradient m and the hadamard squared gradient v
-# Beta1 and beta2 control the decay rate of these averages. (hyperparameters)
-# Eta step size (in total 3 hyperparamters)
 from sklearn.utils import shuffle
 import numpy as np
 
@@ -10,6 +5,7 @@ from . import SolverBaseClass
 from sklvq.objectives import ObjectiveBaseClass
 
 from typing import TYPE_CHECKING
+from typing import Union
 
 if TYPE_CHECKING:
     from sklvq.models import LVQBaseClass
@@ -18,28 +14,62 @@ STATE_KEYS = ["variables", "nit", "fun", "jac", "m_hat", "v_hat"]
 
 
 class AdaptiveMomentEstimation(SolverBaseClass):
-    """
+    """AdaptiveMomentEstimation
+
+    Implementation based on description given in [1]_.
 
     Parameters
     ----------
-    objective
-    max_runs
-    beta1
-    beta2
-    step_size
-    epsilon
-    callback
+    objective: ObjectiveBaseClass, required
+        This is/should be set by the algorithm.
+    max_runs: int
+        Number of runs over all the data. Should be >= 1
+    beta1: float
+        Controls the decay rate of the moving average of the gradient. Should be less than 1.0
+        and greater than 0.
+    beta2: float
+        Controls the decay rate of the moving average of the squared gradient. Should be less
+        than 1.0 and greater than 0.
+    step_size: float
+        The step size to control the learning rate.
+    epsilon: float
+        Small value to overcome zero division
+
+    callback: callable
+        Callable with signature callable(model, state). If the callable returns True the solver
+        will stop (early). The state object contains the following.
+
+        - "variables"
+            Concatenated 1D ndarray of the model's parameters
+        - "nit"
+            The current iteration counter
+        - "fun"
+            The objective cost
+        - "jac"
+            The objective gradient
+        - "m_hat"
+            Unbiased moving average of the gradient
+        - "v_hat"
+            Unbiased moving average of the Hadamard squared gradient
+
+    References
+    ----------
+    .. [1] LeKander, M., Biehl, M., & De Vries, H. (2017). "Empirical evaluation of gradient
+        methods for matrix learning vector quantization." 12th International Workshop on
+        Self-Organizing Maps and Learning Vector Quantization, Clustering and Data
+        Visualization, WSOM 2017.
 
     """
+
     def __init__(
         self,
         objective: ObjectiveBaseClass,
-        max_runs=20,
-        beta1=0.9,
-        beta2=0.999,
-        step_size=0.001,
-        epsilon=1e-4,
-        callback=None
+        max_runs: int = 20,
+        beta1: float = 0.9,
+        beta2: float = 0.999,
+        step_size: float = 0.001,
+        epsilon: float = 1e-4,
+        callback: callable = None,
     ):
         super().__init__(objective)
         self.max_runs = max_runs
@@ -52,6 +82,16 @@ class AdaptiveMomentEstimation(SolverBaseClass):
     def solve(
         self, data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass",
     ):
+        """
+
+        Parameters
+        ----------
+        data : ndarray of shape (number of observations, number of dimensions)
+        labels : ndarray of size (number of observations)
+        model : LVQBaseClass
+            The initial model that will be changed and holds the results at the end
+
+        """
 
         # Administration
         variables = model._to_variables(model._get_model_params())
@@ -116,9 +156,7 @@ class AdaptiveMomentEstimation(SolverBaseClass):
                 new_model_variables = model_variables - objective_gradient
 
                 # Transform back to parameters form to update the model
-                model._set_model_params(
-                    model._to_params(new_model_variables)
-                )
+                model._set_model_params(model._to_params(new_model_variables))
 
             if self.callback is not None:
                 state = self.create_state(
@@ -128,7 +166,7 @@ class AdaptiveMomentEstimation(SolverBaseClass):
                     fun=self.objective(new_model_variables, model, data, labels),
                     jac=objective_gradient,
                     m_hat=m_hat,
-                    v_hat=v_hat
+                    v_hat=v_hat,
                 )
                 if self.callback(model, state):
-                   return
+                    return

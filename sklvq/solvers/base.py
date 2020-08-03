@@ -15,6 +15,7 @@ class SolverBaseClass(ABC):
     """ SolverBaseClass
 
     """
+
     def __init__(self, objective: ObjectiveBaseClass):
         self.objective = objective
 
@@ -23,6 +24,7 @@ class SolverBaseClass(ABC):
         self, data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass",
     ):
         """
+        Solve alters the model and does not return anything
 
         Parameters
         ----------
@@ -30,14 +32,10 @@ class SolverBaseClass(ABC):
         labels : ndarray of size (number of observations)
         model : LVQBaseClass
             The initial model that will hold the result
-
-        Returns
-        -------
-            The trained model
-
         """
         raise NotImplementedError("You should implement this!")
 
+    # TODO: move out of object
     @staticmethod
     def create_state(state_keys, **kwargs) -> dict:
         state = dict.fromkeys(state_keys)
@@ -65,9 +63,7 @@ class SolverBaseClass(ABC):
 
 
 class ScipyBaseSolver(SolverBaseClass):
-    def __init__(
-        self, objective, method: str = "L-BFGS-B", **kwargs
-    ):
+    def __init__(self, objective, method: str = "L-BFGS-B", **kwargs):
         self.method = method
         self.params = kwargs
         super().__init__(objective)
@@ -76,15 +72,14 @@ class ScipyBaseSolver(SolverBaseClass):
         self, data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass",
     ):
         """
+        Solve alters the model and does not return anything
 
         Parameters
         ----------
-        data
-        labels
-        model
-
-        Returns
-        -------
+        data : ndarray of shape (number of observations, number of dimensions)
+        labels : ndarray of size (number of observations)
+        model : LVQBaseClass
+            The initial model that will hold the result
 
         """
         params = {"jac": self.objective.gradient}

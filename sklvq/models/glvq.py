@@ -203,7 +203,7 @@ class GLVQ(LVQBaseClass):
         Returns
         -------
         ndarray
-            Concatenated list of the model's parameters ravelled (ravel())
+            Concatenated 1D ndarray of the model's parameters
 
         """
         return model_params.ravel()

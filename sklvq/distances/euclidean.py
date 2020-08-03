@@ -17,13 +17,13 @@ class Euclidean(DistanceBaseClass):
     SquaredEuclidean, AdaptiveSquaredEuclidean, LocalAdaptiveSquaredEuclidean
     """
 
-    def __init__(self, **other_kwargs):
+    def __init__(self, **kwargs):
         # Default euclidean
         self.metric_kwargs = {"metric": "euclidean", "squared": False}
 
         # Could contain other kwargs for sklearn.metrics.pairwise_distances
-        if other_kwargs is not None:
-            self.metric_kwargs.update(other_kwargs)
+        if kwargs is not None:
+            self.metric_kwargs.update(kwargs)
 
         # This might include force_all_finite which if it is set to "allow-nan" should switch the
         # metric used to nan_euclidean else euclidean is fine.

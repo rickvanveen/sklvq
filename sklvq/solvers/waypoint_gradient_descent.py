@@ -12,29 +12,73 @@ if TYPE_CHECKING:
 STATE_KEYS = ["variables", "nit", "fun", "nfun", "tfun", "njac", "tjac", "step_size"]
 
 
+# TODO: its wrong should store average of past points not gradients....
 class WaypointGradientDescent(SolverBaseClass):
     """ WaypointGradientDescent
 
+    Original description in [1]_. Implementation based on description given in [2]_.
+
     Parameters
     ----------
-    objective
-    max_runs
-    step_size
-    loss
-    gain
-    k
-    callback
+    objective: ObjectiveBaseClass, required
+        This is/should be set by the algorithm.
+    max_runs: int
+        Number of runs over all the data. Should be >= k
+    step_size: float or ndarray
+        The step size to control the learning rate of the model parameters. If the same step_size
+        should be used for all parameters (e.g., prototypes and omega) then a float is
+        sufficient. If separate initial step_sizes should be used per model parameter then this
+        should be specified by using a ndarray.
+    loss: float
+        Less than 1 and controls the learning rate change factor for the waypoint average steps.
+    gain: float
+        Greater than 1 and controls the learning rate change factor for the gradient steps.
+    k: int
+        The number of runs used to compute the average gradient update.
+
+    callback: callable
+        Callable with signature callable(model, state). If the callable returns True the solver
+        will stop (early). The state object contains the following.
+
+        - "variables"
+            Concatenated 1D ndarray of the model's parameters
+        - "nit"
+            The current iteration counter.
+        - "fun"
+            The accepted cost.
+        - "nfun"
+            The cost of the regular update step.
+        - "tfun"
+            The cost of the "tentative" update, i.e., the average of the past k updates.
+        - "njac"
+            The gradient update of the regular update.
+        - "tjac",
+            The average gradient update.
+        - "step_size"
+            The current step_size(s)
+
+
+    References
+    ----------
+    .. [1] Papari, G., and Bunte, K., and Biehl, M. (2011) "Waypoint averaging and step size
+        control in learning by gradient descent" Mittweida Workshop on Computational
+        Intelligence (MIWOCI) 2011.
+    .. [2] LeKander, M., Biehl, M., & De Vries, H. (2017). "Empirical evaluation of gradient
+        methods for matrix learning vector quantization." 12th International Workshop on
+        Self-Organizing Maps and Learning Vector Quantization, Clustering and Data
+        Visualization, WSOM 2017.
 
     """
+
     def __init__(
         self,
         objective: ObjectiveBaseClass,
-        max_runs=10,
-        step_size=0.1,
-        loss=2 / 3,
-        gain=1.1,
-        k=3,
-        callback=None,
+        max_runs: int = 10,
+        step_size: float = 0.1,
+        loss: float = 2 / 3,
+        gain: float = 1.1,
+        k: int = 3,
+        callback: callable = None,
     ):
         super().__init__(objective)
         self.max_runs = max_runs
@@ -51,12 +95,10 @@ class WaypointGradientDescent(SolverBaseClass):
 
         Parameters
         ----------
-        data
-        labels
-        model
-
-        Returns
-        -------
+        data : ndarray of shape (number of observations, number of dimensions)
+        labels : ndarray of size (number of observations)
+        model : LVQBaseClass
+            The initial model that will be changed and holds the results at the end
 
         """
         previous_objective_gradients = np.zeros(
@@ -70,11 +112,7 @@ class WaypointGradientDescent(SolverBaseClass):
             variables = model._to_variables(model._get_model_params())
             cost = self.objective(variables, model, data, labels)
             state = self.create_state(
-                STATE_KEYS,
-                variables=variables,
-                nit=0,
-                nfun=cost,
-                fun=cost
+                STATE_KEYS, variables=variables, nit=0, nfun=cost, fun=cost
             )
             if self.callback(model, state):
                 return
@@ -112,9 +150,7 @@ class WaypointGradientDescent(SolverBaseClass):
             new_model_variables = model_variables - objective_gradient
 
             # Transform back to parameters form and update the model
-            model._set_model_params(
-                model._to_params(new_model_variables)
-            )
+            model._set_model_params(model._to_params(new_model_variables))
 
             if self.callback is not None:
                 cost = self.objective(new_model_variables, model, data, labels)
@@ -156,9 +192,7 @@ class WaypointGradientDescent(SolverBaseClass):
             )
 
             # Tentative update step cost
-            tentative_objective_gradient = np.mean(
-                previous_objective_gradients, axis=0
-            )
+            tentative_objective_gradient = np.mean(previous_objective_gradients, axis=0)
 
             tentative_model_variables = model_variables - tentative_objective_gradient
             # tentative_model_variables = mean_previous_objective_gradients

@@ -50,7 +50,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
     @abstractmethod
     def _set_model_params(self, model_params: Union[tuple, np.ndarray]) -> None:
         """
-        Changes the model object's internal parameters.
+        Changes the model's internal parameters.
 
         Parameters
         ----------
