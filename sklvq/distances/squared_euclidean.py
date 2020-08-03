@@ -22,8 +22,7 @@ class SquaredEuclidean(DistanceBaseClass):
         self.metric_kwargs = {"metric": "euclidean", "squared": True}
 
         # Should contain other kwargs for sklearn.metrics.pairwise_distances
-        if kwargs is not None:
-            self.metric_kwargs.update(kwargs)
+        self.metric_kwargs.update(kwargs)
 
         # This might include force_all_finite which if it is set to "allow-nan" should switch the
         # metric used to nan_euclidean else euclidean is fine.

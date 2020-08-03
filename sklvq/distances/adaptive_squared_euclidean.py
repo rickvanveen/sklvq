@@ -23,8 +23,7 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
             "metric": "mahalanobis",
         }
 
-        if kwargs is not None:
-            self.metric_kwargs.update(kwargs)
+        self.metric_kwargs.update(kwargs)
 
         if "force_all_finite" in self.metric_kwargs:
             if self.metric_kwargs["force_all_finite"] == "allow-nan":

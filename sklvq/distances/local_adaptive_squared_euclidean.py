@@ -28,8 +28,7 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
             "metric": "mahalanobis",
         }
 
-        if kwargs is not None:
-            self.metric_kwargs.update(kwargs)
+        self.metric_kwargs.update(kwargs)
 
         if "force_all_finite" in self.metric_kwargs:
             if self.metric_kwargs["force_all_finite"] == "allow-nan":
@@ -88,11 +87,12 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
     def gradient(
         self, data: np.ndarray, model: "LGMLVQ", i_prototype: int
     ) -> np.ndarray:
-        """ The partial derivative of the adaptive squared euclidean distance function, with respect
+        """ The partial derivative of the adaptive squared euclidean distance function,
+        with respect
         to a specified prototype and the matrix omega.
 
             .. math::
-                \\frac{\\partial d}{\\partial \\vec{w_i}} = -2 \\cdot \\Lambda_j \cdot (\\vec{x} -
+                \\frac{\\partial d}{\\partial \\vec{w_i}} = -2 \\cdot \\Lambda_j \\cdot (\\vec{x} -
                 \\vec{w_i})
 
         with :math:`\\Lambda_j` the matrix matched to the prototype. This depends on the

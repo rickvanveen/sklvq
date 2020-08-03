@@ -174,6 +174,9 @@ def test_lgmlvq_distance(distance_class):
 
     _check_distance(distfun, data, model)
 
+    model.localization = "class"
+    _check_distance(distfun, data, model)
+
     distfun = distance_class(force_all_finite="allow-nan")
     _check_distance(distfun, data, model)
 
@@ -196,4 +199,7 @@ def test_gmlvq_nan_distance(distance_class):
     model.localization = "prototype"
     model.prototypes_labels_ = np.array([0, 1, 2])
 
+    _check_distance(distfun, data, model)
+
+    model.localization = "class"
     _check_distance(distfun, data, model)
