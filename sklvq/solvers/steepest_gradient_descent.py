@@ -141,7 +141,7 @@ class SteepestGradientDescent(SolverBaseClass):
                 state = self.create_state(
                     STATE_KEYS,
                     variables=new_model_variables,
-                    nit=i_run,
+                    nit=i_run + 1,
                     fun=self.objective(new_model_variables, model, data, labels),
                     step_size=step_size,
                 )

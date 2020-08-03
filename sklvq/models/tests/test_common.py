@@ -5,7 +5,6 @@ from sklearn.utils.estimator_checks import check_estimator
 from sklearn import datasets
 from sklearn import preprocessing
 from sklearn.model_selection import (
-    cross_val_score,
     GridSearchCV,
     RepeatedStratifiedKFold,
 )
