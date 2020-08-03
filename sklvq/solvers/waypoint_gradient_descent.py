@@ -11,7 +11,6 @@ if TYPE_CHECKING:
 STATE_KEYS = ["variables", "nit", "fun", "nfun", "tfun", "step_size"]
 
 
-# TODO: its wrong should store average of past points not gradients....
 class WaypointGradientDescent(SolverBaseClass):
     """ WaypointGradientDescent
 
