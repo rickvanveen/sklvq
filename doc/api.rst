@@ -104,9 +104,6 @@ Distance functions ordered by compatible predictor.
 
     DistanceBaseClass
 
-GLVQ
-----
-
 .. autosummary::
    :toctree: generated/
    :template: callable.rst
@@ -119,17 +116,11 @@ GLVQ
 
     SquaredEuclidean
 
-GMLVQ
------
-
 .. autosummary::
    :toctree: generated/
    :template: callable.rst
 
     AdaptiveSquaredEuclidean
-
-LGMLVQ
---------
 
 .. autosummary::
    :toctree: generated/

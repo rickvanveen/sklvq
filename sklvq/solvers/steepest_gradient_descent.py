@@ -3,6 +3,7 @@ from sklearn.utils import shuffle
 
 from . import SolverBaseClass
 from ..objectives import ObjectiveBaseClass
+from .base import _update_state, _multiply_model_params
 
 from typing import Union
 from typing import TYPE_CHECKING
@@ -77,16 +78,15 @@ class SteepestGradientDescent(SolverBaseClass):
 
         if self.callback is not None:
             variables = model.to_variables(model.get_model_params())
-            state = self.create_state(
+            state = _update_state(
                 STATE_KEYS,
                 variables=variables,
                 nit=0,
                 fun=self.objective(variables, model, data, labels),
             )
-            if self.callback(model, state):
+            if self.callback(state):
                 return
 
-        objective_gradient = None
         new_model_variables = None
 
         for i_run in range(0, self.max_runs):
@@ -128,7 +128,7 @@ class SteepestGradientDescent(SolverBaseClass):
                 # Transform objective gradient to variables form
                 objective_gradient = model.to_variables(
                     # Apply the step size to the model parameters
-                    self.multiply_model_params(step_size, objective_gradient)
+                    _multiply_model_params(step_size, objective_gradient)
                 )
 
                 # Subtract objective gradient of model params in variables form
@@ -138,12 +138,12 @@ class SteepestGradientDescent(SolverBaseClass):
                 model.set_model_params(model.to_params(new_model_variables))
 
             if self.callback is not None:
-                state = self.create_state(
+                state = _update_state(
                     STATE_KEYS,
                     variables=new_model_variables,
                     nit=i_run + 1,
                     fun=self.objective(new_model_variables, model, data, labels),
                     step_size=step_size,
                 )
-                if self.callback(model, state):
+                if self.callback(state):
                     return

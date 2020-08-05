@@ -16,7 +16,7 @@ class ProgressLogger:
     def __init__(self):
         self.states = np.array([])
 
-    def __call__(self, model, state) -> bool:
+    def __call__(self, state) -> bool:
         self.states = np.append(self.states, state)
         return False
 

@@ -88,12 +88,10 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
         self, data: np.ndarray, model: "LGMLVQ", i_prototype: int
     ) -> np.ndarray:
         """ The partial derivative of the adaptive squared euclidean distance function,
-        with respect
-        to a specified prototype and the matrix omega.
+        with respect to a specified prototype and the matrix omega:
 
             .. math::
-                \\frac{\\partial d}{\\partial \\vec{w_i}} = -2 \\cdot \\Lambda_j \\cdot (\\vec{x} -
-                \\vec{w_i})
+                \\frac{\\partial d}{\\partial \\vec{w_i}} = -2 \\cdot \\Lambda_j \\cdot (\\vec{x} - \\vec{w_i})
 
         with :math:`\\Lambda_j` the matrix matched to the prototype. This depends on the
         localization setting of the model.

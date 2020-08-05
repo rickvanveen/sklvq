@@ -35,7 +35,7 @@ class ProcessLogger:
 
     # A callback function has to accept two arguments, i.e., model and state, where model is the
     # current model, and state contains a number of the optimizers variables.
-    def __call__(self, model, state):
+    def __call__(self, state):
         self.states = np.append(self.states, state)
         return False  # The callback function can also be used to stop training early,
         # if some condition is met by returning True.
@@ -52,7 +52,7 @@ model = GMLVQ(
     activation_params={"beta": 2},
     solver_type="waypoint-gradient-descent",
     solver_params={
-        "max_runs": 10,
+        "max_runs": 15,
         "k": 3,
         "step_size": np.array([0.75, 0.85]), # Note we chose very large step_sizes here to show
         # the usefulness of waypoint averaging.

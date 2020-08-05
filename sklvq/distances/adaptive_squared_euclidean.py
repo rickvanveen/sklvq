@@ -65,11 +65,11 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
     def gradient(
         self, data: np.ndarray, model: "GMLVQ", i_prototype: int
     ) -> np.ndarray:
-        r""" The partial derivative of the adaptive squared euclidean distance function,
+        """ The partial derivative of the adaptive squared euclidean distance function,
         with respect to a specified prototype and the matrix omega:
 
             .. math::
-                \\frac{\\partial d}{\\partial \\vec{w_i}} = -2 \\cdot \\Lambda \cdot (\\vec{x} -
+                \\frac{\\partial d}{\\partial \\vec{w_i}} = -2 \\cdot \\Lambda \\cdot (\\vec{x} -
                 \\vec{w_i})
 
         Parameters

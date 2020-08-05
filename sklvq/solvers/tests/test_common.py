@@ -13,7 +13,7 @@ class ProgressLogger:
         self.states = np.array([])
         self.counter = 0
 
-    def __call__(self, model, state) -> bool:
+    def __call__(self, state) -> bool:
         self.states = np.append(self.states, state)
         self.counter = self.counter + 1
 
@@ -64,7 +64,7 @@ def test_solvers_callback(solver):
         "bfgs",
     ]
 )
-def test_solvers_callback(solver):
+def test_scipy_solvers_callback(solver):
     iris = datasets.load_iris()
 
     logger = ScipyProgressLogger()

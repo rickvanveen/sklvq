@@ -3,6 +3,7 @@ from sklearn.utils import shuffle
 
 from . import SolverBaseClass
 from ..objectives import ObjectiveBaseClass
+from .base import _update_state, _multiply_model_params
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -106,10 +107,10 @@ class WaypointGradientDescent(SolverBaseClass):
         if self.callback is not None:
             variables = model.to_variables(model.get_model_params())
             cost = self.objective(variables, model, data, labels)
-            state = self.create_state(
+            state = _update_state(
                 STATE_KEYS, variables=variables, nit=0, nfun=cost, fun=cost
             )
-            if self.callback(model, state):
+            if self.callback(state):
                 return
 
         # Initial runs to get enough gradients to average.
@@ -134,7 +135,7 @@ class WaypointGradientDescent(SolverBaseClass):
 
             # Multiply params by step_size and transform to variables shape
             objective_gradient = model.to_variables(
-                self.multiply_model_params(step_size, objective_gradient)
+                _multiply_model_params(step_size, objective_gradient)
             )
             # Subtract objective gradient of model params in variables form
             # and
@@ -149,7 +150,7 @@ class WaypointGradientDescent(SolverBaseClass):
 
             if self.callback is not None:
                 cost = self.objective(new_model_variables, model, data, labels)
-                state = self.create_state(
+                state = _update_state(
                     STATE_KEYS,
                     variables=new_model_variables,
                     nit=i_run + 1,
@@ -157,7 +158,7 @@ class WaypointGradientDescent(SolverBaseClass):
                     fun=cost,
                     step_size=step_size,
                 )
-                if self.callback(model, state):
+                if self.callback(state):
                     return
 
         # The remainder of the runs
@@ -182,14 +183,11 @@ class WaypointGradientDescent(SolverBaseClass):
 
             # Multiply params by step_size and transform to variables shape
             objective_gradient = model.to_variables(
-                self.multiply_model_params(step_size, objective_gradient)
+                _multiply_model_params(step_size, objective_gradient)
             )
 
-            # Tentative update step cost
-            # tentative_objective_gradient = np.mean(previous_objective_gradients, axis=0)
+            # Tentative average update
             tentative_model_variables = np.mean(previous_waypoints, axis=0)
-
-            # tentative_model_variables = model_variables - tentative_objective_gradient
 
             # Update the model using normalized update step
             new_model_variables = model_variables - objective_gradient
@@ -223,7 +221,7 @@ class WaypointGradientDescent(SolverBaseClass):
             previous_waypoints[np.mod(i_run, self.k), :] = accepted_variables
 
             if self.callback is not None:
-                state = self.create_state(
+                state = _update_state(
                     STATE_KEYS,
                     variables=accepted_variables,
                     nit=i_run + 1,
@@ -232,5 +230,5 @@ class WaypointGradientDescent(SolverBaseClass):
                     fun=accepted_cost,
                     step_size=step_size,
                 )
-                if self.callback(model, state):
+                if self.callback(state):
                     return
