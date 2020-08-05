@@ -19,7 +19,6 @@ class ActivationBaseClass(ABC):
     @abstractmethod
     def __call__(self, x: np.ndarray) -> np.ndarray:
         """
-        
         Parameters
         ----------
         x : ndarray

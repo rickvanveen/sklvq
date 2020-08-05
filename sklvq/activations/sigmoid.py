@@ -56,7 +56,7 @@ class Sigmoid(ActivationBaseClass):
          x : ndarray
 
         Returns
-        ------- 
+        -------
         ndarray of shape (x.shape)
             Elementwise evaluation of the sigmoid function's gradient.
         """

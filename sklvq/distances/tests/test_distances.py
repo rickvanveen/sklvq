@@ -184,7 +184,7 @@ def test_lgmlvq_distance(distance_class):
 @pytest.mark.parametrize(
     "distance_class", [LocalAdaptiveSquaredEuclidean],
 )
-def test_gmlvq_nan_distance(distance_class):
+def test_lgmlvq_nan_distance(distance_class):
     distfun = distance_class(force_all_finite="allow-nan")
 
     # Some X and prototypes
