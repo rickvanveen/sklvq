@@ -32,13 +32,13 @@ def test_lgmlvq_iris():
             "callback": progress_logger,
             "max_runs": 20,
             "step_size": np.array([0.001, 0.5]),
-            "batch_size": 25
+            "batch_size": 25,
         },
         activation_type="swish",
         localization="prototype",
         distance_type="local-adaptive-squared-euclidean",
         normalized_omega=False,
-        force_all_finite=True
+        force_all_finite=True,
     )
     classifier = classifier.fit(iris.data, iris.target)
 

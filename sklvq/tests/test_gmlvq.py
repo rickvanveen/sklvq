@@ -40,7 +40,7 @@ def test_gmlvq_iris():
         distance_type="adaptive-squared-euclidean",
         normalized_omega=False,
         initial_omega=init_omega,
-        force_all_finite=True
+        force_all_finite=True,
     )
     classifier = classifier.fit(iris.data, iris.target)
 

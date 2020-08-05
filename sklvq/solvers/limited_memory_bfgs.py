@@ -19,6 +19,4 @@ class LimitedMemoryBfgs(ScipyBaseSolver):
     """
 
     def __init__(self, objective: ObjectiveBaseClass, **kwargs):
-        super(LimitedMemoryBfgs, self).__init__(
-            objective, method="L-BFGS-B", **kwargs
-        )
+        super(LimitedMemoryBfgs, self).__init__(objective, method="L-BFGS-B", **kwargs)

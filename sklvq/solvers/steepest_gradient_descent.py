@@ -7,6 +7,7 @@ from .base import _update_state, _multiply_model_params
 
 from typing import Union
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from sklvq.models import LVQBaseClass
 

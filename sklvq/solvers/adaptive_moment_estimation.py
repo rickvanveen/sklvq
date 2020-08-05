@@ -6,6 +6,7 @@ from ..objectives import ObjectiveBaseClass
 from .base import _update_state
 
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from sklvq.models import LVQBaseClass
 

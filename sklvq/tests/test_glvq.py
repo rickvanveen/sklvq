@@ -47,7 +47,6 @@ def test_glvq_iris():
     # print(progress_logger.costs)
     print("\nIris accuracy: {}".format(accuracy))
 
-    
 
 #
 # def test_glvq_with_multiple_prototypes_per_class():

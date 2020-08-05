@@ -15,9 +15,6 @@ from typing import Tuple, Union
 
 ModelParamsType = np.ndarray
 
-# Can be switched out by parameters to the models.
-from sklvq import distances, solvers
-
 
 class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
     prototypes_: np.ndarray

@@ -28,7 +28,7 @@ SOLVERS = [
 class GLVQ(LVQBaseClass):
     r"""Generalized Learning Vector Quantization
 
-    This model optimizes the generalized learning objective introduced in [1]_. The 
+    This model optimizes the generalized learning objective introduced in [1]_.
 
     Parameters
     ----------

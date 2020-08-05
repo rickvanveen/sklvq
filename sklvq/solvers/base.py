@@ -8,6 +8,7 @@ from ..objectives import ObjectiveBaseClass
 
 from typing import Union, List, Any
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from sklvq.models import LVQBaseClass
 
@@ -80,8 +81,7 @@ def _update_state(state_keys: List[str], **kwargs: Any) -> dict:
 
 
 def _multiply_model_params(
-    step_sizes: Union[int, float, np.ndarray],
-    model_params: Union[tuple, np.ndarray],
+    step_sizes: Union[int, float, np.ndarray], model_params: Union[tuple, np.ndarray],
 ) -> Union[tuple, np.ndarray]:
     if isinstance(model_params, np.ndarray):
         return step_sizes * model_params

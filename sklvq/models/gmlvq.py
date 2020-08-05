@@ -397,7 +397,9 @@ class GMLVQ(LVQBaseClass):
         self.eigenvalues_ = eigenvalues[sorted_indices]
         self.omega_hat_ = omega_hat[:, sorted_indices]
 
-    def fit_transform(self, data: np.ndarray, y: np.ndarray, **trans_params) -> np.ndarray:
+    def fit_transform(
+        self, data: np.ndarray, y: np.ndarray, **trans_params
+    ) -> np.ndarray:
         r"""
 
         Parameters

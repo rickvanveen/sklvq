@@ -22,6 +22,7 @@ class ProgressLogger:
 
         return False
 
+
 class ScipyProgressLogger:
     def __init__(self):
         self.states = np.array([])
@@ -38,11 +39,12 @@ class ScipyProgressLogger:
 
 
 @pytest.mark.parametrize(
-    "solver", [
+    "solver",
+    [
         "steepest-gradient-descent",
         "waypoint-gradient-descent",
         "adaptive-moment-estimation",
-    ]
+    ],
 )
 def test_solvers_callback(solver):
     iris = datasets.load_iris()
@@ -58,12 +60,7 @@ def test_solvers_callback(solver):
     assert logger.states[-1]["nit"] == 3
 
 
-@pytest.mark.parametrize(
-    "solver", [
-        "lbfgs",
-        "bfgs",
-    ]
-)
+@pytest.mark.parametrize("solver", ["lbfgs", "bfgs"])
 def test_scipy_solvers_callback(solver):
     iris = datasets.load_iris()
 

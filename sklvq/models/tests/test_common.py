@@ -14,9 +14,8 @@ from .. import GLVQ
 from .. import GMLVQ
 from .. import LGMLVQ
 
-@pytest.mark.parametrize(
-    "estimator", [GLVQ, GMLVQ, LGMLVQ]
-)
+
+@pytest.mark.parametrize("estimator", [GLVQ, GMLVQ, LGMLVQ])
 def test_estimators(estimator):
     instance = estimator()
     return check_estimator(instance)

@@ -28,6 +28,4 @@ PACKAGE = "sklvq.solvers"
 
 
 def grab(class_type, class_args=[], class_kwargs={}, whitelist=[]):
-    return utils.grab(
-        class_type, class_args, class_kwargs, ALIASES, whitelist, PACKAGE
-    )
+    return utils.grab(class_type, class_args, class_kwargs, ALIASES, whitelist, PACKAGE)
