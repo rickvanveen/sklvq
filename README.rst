@@ -11,6 +11,6 @@
 .. |CodeCov| image:: https://codecov.io/gh/rickvanveen/sklvq/branch/master/graph/badge.svg?token=8fSs8zLiiS&style=shield
 .. _CodeCov: https://codecov.io/gh/rickvanveen/sklvq
 
-sklvq - A collection of extendable Learning Vector Quantization algorithms
+sklvq - A collection of expandable Learning Vector Quantization algorithms
 ==========================================================================
 
