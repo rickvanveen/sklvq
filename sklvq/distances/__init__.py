@@ -3,9 +3,7 @@ from .base import DistanceBaseClass
 from .euclidean import Euclidean
 from .squared_euclidean import SquaredEuclidean
 from .adaptive_squared_euclidean import AdaptiveSquaredEuclidean
-from .local_adaptive_squared_euclidean import (
-    LocalAdaptiveSquaredEuclidean,
-)
+from .local_adaptive_squared_euclidean import LocalAdaptiveSquaredEuclidean
 
 from typing import Union
 from sklvq.misc import utils

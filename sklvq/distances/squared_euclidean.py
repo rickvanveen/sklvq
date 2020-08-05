@@ -17,6 +17,7 @@ class SquaredEuclidean(DistanceBaseClass):
     Euclidean, AdaptiveSquaredEuclidean, LocalAdaptiveSquaredEuclidean
 
     """
+
     def __init__(self, **kwargs):
         # Default just use euclidean
         self.metric_kwargs = {"metric": "euclidean", "squared": True}

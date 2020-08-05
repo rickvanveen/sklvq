@@ -13,9 +13,7 @@ from sklvq.distances import (
 from sklvq.distances import AdaptiveSquaredEuclidean
 
 # LGMLVQ Distances
-from sklvq.distances import (
-    LocalAdaptiveSquaredEuclidean,
-)
+from sklvq.distances import LocalAdaptiveSquaredEuclidean
 
 
 class LVQModel:
@@ -154,6 +152,7 @@ def test_gmlvq_nan_distance(distance_class):
     model = LVQModel(p, o)
 
     _check_distance(distfun, data, model)
+
 
 @pytest.mark.parametrize(
     "distance_class", [LocalAdaptiveSquaredEuclidean],
