@@ -6,29 +6,27 @@
 trigger:
 - master
 
-jobs:
-- job: Linux
-  pool:
-    vmImage: 'ubuntu-latest'
-  strategy:
-    matrix:
-      Python36:
-        python.version: '3.6'
-      Python37: 
-        python.version: '3.7'
+parameters:
+  - name: image
+    displayName: Pool Image
+    default: ubuntu-latest
+    values:
+      - ubuntu-latest
+      - vs2017-win2016
+      - macOS-latest
 
-  steps:
-  - template: build_tools/azure/templates/steps.yml
-    
-- job: Windows
+jobs:
+- job: test
   pool:
-    vmImage: 'vs2017-win2016'
+    vmImage: ${{ parameters.image }}
   strategy:
     matrix:
       Python36:
         python.version: '3.6'
       Python37: 
         python.version: '3.7'
+      Python38:
+        python.version: '3.8'
 
   steps:
   - template: build_tools/azure/templates/steps.yml
