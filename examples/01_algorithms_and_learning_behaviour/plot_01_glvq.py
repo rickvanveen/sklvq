@@ -5,19 +5,17 @@ Generalized LVQ (GLVQ)
 
 Example of how to use the GLVQ algorithm on the classic iris dataset.
 """
-import numpy as np
-
 import matplotlib
 import matplotlib.pyplot as plt
-
-matplotlib.rc("xtick", labelsize="small")
-matplotlib.rc("ytick", labelsize="small")
 
 from sklearn.datasets import load_iris
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import classification_report
 
 from sklvq import GLVQ
+
+matplotlib.rc("xtick", labelsize="small")
+matplotlib.rc("ytick", labelsize="small")
 
 iris = load_iris()
 data = iris.data
@@ -86,10 +84,7 @@ for i, prototype in enumerate(model.prototypes_):
     else:
         ax[i].set_xticklabels([], visible=False)
         ax[i].tick_params(
-            axis='x',
-            which='both',
-            bottom=False,
-            top=False,
-            labelbottom=False)
+            axis="x", which="both", bottom=False, top=False, labelbottom=False
+        )
     ax[i].set_ylabel("cm")
     ax[i].legend()

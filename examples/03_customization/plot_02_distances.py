@@ -3,9 +3,18 @@
 Distance Functions
 ==================
 """
-
 from sklearn.datasets import load_iris
 from sklearn.metrics import classification_report
+
+import numpy as np
+from sklearn.metrics.pairwise import pairwise_distances
+
+from sklvq.distances import DistanceBaseClass
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from sklvq.models import LVQBaseClass
 
 from sklvq import GLVQ
 
@@ -18,16 +27,6 @@ data, labels = load_iris(return_X_y=True)
 # to the different parameters need to be returned are important. Furthermore not every
 # distance functions works with every algorithm. Below the
 # `sklvq.distances.SquaredEuclidean`, which is suitable for the GLVQ algorithm.
-
-import numpy as np
-from sklearn.metrics.pairwise import pairwise_distances
-
-from sklvq.distances import DistanceBaseClass
-
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from sklvq.models import LVQBaseClass
 
 
 class CustomSquaredEuclidean(DistanceBaseClass):

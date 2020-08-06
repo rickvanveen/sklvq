@@ -36,7 +36,7 @@ CLASSIFIERS = [
     "Programming Language :: Python :: 3.8",
 ]
 EXTRAS_REQUIRE = {
-    "tests": ["pytest", "pytest-cov"],
+    "tests": ["pytest", "pytest-cov", "pandas"],
     "docs": ["sphinx", "sphinx-gallery", "sphinx_rtd_theme", "numpydoc", "matplotlib", "pillow"],
 }
 

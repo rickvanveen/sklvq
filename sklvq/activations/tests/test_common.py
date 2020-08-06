@@ -9,9 +9,7 @@ from sklvq.activations.swish import Swish
 from sklvq.misc.common_checks import has_call_method, has_gradient_method
 
 
-@pytest.mark.parametrize(
-    "activation", [Identity, Sigmoid, SoftPlus, Swish]
-)
+@pytest.mark.parametrize("activation", [Identity, Sigmoid, SoftPlus, Swish])
 def test_activations(activation):
     return check_activation(activation)
 

@@ -6,9 +6,7 @@ from sklvq.discriminants import RelativeDistance
 from sklvq.misc.common_checks import has_call_method, has_gradient_method
 
 
-@pytest.mark.parametrize(
-    "discriminant", [RelativeDistance]
-)
+@pytest.mark.parametrize("discriminant", [RelativeDistance])
 def test_discriminants(discriminant):
     return check_discriminant(discriminant)
 

@@ -7,9 +7,8 @@ Grid Search
 ###############################################################################
 # First, imports and load iris dataset
 
-import numpy as np
 from sklearn.datasets import load_iris
-from sklearn.model_selection import GridSearchCV, RepeatedStratifiedKFold, ParameterGrid
+from sklearn.model_selection import GridSearchCV, RepeatedStratifiedKFold
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 

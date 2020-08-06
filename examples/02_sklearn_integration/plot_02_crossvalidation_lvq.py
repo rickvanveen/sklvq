@@ -45,7 +45,5 @@ repeated_10_fold = RepeatedKFold(n_splits=10, n_repeats=10)
 accuracy = cross_val_score(pipeline, data, labels, cv=repeated_10_fold)
 
 print(
-    "Accuracy, mean (std): {:.2f} ({:.2f})".format(
-        np.mean(accuracy), np.std(accuracy)
-    )
+    "Accuracy, mean (std): {:.2f} ({:.2f})".format(np.mean(accuracy), np.std(accuracy))
 )

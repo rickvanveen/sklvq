@@ -39,7 +39,6 @@ def test_find_and_init():
     with pytest.raises(ValueError):
         find_and_init(package, module_name, class_name, class_args, class_kwargs)
 
-
     # Wrong kwargs are given should throw an exception
     class_args = []
     class_kwargs = {"alpha": 3}
@@ -103,7 +102,7 @@ def test_grab():
     assert isinstance(object, distances.squared_euclidean.SquaredEuclidean)
 
     class Mockclass:
-        def __init__(self, mock_parameter = 1):
+        def __init__(self, mock_parameter=1):
             self.mock_parameter = mock_parameter
 
     object = grab(Mockclass, class_args, class_kwargs, aliases, whitelist, package)

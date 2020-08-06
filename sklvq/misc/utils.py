@@ -3,18 +3,7 @@ from inspect import isclass
 from typing import Tuple, Union
 
 
-def grab(
-    class_type: Union[type, str],
-    class_args,
-    class_kwargs,
-    aliases,
-    whitelist,
-    package,
-):
-    if not (isinstance(class_type, str) or isclass(class_type)):
-        raise ValueError("Type parameter should either be a class or string")
-
-    # Set args and kwargs to empty iterables if they are None
+def _check_input(class_args, class_kwargs, aliases, whitelist):
     if class_args is None:
         class_args = []
 
@@ -27,6 +16,20 @@ def grab(
     if whitelist is None:
         whitelist = []
 
+    return class_args, class_kwargs, aliases, whitelist
+
+
+def grab(
+    class_type: Union[type, str], class_args, class_kwargs, aliases, whitelist, package,
+):
+    if not (isinstance(class_type, str) or isclass(class_type)):
+        raise ValueError("Type parameter should either be a class or string")
+
+    # Set args and kwargs to empty iterables if they are None
+    class_args, class_kwargs, aliases, whitelist = _check_input(
+        class_args, class_kwargs, aliases, whitelist
+    )
+
     # Check if class_type is actually a custom class
     if not isinstance(class_type, str):
         # If this fails the wrong args and or kwargs were provided. If None, i.e.,
@@ -35,8 +38,7 @@ def grab(
             return class_type(*class_args, **class_kwargs)
         except TypeError:
             raise ValueError(
-                "{} does not accept the provided arguments.".format(
-                    class_type)
+                "{} does not accept the provided arguments.".format(class_type)
             )
 
     # If an alias is used (this must be a key in the aliases constant of the package) get the
@@ -70,8 +72,7 @@ def find_and_init(package, module_name, class_name, class_args, class_kwargs):
         return path_to_class(*class_args, **class_kwargs)
     except TypeError:
         raise ValueError(
-            "{} does not accept the provided arguments".format(
-                path_to_class)
+            "{} does not accept the provided arguments".format(path_to_class)
         )
 
 

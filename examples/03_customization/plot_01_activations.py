@@ -3,9 +3,14 @@
 Activation Functions
 ====================
 """
-
 from sklearn.datasets import load_iris
 from sklearn.metrics import classification_report
+
+import numpy as np
+from typing import Union
+
+from sklvq import GLVQ
+from sklvq.activations import ActivationBaseClass
 
 data, labels = load_iris(return_X_y=True)
 
@@ -15,12 +20,6 @@ data, labels = load_iris(return_X_y=True)
 # works with callable classes and provides a base class for convenience. The base class
 # for the activation functions is sklvq.activations.ActivationBaseClass` and does
 # nothing more then tell you to implement a `__call__()` and `gradient()` method.
-
-import numpy as np
-from typing import Union
-
-from sklvq import GLVQ
-from sklvq.activations import ActivationBaseClass
 
 
 # This is the implementation of sklvq.activations.Sigmoid with some additional comments

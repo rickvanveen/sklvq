@@ -13,15 +13,15 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 
-matplotlib.rc("xtick", labelsize="small")
-matplotlib.rc("ytick", labelsize="small")
-
 from sklearn.datasets import load_iris
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import classification_report
 from sklearn.pipeline import make_pipeline
 
 from sklvq import GMLVQ
+
+matplotlib.rc("xtick", labelsize="small")
+matplotlib.rc("ytick", labelsize="small")
 
 data, labels = load_iris(return_X_y=True)
 
@@ -54,7 +54,9 @@ model = GMLVQ(
     solver_params={
         "max_runs": 15,
         "k": 3,
-        "step_size": np.array([0.75, 0.85]), # Note we chose very large step_sizes here to show
+        "step_size": np.array(
+            [0.75, 0.85]
+        ),  # Note we chose very large step_sizes here to show
         # the usefulness of waypoint averaging.
         "callback": logger,
     },
@@ -75,9 +77,7 @@ print(classification_report(labels, predicted_labels))
 # look very smooth and even gets worse. This is because of the chosen step_size, which is too
 # large.
 
-iteration, fun = zip(
-    *[(state["nit"], state["fun"]) for state in logger.states]
-)
+iteration, fun = zip(*[(state["nit"], state["fun"]) for state in logger.states])
 
 fig = plt.figure()
 ax = plt.axes()
@@ -91,9 +91,7 @@ _ = ax.legend(["Cost per iteration"])
 # k=3 updates and a regular update cost (nfun). Depending on which is less the regular update or
 # the average update is applied.
 
-tfun, nfun = zip(
-    *[(state["tfun"], state["nfun"]) for state in logger.states]
-)
+tfun, nfun = zip(*[(state["tfun"], state["nfun"]) for state in logger.states])
 
 fig = plt.figure()
 ax = plt.axes()

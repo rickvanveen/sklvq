@@ -106,9 +106,7 @@ def test_swish():
 
     # Swish is approximately the identity function, when x gets large enough, thus gradient is 1.
     x = np.array([4, 8, 12, 20, 50, 100, 200])
-    assert swish(x) == pytest.approx(
-        x, abs=1e-1
-    )
+    assert swish(x) == pytest.approx(x, abs=1e-1)
     assert swish.gradient(x) == pytest.approx(1, abs=1e-1)
 
     swish = activations.grab("swish", class_kwargs={"beta": other_beta})

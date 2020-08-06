@@ -3,9 +3,14 @@
 Discriminant Functions
 ======================
 """
-
 from sklearn.datasets import load_iris
 from sklearn.metrics import classification_report
+
+from sklvq import GLVQ
+from sklvq.discriminants import DiscriminativeBaseClass
+
+import numpy as np
+
 
 data, labels = load_iris(return_X_y=True)
 
@@ -13,10 +18,6 @@ data, labels = load_iris(return_X_y=True)
 # The sklvq contains a single discriminant function and additions are very welcome. Note that
 # they should (at the moment) work with the sklvq.objectives.GeneralizedLearningObjective.
 
-from sklvq import GLVQ
-from sklvq.discriminants import DiscriminativeBaseClass
-
-import numpy as np
 
 # The discriminative function is depended on the objective function. This determines the
 # parameters of the call and gradient. See sklvq.objective.GeneralizedLearningObjective.

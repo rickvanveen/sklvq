@@ -9,16 +9,15 @@ with missing values.
 
 import numpy as np
 import matplotlib
-import matplotlib.pyplot as plt
-
-matplotlib.rc("xtick", labelsize="small")
-matplotlib.rc("ytick", labelsize="small")
 
 from sklearn.datasets import load_iris
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import classification_report
 
 from sklvq import GMLVQ
+
+matplotlib.rc("xtick", labelsize="small")
+matplotlib.rc("ytick", labelsize="small")
 
 iris = load_iris()
 
@@ -42,7 +41,7 @@ model = GMLVQ(
     solver_type="waypoint-gradient-descent",
     solver_params={"max_runs": 10, "k": 3, "step_size": np.array([0.1, 0.05])},
     random_state=1428,
-    force_all_finite="allow-nan", # This will make the checks and distance function accept and
+    force_all_finite="allow-nan",  # This will make the checks and distance function accept and
     # deal with np.nan values.
 )
 
