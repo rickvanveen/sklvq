@@ -19,7 +19,7 @@ URL = "https://github.com/rickvanveen/sklvq"
 LICENSE = "GNU Affero General Public License v3.0"
 DOWNLOAD_URL = "https://github.com/rickvanveen/sklvq"
 VERSION = __version__
-INSTALL_REQUIRES = ["numpy", "scipy", "scikit-learn>=0.23.1"]
+INSTALL_REQUIRES = ["numpy>=1.13.3", "scipy>=0.19.1", "scikit-learn>=0.23.1"]
 CLASSIFIERS = [
     "Intended Audience :: Science/Research",
     "Intended Audience :: Developers",
