@@ -6,19 +6,16 @@
 trigger:
 - master
 
-parameters:
-  - name: image
-    displayName: Pool Image
-    default: ubuntu-latest
-    values:
-      - ubuntu-latest
-      - vs2017-win2016
-      - macOS-latest
-
 jobs:
 - job: test
   pool:
-    vmImage: ${{ parameters.image }}
+    strategy:
+      matrix:
+        linux: 
+          imageName: 'ubuntu-latest'
+        windows:
+          imageName: 'vs2017-win2016'
+    vmImage: $(imageName)
   strategy:
     matrix:
       Python36:
