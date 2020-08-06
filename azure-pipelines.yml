@@ -7,23 +7,19 @@ trigger:
 - master
 
 jobs:
-- job: test
+- job: linting
+  displayName: Linting
   pool:
-    strategy:
-      matrix:
-        linux: 
-          imageName: 'ubuntu-latest'
-        windows:
-          imageName: 'vs2017-win2016'
-    vmImage: $(imageName)
-  strategy:
-    matrix:
-      Python36:
-        python.version: '3.6'
-      Python37: 
-        python.version: '3.7'
-      Python38:
-        python.version: '3.8'
-
+    vmImage: 'ubuntu-20.04'
   steps:
-  - template: build_tools/azure/templates/steps.yml
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '3.8'
+    - script: |
+        python -m pip install --upgrade pip
+        pip install flake8
+      displayName: 'Install flake8'
+
+    - script: | 
+        flake8 .
+      displayName: 'Run lint Test'
