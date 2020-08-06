@@ -25,6 +25,7 @@ jobs:
     # E203: whitespace before ':', 
     # W503: Line break occured before a binary operator
     - script: | 
-        flake8 . --ignore E501,E203,W503 
+        flake8 ./sklvq --ignore E501,E203,W503 
+        flake8 ./examples --ignore E501,E203,W503 
       displayName: 'Run lint Test'
 
