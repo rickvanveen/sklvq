@@ -13,7 +13,7 @@ DISTNAME = "sklvq"
 DESCRIPTION = "A collection of Learning Vector Quantization algorithms compatible with scikit-learn"
 with codecs.open("README.rst", encoding="utf-8-sig") as f:
     LONG_DESCRIPTION = f.read()
-MAINTAINER = "R. van Veen"
+MAINTAINER = "Rick van Veen"
 MAINTAINER_EMAIL = "r.van.veen133@gmail.com"
 URL = "https://github.com/rickvanveen/sklvq"
 LICENSE = "GNU Affero General Public License v3.0"
@@ -31,12 +31,12 @@ CLASSIFIERS = [
     "Operating System :: POSIX",
     "Operating System :: Unix",
     "Operating System :: MacOS",
-    "Programming Language :: Python :: 3.5",
     "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
 ]
 EXTRAS_REQUIRE = {
-    "tests": ["pytest", "pytest-cov", "pandas"],
+    "tests": ["pytest", "pytest-cov"],
     "docs": ["sphinx", "sphinx-gallery", "sphinx_rtd_theme", "numpydoc", "matplotlib", "pillow"],
 }
 
