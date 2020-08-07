@@ -24,3 +24,6 @@
 sklvq - A collection of expandable Learning Vector Quantization algorithms
 ==========================================================================
 
+Documentation with install instruction and examples can be found here: https://sklvq.readthedocs.io/en/latest/
+
+If you find any bugs or have any other suggestions on how to improve the code then please use the issue tracker on github.
