@@ -44,3 +44,5 @@ jobs:
         python.version: '3.8'
   steps:
   - template: ./build_tools/azure/templates/steps.yml
+
+# Add windows and macOS
