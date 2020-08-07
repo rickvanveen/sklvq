@@ -25,6 +25,22 @@ jobs:
     # E203: whitespace before ':', 
     # W503: Line break occured before a binary operator
     - script: | 
-        flake8 . --ignore E501,E203,W503 
+        flake8 ./sklvq --ignore E501,E203,W503 
+        flake8 ./examples --ignore E501,E203,W503 
       displayName: 'Run lint Test'
 
+- job: testing
+  displayName: Testing
+  pool:
+    vmImage: 'ubuntu-20.04'
+  dependsOn: [linting]
+  strategy:
+    matrix:
+      Python36:
+        python.version: '3.6'
+      Python37:
+        python.version: '3.7'
+      Python38:
+        python.version: '3.8'
+  steps:
+  - template: ./build_tools/azure/templates/steps.yml
