@@ -36,7 +36,7 @@ class AdaptiveMomentEstimation(SolverBaseClass):
         Small value to overcome zero division
 
     callback: callable
-        Callable with signature callable(model, state). If the callable returns True the solver
+        Callable with signature callable(state). If the callable returns True the solver
         will stop (early). The state object contains the following.
 
         - "variables"

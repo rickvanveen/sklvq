@@ -35,7 +35,7 @@ class SteepestGradientDescent(SolverBaseClass):
         sufficient. If separate initial step_sizes should be used per model parameter then this
         should be specified by using a ndarray.
     callback: callable
-        Callable with signature callable(model, state). If the callable returns True the solver
+        Callable with signature callable(state). If the callable returns True the solver
         will stop (early). The state object contains the following.
 
         - "variables"
