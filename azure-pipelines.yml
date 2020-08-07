@@ -20,7 +20,7 @@ jobs:
         pip install flake8
       displayName: 'Install flake8'
 
-    # Igoring the following errors and warnings.
+    # Igoring the following errors and warnings. Because of "black" code style
     # E501: Line too long, 
     # E203: whitespace before ':', 
     # W503: Line break occured before a binary operator
