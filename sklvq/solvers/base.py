@@ -10,7 +10,7 @@ from typing import Union, List, Any
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from sklvq.models import LVQBaseClass
+    from ..models import LVQBaseClass
 
 
 class SolverBaseClass(ABC):

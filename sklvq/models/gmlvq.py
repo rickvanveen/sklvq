@@ -12,8 +12,6 @@ from typing import Tuple
 
 ModelParamsType = Tuple[np.ndarray, np.ndarray]
 
-# TODO: Transform (inverse_transform) function sklearn
-
 DISTANCE_FUNCTIONS = [
     "adaptive-squared-euclidean",
 ]
@@ -369,7 +367,6 @@ class GMLVQ(LVQBaseClass):
 
     def _initialize_omega(self, data):
         if isinstance(self.initial_omega, np.ndarray):
-            # TODO Checks
             self.omega_ = self.initial_omega
         elif self.initial_omega == "identity":
             self.omega_ = np.eye(data.shape[1])
@@ -445,53 +442,3 @@ class GMLVQ(LVQBaseClass):
         data_new = data.dot(transformation_matrix)
 
         return data_new
-
-    # TODO: add a sklvq.plot for these things?
-    # def dist_function(self, X):
-    #     # SciKit-learn list of checked params before predict
-    #     check_is_fitted(self)
-    #
-    #     # Input validation
-    #     X = check_array(X)
-    #
-    #     distances = self._distance(X, self)
-    #     min_args = np.argsort(distances, axis=1)
-    #
-    #     winner = distances[list(range(0, distances.shape[0])), min_args[:, 0]]
-    #     runner_up = distances[list(range(0, distances.shape[0])), min_args[:, 1]]
-    #
-    #     return np.abs(winner - runner_up) / (
-    #         2
-    #         * np.linalg.norm(
-    #             self.prototypes_[min_args[:, 0], :]
-    #             - self.prototypes_[min_args[:, 1], :]
-    #         )
-    #         ** 2
-    #     )
-
-    # def rel_dist_function(self, X):
-    #     # SciKit-learn list of checked params before predict
-    #     check_is_fitted(self)
-    #
-    #     # Input validation
-    #     X = check_array(X)
-    #
-    #     distances = np.sort(self._distance(X, self))
-    #
-    #     winner = distances[:, 0]
-    #     runner_up = distances[:, 1]
-    #
-    #     return (runner_up - winner) / (winner + runner_up)
-    #
-    # def d_plus_function(self, X):
-    #     # SciKit-learn list of checked params before predict
-    #     check_is_fitted(self)
-    #
-    #     # Input validation
-    #     X = check_array(X)
-    #
-    #     distances = np.sort(self._distance(X, self))
-    #
-    #     winner = distances[:, 0]
-    #
-    #     return -1 * winner

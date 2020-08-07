@@ -8,7 +8,7 @@ from .base import _update_state, _multiply_model_params
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from sklvq.models import LVQBaseClass
+    from ..models import LVQBaseClass
 
 STATE_KEYS = ["variables", "nit", "fun", "nfun", "tfun", "step_size"]
 
