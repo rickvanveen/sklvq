@@ -1,6 +1,6 @@
 .. -*- mode: rst -*-
 
-|TravisCI|_ |CircleCI|_ |CodeCov|_ |ReadTheDocs|_ |CodeStyleBlack|_
+|TravisCI|_ |CircleCI|_ |CodeCov|_ |ReadTheDocs|_ |CodeStyleBlack|_ |CodeFactor|_
 
 .. |CircleCI| image:: https://circleci.com/gh/rickvanveen/sklvq.svg?style=shield&circle-token=a81339490ab5a132d8122a26935e1d5cec2462c9
 .. _CircleCI: https://circleci.com/gh/rickvanveen/sklvq/tree/master
@@ -16,6 +16,10 @@
 
 .. |CodeStyleBlack| image:: https://img.shields.io/badge/code%20style-black-000000.svg
 .. _CodeStyleBlack: https://github.com/psf/black
+
+.. |CodeFactor| image:: https://www.codefactor.io/repository/github/rickvanveen/sklvq/badge/master
+.. _CodeFactor: https://www.codefactor.io/repository/github/rickvanveen/sklvq/overview/master
+
 
 sklvq - A collection of expandable Learning Vector Quantization algorithms
 ==========================================================================
