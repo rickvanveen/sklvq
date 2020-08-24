@@ -21,12 +21,12 @@ jobs:
       displayName: 'Install flake8'
 
     # Igoring the following errors and warnings. Because of "black" code style
-    # E501: Line too long, 
-    # E203: whitespace before ':', 
-    # W503: Line break occured before a binary operator
-    - script: | 
-        flake8 ./sklvq --ignore E501,E203,W503 
-        flake8 ./examples --ignore E501,E203,W503 
+    # E501: Line too long,
+    # E203: whitespace before ':',
+    # W503: Line break occurred before a binary operator
+    - script: |
+        flake8 ./sklvq --ignore E501,E203,W503
+        flake8 ./examples --ignore E501,E203,W503
       displayName: 'Run lint Test'
 
 - job: testing

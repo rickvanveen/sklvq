@@ -25,7 +25,7 @@ class Sigmoid(ActivationBaseClass):
         Functions for Generalized Learning Vector Quantization - A Performance Comparison", 2019.
     """
 
-    def __init__(self, beta: Union[int, float] = 1):
+    def __init__(self, beta: Union[int, float] = 1.0):
         self.beta = beta
 
     def __call__(self, x: np.ndarray) -> np.ndarray:
