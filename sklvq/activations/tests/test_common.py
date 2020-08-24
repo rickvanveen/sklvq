@@ -30,10 +30,10 @@ def check_activation(activation_class):
     assert activation_callable(x).shape == x.shape
 
     # Check output type __call__
-    assert type(activation_callable(x)) == np.ndarray
+    assert isinstance(activation_callable(x), np.ndarray)
 
     # Check output shape gradient
     assert activation_callable.gradient(x).shape == x.shape
 
     # Check output type gradient
-    assert type(activation_callable.gradient(x)) == np.ndarray
+    assert isinstance(activation_callable.gradient(x), np.ndarray)

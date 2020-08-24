@@ -28,12 +28,12 @@ def check_discriminant(discriminant_class):
     assert discriminant_callable(x, y).shape == x.shape
 
     # Check output type __call__
-    assert type(discriminant_callable(x, y)) == np.ndarray
+    assert isinstance(discriminant_callable(x, y), np.ndarray)
 
     # Check output shape gradient
     assert discriminant_callable.gradient(x, y, True).shape == x.shape
     assert discriminant_callable.gradient(x, y, False).shape == x.shape
 
     # Check output type gradient
-    assert type(discriminant_callable.gradient(x, y, True)) == np.ndarray
-    assert type(discriminant_callable.gradient(x, y, False)) == np.ndarray
+    assert isinstance(discriminant_callable.gradient(x, y, True), np.ndarray)
+    assert isinstance(discriminant_callable.gradient(x, y, False), np.ndarray)
