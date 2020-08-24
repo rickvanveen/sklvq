@@ -29,8 +29,7 @@ class LVQModel:
     def get_model_params(self):
         if self.omega_ is None:
             return self.prototypes_
-        else:
-            return self.prototypes_, self.omega_
+        return self.prototypes_, self.omega_
 
 
 def _check_distance(distfun, data, model):

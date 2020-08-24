@@ -331,7 +331,6 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         X : ndarray with shape (number of observations, number of dimensions)
         y : ndarray with size equal to the number of observations
         """
-        pass
 
     def decision_function(self, X: np.ndarray):
         """ Evaluates the decision function for the samples in X.

@@ -90,28 +90,28 @@ def test_grab():
     aliases = None
     whitelist = None
 
-    object = grab(class_type, class_args, class_kwargs, aliases, whitelist, package)
-    assert isinstance(object, distances.squared_euclidean.SquaredEuclidean)
+    object_instance = grab(class_type, class_args, class_kwargs, aliases, whitelist, package)
+    assert isinstance(object_instance, distances.squared_euclidean.SquaredEuclidean)
 
     whitelist = ["euclidean"]
     with pytest.raises(ValueError):
         grab(class_type, class_args, class_kwargs, aliases, whitelist, package)
 
     whitelist = ["squared-euclidean"]
-    object = grab(class_type, class_args, class_kwargs, aliases, whitelist, package)
-    assert isinstance(object, distances.squared_euclidean.SquaredEuclidean)
+    object_instance = grab(class_type, class_args, class_kwargs, aliases, whitelist, package)
+    assert isinstance(object_instance, distances.squared_euclidean.SquaredEuclidean)
 
     class Mockclass:
         def __init__(self, mock_parameter=1):
             self.mock_parameter = mock_parameter
 
-    object = grab(Mockclass, class_args, class_kwargs, aliases, whitelist, package)
-    assert isinstance(object, Mockclass)
-    assert object.mock_parameter == 1
+    object_instance = grab(Mockclass, class_args, class_kwargs, aliases, whitelist, package)
+    assert isinstance(object_instance, Mockclass)
+    assert object_instance.mock_parameter == 1
 
     class_kwargs = {"mock_parameter": 6}
-    object = grab(Mockclass, class_args, class_kwargs, aliases, whitelist, package)
-    assert object.mock_parameter == 6
+    object_instance = grab(Mockclass, class_args, class_kwargs, aliases, whitelist, package)
+    assert object_instance.mock_parameter == 6
 
     class_args = [10]
     class_kwargs = {"alpha": 6}
@@ -126,5 +126,5 @@ def test_grab():
     whitelist = None
     package = "sklvq.activations"
 
-    object = grab(class_type, class_args, class_kwargs, aliases, whitelist, package)
-    assert isinstance(object, activations.soft_plus.SoftPlus)
+    object_instance = grab(class_type, class_args, class_kwargs, aliases, whitelist, package)
+    assert isinstance(object_instance, activations.soft_plus.SoftPlus)
