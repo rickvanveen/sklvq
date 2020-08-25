@@ -9,6 +9,7 @@ class Identity(ActivationBaseClass):
     --------
     Sigmoid, SoftPlus, Swish
     """
+    __slots__ = ()
 
     def __call__(self, x: np.ndarray) -> np.ndarray:
         """ Implements the identity function:

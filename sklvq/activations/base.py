@@ -15,6 +15,7 @@ class ActivationBaseClass(ABC):
     --------
     Identity, Sigmoid, SoftPlus, Swish
     """
+    # __slots__ = ()
 
     @abstractmethod
     def __call__(self, x: np.ndarray) -> np.ndarray:
