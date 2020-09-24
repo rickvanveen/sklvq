@@ -1,19 +1,17 @@
-from .base import DiscriminativeBaseClass
-from .relative_distance import RelativeDistance
+from ._base import DiscriminativeBaseClass
+from sklvq._utils import _import_class_from_string
 
-from typing import Union
-from sklvq.misc import utils
+__all__ = ["DiscriminativeBaseClass"]
 
-__all__ = ["DiscriminativeBaseClass", "RelativeDistance"]
-
-ALIASES = {"reldist": "relative-distance"}
-PACKAGE = "sklvq.discriminants"
+ALIASES = {}
 
 
-def grab(
-    class_type: Union[str, type],
-    class_args: list = None,
-    class_kwargs: dict = None,
-    whitelist: list = None,
-) -> Union[DiscriminativeBaseClass, object]:
-    return utils.grab(class_type, class_args, class_kwargs, ALIASES, whitelist, PACKAGE)
+def import_from_string(class_string, valid_strings=None) -> type:
+    if class_string in ALIASES.keys():
+        class_string = ALIASES[class_string]
+
+    if valid_strings is not None:
+        if not (class_string in valid_strings):
+            raise ValueError("Provided activation_type is invalid.")
+
+    return _import_class_from_string(__name__, class_string)

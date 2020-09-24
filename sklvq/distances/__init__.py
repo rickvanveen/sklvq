@@ -1,30 +1,17 @@
-from .base import DistanceBaseClass
+from ._base import DistanceBaseClass
+from sklvq._utils import _import_class_from_string
 
-from .euclidean import Euclidean
-from .squared_euclidean import SquaredEuclidean
-from .adaptive_squared_euclidean import AdaptiveSquaredEuclidean
-from .local_adaptive_squared_euclidean import LocalAdaptiveSquaredEuclidean
+__all__ = ["DistanceBaseClass"]
 
-from typing import Union
-from sklvq.misc import utils
-
-__all__ = [
-    "DistanceBaseClass",
-    "Euclidean",
-    "SquaredEuclidean",
-    "AdaptiveSquaredEuclidean",
-    "LocalAdaptiveSquaredEuclidean",
-]
-
-ALIASES = {"sqeuclidean": "squared-euclidean"}
-PACKAGE = "sklvq.distances"
+ALIASES = {}
 
 
-def grab(
-    class_type: Union[str, type],
-    class_args: list = None,
-    class_kwargs: dict = None,
-    whitelist: list = None,
-) -> Union[DistanceBaseClass, object]:
+def import_from_string(class_string, valid_strings=None) -> type:
+    if class_string in ALIASES.keys():
+        class_string = ALIASES[class_string]
 
-    return utils.grab(class_type, class_args, class_kwargs, ALIASES, whitelist, PACKAGE)
+    if valid_strings is not None:
+        if not (class_string in valid_strings):
+            raise ValueError("Provided distance_type is invalid.")
+
+    return _import_class_from_string(__name__, class_string)
