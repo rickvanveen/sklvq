@@ -1,7 +1,18 @@
 from ._base import DistanceBaseClass
+from ._euclidean import Euclidean
+from ._squared_euclidean import SquaredEuclidean
+from ._adaptive_squared_euclidean import AdaptiveSquaredEuclidean
+from ._local_adaptive_squared_euclidean import LocalAdaptiveSquaredEuclidean
+
 from sklvq._utils import _import_class_from_string
 
-__all__ = ["DistanceBaseClass"]
+__all__ = [
+    "DistanceBaseClass",
+    "Euclidean",
+    "SquaredEuclidean",
+    "AdaptiveSquaredEuclidean",
+    "LocalAdaptiveSquaredEuclidean",
+]
 
 ALIASES = {}
 

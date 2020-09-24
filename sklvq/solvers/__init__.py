@@ -1,7 +1,21 @@
 from ._base import SolverBaseClass, ScipyBaseSolver
+from ._steepest_gradient_descent import SteepestGradientDescent
+from ._waypoint_gradient_descent import WaypointGradientDescent
+from ._adaptive_moment_estimation import AdaptiveMomentEstimation
+from ._limited_memory_bfgs import LimitedMemoryBfgs
+from ._broyden_fletcher_goldfarb_shanno import BroydenFletcherGoldfarbShanno
+
 from sklvq._utils import _import_class_from_string
 
-__all__ = ["SolverBaseClass", "ScipyBaseSolver"]
+__all__ = [
+    "SolverBaseClass",
+    "ScipyBaseSolver",
+    "SteepestGradientDescent",
+    "WaypointGradientDescent",
+    "AdaptiveMomentEstimation",
+    "LimitedMemoryBfgs",
+    "BroydenFletcherGoldfarbShanno",
+]
 
 ALIASES = {
     "sgd": "steepest-gradient-descent",

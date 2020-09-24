@@ -37,7 +37,7 @@ data = scaler.fit_transform(data)
 
 # Initialize GMLVQ object
 model = LGMLVQ(
-    localization="class",  # Can either be per "class" or "prototype"
+    relevance_params={"localization": "class"}, # Can either be per "class" or "prototype"
     distance_type="local-adaptive-squared-euclidean",
     activation_type="swish",
     activation_params={"beta": 2},

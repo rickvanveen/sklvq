@@ -14,8 +14,6 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ..models import LGMLVQ
 
-from sklvq.models import GMLVQ
-
 
 class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
     """ Local adaptive squared Euclidean distance

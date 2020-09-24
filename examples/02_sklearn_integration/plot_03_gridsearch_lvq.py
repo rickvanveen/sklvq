@@ -49,7 +49,7 @@ param_grid = [
         "gmlvq__solver_type": solvers_types,
         "gmlvq__distance_type": distance_types,
         "gmlvq__activation_type": ["sigmoid"],
-        "gmlvq__activation_params": [{"beta": beta} for beta in range(2, 4, 1)],
+        "gmlvq__activation_params": [{"beta": beta} for beta in range(1, 4, 1)],
     },
 ]
 

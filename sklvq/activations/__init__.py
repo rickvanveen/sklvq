@@ -1,7 +1,12 @@
 from ._base import ActivationBaseClass
+from ._identity import Identity
+from ._sigmoid import Sigmoid
+from ._soft_plus import SoftPlus
+from ._swish import Swish
+
 from sklvq._utils import _import_class_from_string
 
-__all__ = ["ActivationBaseClass"]
+__all__ = ["ActivationBaseClass", "Identity", "Sigmoid", "SoftPlus", "Swish"]
 
 ALIASES = {"soft+": "soft-plus"}
 
