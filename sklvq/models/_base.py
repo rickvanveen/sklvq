@@ -585,6 +585,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         # Input validation
         # X = self._validate_data(X, force_all_finite=self.force_all_finite)
 
+        # TODO: Check the decision functions -> basically the score function from other lib?
         decision_values = self.decision_function(X)
 
         # Prototypes labels are indices of classes_

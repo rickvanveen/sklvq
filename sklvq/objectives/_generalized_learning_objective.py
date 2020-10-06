@@ -80,6 +80,8 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
 
         dist_same, dist_diff, _, _ = _compute_distance(data, labels, model)
 
+        # return np.sum(self.activation(self.discriminant(data, labels)))
+
         return np.sum(self.activation(self.discriminant(dist_same, dist_diff)))
 
     def gradient(
@@ -125,14 +127,15 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
         dist_same, dist_diff, i_dist_same, i_dist_diff = _compute_distance(
             data, labels, model
         )
+        #  Distance from every sample to every prototype...
 
+        # Distances plus dist_same / dist_diff indices...
         discriminant_score = self.discriminant(dist_same, dist_diff)
 
         # Gradient is basically model._variables... way to view params but also single
         # prototype/omega?
         gradient_buffer = np.zeros(model.get_variables().size)
 
-        # For subset of X....
 
         # For each prototype
         for i_prototype in range(0, model.prototypes_labels_.size):

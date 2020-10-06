@@ -30,6 +30,9 @@ class RelativeDistance(DiscriminativeBaseClass):
                 Per sample evaluation of the relative distance discriminative function.
 
         """
+        # data, labels, model which contains the prototypes and distance_function
+        # return 
+
         return (dist_same - dist_diff) / (dist_same + dist_diff)
 
     def gradient(
