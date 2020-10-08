@@ -19,12 +19,12 @@ class ActivationBaseClass(ABC):
         """
         Parameters
         ----------
-        x : ndarray
+        x : ndarray of any shape
 
         Returns
         -------
         ndarray of shape (x.shape)
-            Elementwise evaluation of an activation function.
+            Should perform an elementwise evaluation of some activation function.
 
         """
         raise NotImplementedError("You should implement this!")
@@ -35,12 +35,12 @@ class ActivationBaseClass(ABC):
 
         Parameters
         ----------
-        x : ndarray
+        x : ndarray of any shape
 
         Returns
         -------
         ndarray of shape (x.shape)
-            Elementwise evaluation of an activation function's gradient.
+            Should return the elementwise evaluation of the activation function.
 
         """
         raise NotImplementedError("You should implement this!")

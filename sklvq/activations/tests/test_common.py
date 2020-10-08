@@ -4,6 +4,7 @@ from sklvq._utils import init_class
 
 from sklvq.activations import ALIASES
 
+
 def check_init_activation(activation_string):
     activation_class = init_class(activations, activation_string)
 

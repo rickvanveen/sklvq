@@ -5,6 +5,8 @@ import numpy as np
 class Identity(ActivationBaseClass):
     """ Identity function
 
+    Class that holds the sigmoid function and derivative.
+
     See also
     --------
     Sigmoid, SoftPlus, Swish
@@ -19,7 +21,7 @@ class Identity(ActivationBaseClass):
 
         Parameters
         ----------
-        x : ndarray
+        x : ndarray of any shape
 
         Returns
         -------

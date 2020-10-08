@@ -7,7 +7,7 @@ from typing import Union
 class SoftPlus(ActivationBaseClass):
     """ Soft+ function
 
-    Function and derivatives as discussed in [1]_
+    Class that holds the soft+ function and derivative as discussed in [1]_
 
     Parameters
     ----------
@@ -30,8 +30,8 @@ class SoftPlus(ActivationBaseClass):
     def __init__(self, beta: Union[int, float] = 1):
         if beta <= 0:
             raise ValueError(
-                "The activation function {} expects beta > 0".format(
-                    type(self).__name__
+                "The activation function {} expects beta > 0, but got beta = {}".format(
+                    type(self).__name__, beta
                 )
             )
 
@@ -45,7 +45,7 @@ class SoftPlus(ActivationBaseClass):
 
         Parameters
         ----------
-        x : ndarray
+        x : ndarray of any shape
 
         Returns
         -------

@@ -7,13 +7,13 @@ from . import ActivationBaseClass
 class Sigmoid(ActivationBaseClass):
     """ Sigmoid function
 
-    Function and derivatives as discussed in [1]_
+    Class that holds the sigmoid function and derivative as discussed in [1]_
 
     Parameters
     ----------
     beta : int or float, optional, default=1
-           Parameter that can be set during instantiation in order to control the steepness
-           of the constructed callable instance.
+           Parameter that can be set during that controls the steepness of the constructed
+           callable instance.
 
     See also
     --------
@@ -30,8 +30,8 @@ class Sigmoid(ActivationBaseClass):
     def __init__(self, beta: Union[int, float] = 1):
         if beta <= 0:
             raise ValueError(
-                "The activation function {} expects beta > 0".format(
-                    type(self).__name__
+                "The activation function {} expects beta > 0, but got beta = {}".format(
+                    type(self).__name__, beta
                 )
             )
 
@@ -45,7 +45,7 @@ class Sigmoid(ActivationBaseClass):
 
         Parameters
         ----------
-        x : ndarray
+        x : ndarray of any shape.
 
         Returns
         -------
@@ -62,7 +62,7 @@ class Sigmoid(ActivationBaseClass):
 
         Parameters
         ----------
-        x : ndarray
+        x : ndarray of any shape
 
         Returns
         -------
