@@ -5,6 +5,8 @@ import numpy as np
 class RelativeDistance(DiscriminativeBaseClass):
     """ Relative distance function
 
+    Class that holds the relative distance function and derivative.
+
     """
     __slots__ = ()
 
@@ -26,13 +28,10 @@ class RelativeDistance(DiscriminativeBaseClass):
 
         Returns
         -------
-        ndarray with shape (n_sampeles, 1)
-                Per sample evaluation of the relative distance discriminative function.
+        ndarray with shape (n_samples, 1)
+            Per sample evaluation of the relative distance discriminative function.
 
         """
-        # data, labels, model which contains the prototypes and distance_function
-        # return 
-
         return (dist_same - dist_diff) / (dist_same + dist_diff)
 
     def gradient(

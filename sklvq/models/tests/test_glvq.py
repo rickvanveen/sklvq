@@ -17,7 +17,7 @@ from .. import GLVQ
 def test_glvq():
     iris = datasets.load_iris()
 
-    estimator = GLVQ()
+    estimator = GLVQ(random_state=31415)
     pipeline = make_pipeline(preprocessing.StandardScaler(), estimator)
 
     # Run each solver ones
@@ -50,15 +50,16 @@ def test_glvq():
     search = GridSearchCV(
         pipeline,
         param_grid,
-        scoring="accuracy",
+        scoring=["accuracy", "roc_auc_ovo", "precision_macro", "recall_macro"],
         cv=repeated_kfolds,
         return_train_score=True,
+        refit="roc_auc_ovo",
     )
 
     search.fit(iris.data, iris.target)
 
-    assert np.all(search.cv_results_["mean_train_score"] > 0.75)
-    assert np.all(search.cv_results_["mean_test_score"] > 0.75)
+    assert np.all(search.cv_results_["mean_train_roc_auc_ovo"] > 0.75)
+    assert np.all(search.cv_results_["mean_test_roc_auc_ovo"] > 0.75)
 
-    print("\nBest parameter (CV score=%0.3f):" % search.best_score_)
+    print("\nBest parameter (CV roc_auc=%0.3f):" % search.best_score_)
     print(search.best_params_)

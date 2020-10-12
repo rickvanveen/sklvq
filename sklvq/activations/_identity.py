@@ -3,9 +3,7 @@ import numpy as np
 
 
 class Identity(ActivationBaseClass):
-    """ Identity function
-
-    Class that holds the sigmoid function and derivative.
+    """ Identity class that holds the identity function and gradient.
 
     See also
     --------
@@ -14,7 +12,7 @@ class Identity(ActivationBaseClass):
     __slots__ = ()
 
     def __call__(self, x: np.ndarray) -> np.ndarray:
-        """ Implements the identity function:
+        """ Implementation of the identity function:
             .. math::
 
                 f(x) = x
@@ -31,7 +29,7 @@ class Identity(ActivationBaseClass):
         return x
 
     def gradient(self, x: np.ndarray) -> np.ndarray:
-        """ Implements the identity function's derivative:
+        """ The identity functions's derivative:
             .. math::
 
                 \\frac{\\partial f}{\\partial x} = 1

@@ -5,7 +5,6 @@ from . import SolverBaseClass
 from ..objectives import ObjectiveBaseClass
 from ._base import _update_state
 
-from typing import Union
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:

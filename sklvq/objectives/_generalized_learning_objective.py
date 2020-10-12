@@ -121,13 +121,9 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
                 The generalized learning objective function's gradient
 
         """
-
-        # model.set_model_params(model.to_params(variables))
-
         dist_same, dist_diff, i_dist_same, i_dist_diff = _compute_distance(
             data, labels, model
         )
-        #  Distance from every sample to every prototype...
 
         # Distances plus dist_same / dist_diff indices...
         discriminant_score = self.discriminant(dist_same, dist_diff)
@@ -136,70 +132,83 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
         # prototype/omega?
         gradient_buffer = np.zeros(model.get_variables().size)
 
-
         # For each prototype
         for i_prototype in range(0, model.prototypes_labels_.size):
             # Find for which samples it is the closest/winner AND has the same label
-            ii_winner_same = i_prototype == i_dist_same
-            if any(ii_winner_same):
+            # ii_winner_same = i_prototype == i_dist_same
+            if i_prototype in i_dist_same:
+                ii_winner_same = i_prototype == i_dist_same
                 # Only if these cases exist we can compute an update
-                # Computes the following partial derivative: df/du
-                activation_gradient = self.activation.gradient(
-                    discriminant_score[ii_winner_same]
+                self._partial_gradient(
+                    gradient_buffer,
+                    discriminant_score[ii_winner_same],
+                    dist_same[ii_winner_same],
+                    dist_diff[ii_winner_same],
+                    True,
+                    data[ii_winner_same, :],
+                    model,
+                    i_prototype,
                 )
-
-                #  Computes the following partial derivatives: du/ddi, with i = 1
-                discriminant_gradient = self.discriminant.gradient(
-                    dist_same[ii_winner_same], dist_diff[ii_winner_same], True
-                )
-
-                # Computes the following partial derivatives: ddi/dwi, with i = 1
-                distance_gradient = model._distance.gradient(
-                    data[ii_winner_same, :], model, i_prototype
-                )
-
-                # The distance vectors weighted by the activation and discriminant partial
-                # derivatives.
-                model.add_partial_gradient(gradient_buffer, (
-                    activation_gradient * discriminant_gradient
-                ).dot(distance_gradient), i_prototype)
 
             # Find for which samples this prototype is the closest and has a different label
-            ii_winner_diff = i_prototype == i_dist_diff
-            if any(ii_winner_diff):
-                # Computes the following partial derivative: df/du
-                activation_gradient = self.activation.gradient(
-                    discriminant_score[ii_winner_diff]
+            if i_prototype in i_dist_diff:
+                ii_winner_diff = i_prototype == i_dist_diff
+                self._partial_gradient(
+                    gradient_buffer,
+                    discriminant_score[ii_winner_diff],
+                    dist_same[ii_winner_diff],
+                    dist_diff[ii_winner_diff],
+                    False,
+                    data[ii_winner_diff, :],
+                    model,
+                    i_prototype,
                 )
-
-                #  Computes the following partial derivatives: du/ddi, with i = 2
-                discriminant_gradient = self.discriminant.gradient(
-                    dist_same[ii_winner_diff], dist_diff[ii_winner_diff], False
-                )
-
-                # Computes the following partial derivatives: ddi/dwi, with i = 2
-                distance_gradient = model._distance.gradient(
-                    data[ii_winner_diff, :], model, i_prototype
-                )
-
-                # The distance vectors weighted by the activation and discriminant partial
-                # derivatives.
-                model.add_partial_gradient(gradient_buffer, (
-                    activation_gradient * discriminant_gradient
-                ).dot(distance_gradient), i_prototype)
 
         return gradient_buffer
+
+    def _partial_gradient(
+        self,
+        gradient_buffer,
+        discriminant_score,
+        dist_same,
+        dist_diff,
+        winner_same,
+        data,
+        model,
+        i_prototype,
+    ):
+        # Computes the following partial derivative: df/du
+        activation_gradient = self.activation.gradient(discriminant_score)
+
+        #  Computes the following partial derivatives: du/ddi, with i = 2
+        discriminant_gradient = self.discriminant.gradient(
+            dist_same, dist_diff, winner_same
+        )
+
+        # Computes the following partial derivatives: ddi/dwi, with i = 2
+        distance_gradient = model._distance.gradient(data, model, i_prototype)
+
+        # The distance vectors weighted by the activation and discriminant partial
+        # derivatives.
+        model.add_partial_gradient(
+            gradient_buffer,
+            (activation_gradient * discriminant_gradient).dot(distance_gradient),
+            i_prototype,
+        )
 
 
 def _find_min(indices: np.ndarray, distances: np.ndarray) -> (np.ndarray, np.ndarray):
     """ Helper function to find the minimum distance and the index of this distance. """
     dist_temp = np.where(indices, distances, np.inf)
-    return dist_temp.min(axis=1), dist_temp.argmin(axis=1)
+
+    i_dist_min = dist_temp.argmin(axis=1)
+    return dist_temp[np.arange(i_dist_min.size), i_dist_min], i_dist_min
 
 
 def _compute_distance(data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass"):
     """ Computes the distances between each prototype and each observation and finds all indices
     where the shortest distance is that of the prototype with the same label and with a different label. """
+    prototypes_labels = model.prototypes_labels_
 
     # Step 1: Compute distances between X and the model (how is depending on model and coupled
     # distance function)
@@ -207,11 +216,17 @@ def _compute_distance(data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass
 
     # Step 2: Find for all samples the distance between closest prototype with same label (d1)
     # and different label (d2). ii_same marks for all samples the prototype with the same label.
-    ii_same = np.transpose(
-        np.array(
-            [labels == prototype_label for prototype_label in model.prototypes_labels_]
-        )
-    )
+
+    num_samples = labels.size
+    num_prototypes = model.prototypes_labels_.size
+    if num_samples == 1:
+        ii_same = np.atleast_2d(labels == prototypes_labels)
+    elif num_samples < num_prototypes:
+        ii_same = np.array([label == prototypes_labels for label in labels])
+    else:
+        ii_same = np.transpose(
+            [labels == prototype_label for prototype_label in prototypes_labels]
+        )  # List comprehension takes 13% of total computation time in compute distance...
 
     # For each prototype mark the samples that have a different label
     ii_diff = ~ii_same

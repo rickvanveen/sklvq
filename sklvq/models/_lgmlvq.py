@@ -194,7 +194,7 @@ class LGMLVQ(LVQBaseClass):
         self.discriminant_type = discriminant_type
         self.discriminant_params = discriminant_params
         self.relevance_init = relevance_init
-        relevance_params = self._init_parameter_params(
+        relevance_params = self._init_model_params_options(
             relevance_params, _RELEVANCES_PARAMS_DEFAULS
         )
         self.relevance_params = relevance_params
