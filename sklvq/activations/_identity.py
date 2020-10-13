@@ -3,7 +3,9 @@ import numpy as np
 
 
 class Identity(ActivationBaseClass):
-    """ Identity class that holds the identity function and gradient.
+    """ Identity function
+
+    Class that holds the identity function and gradient.
 
     See also
     --------
@@ -29,7 +31,7 @@ class Identity(ActivationBaseClass):
         return x
 
     def gradient(self, x: np.ndarray) -> np.ndarray:
-        """ The identity functions's derivative:
+        """ The identity functions's gradient:
             .. math::
 
                 \\frac{\\partial f}{\\partial \\vec{x}} = \\vec{1}

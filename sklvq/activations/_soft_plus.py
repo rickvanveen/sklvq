@@ -54,7 +54,7 @@ class SoftPlus(ActivationBaseClass):
         return np.log(1 + np.exp(self.beta * x))
 
     def gradient(self, x: np.ndarray) -> np.ndarray:
-        """ Implements the sigmoid function's derivative:
+        """ Implements the sigmoid function's gradient:
             .. math::
 
                 \\frac{\\partial f}{\\partial \\vec{x}} = \\frac{\\beta \\cdot e^{\\beta \\cdot \\vec{x}}}{1 + e^{\\beta \\cdot \\vec{x}}}

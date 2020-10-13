@@ -9,6 +9,8 @@ class ActivationBaseClass(ABC):
     Abstract class for implementing activation functions, providing abstract methods with
     expected call signatures.
 
+    Custom activation function '__init__' should accept any parameters as key-value pairs.
+
     See also
     --------
     Identity, Sigmoid, SoftPlus, Swish
@@ -18,6 +20,8 @@ class ActivationBaseClass(ABC):
     @abstractmethod
     def __call__(self, x: np.ndarray) -> np.ndarray:
         """
+        Should implement an activation function
+
         Parameters
         ----------
         x : ndarray of any shape
@@ -33,6 +37,7 @@ class ActivationBaseClass(ABC):
     @abstractmethod
     def gradient(self, x: np.ndarray) -> np.ndarray:
         """
+        Should implement the activation function's  gradient
 
         Parameters
         ----------
