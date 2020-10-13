@@ -7,13 +7,12 @@ from typing import Union
 class SoftPlus(ActivationBaseClass):
     """ Soft+ function
 
-    Class that holds the soft+ function and derivative as discussed in [1]_
+    Class that holds the soft+ function and gradient as discussed in [1]_
 
     Parameters
     ----------
     beta : int or float, optional, default=1
-           Parameter that can be set during instantiation in order to control the steepness
-           of the constructed callable instance.
+           Positive non-zero value that controls the steepness of the Soft+ function.
 
     See also
     --------
@@ -41,7 +40,7 @@ class SoftPlus(ActivationBaseClass):
         """ Implements the soft+ function:
             .. math::
 
-                f(x) = \\ln(1 + e^{\\beta \\cdot x})
+                f(\\vec{x}) = \\ln(1 + e^{\\beta \\cdot \\vec{x}})
 
         Parameters
         ----------
@@ -58,7 +57,7 @@ class SoftPlus(ActivationBaseClass):
         """ Implements the sigmoid function's derivative:
             .. math::
 
-                \\frac{\\partial f}{\\partial x} = \\frac{\\beta \\cdot e^{\\beta \\cdot x}}{1 + e^{\\beta \\cdot x}}
+                \\frac{\\partial f}{\\partial \\vec{x}} = \\frac{\\beta \\cdot e^{\\beta \\cdot \\vec{x}}}{1 + e^{\\beta \\cdot \\vec{x}}}
 
         Parameters
         ----------

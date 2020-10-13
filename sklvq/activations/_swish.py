@@ -7,13 +7,12 @@ from typing import Union
 class Swish(ActivationBaseClass):
     """ Swish function
 
-    Class that holds the swish function and derivative as discussed in [1]_
+    Class that holds the swish function and gradient as discussed in [1]_
 
     Parameters
     ----------
     beta : int, float, default=1
-           Parameter that can be set during instantiation in order to control the steepness
-           of the constructed callable instance.
+          Positive non-zero value that controls the steepness of the Swish function.
 
     See also
     --------
@@ -41,7 +40,7 @@ class Swish(ActivationBaseClass):
         """ Implements the swish function:
             .. math::
 
-                f(x) = \\frac{x}{1 + e^{-\\beta \\cdot x}}
+                f(\\vec{x}) = \\frac{\\vec{x}}{1 + e^{-\\beta \\cdot \\vec{x}}}
 
         Parameters
         ----------
@@ -58,7 +57,7 @@ class Swish(ActivationBaseClass):
         """ Implements the sigmoid function's derivative:
             .. math::
 
-                \\frac{\\partial f}{\\partial x} = \\beta \\cdot f(x) + (\\frac{1}{1 + e^{-\\beta \\cdot x}}) \\cdot (1 - \\beta \\cdot f(x))
+                \\frac{\\partial f}{\\partial \\vec{x}} = \\beta \\cdot f(\\vec{x}) + (\\frac{1}{1 + e^{-\\beta \\cdot \\vec{x}}}) \\cdot (1 - \\beta \\cdot f(\\vec{x}))
 
         Parameters
         ----------
@@ -75,8 +74,10 @@ class Swish(ActivationBaseClass):
 
 
 def _sgd(x: np.ndarray, beta: int) -> np.ndarray:
+    # Sigmoid function
     return 1 / (np.exp(-beta * x) + 1)
 
 
 def _swish(x: np.ndarray, beta: int) -> np.ndarray:
+    # Swish function
     return x * _sgd(x, beta)

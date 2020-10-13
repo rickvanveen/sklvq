@@ -7,13 +7,12 @@ from . import ActivationBaseClass
 class Sigmoid(ActivationBaseClass):
     """ Sigmoid function
 
-    Class that holds the sigmoid function and derivative as discussed in [1]_
+    Class that holds the sigmoid function and gradient as discussed in [1]_
 
     Parameters
     ----------
     beta : int or float, optional, default=1
-           Parameter that can be set during that controls the steepness of the constructed
-           callable instance.
+           Positive non-zero value that controls the steepness of the Sigmoid function.
 
     See also
     --------
@@ -23,6 +22,7 @@ class Sigmoid(ActivationBaseClass):
     ----------
     .. [1] Villmann, T., Ravichandran, J., Villmann, A., Nebel, D., & Kaden, M. (2019). "Activation
         Functions for Generalized Learning Vector Quantization - A Performance Comparison", 2019.
+
     """
 
     __slots__ = "beta"
@@ -41,7 +41,7 @@ class Sigmoid(ActivationBaseClass):
         """ Computes the sigmoid function:
             .. math::
 
-                f(x) = \\frac{1}{e^{-\\beta \\cdot x} + 1}
+                f(\\vec{x}) = \\frac{1}{e^{-\\beta \\cdot \\vec{x}} + 1}
 
         Parameters
         ----------
@@ -58,7 +58,7 @@ class Sigmoid(ActivationBaseClass):
         """ Computes the sigmoid function's derivative with respect to x:
            .. math::
 
-               \\frac{\\partial f}{\\partial x} = \\frac{(\\beta \\cdot e^{\\beta \\cdot x)}}{(e^{\\beta \\cdot x} + 1)^2}
+               \\frac{\\partial f}{\\partial \\vec{x}} = \\frac{(\\beta \\cdot e^{\\beta \\cdot \\vec{x})}}{(e^{\\beta \\cdot \\vec{x}} + 1)^2}
 
         Parameters
         ----------

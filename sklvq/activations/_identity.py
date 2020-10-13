@@ -15,7 +15,7 @@ class Identity(ActivationBaseClass):
         """ Implementation of the identity function:
             .. math::
 
-                f(x) = x
+                f(\\vec{x}) = \\vec{x}
 
         Parameters
         ----------
@@ -32,7 +32,7 @@ class Identity(ActivationBaseClass):
         """ The identity functions's derivative:
             .. math::
 
-                \\frac{\\partial f}{\\partial x} = 1
+                \\frac{\\partial f}{\\partial \\vec{x}} = \\vec{1}
 
         Parameters
         ----------

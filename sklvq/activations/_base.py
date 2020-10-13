@@ -41,7 +41,7 @@ class ActivationBaseClass(ABC):
         Returns
         -------
         ndarray of shape (x.shape)
-            Should return the elementwise evaluation of the activation function.
+            Should return the elementwise evaluation of the activation function's gradient.
 
         """
         raise NotImplementedError("You should implement this!")
