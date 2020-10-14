@@ -1,15 +1,11 @@
-from sklvq.models import LVQBaseClass
+from typing import Tuple
+from typing import Union
 
 import numpy as np
 from sklearn.utils.validation import check_is_fitted, check_array
 
 from . import LVQBaseClass
-from .. import distances, solvers
 from ..objectives import GeneralizedLearningObjective
-from ..solvers import SolverBaseClass
-
-from typing import Union
-from typing import Tuple
 
 ModelParamsType = Tuple[np.ndarray, np.ndarray]
 
@@ -272,7 +268,7 @@ class GMLVQ(LVQBaseClass):
     # Functions to transform the 1D variables array to model parameters and back
     ###########################################################################################
 
-    def to_model_params(self, variables: np.ndarray) -> ModelParamsType:
+    def to_model_params_view(self, variables: np.ndarray) -> ModelParamsType:
         """
 
         Parameters
@@ -288,11 +284,11 @@ class GMLVQ(LVQBaseClass):
 
         """
         return (
-            self.to_prototypes(variables),
+            self.to_prototypes_view(variables),
             self.to_omega(variables),
         )
 
-    def to_prototypes(self, var_buffer: np.ndarray) -> np.ndarray:
+    def to_prototypes_view(self, var_buffer: np.ndarray) -> np.ndarray:
         """
         Returns a view (of the shape of the model's prototypes) into the provided variables
         buffer of the same size as the model's variables array.
@@ -345,13 +341,12 @@ class GMLVQ(LVQBaseClass):
             implementation.
 
         """
-        (prototypes, omega) = self.to_model_params(var_buffer)
+        (prototypes, omega) = self.to_model_params_view(var_buffer)
 
         self._normalize_prototypes(prototypes)
         self._normalise_omega(omega)
 
-    @staticmethod
-    def _normalise_omega(omega: np.ndarray) -> None:
+    def _normalise_omega(self, omega: np.ndarray) -> None:
         np.divide(omega, np.sqrt(np.einsum("ji, ji", omega, omega)), out=omega)
 
     ###########################################################################################
@@ -361,7 +356,7 @@ class GMLVQ(LVQBaseClass):
     def add_partial_gradient(self, gradient, partial_gradient, i_prototype) -> None:
         n_features = self.n_features_in_
 
-        prots_view = self.to_prototypes(gradient)
+        prots_view = self.to_prototypes_view(gradient)
         np.add(
             prots_view[i_prototype, :],
             partial_gradient[:n_features],
@@ -371,7 +366,7 @@ class GMLVQ(LVQBaseClass):
         omega_view = gradient[self.prototypes_.size :]
         np.add(omega_view, partial_gradient[n_features:], out=omega_view)
 
-    def multiply_variables(
+    def mul_step_size(
         self, step_sizes: Union[int, float, np.ndarray], var_buffer: np.ndarray
     ) -> None:
         if isinstance(step_sizes, int) | isinstance(step_sizes, float):
@@ -380,7 +375,7 @@ class GMLVQ(LVQBaseClass):
 
         if isinstance(step_sizes, np.ndarray):
             if step_sizes.size == 2:
-                prototypes, omega = self.to_model_params(var_buffer)
+                prototypes, omega = self.to_model_params_view(var_buffer)
                 prototypes *= step_sizes[0]
                 omega *= step_sizes[1]
 

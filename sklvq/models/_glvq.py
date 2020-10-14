@@ -1,12 +1,10 @@
+# Typing
+from typing import Union
+
 import numpy as np
 
 from . import LVQBaseClass
-from .. import distances, solvers
 from ..objectives import GeneralizedLearningObjective
-from ..solvers import SolverBaseClass
-
-# Typing
-from typing import Union
 
 ModelParamsType = np.ndarray
 
@@ -161,6 +159,17 @@ class GLVQ(LVQBaseClass):
     # The "Getter" and "Setter" that are used by the solvers to set and get model params.
     ###########################################################################################
 
+    def get_model_params(self) -> ModelParamsType:
+        """
+
+        Returns
+        -------
+        ndarray
+             Returns the prototypes as ndarray.
+
+        """
+        return self.get_prototypes()
+
     def set_model_params(self, model_params: ModelParamsType) -> None:
         """
         Changes the model's internal parameters. Copies the values in model_params into
@@ -175,22 +184,11 @@ class GLVQ(LVQBaseClass):
         """
         self.set_prototypes(model_params)
 
-    def get_model_params(self) -> ModelParamsType:
-        """
-
-        Returns
-        -------
-        ndarray
-             Returns the prototypes as ndarray.
-
-        """
-        return self.get_prototypes()
-
     ###########################################################################################
     # Functions to transform the 1D variables array to model parameters and back
     ###########################################################################################
 
-    def to_model_params(self, variables: np.ndarray) -> ModelParamsType:
+    def to_model_params_view(self, variables: np.ndarray) -> ModelParamsType:
         """
         Should create a view of the variables array in prototype shape.
 
@@ -206,9 +204,9 @@ class GLVQ(LVQBaseClass):
             Returns the prototypes as ndarray.
 
         """
-        return self.to_prototypes(variables)
+        return self.to_prototypes_view(variables)
 
-    def to_prototypes(self, var_buffer: np.ndarray) -> np.ndarray:
+    def to_prototypes_view(self, var_buffer: np.ndarray) -> np.ndarray:
         return var_buffer.reshape(self._prototypes_shape)
 
     ###########################################################################################
@@ -220,8 +218,8 @@ class GLVQ(LVQBaseClass):
 
         Parameters
         ----------
-        model_params : ndarray
-            Model parameters as provided by get_model_params()
+        var_buffer : ndarray
+
 
         Returns
         -------
@@ -230,7 +228,7 @@ class GLVQ(LVQBaseClass):
             implementation.
 
         """
-        LVQBaseClass._normalize_prototypes(self.to_prototypes(var_buffer))
+        LVQBaseClass._normalize_prototypes(self.to_prototypes_view(var_buffer))
 
     ###########################################################################################
     # Solver helper functions
@@ -251,14 +249,14 @@ class GLVQ(LVQBaseClass):
         """
         n_features = self.n_features_in_
 
-        prots_view = self.to_prototypes(gradient)
+        prots_view = self.to_prototypes_view(gradient)
         np.add(
             prots_view[i_prototype, :],
             partial_gradient[:n_features],
             out=prots_view[i_prototype, :],
         )
 
-    def multiply_variables(
+    def mul_step_size(
         self, step_size: Union[int, float], var_buffer: np.ndarray
     ) -> None:
         var_buffer *= step_size

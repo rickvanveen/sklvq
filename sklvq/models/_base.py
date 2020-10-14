@@ -11,9 +11,8 @@ from .. import distances
 from .. import solvers
 from .._utils import init_class
 
-from ..distances._base import DistanceBaseClass
-from ..solvers._base import SolverBaseClass
-from ..objectives._generalized_learning_objective import GeneralizedLearningObjective
+from ..distances import DistanceBaseClass
+from ..objectives import GeneralizedLearningObjective
 
 from typing import Tuple, Union, List
 
@@ -24,7 +23,7 @@ _PROTOTYPES_PARAMS_DEFAULTS = {"prototypes_per_class": 1}
 
 class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
     prototypes_: np.ndarray
-    _distance: Union[DistanceBaseClass, object]
+    distance: Union[DistanceBaseClass, object]
     _objective: GeneralizedLearningObjective
     _variables: np.ndarray
 
@@ -54,7 +53,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         self.valid_solvers = valid_solvers
 
         self.prototype_init = prototype_init
-        prototype_params = self._init_parameter_params(
+        prototype_params = self._init_model_params_options(
             prototype_params, _PROTOTYPES_PARAMS_DEFAULTS
         )
         self.prototype_params = prototype_params
@@ -63,7 +62,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         self.force_all_finite = force_all_finite
 
     @staticmethod
-    def _init_parameter_params(parameter_params, parameter_params_defaults):
+    def _init_model_params_options(parameter_params, parameter_params_defaults):
         if parameter_params is None:
             return parameter_params_defaults
 
@@ -77,6 +76,18 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
     # The "Getter" and "Setter" that are used by the solvers to set and get model params.
     ###########################################################################################
 
+    def get_variables(self) -> np.ndarray:
+        """
+        Consistency/convenience function.
+
+        Returns
+        -------
+            variables : ndarray
+                returns the models variables array.
+
+        """
+        return self._variables
+
     def set_variables(self, new_variables: np.ndarray) -> None:
         """
         Will modify the variables stored by the model (self) using numpy copyto.
@@ -89,17 +100,18 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         """
         np.copyto(self._variables, new_variables)
 
-    def get_variables(self) -> np.ndarray:
+    @abstractmethod
+    def get_model_params(self) -> Union[tuple, np.ndarray]:
         """
-        Consistency/convenience function.
 
         Returns
         -------
-            variables : ndarray
-                returns the models variables array.
+        ndarray or tuple
+            In the simplest case returns only the prototypes as ndarray. Other models may include
+            multiple parameters then they are stored in a tuple.
 
         """
-        return self._variables
+        raise NotImplementedError("You should implement this!")
 
     @abstractmethod
     def set_model_params(self, model_params: Union[tuple, np.ndarray]):
@@ -115,38 +127,13 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         """
         raise NotImplementedError("You should implement this!")
 
-    @abstractmethod
-    def get_model_params(self) -> Union[tuple, np.ndarray]:
-        """
-
-        Returns
-        -------
-        ndarray or tuple
-            In the simplest case returns only the prototypes as ndarray. Other models may include
-            multiple parameters then they are stored in a tuple.
-
-        """
-        raise NotImplementedError("You should implement this!")
-
     ###########################################################################################
     # Specific "getters" and "setters" for the prototypes shared by every LVQ model.
     ###########################################################################################
 
-    def set_prototypes(self, prototypes: np.ndarray) -> None:
-        """
-        Will copy the new prototypes into the model's prototypes, which is a view into the
-        variables array and therefore will alter it.
-
-        Parameters
-        ----------
-        prototypes : ndarray of shape (n_prototypes, n_features)
-            The new prototypes the model should store.
-        """
-        np.copyto(self.prototypes_, prototypes)
-
     def get_prototypes(self) -> np.ndarray:
         """
-        Convenience/consistency function. Only works after fitting the model and the prototypes
+        Convenience function. Only works after fitting the model and the prototypes
         have been initialized.
 
         Returns
@@ -157,17 +144,28 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         """
         return self.prototypes_
 
+    def set_prototypes(self, new_prototypes: np.ndarray) -> None:
+        """
+        Will copy the new prototypes into the model's prototypes, which is a view into the
+        variables array and therefore will alter it.
+
+        Parameters
+        ----------
+        prototypes : ndarray of shape (n_prototypes, n_features)
+            The new prototypes the model should store.
+        """
+        np.copyto(self.prototypes_, new_prototypes)
+
     ###########################################################################################
     # Functions to transform the 1D variables array to model parameters and back
     ###########################################################################################
 
     @abstractmethod
-    def to_model_params(self, variables: np.ndarray) -> Union[tuple, np.ndarray]:
+    def to_model_params_view(self, var_buffer: np.ndarray) -> Union[tuple, np.ndarray]:
         """
-
         Parameters
         ----------
-        variables : ndarray
+        var_buffer : ndarray
             Single ndarray that stores the parameters in the order as given by the
             "to_variabes()" function
 
@@ -181,7 +179,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         raise NotImplementedError("You should implement this!")
 
     @abstractmethod
-    def to_prototypes(self, var_buffer: np.ndarray) -> np.ndarray:
+    def to_prototypes_view(self, var_buffer: np.ndarray) -> np.ndarray:
         """
         Function that depends on a specific model. Should return a view (of the shape of the
         model's prototypes) into the provided variables buffer of the same size as the
@@ -210,8 +208,8 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
 
         Parameters
         ----------
-        model_params : ndarray or tuple
-            Model parameters as provided by get_model_params()
+        var_buffer : ndarray
+            1d array of the shame size as the model's variables array.
 
         Returns
         -------
@@ -267,7 +265,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         raise NotImplementedError("You should implement this!")
 
     @abstractmethod
-    def multiply_variables(self, step_size, var_buffer: np.ndarray) -> None:
+    def mul_step_size(self, step_size, var_buffer: np.ndarray) -> None:
         """
 
         Parameters
@@ -352,7 +350,8 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
             np.arange(0, self.classes_.size), prototypes_per_class
         )
 
-        self.prototypes_ = self.to_prototypes(self._variables)
+        # Sets initial value for prototypes....
+        self.prototypes_ = self.to_prototypes_view(self._variables)
 
         if self.prototype_init == "class-conditional-mean":
             conditional_mean = _conditional_mean(self.prototypes_labels_, X, y)
@@ -385,7 +384,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
             distances, self.distance_type, valid_class_types=self.valid_distances,
         )
 
-        self._distance = distance_class(**distance_params)
+        self.distance = distance_class(**distance_params)
 
     def _init_solver(self) -> None:
         """
@@ -398,7 +397,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
     # Data and label validation
     ###########################################################################################
 
-    def _validate_data_labels(
+    def _check_data_and_labels(
         self, X: np.ndarray, labels: np.ndarray
     ) -> Tuple[np.ndarray, np.ndarray]:
         """
@@ -457,7 +456,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         Should initialize:
             1. self._variables and algorithm specific parameters which should be
                views into self._variables.
-            2. The distance function in self._distance
+            2. The distance function in self.distance
             3. The objective function in self._objective
             4. The solver function in self._solver
 
@@ -470,7 +469,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         """
         self._check_model_params()
 
-        # Initializes the 1D block of continuous memory.
+        # Initializes the 1D block of continuous memory to hold the model params.
         self._init_variables()
 
         # Initialize algorithm specific parameters.
@@ -514,7 +513,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
 
         """
         # Check X and check and transform labels.
-        X, y_index = self._validate_data_labels(X, y)
+        X, y_index = self._check_data_and_labels(X, y)
 
         # Initialize random_state_ that should be used to perform any rng.
         self.random_state_ = check_random_state(self.random_state)
@@ -547,26 +546,43 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         X = check_array(X, force_all_finite=self.force_all_finite)
 
         # Of shape n_observations , n_prototypes
-        distances = self._distance(X, self)
+        distances = self.distance(X, self)
 
         # Allocation n_observations, n_classes
-        min_distances = np.zeros((X.shape[0], self.classes_.size))
+        discriminant_scores = np.zeros((X.shape[0], self.classes_.size))
 
         # return n_observations, n_classes
-        for i, c in enumerate(self.classes_):  # Correct?
-            min_distances[:, i] = distances[:, self.prototypes_labels_ == i].min(axis=1)
-
-        sum_min_distances = np.sum(min_distances, axis=1)
-
-        decision_values = (1 - (min_distances / sum_min_distances[:, np.newaxis])) / 2
-
-        # if binary then + for positive class and - for negative class
-        if self.classes_.size == 2:
-            return np.max(decision_values, axis=1) * (
-                (np.argmax(decision_values, axis=1) * 2) - 1
+        for i, _ in enumerate(self.classes_):
+            discriminant_scores[:, i] = self._objective.discriminant(
+                distances[:, self.prototypes_labels_ == i].min(axis=1),
+                distances[:, self.prototypes_labels_ != i].min(axis=1),
             )
 
-        return decision_values
+        return discriminant_scores
+
+    def predict_proba(self, X: np.ndarray):
+        """
+        Turns decision values into confidence scores ("probabilities"). Very tied to the
+        currently only supported discriminant function... by converting the range [-1, 1] to 2
+        -  [0, 2] and normalizing it by dividing it by the sum of the discriminant values. Now
+        the most negative value has the highest "probability" and the most positive the lowest.
+
+        Parameters
+        ----------
+        X
+
+        Returns
+        -------
+
+        """
+        decision_values = self.decision_function(X)
+
+        decision_values = 2 - (decision_values + 1)
+        sum_decision_values = np.sum(decision_values, axis=1)
+
+        confidence_scores = decision_values / sum_decision_values[:, np.newaxis]
+
+        return confidence_scores
 
     def predict(self, X: np.ndarray):
         """ Predict function
@@ -584,15 +600,10 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
 
         # Input validation
         # X = self._validate_data(X, force_all_finite=self.force_all_finite)
-
-        # TODO: Check the decision functions -> basically the score function from other lib?
         decision_values = self.decision_function(X)
 
-        # Prototypes labels are indices of classes_
-        if self.classes_.size == 2:
-            return self.classes_[(decision_values > 0).astype(np.int)]
-
-        return self.classes_[decision_values.argmax(axis=1)]
+        # Lower value is the closest prototype.
+        return self.classes_[decision_values.argmin(axis=1)]
 
 
 def _conditional_mean(p_labels: np.ndarray, data: np.ndarray, d_labels: np.ndarray):
