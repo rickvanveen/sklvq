@@ -4,7 +4,7 @@ import numpy as np
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ..models._base import LVQBaseClass
+    from ..models import LVQBaseClass
 
 
 class DistanceBaseClass(ABC):
@@ -13,8 +13,7 @@ class DistanceBaseClass(ABC):
     Abstract class for implementing distance functions. It provides abstract methods with
     expected call signatures.
 
-    When developing a custom distance function '__init__' should accept any parameters as
-    key-value pairs.
+    Custom distance function '__init__' should accept any parameters as key-value pairs.
 
     See also
     --------
@@ -24,12 +23,13 @@ class DistanceBaseClass(ABC):
 
     @abstractmethod
     def __call__(self, data: np.ndarray, model: "LVQBaseClass") -> np.ndarray:
-        """The distance function.
+        """
+        Should implement a distance function.
 
         Parameters
         ----------
         data : ndarray with shape (n_samples, n_features)
-            The X for which the distance to the prototypes of the model need to be computed.
+            The samples for which the distance to the prototypes of the model need to be computed.
         model : LVQBaseClass
             Any class extending the LVQBaseClass or depending on the type of distance function
             is implemented a class that provides the required attributes.
@@ -38,7 +38,6 @@ class DistanceBaseClass(ABC):
         -------
         ndarray with shape (n_samples, n_prototypes)
             Evaluation of the distance between each sample and prototype of the model.
-
         """
         raise NotImplementedError("You should implement this!")
 
@@ -51,7 +50,7 @@ class DistanceBaseClass(ABC):
         Parameters
         ----------
         data : ndarray with shape (n_samples, n_features)
-            The X for which the distance gradient to the prototypes of the model need to be
+            The data for which the distance gradient to the prototypes of the model need to be
             computed.
         model : LVQBaseClass
             Any class extending the LVQBaseClass or depending on the type of distance function
@@ -62,7 +61,7 @@ class DistanceBaseClass(ABC):
         Returns
         -------
         ndarray with shape (n_samples, n_features)
-            The gradient with respect to the prototype and every sample in the X.
+            The gradient with respect to the prototype (i_prototype) and every sample in X.
 
         """
         raise NotImplementedError("You should implement this!")

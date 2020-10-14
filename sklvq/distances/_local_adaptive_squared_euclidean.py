@@ -4,7 +4,7 @@ import numpy as np
 from scipy.spatial.distance import cdist
 
 from ._adaptive_squared_euclidean import (
-    # _nan_mahalanobis,
+    _nan_mahalanobis,
     _prototype_gradient,
     _omega_gradient,
 )
@@ -18,9 +18,28 @@ if TYPE_CHECKING:
 class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
     """ Local adaptive squared Euclidean distance
 
+    Class that holds the localized adaptive squared Euclidean distance function and its gradient as
+    described in [1]_ and [2]_.
+
+    Parameters
+    ----------
+    force_all_finite  : {True, False, "allow-nan"}
+        Parameter to indicate that NaNLVQ distance variant should be used. If true no nans are
+        allowed. If False or "allow-nan" nans are allowed.
+
     See also
     --------
     Euclidean, SquaredEuclidean, AdaptiveSquaredEuclidean
+
+    Notes
+    -----
+    Compatible with the :class:`.LGMLVQ` algorithm (only).
+
+    References
+    ----------
+    .. [1] Schneider, P. (2010). Advanced methods for prototype-based classification. Groningen.
+    .. [2] Schneider, P., Biehl, M., & Hammer, B. (2009). Adaptive Relevance Matrices in Learning
+           Vector Quantization. Neural Computation, 21(12), 3532–3561.
 
     """
 
@@ -30,40 +49,45 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
         self.force_all_finite = force_all_finite
 
     def __call__(self, data: np.ndarray, model: "LGMLVQ") -> np.ndarray:
-        """ Implements a weighted variant of the squared euclidean distance:
+        """ Computes the local variant of the adaptive squared Euclidean distance:
 
             .. math::
                 d^{\\Lambda}(\\vec{w}, \\vec{x}) = (\\vec{x} - \\vec{w})^{\\top}
                 \\Omega_j^{\\top} \\Omega_j (\\vec{x} - \\vec{w})
 
         with :math:`\\Omega_j` depending on the localization setting of the model and
-        :math:`\\Lambda_j = \\Omega_j^{\\top} \\Omega_j`
+        :math:`\\Lambda_j = \\Omega_j^{\\top} \\Omega_j`. The localization can be either per
+        prototype or per class, see the documentation of :class:`.LGMLVQ`.
 
         Parameters
         ----------
         data : ndarray with shape (n_samples, n_features)
-            The X for which the distance gradient to the prototypes of the model need to be
+            The data for which the distance gradient to the prototypes of the model need to be
             computed.
         model : LGMLVQ
-            The model instance.
+            A LGMLVQ model instance, containing the prototypes and relevance matrices.
 
         Returns
         -------
-        ndarray
-            The adaptive squared euclidean distance for every sample to every prototype stored row-wise.
+        ndarray with shape (n_samples, n_prototypes)
+            Evaluation of the distance between each sample in the data and prototype of the model.
         """
         prototypes_, omegas_ = model.get_model_params()
         prototypes_labels_ = model.prototypes_labels_
         localization = model.relevance_params["localization"]
 
-        pdists = np.zeros((data.shape[0], model._prototypes_shape[0]))
+        distance_function = "mahalanobis"
+        if self.force_all_finite == "allow-nan" or False:
+            distance_function = _nan_mahalanobis
+
+        cdists = np.zeros((data.shape[0], model._prototypes_shape[0]))
 
         if localization == "prototypes":
             for i, (prototype, omega) in enumerate(zip(prototypes_, omegas_)):
-                pdists[:, i] = cdist(
+                cdists[:, i] = cdist(
                     data,
                     np.atleast_2d(prototype),
-                    "mahalanobis",
+                    distance_function,
                     VI=model._compute_lambda(omega),
                 ).squeeze()
 
@@ -72,26 +96,29 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
                 # Prototype labels are indices to model.classes_ so all prototypes with 'index'
                 # i as label have the same class.
                 prototypes = prototypes_[i == prototypes_labels_, :]
-                pdists[:, i == prototypes_labels_] = cdist(
+                cdists[:, i == prototypes_labels_] = cdist(
                     data,
                     np.atleast_2d(prototypes),
-                    "mahalanobis",
+                    distance_function,
                     VI=model._compute_lambda(omega),
                 )
 
-        return pdists ** 2
+        return cdists ** 2
 
     def gradient(
         self, data: np.ndarray, model: "LGMLVQ", i_prototype: int
     ) -> np.ndarray:
-        """ The partial derivative of the adaptive squared euclidean distance function,
-        with respect to a specified prototype and the matrix omega:
+        """ Computes the gradient of the localized adaptive squared euclidean distance function
+        with respect to a specified prototype:
 
             .. math::
-                \\frac{\\partial d}{\\partial \\vec{w_i}} = -2 \\cdot \\Lambda_j \\cdot (\\vec{x} - \\vec{w_i})
+                \\frac{\\partial d}{\\partial \\vec{w_i}} = -2 \\Lambda_j (\\vec{x} - \\vec{w_i})
 
-        with :math:`\\Lambda_j` the matrix matched to the prototype. This depends on the
-        localization setting of the model.
+        and implicitly coupled omega matrix (per element):
+
+            .. math::
+                \\frac{\\partial d}{\\partial \\Omega_{lm}} =  2 \\sum_i (x^i - w^i)
+                \\Omega_{li} (x^m - w^m)
 
         Parameters
         ----------
@@ -99,16 +126,16 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
             The X for which the distance gradient to the prototypes of the model need to be
             computed.
         model : LGMLVQ
-            The model instance.
+            The LGMLVQ model instance, containing the prototypes and relevance matrices.
         i_prototype : int
             An integer index value of the relevant prototype
 
         Returns
         -------
-        ndarray
-            The gradient for every feature/dimension. Returned in one 1D vector. The non-relevant prototype's
-            gradient is set to 0, but is still included in the output.
+        ndarray with shape (n_samples, n_features + n_omega_elements)
+            The gradient of the prototype and omega matrix with respect to each data sample.
         """
+
         (prototypes, omegas) = model.get_model_params()
 
         prototype = prototypes[i_prototype, :]
@@ -130,7 +157,7 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
             difference, omega, out=distance_gradient[:, : prototype.size]
         )
 
-        distance_gradient_omega_view = distance_gradient[:, prototype.size:].reshape(
+        distance_gradient_omega_view = distance_gradient[:, prototype.size :].reshape(
             (num_samples, *omega.shape)
         )
 

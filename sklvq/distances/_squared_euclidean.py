@@ -13,20 +13,29 @@ if TYPE_CHECKING:
 class SquaredEuclidean(DistanceBaseClass):
     """ Squared Euclidean distance
 
+    Parameters
+    ----------
+    force_all_finite  : {True, False, "allow-nan"}
+        Parameter to indicate that NaNLVQ distance variant should be used. If true no nans are
+        allowed. If False or "allow-nan" nans are allowed.
+
     See also
     --------
     Euclidean, AdaptiveSquaredEuclidean, LocalAdaptiveSquaredEuclidean
 
+    Notes
+    -----
+    Compatible with the :class:`.GLVQ` algorithm (only).
     """
 
-    __slots__ = ("force_all_finite")
+    __slots__ = "force_all_finite"
 
     def __init__(self, force_all_finite=True):
         self.force_all_finite = force_all_finite
 
     def __call__(self, data: np.ndarray, model: "GLVQ") -> np.ndarray:
         """
-         Computes the Euclidean distance:
+         Computes the squared Euclidean distance:
             .. math::
 
                 d(\\vec{w}, \\vec{x}) = (\\vec{x} - \\vec{w})^{\\top} (\\vec{x} - \\vec{w}),
@@ -36,10 +45,10 @@ class SquaredEuclidean(DistanceBaseClass):
         Parameters
         ----------
         data : ndarray with shape (n_samples, n_features)
-            The X for which the distance gradient to the prototypes of the model need to be
+            The data for which the distance gradient to the prototypes of the model need to be
             computed.
         model : GLVQ
-            The model instance.
+            The GLVQ model instance, containing the prototypes.
 
         Returns
         -------
@@ -47,14 +56,14 @@ class SquaredEuclidean(DistanceBaseClass):
             Evaluation of the distance between each sample and prototype of the model.
         """
         distance_function = "sqeuclidean"
-        # if self.force_all_finite == "allow-nan" or False:
-        #     distance_function = lambda u, v: np.nansum(u - v)**2
+        if self.force_all_finite == "allow-nan" or False:
+            distance_function = _nan_squared_euclidean
 
         return cdist(data, model.prototypes_, distance_function)
 
     def gradient(self, data: np.ndarray, model: "GLVQ", i_prototype: int) -> np.ndarray:
-        """ Implements the derivative of the squared euclidean distance, with respect to a single
-        prototype for the euclidean and nan_euclidean distance:
+        """ Computes the gradient of the squared euclidean distance, with respect to a single
+        prototype:
 
             .. math::
                 \\frac{\\partial d}{\\partial \\vec{w_i}} = -2 \\cdot (\\vec{x} - \\vec{w_i})
@@ -62,27 +71,29 @@ class SquaredEuclidean(DistanceBaseClass):
         Parameters
         ----------
         data : ndarray with shape (n_samples, n_features)
-            The X for which the distance gradient to the prototypes of the model need to be
+            The data for which the distance gradient to the prototypes of the model need to be
             computed.
         model : GLVQ
-            The model instance.
+            The GLVQ model instance.
         i_prototype : int
             Index of the prototype to compute the gradient for.
 
         Returns
         -------
         gradient : ndarray with shape (n_samples, n_features)
-            The gradient with respect to the prototype and every sample in the X.
+            The gradient of the prototype with respect to every sample in the data.
 
         """
-        # Compute gradient
-        distance_gradient = -2 * (
-            data - model.get_model_params()[i_prototype, :]
-        )
+        distance_gradient = -2 * (data - model.get_model_params()[i_prototype, :])
 
         # In case of nans replace nan values by 0.0
-        if self.force_all_finite == "allow-nan":
+        if self.force_all_finite == "allow-nan" or False:
             distance_gradient[np.isnan(distance_gradient)] = 0.0
 
         # Return 1d array (the original memory)
         return distance_gradient
+
+
+def _nan_squared_euclidean(u: np.ndarray, v: np.ndarray) -> np.ndarray:
+    # Squared Euclidean distance between two vectors u and v, ignoring nans.
+    return np.nansum(u - v) ** 2
