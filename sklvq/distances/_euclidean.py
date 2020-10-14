@@ -81,7 +81,7 @@ class Euclidean(DistanceBaseClass):
 
         Returns
         -------
-        gradient : ndarray with shape (n_samples, n_features)
+        ndarray with shape (n_samples, n_features)
             The gradient of the prototype with respect to every sample in the data.
 
         """
