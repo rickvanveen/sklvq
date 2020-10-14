@@ -84,7 +84,7 @@ Discriminant Functions
    :toctree: generated/
    :template: callable.rst
 
-    DiscriminativeBaseClass
+    DiscriminantBaseClass
 
 .. autosummary::
    :toctree: generated/
