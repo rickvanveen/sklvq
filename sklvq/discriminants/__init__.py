@@ -1,8 +1,8 @@
-from ._base import DiscriminativeBaseClass
+from ._base import DiscriminantBaseClass
 from ._relative_distance import RelativeDistance
 from sklvq._utils import _import_class_from_string
 
-__all__ = ["DiscriminativeBaseClass", "RelativeDistance"]
+__all__ = ["DiscriminantBaseClass", "RelativeDistance"]
 
 ALIASES = {}
 

@@ -1,13 +1,19 @@
-from ._base import DiscriminativeBaseClass
+from ._base import DiscriminantBaseClass
 import numpy as np
 
 
-class RelativeDistance(DiscriminativeBaseClass):
+class RelativeDistance(DiscriminantBaseClass):
     """ Relative distance function
 
-    Class that holds the relative distance function and gradient.
+    Class that holds the relative distance function and gradient as described in [1]_.
+
+    References
+    ----------
+    .. [1] Sato, A., and Yamada, K. (1996) "Generalized Learning Vector Quantization."
+        Advances in Neural Network Information Processing Systems, 423–429, 1996.
 
     """
+
     __slots__ = ()
 
     def __call__(self, dist_same: np.ndarray, dist_diff: np.ndarray) -> np.ndarray:
@@ -38,7 +44,7 @@ class RelativeDistance(DiscriminativeBaseClass):
     def gradient(
         self, dist_same: np.ndarray, dist_diff: np.ndarray, same_label: bool
     ) -> np.ndarray:
-        """ The relative distance discriminant function's gradient.
+        """ Computes the relative distance discriminant function's gradient.
 
             1. The partial derivative with respect to the closest prototypes with the same label (same_label=True):
 
@@ -70,7 +76,7 @@ class RelativeDistance(DiscriminativeBaseClass):
 
         Returns
         -------
-        ndarray
+        ndarray with shape (n_samples, 1)
             Evaluation of the relative distance function's gradient.
 
         """

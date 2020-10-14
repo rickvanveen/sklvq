@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 
-class DiscriminativeBaseClass(ABC):
-    """ DiscriminativeBaseClass
+class DiscriminantBaseClass(ABC):
+    """ DiscriminantBaseClass
 
     Abstract class for implementing discriminant functions, providing abstract methods with
     expected call signatures.
