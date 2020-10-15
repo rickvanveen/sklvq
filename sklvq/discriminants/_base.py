@@ -5,7 +5,7 @@ import numpy as np
 class DiscriminantBaseClass(ABC):
     """ DiscriminantBaseClass
 
-    Abstract class for implementing discriminant functions, providing abstract methods with
+    Abstract class for implementing discriminant functions. Provides abstract methods with
     expected call signatures.
 
     Custom discriminative function '__init__' should accept any parameters as key-value pairs.

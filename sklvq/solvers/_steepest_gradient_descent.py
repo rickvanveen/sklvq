@@ -15,28 +15,44 @@ STATE_KEYS = ["variables", "nit", "fun", "step_size"]
 
 
 class SteepestGradientDescent(SolverBaseClass):
-    """ SteepestGradientDescent
+    """ Steepest gradient descent (SGD)
 
-    Implements the stochastic, batch and mini-batch gradient descent optimization methods.
+    Implements the steepest gradient descent optimization method. Can perform stochastic,
+    mini-batch and batch gradient descent by changing the batch_size.
 
     Parameters
     ----------
     objective: ObjectiveBaseClass, required
-        This is/should be set by the algorithm.
+        This is set by the algorithm. See :class:`sklvq.models.GLVQ`, :class:`sklvq.models.GMLVQ`,
+        and :class:`sklvq.models.LGMLVQ`.
+
     max_runs: int
-        Number of runs over all the X. Should be >= 1
+        Maximum number of runs/epochs that will be computed. Should be >= 1. Early stopping can
+        be implemented by providing a callback function that returns True when the solver should
+        stop. See callback documentation below.
+
     batch_size: int
-        Controls the batch size. Use 1 for stochastic, 0 for all X (batch gradient descent),
-        and any number > 1 for mini batch. For mini-batch the solver will do as many batches with
-        the specified number as possible. The last batch may have less samples then specified.
+        Controls the batch size and accepts a value >= 0. The value indicates the number of
+        samples considered to be in the batch. A stochastic gradient descent corresponds with a
+        batch_size of 1. For Batch gradient descent 0 can be used to indicate to use all the
+        samples. Any value > 1 < n_samples can be considered as a mini-batch gradient descent.
+
+        If batches can not properly  be divided in batches with the specified size the last
+        batch might contain less than the specified number of samples.
+
+        The data is always shuffled before it is split into batches.
+
     step_size: float or ndarray
         The step size to control the learning rate of the model parameters. If the same step_size
-        should be used for all parameters (e.g., prototypes and omega) then a float is
+        should be used for all parameters (e.g., prototypes and omega) then a single float is
         sufficient. If separate initial step_sizes should be used per model parameter then this
         should be specified by using a ndarray.
+
+        The step size(s) are reduced over time:  step_size / (t  / max_runs)
+
     callback: callable
         Callable with signature callable(state). If the callable returns True the solver
-        will stop (early). The state object contains the following.
+        will stop even if max_runs is not reached yet. The state object contains the following:
 
         - "variables"
             Concatenated 1D ndarray of the model's parameters
@@ -50,38 +66,66 @@ class SteepestGradientDescent(SolverBaseClass):
     """
 
     def __init__(
-            self,
-            objective: ObjectiveBaseClass,
-            max_runs: int = 10,
-            batch_size: int = 1,
-            step_size: float = 0.2,
-            callback: callable = None,
+        self,
+        objective: ObjectiveBaseClass,
+        max_runs: int = 10,
+        batch_size: int = 1,
+        step_size: float = 0.2,
+        callback: callable = None,
     ):
         super().__init__(objective)
-        self.max_runs: int = max_runs
-        self.batch_size: int = batch_size
-        self.step_size: Union[float, np.ndarray] = step_size
-        self.callback: callable = callback
+        if max_runs <= 0:
+            raise ValueError(
+                "{}:  Expected max_runs to be > 0, but got max_runs = {}".format(
+                    type(self).__name__, max_runs
+                )
+            )
+        self.max_runs = max_runs
+
+        if batch_size < 0:
+            raise ValueError(
+                "{}:  Expected batch_size to be >= 0, but got batch_size = {}".format(
+                    type(self).__name__, batch_size
+                )
+            )
+        self.batch_size = batch_size
+
+        if step_size <= 0:
+            raise ValueError(
+                "{}:  Expected step_size to be > 0, but got step_size = {}".format(
+                    type(self).__name__, step_size
+                )
+            )
+        self.step_size = step_size
+
+        if not callable(callback):
+            raise ValueError(
+                "{}:  callback is not callable.".format(type(self).__name__)
+            )
+        self.callback = callback
 
     def solve(
-            self, data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass",
+        self, data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass",
     ):
-        """
+        """ Solve
+
+        Performs the actual steps of the gradient descent solvers.
 
         Parameters
         ----------
         data : ndarray of shape (number of observations, number of dimensions)
+            The data.
         labels : ndarray of size (number of observations)
+            The labels of the samples in the data.
         model : LVQBaseClass
-            The initial model that will be changed and holds the results at the end
-
+            The initial model that will also hold the final result
         """
 
         if self.callback is not None:
             state = _update_state(
                 STATE_KEYS,
-                variables=model.get_variables(),
-                nit=0,
+                variables=np.copy(model.get_variables()),
+                nit="Initial",
                 fun=self.objective(model, data, labels),
             )
             if self.callback(state):
@@ -121,7 +165,7 @@ class SteepestGradientDescent(SolverBaseClass):
                 objective_gradient = self.objective.gradient(model, batch, batch_labels)
 
                 # Multiply each param by its given step_size
-                model.multiply_variables(step_size, objective_gradient)
+                model.mul_step_size(step_size, objective_gradient)
 
                 # Update the model by subtracting the objective-gradient (descent) from the
                 # current models variables, e.g., (prototypes, omega) in case of GMLVQ
@@ -136,7 +180,7 @@ class SteepestGradientDescent(SolverBaseClass):
             if self.callback is not None:
                 state = _update_state(
                     STATE_KEYS,
-                    variables=model.get_variables(),
+                    variables=np.copy(model.get_variables()),
                     nit=i_run + 1,
                     fun=self.objective(model, data, labels),
                     step_size=step_size,

@@ -14,7 +14,7 @@ STATE_KEYS = ["variables", "nit", "fun", "m_hat", "v_hat"]
 
 
 class AdaptiveMomentEstimation(SolverBaseClass):
-    """AdaptiveMomentEstimation
+    """Adaptive moment estimation (ADAM)
 
     Implementation based on description given in [1]_.
 

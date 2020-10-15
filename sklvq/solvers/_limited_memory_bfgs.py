@@ -3,9 +3,9 @@ from ..objectives import ObjectiveBaseClass
 
 
 class LimitedMemoryBfgs(ScipyBaseSolver):
-    """ LimitedMemoryBfgs
+    """ Limited memory variant of BFGS (L-BFGS)
 
-    See the documentation of scipy for a complete parameter list and inner workings.
+    See the documentation of scipy for the parameter list.
 
     Parameters
     ----------

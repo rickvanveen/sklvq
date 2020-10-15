@@ -47,7 +47,7 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
 
             .. math::
                 d^{\\Lambda}(\\vec{w}, \\vec{x}) = (\\vec{x} - \\vec{w})^{\\top}
-                \\Omega^{\\top} \\Omega (\\vec{x} - \\vec{w})
+                \\Lambda (\\vec{x} - \\vec{w})
 
             with the relevance matrix :math:`\\Lambda = \\Omega^{\\top} \\Omega`, the  prototype
             :math:`\\vec{w}`, and sample :math:`\\vec{x}`.

@@ -15,29 +15,47 @@ if TYPE_CHECKING:
 class SolverBaseClass(ABC):
     """ SolverBaseClass
 
+    Abstract class for implementing solvers. Provides abstract methods with expected calls
+    signatures.
+
+    See also
+    --------
+    SteepestGradientDescent, WaypointGradientDescent, AdaptiveMomentEstimation,
+    BroydenFletcherGoldfarbShanno, LimitedMemoryBfgs
+
     """
+
     def __init__(self, objective: ObjectiveBaseClass):
         self.objective = objective
 
     @abstractmethod
     def solve(
         self, data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass",
-    ):
+    ) -> None:
         """
-        Solve alters the model and does not return anything
+        Solve updates the model it is given and does not return anything.
 
         Parameters
         ----------
         data : ndarray of shape (number of observations, number of dimensions)
+            The data.
         labels : ndarray of size (number of observations)
+            The labels of the samples in the data.
         model : LVQBaseClass
-            The initial model that will hold the result
+            The initial model that will also hold the final result
         """
         raise NotImplementedError("You should implement this!")
 
 
 class ScipyBaseSolver(SolverBaseClass):
+    """ ScipyBaseSolver
 
+    Class to wrap around scipy solvers.
+
+    See also
+    --------
+    BroydenFletcherGoldfarbShanno, LimitedMemoryBfgs
+    """
     def __init__(self, objective, method: str = "L-BFGS-B", **kwargs):
         self.method = method
         self.params = kwargs
@@ -55,15 +73,16 @@ class ScipyBaseSolver(SolverBaseClass):
         self, data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass",
     ):
         """
-        Solve alters the model and does not return anything
+        Solve updates the model it is given and does not return anything.
 
         Parameters
         ----------
         data : ndarray of shape (number of observations, number of dimensions)
+            The data.
         labels : ndarray of size (number of observations)
+            The labels of the samples in the data.
         model : LVQBaseClass
-            The initial model that will hold the result
-
+            The initial model that will also hold the final result
         """
         params = {"jac": self._objective_gradient_wrapper}
         if self.params is not None:
@@ -82,6 +101,9 @@ class ScipyBaseSolver(SolverBaseClass):
 
 
 def _update_state(state_keys: List[str], **kwargs: Any) -> dict:
+    # Helper function that can be used to update state dict. The state_keys is a  list of strings
+    # indicating the keys the dictionary should hold. If not provided in the kwargs they are set
+    # to None.
     state = dict.fromkeys(state_keys)
     state.update(**kwargs)
     return state

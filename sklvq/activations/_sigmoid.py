@@ -30,7 +30,7 @@ class Sigmoid(ActivationBaseClass):
     def __init__(self, beta: Union[int, float] = 1):
         if beta <= 0:
             raise ValueError(
-                "The activation function {} expects beta > 0, but got beta = {}".format(
+                "{}: Expected beta > 0, but got beta = {}".format(
                     type(self).__name__, beta
                 )
             )

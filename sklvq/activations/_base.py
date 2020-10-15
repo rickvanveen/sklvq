@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 class ActivationBaseClass(ABC):
     """ ActivationBaseClass
 
-    Abstract class for implementing activation functions, providing abstract methods with
+    Abstract class for implementing activation functions. Provides abstract methods with
     expected call signatures.
 
     Custom activation function '__init__' should accept any parameters as key-value pairs.

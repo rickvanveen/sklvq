@@ -7,7 +7,7 @@ from sklearn.datasets import load_iris
 from sklearn.metrics import classification_report
 
 from sklvq import GLVQ
-from sklvq.discriminants import DiscriminativeBaseClass
+from sklvq.discriminants import DiscriminantBaseClass
 
 import numpy as np
 
@@ -21,7 +21,7 @@ data, labels = load_iris(return_X_y=True)
 #
 # # The discriminative function is depended on the objective function. This determines the
 # # parameters of the call and gradient. See sklvq.objective.GeneralizedLearningObjective.
-# class CustomRelativeDistance(DiscriminativeBaseClass):
+# class CustomRelativeDistance(DiscriminantBaseClass):
 #     def __call__(self, dist_same: np.ndarray, dist_diff: np.ndarray) -> np.ndarray:
 #         # dist_same = distance to prototype with same label as X.
 #         # dist_diff = distance to prototype with different label as X.

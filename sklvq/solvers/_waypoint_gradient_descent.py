@@ -14,31 +14,44 @@ STATE_KEYS = ["variables", "nit", "fun", "nfun", "tfun", "step_size"]
 
 
 class WaypointGradientDescent(SolverBaseClass):
-    """ WaypointGradientDescent
+    """ Waypoint gradient descent (WGD)
 
-    Original description in [1]_. Implementation based on description given in [2]_.
+    Implements the waypoint average optimization scheme. Original description in [1]_.
+    Implementation based on description given in [2]_.
 
     Parameters
     ----------
     objective: ObjectiveBaseClass, required
-        This is/should be set by the algorithm.
+       This is set by the algorithm. See :class:`sklvq.models.GLVQ`, :class:`sklvq.models.GMLVQ`,
+        and :class:`sklvq.models.LGMLVQ`.
+
     max_runs: int
-        Number of runs over all the X. Should be >= k
+        Maximum number of runs/epochs that will be computed. Should be >= k. Early stopping can
+        be implemented by providing a callback function that returns True when the solver should
+        stop. See callback documentation below.
+
     step_size: float or ndarray
         The step size to control the learning rate of the model parameters. If the same step_size
-        should be used for all parameters (e.g., prototypes and omega) then a float is
+        should be used for all parameters (e.g., prototypes and omega) then a single float is
         sufficient. If separate initial step_sizes should be used per model parameter then this
         should be specified by using a ndarray.
+
+        Whenever the averge update is accepted (has a lower cost) the step sizes are mutliplied
+        with the loss factor. When the "regular" update is accepted then the step size(s) are
+        multiplied by the gain factor.
+
     loss: float
-        Less than 1 and controls the learning rate change factor for the waypoint average steps.
+        Should be a value less than 1 and controls the learning rate change factor when an
+        average waypoint step is accepted.
     gain: float
-        Greater than 1 and controls the learning rate change factor for the gradient steps.
+        Should be a value greater than 1 and controls the learning rate change factor when a
+        regular update step is accepted.
     k: int
-        The number of runs used to compute the average gradient update.
+        The number of runs used to compute the average waypoint over.
 
     callback: callable
         Callable with signature callable(state). If the callable returns True the solver
-        will stop (early). The state object contains the following.
+        will stop even if max_runs is not reached yet. The state object contains the following:
 
         - "variables"
             Concatenated 1D ndarray of the model's parameters
@@ -77,25 +90,67 @@ class WaypointGradientDescent(SolverBaseClass):
         callback: callable = None,
     ):
         super().__init__(objective)
+        if max_runs <= k or max_runs <= 0:
+            raise ValueError(
+                "{}:  Expected 0 < max_runs > k, but got max_runs = {}".format(
+                    type(self).__name__, max_runs
+                )
+            )
         self.max_runs = max_runs
+
+        if step_size <= 0:
+            raise ValueError(
+                "{}:  Expected step_size to be > 0, but got step_size = {}".format(
+                    type(self).__name__, step_size
+                )
+            )
         self.step_size = step_size
+
+        if loss <= 0 or loss > 1:
+            raise ValueError(
+                "{}: Expected loss to be > 0 and < 1, but got loss = {}".format(
+                    type(self).__name__, loss
+                )
+            )
         self.loss = loss
+
+        if gain < 1:
+            raise ValueError(
+                "{}: Expected gain to be >= 1, but got gain = {}".format(
+                    type(self).__name__, gain
+                )
+            )
         self.gain = gain
+
+        if k <= 1:
+            raise ValueError(
+                "{}: Expected k to be >= 2, but got k = {}".format(
+                    type(self).__name__, k
+                )
+            )
         self.k = k
+
+        if not callable(callback):
+            raise ValueError(
+                "{}:  callback is not callable.".format(type(self).__name__)
+            )
         self.callback = callback
 
     def solve(
         self, data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass",
     ):
-        """
+        """ Solve
+
+        Performs the actual steps of the waypoint gradient descent optimization.
 
         Parameters
         ----------
         data : ndarray of shape (number of observations, number of dimensions)
+            The data.
         labels : ndarray of size (number of observations)
+            The labels of the samples in the data.
         model : LVQBaseClass
-            The initial model that will be changed and holds the results at the end
-
+            The initial model that will also hold the final result
         """
 
         previous_waypoints = np.empty((self.k, model.get_variables().size))
@@ -107,7 +162,7 @@ class WaypointGradientDescent(SolverBaseClass):
             variables = model.get_variables()
             cost = self.objective(model, data, labels)
             state = _update_state(
-                STATE_KEYS, variables=variables, nit=0, nfun=cost, fun=cost
+                STATE_KEYS, variables=variables, nit="Initial", nfun=cost, fun=cost
             )
             if self.callback(state):
                 return
@@ -129,7 +184,7 @@ class WaypointGradientDescent(SolverBaseClass):
             model.normalize_variables(objective_gradient)
 
             # Multiply params by step_size
-            model.multiply_variables(step_size, objective_gradient)
+            model.mul_step_size(step_size, objective_gradient)
 
             model.set_variables(
                 np.subtract(  # returns out=objective_gradient
@@ -169,7 +224,7 @@ class WaypointGradientDescent(SolverBaseClass):
             model.normalize_variables(objective_gradient)
 
             # Multiply params by step_size
-            model.multiply_variables(step_size, objective_gradient)
+            model.mul_step_size(step_size, objective_gradient)
 
             new_model_variables = np.subtract(  # returns out=objective_gradient
                 model.get_variables(), objective_gradient, out=objective_gradient,

@@ -25,7 +25,7 @@ DISCRIMINANT_FUNCTIONS = [
 
 
 class GeneralizedLearningObjective(ObjectiveBaseClass):
-    """ The generalized learning objective
+    """ Generalized learning objective
 
     Class that holds the generalized learning objective function and its gradient as described
     in [1]_.
