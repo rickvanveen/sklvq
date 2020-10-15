@@ -43,7 +43,7 @@ class SteepestGradientDescent(SolverBaseClass):
         The data is always shuffled before it is split into batches.
 
     step_size: float or ndarray
-        The step size to control the learning rate of the model parameters. If the same ``step_size``
+        The step size to control the learning rate of the model parameters. If the same step size
         should be used for all parameters (e.g., prototypes and omega) then a single float is
         sufficient. If separate initial step sizes should be used per model parameter then this
         should be specified by using a numpy array.

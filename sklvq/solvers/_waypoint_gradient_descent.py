@@ -27,24 +27,24 @@ class WaypointGradientDescent(SolverBaseClass):
 
     max_runs: int
         Maximum number of runs/epochs that will be computed. Should be >= k. Early stopping can
-        be implemented by providing a callback function that returns True when the solver should
-        stop. See callback documentation below.
+        be implemented by providing a ``callback`` function that returns True when the solver should
+        stop.
 
     step_size: float or ndarray
-        The step size to control the learning rate of the model parameters. If the same step_size
+        The step size to control the learning rate of the model parameters. If the same step size
         should be used for all parameters (e.g., prototypes and omega) then a single float is
         sufficient. If separate initial step_sizes should be used per model parameter then this
         should be specified by using a ndarray.
 
-        Whenever the averge update is accepted (has a lower cost) the step sizes are mutliplied
-        with the loss factor. When the "regular" update is accepted then the step size(s) are
-        multiplied by the gain factor.
+        Whenever the averge update is accepted (has a lower cost) the step sizes are multiplied
+        with the ``loss`` factor. When the "regular" update is accepted then the step size(s) are
+        multiplied by the ``gain`` factor.
 
     loss: float
-        Should be a value less than 1 and controls the learning rate change factor when an
+        Should be a value less than 1. Controls the step size change factor when an
         average waypoint step is accepted.
     gain: float
-        Should be a value greater than 1 and controls the learning rate change factor when a
+        Should be a value greater than 1. Controls the step size change factor when a
         regular update step is accepted.
     k: int
         The number of runs used to compute the average waypoint over.
