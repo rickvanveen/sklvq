@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 
 class ObjectiveBaseClass(ABC):
-    """ ObjectiveBaseClass
+    """ Objective base class
 
     Abstract class for implementing objective functions. It provides abstract methods with
     expected call signatures.

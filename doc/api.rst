@@ -2,7 +2,9 @@
 API Reference
 =============
 
-API of included algorithms in sklvq.
+If you would like to use sklvq algorithms the most or only interesting part to look at will be
+the "Predictors and Transformers" section. However, the other section can provide information
+about accepted parameters their range and default values.
 
 Predictors and Transformers
 ===========================
@@ -95,8 +97,6 @@ Discriminant Functions
 Distance Functions
 ==================
 .. currentmodule:: sklvq.distances
-
-Distance functions ordered by compatible predictor.
 
 .. autosummary::
    :toctree: generated/

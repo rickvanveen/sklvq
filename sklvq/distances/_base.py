@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 
 
 class DistanceBaseClass(ABC):
-    """ DistanceBaseClass
+    """ Distance base class
 
     Abstract class for implementing distance functions. It provides abstract methods with
     expected call signatures.

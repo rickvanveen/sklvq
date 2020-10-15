@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class SolverBaseClass(ABC):
-    """ SolverBaseClass
+    """ Solver base class
 
     Abstract class for implementing solvers. Provides abstract methods with expected calls
     signatures.
