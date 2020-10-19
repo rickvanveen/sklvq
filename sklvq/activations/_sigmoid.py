@@ -38,10 +38,10 @@ class Sigmoid(ActivationBaseClass):
         self.beta = beta
 
     def __call__(self, x: np.ndarray) -> np.ndarray:
-        """ Computes the sigmoid function:
+        r""" Computes the sigmoid function:
             .. math::
 
-                f(\\vec{x}) = \\frac{1}{e^{-\\beta \\cdot \\vec{x}} + 1}
+                f(\mathbf{x}) = \frac{1}{e^{-\beta \cdot \mathbf{x}} + 1}
 
         Parameters
         ----------
@@ -55,10 +55,10 @@ class Sigmoid(ActivationBaseClass):
         return np.asarray(1.0 / (np.exp(-self.beta * x) + 1.0))
 
     def gradient(self, x: np.ndarray) -> np.ndarray:
-        """ Computes the sigmoid function's gradient with respect to x:
+        r""" Computes the sigmoid function's gradient with respect to x:
            .. math::
 
-               \\frac{\\partial f}{\\partial \\vec{x}} = \\frac{(\\beta \\cdot e^{\\beta \\cdot \\vec{x})}}{(e^{\\beta \\cdot \\vec{x}} + 1)^2}
+               \frac{\partial f}{\partial \mathbf{x}} = \frac{(\beta \cdot e^{\beta \cdot \mathbf{x})}}{(e^{\beta \cdot \mathbf{x}} + 1)^2}
 
         Parameters
         ----------

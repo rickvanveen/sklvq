@@ -49,14 +49,14 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
         self.force_all_finite = force_all_finite
 
     def __call__(self, data: np.ndarray, model: "LGMLVQ") -> np.ndarray:
-        """ Computes the local variant of the adaptive squared Euclidean distance:
+        r""" Computes the local variant of the adaptive squared Euclidean distance:
 
             .. math::
-                d^{\\Lambda}(\\vec{w}, \\vec{x}) = (\\vec{x} - \\vec{w})^{\\top}
-                \\Omega_j^{\\top} \\Omega_j (\\vec{x} - \\vec{w})
+                d^{\Lambda}(\mathbf{w}, \mathbf{x}) = (\mathbf{x} - \mathbf{w})^{\top}
+                \Omega_j^{\top} \Omega_j (\mathbf{x} - \mathbf{w})
 
-        with :math:`\\Omega_j` depending on the localization setting of the model and
-        :math:`\\Lambda_j = \\Omega_j^{\\top} \\Omega_j`. The localization can be either per
+        with :math:`\Omega_j` depending on the localization setting of the model and
+        :math:`\Lambda_j = \Omega_j^{\top} \Omega_j`. The localization can be either per
         prototype or per class, see the documentation of :class:`.LGMLVQ`.
 
         Parameters
@@ -108,17 +108,17 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
     def gradient(
         self, data: np.ndarray, model: "LGMLVQ", i_prototype: int
     ) -> np.ndarray:
-        """ Computes the gradient of the localized adaptive squared euclidean distance function
+        r""" Computes the gradient of the localized adaptive squared euclidean distance function
         with respect to a specified prototype:
 
             .. math::
-                \\frac{\\partial d}{\\partial \\vec{w_i}} = -2 \\Lambda_j (\\vec{x} - \\vec{w_i})
+                \frac{\partial d}{\partial \mathbf{w}_i} = -2 \Lambda_j (\mathbf{x} - \mathbf{w}_i)
 
         and implicitly coupled omega matrix (per element):
 
             .. math::
-                \\frac{\\partial d}{\\partial \\Omega_{lm}} =  2 \\sum_i (x^i - w^i)
-                \\Omega_{li} (x^m - w^m)
+                \frac{\partial d}{\partial \Omega_{lm}} =  2 \sum_i (x^i - w^i)
+                \Omega_{li} (x^m - w^m)
 
         Parameters
         ----------

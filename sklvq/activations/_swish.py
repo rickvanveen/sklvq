@@ -37,10 +37,10 @@ class Swish(ActivationBaseClass):
         self.beta = beta
 
     def __call__(self, x: np.ndarray) -> np.ndarray:
-        """ Implements the swish function:
+        r""" Implements the swish function:
             .. math::
 
-                f(\\vec{x}) = \\frac{\\vec{x}}{1 + e^{-\\beta \\cdot \\vec{x}}}
+                f(\mathbf{x}) = \frac{\mathbf{x}}{1 + e^{-\beta \cdot \mathbf{x}}}
 
         Parameters
         ----------
@@ -54,10 +54,10 @@ class Swish(ActivationBaseClass):
         return _swish(x, self.beta)
 
     def gradient(self, x: np.ndarray) -> np.ndarray:
-        """ Implements the sigmoid function's gradient:
+        r""" Implements the sigmoid function's gradient:
             .. math::
 
-                \\frac{\\partial f}{\\partial \\vec{x}} = \\beta \\cdot f(\\vec{x}) + (\\frac{1}{1 + e^{-\\beta \\cdot \\vec{x}}}) \\cdot (1 - \\beta \\cdot f(\\vec{x}))
+                \frac{\partial f}{\partial \mathbf{x}} = \beta \cdot f(\mathbf{x}) + (\frac{1}{1 + e^{-\beta \cdot \mathbf{x}}}) \cdot (1 - \beta \cdot f(\mathbf{x}))
 
         Parameters
         ----------

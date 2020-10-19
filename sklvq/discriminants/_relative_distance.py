@@ -17,13 +17,13 @@ class RelativeDistance(DiscriminantBaseClass):
     __slots__ = ()
 
     def __call__(self, dist_same: np.ndarray, dist_diff: np.ndarray) -> np.ndarray:
-        """ The relative distance discriminant function for a single sample (:math:`\\vec{x}`):
+        r""" The relative distance discriminant function for a single sample (:math:`\mathbf{x}`):
             .. math::
 
-                \\mu(\\vec{x}) = \\frac{d(\\vec{x}, \\vec{w}_1) - d(\\vec{x}, \\vec{w}_0)}{d(
-                \\vec{x}, \\vec{w}_1) + d(\\vec{x}, \\vec{w}_0)},
+                \mu(\mathbf{x}) = \frac{d(\mathbf{x}, \mathbf{w}_1) - d(\mathbf{x}, \mathbf{w}_0)}{d(
+                \mathbf{x}, \mathbf{w}_1) + d(\mathbf{x}, \mathbf{w}_0)},
 
-        with :math:`\\vec{w}_1` the prototype with the same label and :math:`\\vec{w}_0` the
+        with :math:`\mathbf{w}_1` the prototype with the same label and :math:`\mathbf{w}_0` the
         prototype with a different label.
 
         Parameters
@@ -44,24 +44,24 @@ class RelativeDistance(DiscriminantBaseClass):
     def gradient(
         self, dist_same: np.ndarray, dist_diff: np.ndarray, same_label: bool
     ) -> np.ndarray:
-        """ Computes the relative distance discriminant function's gradient.
+        r""" Computes the relative distance discriminant function's gradient.
 
             1. The partial derivative with respect to the closest prototypes with the same label (same_label=True):
 
             .. math::
 
-                \\frac{\\partial \\mu}{\\partial \\vec{w}_1} = \\frac{2 \\cdot d(\\vec{x},
-                \\vec{w}_0))}{(d(\\vec{x}, \\vec{w}_1) + d(\\vec{x}, \\vec{w}_0))^2}.
+                \frac{\partial \mu}{\partial \mathbf{w}_1} = \frac{2 \cdot d(\mathbf{x},
+                \mathbf{w}_0))}{(d(\mathbf{x}, \mathbf{w}_1) + d(\mathbf{x}, \mathbf{w}_0))^2}.
 
             2. The partial derivative with respect to the closest prototypes with a different label (same_label=False):
 
             .. math::
 
-                \\frac{\\partial \\mu}{\\partial \\vec{w}_0} = \\frac{-2 \\cdot d(\\vec{x},
-                \\vec{w}_1))}{(d(\\vec{x}, \\vec{w}_1) + d(\\vec{x}, \\vec{w}_0))^2},
+                \frac{\partial \mu}{\partial \mathbf{w}_0} = \frac{-2 \cdot d(\mathbf{x},
+                \mathbf{w}_1))}{(d(\mathbf{x}, \mathbf{w}_1) + d(\mathbf{x}, \mathbf{w}_0))^2},
 
-            with :math:`d(\\vec{x}, \\vec{w}_1)` the distance to the prototype with the same label
-            and :math:`d(\\vec{x}, \\vec{w}_0)` the distance to the closest prototype with a
+            with :math:`d(\mathbf{x}, \mathbf{w}_1)` the distance to the prototype with the same label
+            and :math:`d(\mathbf{x}, \mathbf{w}_0)` the distance to the closest prototype with a
             different label.
 
         Parameters

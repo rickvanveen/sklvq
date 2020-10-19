@@ -43,14 +43,14 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
         self.force_all_finite = force_all_finite
 
     def __call__(self, data: np.ndarray, model: "GMLVQ") -> np.ndarray:
-        """ Computes the adaptive squared Euclidean distance:
+        r""" Computes the adaptive squared Euclidean distance:
 
             .. math::
-                d^{\\Lambda}(\\vec{w}, \\vec{x}) = (\\vec{x} - \\vec{w})^{\\top}
-                \\Lambda (\\vec{x} - \\vec{w})
+                d^{\Lambda}(\mathbf{w}, \mathbf{x}) = (\mathbf{x} - \mathbf{w})^{\top}
+                \Lambda (\mathbf{x} - \mathbf{w})
 
-            with the relevance matrix :math:`\\Lambda = \\Omega^{\\top} \\Omega`, the  prototype
-            :math:`\\vec{w}`, and sample :math:`\\vec{x}`.
+            with the relevance matrix :math:`\Lambda = \Omega^{\top} \Omega`, the  prototype
+            :math:`\mathbf{w}`, and sample :math:`\mathbf{x}`.
 
         Parameters
         ----------
@@ -83,18 +83,18 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
     def gradient(
         self, data: np.ndarray, model: "GMLVQ", i_prototype: int
     ) -> np.ndarray:
-        """ Computes the gradient of the adaptive squared euclidean distance function,
+        r""" Computes the gradient of the adaptive squared euclidean distance function,
         with respect to a single prototype:
 
             .. math::
-                \\frac{\\partial d}{\\partial \\vec{w_i}} = -2 \\Lambda (\\vec{x} -
-                \\vec{w_i}),
+                \frac{\partial d}{\partial \mathbf{w_i}} = -2 \Lambda (\mathbf{x} -
+                \mathbf{w_i}),
 
         and the omega matrix (per element):
 
             .. math::
-                \\frac{\\partial d}{\\partial \\Omega_{lm}} =  2 \\sum_i (x^i - w^i)
-                \\Omega_{li} (x^m - w^m)
+                \frac{\partial d}{\partial \Omega_{lm}} =  2 \sum_i (x^i - w^i)
+                \Omega_{li} (x^m - w^m)
 
         Parameters
         ----------

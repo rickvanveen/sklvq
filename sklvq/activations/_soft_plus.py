@@ -37,10 +37,10 @@ class SoftPlus(ActivationBaseClass):
         self.beta = beta
 
     def __call__(self, x: np.ndarray) -> np.ndarray:
-        """ Implements the soft+ function:
+        r""" Implements the soft+ function:
             .. math::
 
-                f(\\vec{x}) = \\ln(1 + e^{\\beta \\cdot \\vec{x}})
+                f(\mathbf{x}) = \ln(1 + e^{\beta \cdot \mathbf{x}})
 
         Parameters
         ----------
@@ -54,10 +54,10 @@ class SoftPlus(ActivationBaseClass):
         return np.log(1 + np.exp(self.beta * x))
 
     def gradient(self, x: np.ndarray) -> np.ndarray:
-        """ Implements the sigmoid function's gradient:
+        r""" Implements the sigmoid function's gradient:
             .. math::
 
-                \\frac{\\partial f}{\\partial \\vec{x}} = \\frac{\\beta \\cdot e^{\\beta \\cdot \\vec{x}}}{1 + e^{\\beta \\cdot \\vec{x}}}
+                \frac{\partial f}{\partial \mathbf{x}} = \frac{\beta \cdot e^{\beta \cdot \mathbf{x}}}{1 + e^{\beta \cdot \mathbf{x}}}
 
         Parameters
         ----------

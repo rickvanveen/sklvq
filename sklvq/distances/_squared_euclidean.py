@@ -34,13 +34,13 @@ class SquaredEuclidean(DistanceBaseClass):
         self.force_all_finite = force_all_finite
 
     def __call__(self, data: np.ndarray, model: "GLVQ") -> np.ndarray:
-        """
+        r"""
          Computes the squared Euclidean distance:
             .. math::
 
-                d(\\vec{w}, \\vec{x}) = (\\vec{x} - \\vec{w})^{\\top} (\\vec{x} - \\vec{w}),
+                d(\mathbf{w}, \mathbf{x}) = (\mathbf{x} - \mathbf{w})^{\top} (\mathbf{x} - \mathbf{w}),
 
-            with :math:`\\vec{w}` a prototype and :math:`\\vec{x}` a sample.
+            with :math:`\mathbf{w}` a prototype and :math:`\mathbf{x}` a sample.
 
         Parameters
         ----------
@@ -62,11 +62,11 @@ class SquaredEuclidean(DistanceBaseClass):
         return cdist(data, model.prototypes_, distance_function)
 
     def gradient(self, data: np.ndarray, model: "GLVQ", i_prototype: int) -> np.ndarray:
-        """ Computes the gradient of the squared euclidean distance, with respect to a single
+        r""" Computes the gradient of the squared euclidean distance, with respect to a single
         prototype:
 
             .. math::
-                \\frac{\\partial d}{\\partial \\vec{w_i}} = -2 \\cdot (\\vec{x} - \\vec{w_i})
+                \frac{\partial d}{\partial \mathbf{w}_i} = -2 \cdot (\mathbf{x} - \mathbf{w}_i)
 
         Parameters
         ----------

@@ -83,14 +83,14 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
     def __call__(
         self, model: "LVQBaseClass", data: np.ndarray, labels: np.ndarray,
     ) -> np.ndarray:
-        """ Computes the generalized learning objective:
+        r""" Computes the generalized learning objective:
 
             .. math::
 
-                E = \\sum_{i=1}^{N} f(\\mu(d_0(\\vec{x}_i), d_1(\\vec{x}_i))
+                E = \sum_{i=1}^{N} f(\mu(d_0(\mathbf{x}_i), d_1(\mathbf{x}_i))
 
-        with :math:`\\mu(\\cdot)` the discriminative function, :math:`f(\\cdot)` the activation
-        function, and :math:`d_0(\\vec{x}_i)` and :math:`d_1(\\vec{x}_i)` the shortest
+        with :math:`\mu(\cdot)` the discriminative function, :math:`f(\cdot)` the activation
+        function, and :math:`d_0(\mathbf{x}_i)` and :math:`d_1(\mathbf{x}_i)` the shortest
         distance to a prototype  with  a different and the same label respectively.
 
         Parameters
@@ -116,21 +116,21 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
     def gradient(
         self, model: "LVQBaseClass", data: np.ndarray, labels: np.ndarray,
     ) -> np.ndarray:
-        """ Computes the generalized learning objective's gradient with respect to the
+        r""" Computes the generalized learning objective's gradient with respect to the
         prototype with a different label:
 
             .. math::
-                \\frac{\\partial E}{\\partial \\vec{w}_0} = \\frac{\\partial f}{\\partial \\mu}
-                \\frac{\\partial \\mu}{\\partial d_0} \\frac{\\partial d_0}{\\partial \\vec{w}_0}
+                \frac{\partial E}{\partial \mathbf{w}_0} = \frac{\partial f}{\partial \mu}
+                \frac{\partial \mu}{\partial d_0} \frac{\partial d_0}{\partial \mathbf{w}_0}
 
-        with :math:`\\vec{w}_0` the prototype with a different label than the data and :math:`d_0`
+        with :math:`\mathbf{w}_0` the prototype with a different label than the data and :math:`d_0`
         the distance to that prototype.
 
             .. math::
-                 \\frac{\\partial E}{\\partial \\vec{w}_1} = \\frac{\\partial f}{\\partial \\mu}
-                 \\frac{\\partial \\mu}{\\partial d_1} \\frac{\\partial d_1}{\\partial \\vec{w}_1}
+                 \frac{\partial E}{\partial \mathbf{w}_1} = \frac{\partial f}{\partial \mu}
+                 \frac{\partial \mu}{\partial d_1} \frac{\partial d_1}{\partial \mathbf{w}_1}
 
-        with :math:`\\vec{w}_1` the prototype with the same label as the data and :math:`d_1`
+        with :math:`\mathbf{w}_1` the prototype with the same label as the data and :math:`d_1`
         the distance to that prototype.
 
         Parameters

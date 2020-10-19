@@ -14,10 +14,10 @@ class Identity(ActivationBaseClass):
     __slots__ = ()
 
     def __call__(self, x: np.ndarray) -> np.ndarray:
-        """ Implementation of the identity function:
+        r""" Implementation of the identity function:
             .. math::
 
-                f(\\vec{x}) = \\vec{x}
+                f(\mathbf{x}) = \mathbf{x}
 
         Parameters
         ----------
@@ -31,10 +31,10 @@ class Identity(ActivationBaseClass):
         return x
 
     def gradient(self, x: np.ndarray) -> np.ndarray:
-        """ The identity functions's gradient:
+        r""" The identity functions's gradient:
             .. math::
 
-                \\frac{\\partial f}{\\partial \\vec{x}} = \\vec{1}
+                \frac{\partial f}{\partial \mathbf{x}} = \mathbf{1}
 
         Parameters
         ----------
