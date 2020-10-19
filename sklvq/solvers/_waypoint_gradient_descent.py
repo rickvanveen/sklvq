@@ -14,10 +14,36 @@ STATE_KEYS = ["variables", "nit", "fun", "nfun", "tfun", "step_size"]
 
 
 class WaypointGradientDescent(SolverBaseClass):
-    """ Waypoint gradient descent (WGD)
+    r""" Waypoint gradient descent (WGD)
 
-    Implements the waypoint average optimization scheme. Original description in [1]_.
-    Implementation based on description given in [2]_.
+    Implements the waypoint average optimization algorithm [1]_. Implementation and description is
+    inspired by [2]_.
+
+    The algorithm keeps a rolling average of the last ``k`` model parameters. After ``k`` steps the
+    algorithms will compare the cost of the average model parameters (:math:`\hat{
+    \mathbf{\theta}}`) versus a "regular" update of the model parameters (:math:`\tilde{\mathbf{
+    \theta}}`).
+
+    .. math::
+        \tilde{\mathbf{\theta}} &= \theta_t - \eta \cdot \frac{\nabla E(\theta_t)}{||\nabla E(\theta_t)||}  \\
+        \hat{\mathbf{\theta}} &= \frac{1}{k} \sum_{i=0}^{k - 1} \mathbf{\theta}_{t_i}
+
+    If the regular step results in a lower cost (:math:`E(\tilde{\mathbf{\theta}}) < E(\hat{
+    \mathbf{\theta}})`), the ``step_size`` is increased by multiplying with the ``gain`` factor:
+
+    .. math::
+        \mathbf{\theta}_{t+1} &= \tilde{\mathbf{\theta}}  \\
+        \eta &= gain \cdot \eta.
+
+    If the average step results in a lower cost ((:math:`E(\hat{\mathbf{\theta}}) < E(\tilde{
+    \mathbf{\theta}})`) the ``step_size`` is decreased by multiplying with
+    the ``loss`` factor:
+
+    .. math::
+        \mathbf{\theta}_{t+1} &= \hat{\mathbf{\theta}} \\
+        \eta &= loss \cdot \eta.
+
+    Note that the solver uses the normalized objective gradient to update the model.
 
     Parameters
     ----------
@@ -139,16 +165,18 @@ class WaypointGradientDescent(SolverBaseClass):
     def solve(
         self, data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass",
     ):
-        """ Solve
+        """ Solve function that gets called by the fit method of the models.
 
-        Performs the actual steps of the waypoint gradient descent optimization.
+        Performs the steps of the waypoint gradient descent optimization method.
 
         Parameters
         ----------
-        data : ndarray of shape (number of observations, number of dimensions)
+        data : ndarray of shape (n_samples, n_features)
             The data.
-        labels : ndarray of size (number of observations)
+
+        labels : ndarray of size (n_samples)
             The labels of the samples in the data.
+
         model : LVQBaseClass
             The initial model that will also hold the final result
         """

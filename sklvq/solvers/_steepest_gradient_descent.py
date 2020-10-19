@@ -15,10 +15,29 @@ STATE_KEYS = ["variables", "nit", "fun", "step_size"]
 
 
 class SteepestGradientDescent(SolverBaseClass):
-    """ Steepest gradient descent (SGD)
+    r""" Steepest gradient descent (SGD)
 
     Implements the steepest gradient descent optimization method. Can perform stochastic,
-    mini-batch and batch gradient descent by changing the batch_size.
+    mini-batch and batch gradient descent by changing the batch_size. Implementation is
+    inspired by the description given in [1]_.
+
+    The algorithm performs the following update of the model parameters (:math:`\mathbf{\theta}`) per
+    batch. This process is repeated multiple times (per step) when the ``batch_size`` (:math:`M`)
+    is smaller than the total number of samples in the data.
+
+    .. math::
+        \mathbf{\theta} = \mathbf{\theta}  - \eta(t) \cdot \sum_i^M \nabla  e_i(\mathbf{\theta}),
+
+    with :math:`\nabla e_i(\mathbf{\theta})` the gradient of the objective function with respect to
+    a sample given the current model parameters :math:`\mathbf{\theta}`, and :math:`\eta(t)` the step
+    size at step :math:`t`, which is changed using a simple annealing function:
+
+    .. math::
+        \eta(t) = \frac{\eta_{init}} {(1 + \frac{t}{t_{max}})},
+
+    with :math:`t_{max}` given by the ``max_runs`` parameter and :math:`\eta_{init}` by the
+    ``step_size`` parameter.
+
 
     Parameters
     ----------
@@ -60,6 +79,13 @@ class SteepestGradientDescent(SolverBaseClass):
             The objective cost
         - "step_size"
             The current step_size(s)
+
+    References
+    ----------
+    .. [1] LeKander, M., Biehl, M., & De Vries, H. (2017). "Empirical evaluation of gradient
+        methods for matrix learning vector quantization." 12th International Workshop on
+        Self-Organizing Maps and Learning Vector Quantization, Clustering and Data
+        Visualization, WSOM 2017.
 
     """
 
@@ -107,29 +133,16 @@ class SteepestGradientDescent(SolverBaseClass):
     ):
         """ Solve function that gets called by the fit method of the models.
 
-        Performs the following update of the model parameters (:math:`\\theta`) per batch. This
-        process is repeated multiple times (per step) when the ``batch_size`` (:math:`M`) is smaller
-        than the total number of samples in the data.
-
-        .. math::
-            \\theta = \\theta  - \\eta(t) \\cdot \\sum_i^M \\nabla  e_i(\\theta),
-
-        with :math:`\\nabla e_i(\\theta)` the gradient of the objective function with respect to
-        a sample given the current model parameters :math:`\\theta`, and :math:`\\eta(t)` the step
-        size at step :math:`t`, which used a simple annealing function:
-
-        .. math::
-            \\eta(t) = \\frac{\\eta_{init}} {(1 + \\frac{t}{t_{max}})},
-
-        with :math:`t_{max}` given by the ``max_runs`` parameter and :math:`\\eta_{init}` by the
-        ``step_size`` parameter.
+        Performs the steps of the steepest gradient descent optimization method.
 
         Parameters
         ----------
-        data : ndarray of shape (number of observations, number of dimensions)
+        data : ndarray of shape (n_samples, n_features)
             The data.
-        labels : ndarray of size (number of observations)
+
+        labels : ndarray of size (n_samples)
             The labels of the samples in the data.
+
         model : LVQBaseClass
             The initial model that will also hold the final result
         """

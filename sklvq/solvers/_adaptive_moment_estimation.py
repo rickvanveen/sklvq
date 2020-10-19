@@ -14,9 +14,36 @@ STATE_KEYS = ["variables", "nit", "fun", "m_hat", "v_hat"]
 
 
 class AdaptiveMomentEstimation(SolverBaseClass):
-    """Adaptive moment estimation (ADAM)
+    r"""Adaptive moment estimation (ADAM)
 
-    Implementation based on description given in [1]_.
+    Implementation and description inspired by [1]_.
+
+    Adam maintains two moving averages of the gradient (:math:`m, v`), which get updated for
+    every sample at each epoch/run until the maximum runs (``max_runs``) has been reached:
+
+    .. math::
+        \mathbf{m} &= \beta_1 \cdot \mathbf{m} + (1 - \beta_1) \cdot \nabla e_i(\theta) \\
+        \mathbf{v} &= \beta_2 \cdot \mathbf{v} + (1 - \beta_2) \cdot [\nabla e_i(\theta)]^{\circ 2}.
+
+    Since :math:`m`  and :math:`v` are initialized to zero vectors, they are biased towards zero.
+    To counteract this, unbiased estimates :math:`\hat{m}` and :math:`\hat{v}` are computed:
+
+    .. math::
+        \hat{\mathbf{m}} &= \mathbf{m} / (1 - \beta^p_1) \\
+        \hat{\mathbf{v}} &= \mathbf{v} / (1 - \beta^p_2),
+
+    where :math:`p` is initially 0, but afterwards it's increased by 1 each time before
+    selecting a  new random sample. The unbiased estimates of the average gradient are then used
+    for the update step:
+
+    .. math::
+        \theta = \theta - \eta \cdot \hat{\mathbf{m}} \odot \hat{\mathbf{v}}^{\circ \frac{1}{2}},
+
+    with :math:`\eta` the ``step_size``. Additionally,  ``beta1``, and ``beta2``,  can be chosen
+    by the user.
+
+    Note that :math:`\odot` denotes the elementwise (Hadamard) product and :math:`\mathbf{x}^{
+    \circ y}` the elementwise power operation.
 
     Parameters
     ----------
@@ -37,7 +64,7 @@ class AdaptiveMomentEstimation(SolverBaseClass):
 
     callback: callable
         Callable with signature callable(state). If the callable returns True the solver
-        will stop (early). The state object contains the following.
+        will stop (early). The state object contains the following information:
 
         - "variables"
             Concatenated 1D ndarray of the model's parameters
