@@ -149,7 +149,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
     @abstractmethod
     def set_model_params(self, new_model_params: Union[tuple, np.ndarray]):
         r"""
-        Should modify the ``self._variables`` array. Accepts the new_variables in the shape of
+        Should modify the ``self._variables`` array. Accepts the new_model_params in the shape of
         the model's parameters, e.g., prototypes or (prototypes, relevance_matrix).
 
         Always needs to be all the model parameters, can not be used for partial updates.

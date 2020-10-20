@@ -26,12 +26,17 @@ class GLVQ(LVQBaseClass):
     r"""Generalized Learning Vector Quantization
 
     This model uses the :class:`sklvq.objectives.GeneralizedLearningObjective` as its objective
-    function.
+    function [1]_.
 
     Parameters
     ----------
     distance_type : {"squared-euclidean", "euclidean"} or Class, default="squared-euclidean"
-        The distance function. Can be one from the list above or a custom class.
+        The distance function. Can be one from the following list or a custom class:
+
+        - "squared-euclidean"
+            See :class:`sklvq.distances.SquaredEuclidean`
+        - "euclidean"
+            See :class:`sklvq.distances.Euclidean`
 
     distance_params : dict, optional, default=None
         Parameters passed to init of distance class.
@@ -41,20 +46,21 @@ class GLVQ(LVQBaseClass):
         function in the list or custom class.
 
         - "identity"
-            See :class:`sklvq.activation.Identity`
+            See :class:`sklvq.activations.Identity`
         - "sigmoid"
-            See :class:`sklvq.activation.Sigmoid`
+            See :class:`sklvq.activations.Sigmoid`
         - "soft+"
-            See :class:`sklvq.activation.SoftPlus`
+            See :class:`sklvq.activations.SoftPlus`
         - "swish"
-            See :class:`sklvq.activation.Swish`
+            See :class:`sklvq.activations.Swish`
 
     activation_params : dict, default=None
         Parameters passed to init of activation function. See the documentation of the activation
         functions for parameters and defaults.
 
     discriminant_type : "relative-distance" or Class
-        The discriminant function.
+        The discriminant function.  Note that different discriminant type may require to rewrite
+        the ``decision_function`` and ``predict_proba`` methods.
 
         - "relative-distance"
             See :class:`sklvq.discriminants.RelativeDistance`
@@ -73,9 +79,9 @@ class GLVQ(LVQBaseClass):
         - "adam" or "adaptive-moment-estimation"
             See :class:`sklvq.solvers.AdaptiveMomentEstimation`.
         - "bfgs" or "broyden-fletcher-goldfarb-shanno"
-            Implementation from scipy package.
+            See :class:`sklvq.solvers.BroydenFletcherGoldfarbShanno`
         - "lbfgs" or "limited-memory-bfgs"
-            Implementation from scipy package.
+            See :class:`skvlq.solvers.LimitedMemoryBfgs`
 
     solver_params : dict, default=None
         Parameters passed to init of solvers. See the documentation of the solvers relevant
@@ -88,7 +94,7 @@ class GLVQ(LVQBaseClass):
     prototype_params: dict = None,
         Containing the following parameters (keys):
 
-        - "protoytpes_per_class":  int or ndarray, optional, default=1
+        - "prototypes_per_class":  int or ndarray, optional, default=1
             Default will generate single prototype per class. In the case of unequal number of
             prototypes per class is needed, provide the labels as  np.ndarray. For example,
             prototypes_per_class = np.array([0, 0, 1, 2, 2, 2]) this will result in a  total of 6
@@ -185,7 +191,7 @@ class GLVQ(LVQBaseClass):
         Parameters
         ----------
         new_model_params : ndarray of shape (n_prototypes, n_features)
-            In this case the prototypes.
+            In the   case the prototypes.
 
         """
         self.set_prototypes(new_model_params)
@@ -249,7 +255,7 @@ class GLVQ(LVQBaseClass):
 
         Returns
         -------
-        ndarray or tuple
+        ndarray
             Same shape and size as input, but normalized.
 
         """
@@ -275,9 +281,6 @@ class GLVQ(LVQBaseClass):
         i_prototype : int
             The index of the prototype to which the partial gradient was  computed.
 
-        Returns
-        -------
-
         """
         n_features = self.n_features_in_
 
@@ -288,9 +291,7 @@ class GLVQ(LVQBaseClass):
             out=prots_view[i_prototype, :],
         )
 
-    def mul_step_size(
-        self, step_size: Union[int, float], gradient: np.ndarray
-    ) -> None:
+    def mul_step_size(self, step_size: Union[int, float], gradient: np.ndarray) -> None:
         """
         As GLVQ only has prototypes that are optimized the step_size should be a single float
         and can just be used to multiply the gradient inplace.
