@@ -9,6 +9,7 @@ from sklearn.utils.validation import check_is_fitted, check_array
 
 from .. import distances
 from .. import solvers
+from ..solvers import SolverBaseClass
 from .._utils import init_class
 
 from ..distances import DistanceBaseClass
@@ -22,9 +23,36 @@ _PROTOTYPES_PARAMS_DEFAULTS = {"prototypes_per_class": 1}
 
 
 class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
+    """ Learning vector quantization base class
+
+    Abstract class for implementing LVQ models. It provides abstract methods with
+    expected call signatures.
+
+    Provides a common interface to the solver and other function that require access to the
+    models. Additionally, it implements a number of functions shared by the currently implemented
+    LVQ variations.
+
+    See also
+    --------
+    GLVQ, GMLVQ, LGMLVQ
+
+    """
+
+    # Public attributes
     prototypes_: np.ndarray
     distance: Union[DistanceBaseClass, object]
+
+    # "Private" attributes
     _objective: GeneralizedLearningObjective
+    _solver: SolverBaseClass
+
+    # Related to model parameters
+    _prototypes_size: int
+    _prototypes_shape: Tuple
+
+    # _variables stores the  model parameters (e.g., prototypes) in 1D format. The
+    # get_prototypes() and other model parameter functions should return a view into this 1D
+    # array.  Likewise set_prototypes() overwrites the _variables array.
     _variables: np.ndarray
 
     def __init__(
@@ -63,6 +91,8 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
 
     @staticmethod
     def _init_model_params_options(parameter_params, parameter_params_defaults):
+        # Helper function to intialize certain model parameter settings. Used for
+        # prototype_params, and relevance_params (GMLVQ, LGMLVQ).
         if parameter_params is None:
             return parameter_params_defaults
 
@@ -77,20 +107,22 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
     ###########################################################################################
 
     def get_variables(self) -> np.ndarray:
-        """
-        Consistency/convenience function.
+        r"""
+        Returns the ``self._variables`` array that owns the memory allocated for the model
+        parameters.
 
         Returns
         -------
-            variables : ndarray
-                returns the models variables array.
+        _variables : ndarray
+            returns the model's _variables array.
 
         """
         return self._variables
 
     def set_variables(self, new_variables: np.ndarray) -> None:
-        """
-        Will modify the variables stored by the model (self) using numpy copyto.
+        r"""
+        Modifies the ``self._variables`` by copying the values of ``new_variables`` into the
+        memory of ``self._variables``.
 
         Parameters
         ----------
@@ -102,27 +134,30 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
 
     @abstractmethod
     def get_model_params(self) -> Union[tuple, np.ndarray]:
-        """
+        r"""
+        Should return a view or tuple of views (in correct shape) of the model's parameters.
+        Implementation depends on specific model as model parameters may differ per model.
 
         Returns
         -------
         ndarray or tuple
-            In the simplest case returns only the prototypes as ndarray. Other models may include
-            multiple parameters then they are stored in a tuple.
+            View or tuple of views of the model's parameters.
 
         """
         raise NotImplementedError("You should implement this!")
 
     @abstractmethod
-    def set_model_params(self, model_params: Union[tuple, np.ndarray]):
-        """
-        Changes the model's internal parameters.
+    def set_model_params(self, new_model_params: Union[tuple, np.ndarray]):
+        r"""
+        Should modify the ``self._variables`` array. Accepts the new_variables in the shape of
+        the model's parameters, e.g., prototypes or (prototypes, relevance_matrix).
+
+        Always needs to be all the model parameters, can not be used for partial updates.
 
         Parameters
         ----------
-        model_params : ndarray or tuple
-            In the simplest case can be only the prototypes as ndarray. Other models may include
-            multiple parameters then they should be stored in a tuple.
+        new_model_params : ndarray or tuple
+            Array or tuple of arrays of the new model's parameters.
 
         """
         raise NotImplementedError("You should implement this!")
@@ -132,26 +167,27 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
     ###########################################################################################
 
     def get_prototypes(self) -> np.ndarray:
-        """
-        Convenience function. Only works after fitting the model and the prototypes
-        have been initialized.
+        r"""
+        Return a view into ``self._variables`` of the the shape of the prototypes (n_prototypes,
+        n_features). At the moment only consistency function, does not actually  create the shape
+        and only  works after ``self.prototypes_`` has been set.
 
         Returns
         -------
-            prototypes : ndarray of shape (n_prototypes, n_features)
-                Returns a view of the shape specified above into the model's variables array.
+        prototypes : ndarray of shape (n_prototypes, n_features)
+            View into ``self._variables`` with shape specified above.
 
         """
         return self.prototypes_
 
     def set_prototypes(self, new_prototypes: np.ndarray) -> None:
-        """
-        Will copy the new prototypes into the model's prototypes, which is a view into the
-        variables array and therefore will alter it.
+        r"""
+        Accepts a new_prototypes array with the same shape as ``self.prototypes_`` and overwrites
+        the ``self._variables`` array by copying the values of the new_prototypes.
 
         Parameters
         ----------
-        prototypes : ndarray of shape (n_prototypes, n_features)
+        new_prototypes : ndarray of shape (n_prototypes, n_features)
             The new prototypes the model should store.
         """
         np.copyto(self.prototypes_, new_prototypes)
@@ -162,37 +198,40 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
 
     @abstractmethod
     def to_model_params_view(self, var_buffer: np.ndarray) -> Union[tuple, np.ndarray]:
-        """
+        r"""
+        Should return a single view into the var_buffer or a tuple of views. This depends on the
+        model and its parameters.
+
         Parameters
         ----------
         var_buffer : ndarray
-            Single ndarray that stores the parameters in the order as given by the
-            "to_variabes()" function
+            Array with the same size as the model's variables array as returned
+            by ``get_variables()``.
 
         Returns
         -------
         ndarray or tuple
-            In the simplest case returns only the prototypes as ndarray. Other models may include
-            multiple parameters then they are stored in a tuple.
+            Should return a view or tuple of views of the model parameters in appropriate shapes.
 
         """
         raise NotImplementedError("You should implement this!")
 
     @abstractmethod
     def to_prototypes_view(self, var_buffer: np.ndarray) -> np.ndarray:
-        """
-        Function that depends on a specific model. Should return a view (of the shape of the
-        model's prototypes) into the provided variables buffer of the same size as the
-        model's variables array.
+        r"""
+        Should return the prototypes from the provided var_buffer. I.e., it selects/views the
+        appropriate part of memory and reshapes it.
 
         Parameters
         ----------
-        var_buffer: ndarray
-            1d array of the shame size as the model's variables array.
+        var_buffer : ndarray
+            Array with the same size as the model's variables array as returned
+            by ``get_variables()``.
 
         Returns
         -------
-            ndarray of shape (n_prototypes, n_features)
+        ndarray of shape (n_prototypes, n_features)
+            View into the var_buffer.
 
         """
         raise NotImplementedError("You should implement this!")
@@ -203,13 +242,16 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
 
     @abstractmethod
     def normalize_variables(self, var_buffer: np.ndarray) -> None:
-        """
-        Should modify the as parameter given model_params in place.
+        r"""
+        Should modify the var_buffer as if it was the variables array provided
+        by ``get_variables()``.
 
         Parameters
         ----------
         var_buffer : ndarray
-            1d array of the shame size as the model's variables array.
+            Array with the same size as the model's variables array as returned
+            by ``get_variables()``.
+
 
         Returns
         -------
@@ -222,18 +264,22 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
 
     @staticmethod
     def _normalize_prototypes(prototypes: np.ndarray) -> None:
-        """
-        Modifies the prototypes argument.
+        r"""
+        Normalizes the provided prototypes array, i.e., it writes to the same memory. Performs
+        the following normalization step for each prototype :math:`\mathbf{w_i}`:
+
+        ..math::
+             \mathbf{w}_i / || \mathbf{w}_i ||
 
         Parameters
         ----------
-        prototypes : ndarray of shape (number of prototypes, number of dimensions)
-
+        prototypes : ndarray of shape (n_prototypes, n_features)
+            To be normalized prototypes.
 
         Returns
         -------
         ndarray of same shape as input
-            Each prototype normalized according to w / norm(w)
+            Normalized prototypes.
 
         """
         np.divide(
@@ -247,34 +293,43 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
     ###########################################################################################
 
     @abstractmethod
-    def add_partial_gradient(
-        self, gradient, partial_gradient, i_prototype
-    ) -> np.ndarray:
-        """
+    def add_partial_gradient(self, gradient, partial_gradient, i_prototype) -> None:
+        r"""
+        To increase performance the distance gradient returns only the relevant values.
+        I.e., the gradient of the prototype i_prototype and potentially other parameters linked to
+        this prototype. This partial gradient needs to added (overwrite) to the correct parts of
+        the actual gradient and this is what this function should do.
 
         Parameters
         ----------
-        gradient
-        partial_gradient
-        i_prototype
+        gradient : ndarray
+            Same shape as the ``get_variables()`` would return.
 
-        Returns
-        -------
+        partial_gradient : ndarray
+            1d array containing the partial gradient.
+
+        i_prototype : int
+            The index of the prototype to which the partial gradient was  computed.
 
         """
         raise NotImplementedError("You should implement this!")
 
     @abstractmethod
-    def mul_step_size(self, step_size, var_buffer: np.ndarray) -> None:
-        """
+    def mul_step_size(
+        self, step_size: Union[float, np.ndarray], gradient: np.ndarray
+    ) -> None:
+        r"""
+        Should multiply the provided gradient with the provided step size and overwrite the
+        values in ``gradient``.  Depending on the ``step_size`` being a float or array different
+        step sizes are used for different model parameters (which also depends on the model if
+        there are more then only prototypes)
 
         Parameters
         ----------
-        step_size
-        var_buffer
-
-        Returns
-        -------
+        step_size : float or ndarray
+            The scalar or list of values containing the step sizes.
+        gradient : ndarray
+            Same shape as the ``get_variables()`` would return.
 
         """
         raise NotImplementedError("You should implement this!")
@@ -285,7 +340,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
 
     @abstractmethod
     def _init_variables(self):
-        """
+        r"""
         Should initialize the variables, 1d numpy array to hold all model parameters. Should
         store these in self._variables.
 
@@ -294,12 +349,17 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
 
     @abstractmethod
     def _check_model_params(self):
+        r"""
+        Should check the model parameters. I.e., call check_prototype_params with parameters and
+        other model parameters that there might be.
+
+        """
         pass
 
     @abstractmethod
     def _init_model_params(self, X, y):
-        """
-        Depending on the model things such as self.prototypes_ should be initialized and set
+        r"""
+        Depending on the model, things such as self.prototypes_ should be initialized and set
         using the set methods or one should make sure the parameters are views into the variables
         array, such that variables array is changed as well.
 
@@ -314,6 +374,22 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         raise NotImplementedError("You should implement this!")
 
     def _check_prototype_params(self, prototypes_per_class=1, **kwargs):
+        """
+        Check prototype params, i.e., if the prototypes_per_class is set correctly.
+        Additionally, it sets the size and shape of the prototypes such that these can be used
+        for the creation of the ``self._variables`` and view ``self.prototypes_``.
+
+        Parameters
+        ----------
+        prototypes_per_class: int, default = 1
+
+        kwargs
+
+        Returns
+        -------
+
+        """
+
         if isinstance(prototypes_per_class, int):
             self._prototypes_shape = (
                 prototypes_per_class * self.classes_.size,
@@ -368,13 +444,13 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
     @abstractmethod
     def _init_objective(self) -> None:
         """
-        Algorithm dependent.
+        Should initialize the ``self._objective``. Depends on the algorithm.
         """
         raise NotImplementedError("You should implement this!")
 
     def _init_distance(self) -> None:
         """
-        Initialize the distance function.
+        Initializes the ``self.distance``.
         """
         # Get the distance function and prepare parameters
         distance_params = {"force_all_finite": self.force_all_finite}
@@ -388,7 +464,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
 
     def _init_solver(self) -> None:
         """
-        Should set the self._solver.
+        Should initialize the ``self._solver``. Depends on the algorithm.
         """
         solver_class = init_class(solvers, self.solver_type, self.valid_solvers)
         self._solver = solver_class(self._objective, **self.solver_params)
@@ -531,12 +607,18 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
     def decision_function(self, X: np.ndarray):
         """ Evaluates the decision function for the samples in X.
 
+        Computes the discriminant scores using the discriminant function. Changing the
+        discriminant function, currently requires rewriting the ``predict_proba()`` function as
+        well.
+
         Parameters
         ----------
         X : ndarray
+            The data.
 
         Returns
         -------
+        discriminant_scores : ndarray of shape (n_observations, n_classes)
 
         """
         # SciKit-learn list of checked params before predict
@@ -569,10 +651,12 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
 
         Parameters
         ----------
-        X
+        X  : ndarray
+            The data.
 
         Returns
         -------
+        confidence_scores : ndarray of shape (n_observations, n_classes)
 
         """
         decision_values = self.decision_function(X)
@@ -587,12 +671,18 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
     def predict(self, X: np.ndarray):
         """ Predict function
 
+        The decision is made for the label of the prototype with the minimum decision value,
+        as provided by the ``decision_function()``.
+
         Parameters
         ----------
-        X
+         X  : ndarray
+            The data.
 
         Returns
         -------
+        ndarray of shape (n_observations)
+            Returns the predicted labels.
 
         """
         # SciKit-learn list of checked params before predict

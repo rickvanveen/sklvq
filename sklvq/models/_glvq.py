@@ -25,7 +25,8 @@ SOLVERS = [
 class GLVQ(LVQBaseClass):
     r"""Generalized Learning Vector Quantization
 
-    This model optimizes the generalized learning objective introduced in [1]_.
+    This model uses the :class:`sklvq.objectives.GeneralizedLearningObjective` as its objective
+    function.
 
     Parameters
     ----------
@@ -39,48 +40,61 @@ class GLVQ(LVQBaseClass):
         The activation function used in the objective function. Can be any of the activation
         function in the list or custom class.
 
+        - "identity"
+            See :class:`sklvq.activation.Identity`
+        - "sigmoid"
+            See :class:`sklvq.activation.Sigmoid`
+        - "soft+"
+            See :class:`sklvq.activation.SoftPlus`
+        - "swish"
+            See :class:`sklvq.activation.Swish`
+
     activation_params : dict, default=None
-        Parameters passed to init of activation function. See the documentation of activation
-        functions for function dependent parameters and defaults.
+        Parameters passed to init of activation function. See the documentation of the activation
+        functions for parameters and defaults.
 
     discriminant_type : "relative-distance" or Class
         The discriminant function.
 
+        - "relative-distance"
+            See :class:`sklvq.discriminants.RelativeDistance`
+
     discriminant_params : dict, default=None
-        Parameters passed to init of discriminant callable
+        Parameters passed to init of discriminant callable. See the documentation of the
+        discriminant functions for parameters and defaults.
 
     solver_type : {"sgd", "wgd", "adam", "lbfgs", "bfgs"},
         The solver used for optimization
 
         - "sgd" or "steepest-gradient-descent"
-            Refers to the stochastic and (mini) batch steepest descent optimizers.
-
+            See :class:`sklvq.solvers.SteepestGradientDescent`.
         - "wgd" or "waypoint-gradient-descent"
-            Implementation based on [2]_
-
+            See :class:`sklvq.solvers.WaypointGradientDescent`.
         - "adam" or "adaptive-moment-estimation"
-            Implementation based on description by [3]_
-
+            See :class:`sklvq.solvers.AdaptiveMomentEstimation`.
         - "bfgs" or "broyden-fletcher-goldfarb-shanno"
             Implementation from scipy package.
-
         - "lbfgs" or "limited-memory-bfgs"
             Implementation from scipy package.
 
     solver_params : dict, default=None
-        Parameters passed to init of solvers. See the documentation of the solver
-        functions for relevant parameters and defaults.
+        Parameters passed to init of solvers. See the documentation of the solvers relevant
+        parameters and defaults.
 
-    initial_prototypes : "class-conditional-mean" or ndarray, default="class-conditional-mean"
+    prototype_init: "class-conditional-mean" or ndarray, default="class-conditional-mean"
         Default will initiate the prototypes to the class conditional mean with a small random
         offset. Custom numpy array can be passed to change the initial positions of the prototypes.
 
-    prototypes_per_class : int or ndarray, optional, default=1
-        Number of prototypes per class. Default will generate single prototype per class. In the
-        case of unequal number of prototypes per class is preferable provide the labels as
-        np.ndarray. Example prototypes_per_class = np.array([0, 0, 1, 2, 2, 2]) this will match
-        with a total of 6 prototypes with first two class with index 0, then one with class index 1,
-        and three with class index 2. Note: labels are indexes to classes\_ attribute.
+    prototype_params: dict = None,
+        Containing the following parameters (keys):
+
+        - "protoytpes_per_class":  int or ndarray, optional, default=1
+            Default will generate single prototype per class. In the case of unequal number of
+            prototypes per class is needed, provide the labels as  np.ndarray. For example,
+            prototypes_per_class = np.array([0, 0, 1, 2, 2, 2]) this will result in a  total of 6
+            prototypes with the first two classes with index 0, then one with class index 1,
+            and three with class index 2. Note: labels are indexes to classes\_ attribute, which is
+            equal to np.unique(labels)
 
     random_state : int, RandomState instance, default=None
         Determines random number generation. Used in random offset of prototypes and shuffling of
@@ -95,27 +109,19 @@ class GLVQ(LVQBaseClass):
     Attributes
     ----------
     classes_ : ndarray of shape (n_classes,)
-        Class labels for each output.
+        The original and unique labels found in the data.
 
     prototypes_ : ndarray of shape (n_protoypes, n_features)
         Positions of the prototypes after fit(X, labels) has been called.
 
     prototypes_labels_ : ndarray of shape (n_prototypes)
-        Labels for each prototypes. Labels are indexes to classes\_
+        Labels for each prototypes. Labels are indexes to ``classes_``
 
     References
     ----------
     .. [1] Sato, A., and Yamada, K. (1996) "Generalized Learning Vector Quantization."
         Advances in Neural Network Information Processing Systems, 423–429, 1996.
 
-    .. [2] Papari, G., and Bunte, K., and Biehl, M. (2011) "Waypoint averaging and step size
-        control in learning by gradient descent" Mittweida Workshop on Computational
-        Intelligence (MIWOCI) 2011.
-
-    .. [3] LeKander, M., Biehl, M., & De Vries, H. (2017). "Empirical evaluation of gradient
-        methods for matrix learning vector quantization." 12th International Workshop on
-        Self-Organizing Maps and Learning Vector Quantization, Clustering and Data
-        Visualization, WSOM 2017.
     """
 
     classes_: np.ndarray
@@ -161,42 +167,42 @@ class GLVQ(LVQBaseClass):
 
     def get_model_params(self) -> ModelParamsType:
         """
+        Returns a view of all model parameters, which are only the prototypes.
 
         Returns
         -------
         ndarray
-             Returns the prototypes as ndarray.
+             Returns a view of the prototypes as ndarray.
 
         """
         return self.get_prototypes()
 
-    def set_model_params(self, model_params: ModelParamsType) -> None:
+    def set_model_params(self, new_model_params: ModelParamsType) -> None:
         """
-        Changes the model's internal parameters. Copies the values in model_params into
-        self.prototypes_ therefor updating the variables_ array.
+        Changes the model's internal parameters. Copies the values of model_params into
+        ``self.prototypes_`` therefor updating the ``self.variables_`` array.
 
         Parameters
         ----------
-        model_params : ndarray or tuple
-            In the simplest case can be only the prototypes as ndarray. Other models may include
-            multiple parameters then they should be stored in a tuple.
+        new_model_params : ndarray of shape (n_prototypes, n_features)
+            In this case the prototypes.
 
         """
-        self.set_prototypes(model_params)
+        self.set_prototypes(new_model_params)
 
     ###########################################################################################
     # Functions to transform the 1D variables array to model parameters and back
     ###########################################################################################
 
-    def to_model_params_view(self, variables: np.ndarray) -> ModelParamsType:
+    def to_model_params_view(self, var_buffer: np.ndarray) -> ModelParamsType:
         """
         Should create a view of the variables array in prototype shape.
 
         Parameters
         ----------
-        variables : ndarray
-            Single ndarray that stores the parameters in the order as given by the
-            "to_variabes()" function
+        var_buffers : ndarray
+            Array with the same size as the model's variables array as returned
+            by ``get_variables()``.
 
         Returns
         -------
@@ -204,9 +210,25 @@ class GLVQ(LVQBaseClass):
             Returns the prototypes as ndarray.
 
         """
-        return self.to_prototypes_view(variables)
+        return self.to_prototypes_view(var_buffer)
 
     def to_prototypes_view(self, var_buffer: np.ndarray) -> np.ndarray:
+        """
+        Returns the prototypes into the provided var_buffer. I.e., it selects/views the
+        appropriate part of memory and reshapes it.
+
+        Parameters
+        ----------
+        var_buffer : ndarray
+            Array with the same size as the model's variables array as returned
+            by ``get_variables()``.
+
+        Returns
+        -------
+        ndarray of shape (n_prototypes, n_features)
+            Prototype view into the var_buffer.
+
+        """
         return var_buffer.reshape(self._prototypes_shape)
 
     ###########################################################################################
@@ -214,18 +236,21 @@ class GLVQ(LVQBaseClass):
     ###########################################################################################
 
     def normalize_variables(self, var_buffer: np.ndarray) -> None:
-        """
+        r"""
+        Modifies the var_buffer as if it was the variables array provided
+        by ``get_variables()``. As variables only contain prototypes it will now  contain the
+        normalized prototypes.
 
         Parameters
         ----------
         var_buffer : ndarray
-
+            Array with the same size as the model's variables array as returned
+            by ``get_variables()``.
 
         Returns
         -------
         ndarray or tuple
-            Same shape and size as input, but normalized. How to normalize depends on model
-            implementation.
+            Same shape and size as input, but normalized.
 
         """
         LVQBaseClass._normalize_prototypes(self.to_prototypes_view(var_buffer))
@@ -236,12 +261,19 @@ class GLVQ(LVQBaseClass):
 
     def add_partial_gradient(self, gradient, partial_gradient, i_prototype) -> None:
         """
+        Adds the partial gradient to the correct part of the gradient, which  depends on
+        ``i_prototype``.
 
         Parameters
         ----------
-        gradient
-        partial_gradient
-        i_prototype
+        gradient : ndarray
+            Same shape as the ``get_variables()`` would return.
+
+        partial_gradient : ndarray
+            1d array containing the partial gradient.
+
+        i_prototype : int
+            The index of the prototype to which the partial gradient was  computed.
 
         Returns
         -------
@@ -257,9 +289,21 @@ class GLVQ(LVQBaseClass):
         )
 
     def mul_step_size(
-        self, step_size: Union[int, float], var_buffer: np.ndarray
+        self, step_size: Union[int, float], gradient: np.ndarray
     ) -> None:
-        var_buffer *= step_size
+        """
+        As GLVQ only has prototypes that are optimized the step_size should be a single float
+        and can just be used to multiply the gradient inplace.
+
+        Parameters
+        ----------
+        step_size : float or ndarray
+            The scalar or list of values containing the step sizes.
+        gradient : ndarray
+            Same shape as the ``get_variables()`` would return.
+
+        """
+        gradient *= step_size
 
     ###########################################################################################
     # Initialization required functions
