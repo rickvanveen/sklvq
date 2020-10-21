@@ -11,7 +11,7 @@ steps:
 
   - script: |
       pip install pytest pytest-azurepipelines
-      pytest ./sklvq --cov-./
+      pytest ./sklvq --cov=./
     displayName: 'Run tests and generate coverage'
 
   - script: |
