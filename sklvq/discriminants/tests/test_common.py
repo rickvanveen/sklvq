@@ -19,3 +19,4 @@ def check_init_discriminant(discriminant_string):
 def test_aliases():
     for value in ALIASES.values():
         check_init_discriminant(value)
+
