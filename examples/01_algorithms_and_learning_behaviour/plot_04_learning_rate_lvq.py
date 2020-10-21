@@ -8,15 +8,13 @@ not each solver provides the same variables. Additionally, the options "lbfgs" a
 implemented in scipy and their callbacks are different from the others. See Scipy's documentation
 for further information.
 """
-import numpy as np
-
 import matplotlib
 import matplotlib.pyplot as plt
-
+import numpy as np
 from sklearn.datasets import load_iris
-from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import classification_report
 from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
 
 from sklvq import GMLVQ
 

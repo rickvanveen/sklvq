@@ -7,12 +7,11 @@ An extension to the LVQ algorithms that provides a number of distance functions 
 with missing values.
 """
 
-import numpy as np
 import matplotlib
-
+import numpy as np
 from sklearn.datasets import load_iris
-from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import classification_report
+from sklearn.preprocessing import StandardScaler
 
 from sklvq import GMLVQ
 

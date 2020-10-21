@@ -6,13 +6,12 @@ Generalized Matrix LVQ (GMLVQ)
 Example of how to use GMLVQ on the classic iris dataset.
 """
 
-import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-
+import numpy as np
 from sklearn.datasets import load_iris
-from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import classification_report
+from sklearn.preprocessing import StandardScaler
 
 from sklvq import GMLVQ
 

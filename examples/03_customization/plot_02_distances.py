@@ -3,15 +3,14 @@
 Distance Functions
 ==================
 """
-from sklearn.datasets import load_iris
-from sklearn.metrics import classification_report
+from typing import TYPE_CHECKING
 
 import numpy as np
+from sklearn.datasets import load_iris
+from sklearn.metrics import classification_report
 from sklearn.metrics.pairwise import pairwise_distances
 
 from sklvq.distances import DistanceBaseClass
-
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from sklvq.models import LVQBaseClass

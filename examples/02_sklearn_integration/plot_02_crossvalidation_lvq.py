@@ -9,14 +9,13 @@ unseen X, i.e., the generalizability of the model.
 """
 
 import numpy as np
-
 from sklearn.datasets import load_iris
-from sklearn.preprocessing import StandardScaler
-from sklearn.pipeline import make_pipeline
 from sklearn.model_selection import (
     cross_val_score,
     RepeatedKFold,
 )
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
 
 from sklvq import GMLVQ
 

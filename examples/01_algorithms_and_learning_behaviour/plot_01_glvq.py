@@ -7,10 +7,9 @@ Example of how to use the GLVQ algorithm on the classic iris dataset.
 """
 import matplotlib
 import matplotlib.pyplot as plt
-
 from sklearn.datasets import load_iris
-from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import classification_report
+from sklearn.preprocessing import StandardScaler
 
 from sklvq import GLVQ
 

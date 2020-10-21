@@ -3,11 +3,11 @@
 Activation Functions
 ====================
 """
-from sklearn.datasets import load_iris
-from sklearn.metrics import classification_report
+from typing import Union
 
 import numpy as np
-from typing import Union
+from sklearn.datasets import load_iris
+from sklearn.metrics import classification_report
 
 from sklvq import GLVQ
 from sklvq.activations import ActivationBaseClass

@@ -291,7 +291,7 @@ class GMLVQ(LVQBaseClass):
         Parameters
         ----------
         omega : ndarray with same shape as ``self.omega_``
-        
+
         """
         np.copyto(self.omega_, omega)
 

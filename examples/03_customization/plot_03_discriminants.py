@@ -3,14 +3,12 @@
 Discriminant Functions
 ======================
 """
+import numpy as np
 from sklearn.datasets import load_iris
 from sklearn.metrics import classification_report
 
 from sklvq import GLVQ
 from sklvq.discriminants import DiscriminantBaseClass
-
-import numpy as np
-
 
 data, labels = load_iris(return_X_y=True)
 

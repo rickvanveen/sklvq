@@ -8,11 +8,10 @@ Also this feature is provided by scikit-learn and we therefore also refer to sci
 documentation.
 """
 import numpy as np
-
 from sklearn.datasets import load_iris
-from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import classification_report
 from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
 
 from sklvq import GMLVQ
 
