@@ -281,7 +281,7 @@ class LGMLVQ(LVQBaseClass):
 
     def get_omega(self):
         """
-        Convenience function to return self.omega_
+        Convenience function to return ``self.omega_``
 
         Returns
         -------
@@ -292,12 +292,12 @@ class LGMLVQ(LVQBaseClass):
 
     def set_omega(self, omega):
         """
-        Convenience function that makes shure to copy the value to self.omega_ and not overwrite
+        Convenience function that makes sure to copy the value to ``self.omega_`` and not overwrite
         it.
 
         Parameters
         ----------
-        omega : ndarray with same shape as self.omega_
+        omega : ndarray with same shape as ``self.omega_``
 
         """
         np.copyto(self.omega_, omega)
@@ -387,7 +387,8 @@ class LGMLVQ(LVQBaseClass):
         self._normalize_prototypes(prototypes)
         self._normalize_omega(omega)
 
-    def _normalize_omega(self,  omega: np.ndarray) -> None:
+    @staticmethod
+    def _normalize_omega(omega: np.ndarray) -> None:
         np.divide(
             omega,
             np.sqrt(np.einsum("ikj, ikj -> i", omega, omega)).reshape(

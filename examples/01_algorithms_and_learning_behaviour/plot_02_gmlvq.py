@@ -40,7 +40,7 @@ model = GMLVQ(
 )
 
 ###############################################################################
-# Fit the GLVQ object to the X and print the performance
+# Fit the GLVQ object to the data and print the performance
 
 # Object to perform z-transform
 scaler = StandardScaler()
@@ -79,7 +79,7 @@ ax.grid(False)
 #   Note that the relevance diagonal adds up to one.
 
 ###############################################################################
-# Transforming the X
+# Transforming the data
 # .....................
 # In addition to making predictions GMLVQ can transform the X using the eigenvectors of the
 # relevance matrix.

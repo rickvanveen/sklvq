@@ -231,7 +231,7 @@ class GMLVQ(LVQBaseClass):
         """
         np.copyto(self._variables, new_variables)
         if self._needs_normalizing():
-            GMLVQ._normalise_omega()
+            GMLVQ._normalise_omega(self.omega_)
 
     def set_model_params(self, new_model_params: ModelParamsType):
         """
@@ -274,7 +274,7 @@ class GMLVQ(LVQBaseClass):
 
     def get_omega(self):
         """
-        Convenience function to return self.omega_
+        Convenience function to return ``self.omega_``
 
         Returns
         -------
@@ -285,12 +285,12 @@ class GMLVQ(LVQBaseClass):
 
     def set_omega(self, omega):
         """
-        Convenience function that makes sure to copy the value to self.omega_ and not overwrite
+        Convenience function that makes sure to copy the value to ``self.omega_`` and not overwrite
         it.
 
         Parameters
         ----------
-        omega : ndarray with same shape as self.omega_
+        omega : ndarray with same shape as ``self.omega_``
         
         """
         np.copyto(self.omega_, omega)
@@ -493,7 +493,7 @@ class GMLVQ(LVQBaseClass):
             raise ValueError("Provided relevance_init is invalid.")
 
         if normalization:
-            GMLVQ._normalise_omega()
+            GMLVQ._normalise_omega(self.omega_)
 
     def _init_objective(self):
         self._objective = GeneralizedLearningObjective(

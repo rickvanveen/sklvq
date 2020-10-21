@@ -66,15 +66,19 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
            Evaluation of the distance between each sample in the data and prototype of the model.
         """
 
-        distance_function = "mahalanobis"
         if self.force_all_finite == "allow-nan" or False:
-            distance_function = _nan_mahalanobis
+            return cdist(
+                data,
+                model.prototypes_,
+                _nan_mahalanobis,
+                relevance_matrix=model._compute_lambda(model.omega_),
+            )
 
         return (
             cdist(
                 data,
                 model.prototypes_,
-                distance_function,
+                "mahalanobis",
                 VI=model._compute_lambda(model.omega_),
             )
             ** 2
@@ -143,12 +147,12 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
         return distance_gradient
 
 
-def _nan_mahalanobis(sample, prototype, VI=None):
+def _nan_mahalanobis(sample, prototype, relevance_matrix=None):
     # The NaNLVQ variant of the mahalanobis distance
     difference = sample - prototype
     difference[np.isnan(difference)] = 0.0
-    # Equal to difference.dot(VI).dot(difference)
-    return np.einsum("i, ij, i ->", difference, VI, difference)
+    return difference.dot(relevance_matrix).dot(difference.T)
+    # return np.einsum("i, ij, j ->", difference, relevance_matrix, difference)
 
 
 def _prototype_gradient(

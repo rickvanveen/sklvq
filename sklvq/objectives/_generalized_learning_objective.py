@@ -213,7 +213,7 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
         )
 
         # Computes the following partial derivatives: ddi/dwi, with i = 2
-        distance_gradient = model.distance.gradient(data, model, i_prototype)
+        distance_gradient = model._distance.gradient(data, model, i_prototype)
 
         # The distance vectors weighted by the activation and discriminant partial
         # derivatives.
@@ -241,7 +241,7 @@ def _compute_distance(data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass
 
     # Step 1: Compute distances between X and the model (how is depending on model and coupled
     # distance function)
-    distances = model.distance(data, model)
+    distances = model._distance(data, model)
 
     # Step 2: Find for all samples the distance between closest prototype with same label (d1)
     # and different label (d2). ii_same marks for all samples the prototype with the same label.

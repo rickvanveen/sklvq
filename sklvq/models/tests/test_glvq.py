@@ -11,8 +11,6 @@ from sklearn.pipeline import make_pipeline
 
 from .. import GLVQ
 
-# TODO: Test INIT
-
 
 def test_glvq():
     iris = datasets.load_iris()

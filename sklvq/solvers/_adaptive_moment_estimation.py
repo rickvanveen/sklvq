@@ -102,6 +102,12 @@ class AdaptiveMomentEstimation(SolverBaseClass):
         self.beta2 = beta2
         self.step_size = step_size
         self.epsilon = epsilon
+
+        if callback is not None:
+            if not callable(callback):
+                raise ValueError(
+                    "{}:  callback is not callable.".format(type(self).__name__)
+                )
         self.callback = callback
 
     def solve(

@@ -40,11 +40,11 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
 
     # Public attributes
     prototypes_: np.ndarray
-    distance: Union[DistanceBaseClass, object]
 
     # "Private" attributes
+    _distance: Union[DistanceBaseClass, object]
     _objective: GeneralizedLearningObjective
-    _solver: SolverBaseClass
+    _solver: Union[SolverBaseClass, object]
 
     # Related to model parameters
     _prototypes_size: int
@@ -460,7 +460,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
             distances, self.distance_type, valid_class_types=self.valid_distances,
         )
 
-        self.distance = distance_class(**distance_params)
+        self._distance = distance_class(**distance_params)
 
     def _init_solver(self) -> None:
         """
@@ -604,12 +604,13 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
 
         return self
 
-    def decision_function(self, X: np.ndarray):
-        """ Evaluates the decision function for the samples in X.
-
-        Computes the discriminant scores using the discriminant function. Changing the
-        discriminant function, currently requires rewriting the ``predict_proba()`` function as
-        well.
+    def _multiclass_decision_function(self, X: np.ndarray):
+        """
+        Computes the decision values and returns shape (n_observations, n_classes). The values
+        are constructed by computing: the distance between an observation and the prototype with
+        a different label minus the distance between that observation and the closest prototype
+        with the same label, where "the same" is defined to be the index of the column the value
+        is being computed for.
 
         Parameters
         ----------
@@ -618,7 +619,40 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
 
         Returns
         -------
-        discriminant_scores : ndarray of shape (n_observations, n_classes)
+        ndarray of shape (n_observations, n_classes)
+
+        """
+        # Of shape n_observations , n_prototypes
+        distances = self._distance(X, self)
+
+        # Allocation n_observations, n_classes
+        decision_values = np.zeros((X.shape[0], self.classes_.size))
+
+        # return n_observations, n_classes
+        for i, _ in enumerate(self.classes_):
+            decision_values[:, i] = distances[:, self.prototypes_labels_ != i].min(
+                axis=1
+            ) - distances[:, self.prototypes_labels_ == i].min(axis=1)
+
+        return decision_values
+
+    def decision_function(self, X: np.ndarray):
+        """
+        Evaluates the decision function for the samples in X.
+        Shape for binary class is (n_observations,) with the decision values for the "greater"
+        class. In the multiclass case it returns decision values for each class and therefore has
+        the shape (n_observations, n_classes).
+
+        Parameters
+        ----------
+        X : ndarray
+            The data.
+
+        Returns
+        -------
+        decision_values : ndarray
+            Binary case shape is (n_observations,) and the multiclass case (n_observations,
+            n_classes)
 
         """
         # SciKit-learn list of checked params before predict
@@ -627,28 +661,17 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         # Input validation
         X = check_array(X, force_all_finite=self.force_all_finite)
 
-        # Of shape n_observations , n_prototypes
-        distances = self.distance(X, self)
+        decision_values = self._multiclass_decision_function(X)
 
-        # Allocation n_observations, n_classes
-        discriminant_scores = np.zeros((X.shape[0], self.classes_.size))
+        if self.classes_.size == 2:
+            # The decision function needs to return (n_samples,) for the "greater" class.
+            return decision_values[:, 1]
 
-        # return n_observations, n_classes
-        for i, _ in enumerate(self.classes_):
-            discriminant_scores[:, i] = self._objective.discriminant(
-                distances[:, self.prototypes_labels_ == i].min(axis=1),
-                distances[:, self.prototypes_labels_ != i].min(axis=1),
-            )
-
-        return discriminant_scores
+        # else it should  return (n_samples, n_classes)
+        return decision_values
 
     def predict_proba(self, X: np.ndarray):
         """
-        Turns decision values into confidence scores ("probabilities"). Very tied to the
-        currently only supported discriminant function... by converting the range [-1, 1] to 2
-        -  [0, 2] and normalizing it by dividing it by the sum of the discriminant values. Now
-        the most negative value has the highest "probability" and the most positive the lowest.
-
         Parameters
         ----------
         X  : ndarray
@@ -659,14 +682,20 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         confidence_scores : ndarray of shape (n_observations, n_classes)
 
         """
-        decision_values = self.decision_function(X)
+        # SciKit-learn list of checked params before predict
+        check_is_fitted(self)
 
-        decision_values = 2 - (decision_values + 1)
-        sum_decision_values = np.sum(decision_values, axis=1)
+        # Input validation
+        X = check_array(X, force_all_finite=self.force_all_finite)
 
-        confidence_scores = decision_values / sum_decision_values[:, np.newaxis]
+        # Between -1  and 1
+        decision_values = self._multiclass_decision_function(X)
 
-        return confidence_scores
+        # Softmax function (keeps the same scipy.stats.rankdata)
+        #  Very  arbitrary  0.01, which also might not always work?
+        exp_decision_values = np.exp(0.01 * decision_values)
+
+        return exp_decision_values / np.sum(exp_decision_values, axis=1)[:, np.newaxis]
 
     def predict(self, X: np.ndarray):
         """ Predict function
@@ -692,12 +721,15 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         # X = self._validate_data(X, force_all_finite=self.force_all_finite)
         decision_values = self.decision_function(X)
 
+        if self.classes_.size == 2:
+            return self.classes_[(decision_values > 0).astype(np.int)]
+
         # Lower value is the closest prototype.
-        return self.classes_[decision_values.argmin(axis=1)]
+        return self.classes_[decision_values.argmax(axis=1)]
 
 
 def _conditional_mean(p_labels: np.ndarray, data: np.ndarray, d_labels: np.ndarray):
-    """ Implements the conditional mean, i.e., mean per class"""
+    """ Implements the conditional mean (ignoring nan values), i.e., mean per class"""
     return np.array(
         [np.nanmean(data[p_label == d_labels, :], axis=0) for p_label in p_labels]
     )

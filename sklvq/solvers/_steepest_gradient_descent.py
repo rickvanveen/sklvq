@@ -114,7 +114,7 @@ class SteepestGradientDescent(SolverBaseClass):
             )
         self.batch_size = batch_size
 
-        if step_size <= 0:
+        if np.all(step_size <= 0):
             raise ValueError(
                 "{}:  Expected step_size to be > 0, but got step_size = {}".format(
                     type(self).__name__, step_size
@@ -122,10 +122,11 @@ class SteepestGradientDescent(SolverBaseClass):
             )
         self.step_size = step_size
 
-        if not callable(callback):
-            raise ValueError(
-                "{}:  callback is not callable.".format(type(self).__name__)
-            )
+        if callback is not None:
+            if not callable(callback):
+                raise ValueError(
+                    "{}:  callback is not callable.".format(type(self).__name__)
+                )
         self.callback = callback
 
     def solve(

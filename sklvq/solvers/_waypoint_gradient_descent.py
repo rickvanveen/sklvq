@@ -124,7 +124,7 @@ class WaypointGradientDescent(SolverBaseClass):
             )
         self.max_runs = max_runs
 
-        if step_size <= 0:
+        if np.all(step_size <= 0):
             raise ValueError(
                 "{}:  Expected step_size to be > 0, but got step_size = {}".format(
                     type(self).__name__, step_size
@@ -156,10 +156,11 @@ class WaypointGradientDescent(SolverBaseClass):
             )
         self.k = k
 
-        if not callable(callback):
-            raise ValueError(
-                "{}:  callback is not callable.".format(type(self).__name__)
-            )
+        if callback is not None:
+            if not callable(callback):
+                raise ValueError(
+                    "{}:  callback is not callable.".format(type(self).__name__)
+                )
         self.callback = callback
 
     def solve(
