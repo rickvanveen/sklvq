@@ -1,19 +1,18 @@
 .. -*- mode: rst -*-
 
-|CodeCov|_ |ReadTheDocs|_ |CodeStyleBlack|_ |CodeFactor|_
+|AzurePipelines|_ |CodeCov|_ |CodeStyleBlack|_ |CodeFactor|_
 
+.. |AzurePipelines| image:: https://dev.azure.com/rvanveen133/sklvq/_apis/build/status/rickvanveen.sklvq?branchName=develop
+.. _AzurePipelines: https://dev.azure.com/rvanveen133/sklvq/
 
-.. |CodeCov| image:: https://codecov.io/gh/rickvanveen/sklvq/branch/master/graph/badge.svg
+.. |CodeCov| image:: https://codecov.io/gh/rickvanveen/sklvq/branch/develop/graph/badge.svg
 .. _CodeCov: https://codecov.io/gh/rickvanveen/sklvq
-
-.. |ReadTheDocs| image:: https://readthedocs.org/projects/sklvq/badge/?version=latest
-.. _ReadTheDocs: https://sklvq.readthedocs.io/en/latest/?badge=latest
 
 .. |CodeStyleBlack| image:: https://img.shields.io/badge/code%20style-black-000000.svg
 .. _CodeStyleBlack: https://github.com/psf/black
 
-.. |CodeFactor| image:: https://www.codefactor.io/repository/github/rickvanveen/sklvq/badge/master
-.. _CodeFactor: https://www.codefactor.io/repository/github/rickvanveen/sklvq/overview/master
+.. |CodeFactor| image:: https://www.codefactor.io/repository/github/rickvanveen/sklvq/badge/develop
+.. _CodeFactor: https://www.codefactor.io/repository/github/rickvanveen/sklvq/badge/develop
 
 
 sklvq - A collection of expandable Learning Vector Quantization algorithms
