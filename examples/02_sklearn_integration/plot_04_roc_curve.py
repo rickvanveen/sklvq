@@ -68,9 +68,7 @@ npc_fpr = fp / (fp + tn)
 fig, ax = plt.subplots()
 fig.suptitle("Receiver operating characteristic ")
 # Plot the ROC curve
-ax.plot(
-    fpr, tpr, color="darkorange", lw=2, label="ROC AUC = {:.3f}".format(roc_auc)
-)
+ax.plot(fpr, tpr, color="darkorange", lw=2, label="ROC AUC = {:.3f}".format(roc_auc))
 # Plot the random line
 ax.plot([0, 1], [0, 1], color="navy", lw=2, linestyle="--")
 # Plot the NPC classifier
