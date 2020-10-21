@@ -7,21 +7,14 @@ steps:
   - script: |
       python -m pip install --upgrade pip
       pip install .[tests]
-    displayName: 'Install dependencies'
+    displayName: 'Install test dependencies'
 
   - script: |
       pip install pytest pytest-azurepipelines
-      pytest ./sklvq --doctest-modules --junitxml=junit/test-results.xml --cov=. --cov-report=xml --cov-report=html
-    displayName: 'Test with pytest and generate coverage'
+      pytest ./sklvq --cov-./
+    displayName: 'Run tests and generate coverage'
 
-  - task: PublishTestResults@2
-    condition: succeededOrFailed()
-    inputs:
-      testResultsFiles: '**/test-*.xml'
-      testRunTitle: 'Publish test results for Python $(python.version)'
+  - script: |
+      bash <(curl -s https://codecov.io/bash)
+    displayName: 'Upload coverage report to codecov.io'
 
-  - task: PublishCodeCoverageResults@1
-    inputs:
-      codeCoverageTool: Cobertura
-      summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
-      reportDirectory: '$(System.DefaultWorkingDirectory)/**/htmlcov'
