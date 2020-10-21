@@ -1,5 +1,0 @@
-name: sklvq
-dependencies:
-  - numpy
-  - scipy
-  - scikit-learn
