@@ -28,26 +28,20 @@ def _import_class_from_string(package_string: str, class_string: str) -> type:
         module = import_module("." + module_string, package_string)
     except ModuleNotFoundError:
         raise ImportError(
-            "{}.{} is not part of our collection".format(
-                module_string, class_string
-            )
+            "{}.{} is not part of our collection".format(module_string, class_string)
         )
     try:
         specified_class = getattr(module, class_string)
     except (AttributeError, TypeError):
         raise ImportError(
-            "{}.{} is not part of our collection".format(
-                module_string, class_string
-            )
+            "{}.{} is not part of our collection".format(module_string, class_string)
         )
     return specified_class
 
 
 def init_class(package, class_type, valid_class_types=None):
     if isinstance(class_type, str):
-        parameter_class = package.import_from_string(
-            class_type, valid_class_types
-        )
+        parameter_class = package.import_from_string(class_type, valid_class_types)
     elif isinstance(class_type, type):
         parameter_class = class_type
     else:

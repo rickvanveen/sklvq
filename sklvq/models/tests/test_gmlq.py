@@ -1,6 +1,4 @@
-import pytest
 import numpy as np
-
 from sklearn import datasets
 from sklearn import preprocessing
 from sklearn.model_selection import (

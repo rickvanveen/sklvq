@@ -1,5 +1,6 @@
-from . import ActivationBaseClass
 import numpy as np
+
+from . import ActivationBaseClass
 
 
 class Identity(ActivationBaseClass):
@@ -11,6 +12,7 @@ class Identity(ActivationBaseClass):
     --------
     Sigmoid, SoftPlus, Swish
     """
+
     __slots__ = ()
 
     def __call__(self, x: np.ndarray) -> np.ndarray:

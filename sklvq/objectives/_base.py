@@ -1,8 +1,7 @@
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
 import numpy as np
-
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ..models._base import LVQBaseClass
@@ -14,14 +13,12 @@ class ObjectiveBaseClass(ABC):
     Abstract class for implementing objective functions. It provides abstract methods with
     expected call signatures.
     """
+
     __slots__ = ()
 
     @abstractmethod
     def __call__(
-        self,
-        model: "LVQBaseClass",
-        data: np.ndarray,
-        labels: np.ndarray,
+        self, model: "LVQBaseClass", data: np.ndarray, labels: np.ndarray,
     ):
         """ The objective function
 
@@ -50,10 +47,7 @@ class ObjectiveBaseClass(ABC):
 
     @abstractmethod
     def gradient(
-        self,
-        model: "LVQBaseClass",
-        data: np.ndarray,
-        labels: np.ndarray,
+        self, model: "LVQBaseClass", data: np.ndarray, labels: np.ndarray,
     ):
         """ The objective gradient
 

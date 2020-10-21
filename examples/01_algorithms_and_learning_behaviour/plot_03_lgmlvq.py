@@ -5,13 +5,12 @@ Local Generalized Matrix LVQ (LGMLVQ)
 
 Example of how to use LGMLVQ on the classic iris dataset.
 """
-import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-
+import numpy as np
 from sklearn.datasets import load_iris
-from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import classification_report
+from sklearn.preprocessing import StandardScaler
 
 from sklvq import LGMLVQ
 
@@ -37,7 +36,9 @@ data = scaler.fit_transform(data)
 
 # Initialize GMLVQ object
 model = LGMLVQ(
-    relevance_params={"localization": "class"}, # Can either be per "class" or "prototype"
+    relevance_params={
+        "localization": "class"
+    },  # Can either be per "class" or "prototype"
     distance_type="local-adaptive-squared-euclidean",
     activation_type="swish",
     activation_params={"beta": 2},

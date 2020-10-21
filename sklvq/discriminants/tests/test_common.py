@@ -1,8 +1,7 @@
 from sklvq import discriminants
-from sklvq.discriminants import DiscriminantBaseClass
 from sklvq._utils import init_class
-
 from sklvq.discriminants import ALIASES
+from sklvq.discriminants import DiscriminantBaseClass
 
 
 def check_init_discriminant(discriminant_string):

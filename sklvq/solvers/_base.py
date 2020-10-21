@@ -1,12 +1,11 @@
 from abc import ABC, abstractmethod
+from typing import List, Any
+from typing import TYPE_CHECKING
 
 import numpy as np
 import scipy.optimize as spo
 
 from ..objectives import ObjectiveBaseClass
-
-from typing import Union, List, Any
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ..models import LVQBaseClass
@@ -56,6 +55,7 @@ class ScipyBaseSolver(SolverBaseClass):
     --------
     BroydenFletcherGoldfarbShanno, LimitedMemoryBfgs
     """
+
     def __init__(self, objective, method: str = "L-BFGS-B", **kwargs):
         self.method = method
         self.params = kwargs

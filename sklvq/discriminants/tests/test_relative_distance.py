@@ -1,6 +1,6 @@
-from .test_common import check_init_discriminant
-
 import numpy as np
+
+from .test_common import check_init_discriminant
 
 
 def test_relative_distance():

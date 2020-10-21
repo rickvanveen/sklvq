@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+
 import numpy as np
 
 
@@ -14,6 +15,7 @@ class DiscriminantBaseClass(ABC):
     --------
     RelativeDistance
     """
+
     __slots__ = ()
 
     @abstractmethod

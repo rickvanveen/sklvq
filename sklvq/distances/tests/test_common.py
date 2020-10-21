@@ -1,10 +1,9 @@
 import numpy as np
 
 from sklvq import distances
-from sklvq.distances import DistanceBaseClass
 from sklvq._utils import init_class
-
 from sklvq.distances import ALIASES
+from sklvq.distances import DistanceBaseClass
 
 
 class DummyLVQ:
@@ -38,10 +37,10 @@ class DummyLVQ:
             self.omega_ = None
 
     def to_prototypes(self, var_buffer):
-        return var_buffer[:self._prototypes_size].reshape(self._prototypes_shape)
+        return var_buffer[: self._prototypes_size].reshape(self._prototypes_shape)
 
     def to_omega(self, var_buffer):
-        return var_buffer[self._prototypes_size:].reshape(self._omega_shape)
+        return var_buffer[self._prototypes_size :].reshape(self._omega_shape)
 
     def get_model_params(self):
         if self.omega_ is not None:

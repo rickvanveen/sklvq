@@ -579,9 +579,7 @@ class LGMLVQ(LVQBaseClass):
     # Transformer related functions
     ###########################################################################################
 
-    def fit_transform(
-        self, X: np.ndarray, y: np.ndarray, **trans_params
-    ) -> np.ndarray:
+    def fit_transform(self, X: np.ndarray, y: np.ndarray, **trans_params) -> np.ndarray:
         r"""
 
         Parameters

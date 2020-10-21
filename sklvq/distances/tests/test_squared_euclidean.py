@@ -1,8 +1,8 @@
 import numpy as np
 
-from .test_common import check_init_distance
-from .test_common import check_distance
 from .test_common import DummyLVQ
+from .test_common import check_distance
+from .test_common import check_init_distance
 
 
 def test_squared_euclidean():

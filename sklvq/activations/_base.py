@@ -1,6 +1,6 @@
-import numpy as np
-
 from abc import ABC, abstractmethod
+
+import numpy as np
 
 
 class ActivationBaseClass(ABC):
@@ -15,6 +15,7 @@ class ActivationBaseClass(ABC):
     --------
     Identity, Sigmoid, SoftPlus, Swish
     """
+
     __slots__ = ()
 
     @abstractmethod
