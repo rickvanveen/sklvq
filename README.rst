@@ -15,7 +15,7 @@
 .. _CodeStyleBlack: https://github.com/psf/black
 
 .. |CodeFactor| image:: https://www.codefactor.io/repository/github/rickvanveen/sklvq/badge/master
-.. _CodeFactor: https://www.codefactor.io/repository/github/rickvanveen/sklvq/badge/master
+.. _CodeFactor: https://www.codefactor.io/repository/github/rickvanveen/sklvq/
 
 
 sklvq - A collection of expandable Learning Vector Quantization algorithms
