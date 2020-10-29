@@ -18,8 +18,8 @@ steps:
 
   - ${{ if eq(parameters.coverage, false) }}:
       - script: |
-        pip install pytest pytest-azurepipelines
-        pytest ./sklvq
+          pip install pytest pytest-azurepipelines
+          pytest ./sklvq
         displayName: 'Run tests'
 
 
