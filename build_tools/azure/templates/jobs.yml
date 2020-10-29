@@ -1,23 +1,30 @@
 parameters:
-- name: name  # defaults for any parameters that aren't specified
-  default: ''
-- name: vmImage
-  default: ''
+  -
+    default: ""
+    name: name
+  -
+    default: ""
+    name: vmImage
 
-jobs: test
-  -job: ${{ parameters.name }}
-    dependsOn: [Linting]
+jobs:
+  -
+    dependsOn:
+      - Linting
+    job: "${{ parameters.name }}"
     pool:
-      vmImage: ${{ parameters.vmImage }}
+      vmImage: "${{ parameters.vmImage }}"
+    steps:
+      -
+        template: build_tools/azure/templates/steps.yml
     strategy:
       matrix:
         Python36:
-          python.version: '3.6'
+          python.version: "3.6"
         Python37:
-          python.version: '3.7'
+          python.version: "3.7"
         Python38:
-          python.version: '3.8'
+          python.version: "3.8"
         Python39:
-          python.version: '3.9'
-    steps:
-    - template: build_tools/azure/templates/steps.yml
+          python.version: "3.9"
+
+
