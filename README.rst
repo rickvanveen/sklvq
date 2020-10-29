@@ -1,9 +1,12 @@
 .. -*- mode: rst -*-
 
-|AzurePipelines|_ |CodeCov|_ |CodeStyleBlack|_ |CodeFactor|_
+|AzurePipelines|_ |ReadTheDocs|_ |CodeCov|_ |CodeStyleBlack|_ |CodeFactor|_
 
 .. |AzurePipelines| image:: https://dev.azure.com/rvanveen133/sklvq/_apis/build/status/rickvanveen.sklvq?branchName=develop
 .. _AzurePipelines: https://dev.azure.com/rvanveen133/sklvq/
+
+.. |ReadTheDocs| image:: https://readthedocs.org/projects/sklvq/badge/?version=latest
+.. _ReadTheDocs: https://sklvq.readthedocs.io/en/latest/?badge=latest
 
 .. |CodeCov| image:: https://codecov.io/gh/rickvanveen/sklvq/branch/develop/graph/badge.svg
 .. _CodeCov: https://codecov.io/gh/rickvanveen/sklvq
