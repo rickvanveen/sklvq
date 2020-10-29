@@ -52,11 +52,11 @@ class AdaptiveMomentEstimation(SolverBaseClass):
     max_runs: int
         Number of runs over all the X. Should be >= 1
     beta1: float
-        Controls the decay rate of the moving average of the gradient. Should be less than 1.0
-        and greater than 0.
+        Controls the decay rate of the moving average of the gradient. Should be < 1.0
+        and > 0.
     beta2: float
-        Controls the decay rate of the moving average of the squared gradient. Should be less
-        than 1.0 and greater than 0.
+        Controls the decay rate of the moving average of the squared gradient. Should be < 1.0
+        and > 0.
     step_size: float
         The step size to control the learning rate.
     epsilon: float
@@ -89,7 +89,7 @@ class AdaptiveMomentEstimation(SolverBaseClass):
     def __init__(
         self,
         objective: ObjectiveBaseClass,
-        max_runs: int = 20,
+        max_runs: int = 10,
         beta1: float = 0.9,
         beta2: float = 0.999,
         step_size: float = 0.001,
@@ -97,10 +97,44 @@ class AdaptiveMomentEstimation(SolverBaseClass):
         callback: callable = None,
     ):
         super().__init__(objective)
+        if max_runs <= 0:
+            raise ValueError(
+                "{}:  Expected max_runs to be > 0, but got max_runs = {}".format(
+                    type(self).__name__, max_runs
+                )
+            )
         self.max_runs = max_runs
+
+        if 0 > beta1 > 1.0:
+            raise ValueError(
+                "{}:  Expected beta1 to be > 0 and <= 1.0 but got beta1 = {}".format(
+                    type(self).__name__, beta1
+                )
+            )
         self.beta1 = beta1
+
+        if 0 > beta2 > 1.0:
+            raise ValueError(
+                "{}:  Expected beta1 to be > 0 and <= 1.0 but got beta2 = {}".format(
+                    type(self).__name__, beta2
+                )
+            )
         self.beta2 = beta2
+
+        if np.all(step_size <= 0):
+            raise ValueError(
+                "{}:  Expected step_size to be > 0, but got step_size = {}".format(
+                    type(self).__name__, step_size
+                )
+            )
         self.step_size = step_size
+
+        if epsilon < 0:
+            raise ValueError(
+                "{}:  Expected epsilon to be > 0, but got epsilon = {}".format(
+                    type(self).__name__, epsilon
+                )
+            )
         self.epsilon = epsilon
 
         if callback is not None:
@@ -136,8 +170,8 @@ class AdaptiveMomentEstimation(SolverBaseClass):
         if self.callback is not None:
             state = _update_state(
                 STATE_KEYS,
-                variables=variables,
-                nit=0,
+                variables=np.copy(model.get_variables()),
+                nit="Initial",
                 fun=self.objective(model, data, labels),
             )
             if self.callback(state):
@@ -187,7 +221,7 @@ class AdaptiveMomentEstimation(SolverBaseClass):
             if self.callback is not None:
                 state = _update_state(
                     STATE_KEYS,
-                    variables=model.get_variables(),
+                    variables=np.copy(model.get_variables()),
                     nit=i_run + 1,
                     fun=self.objective(model, data, labels),
                     m_hat=m_hat,

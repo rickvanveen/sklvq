@@ -188,7 +188,7 @@ class WaypointGradientDescent(SolverBaseClass):
         step_size = self.step_size
 
         if self.callback is not None:
-            variables = model.get_variables()
+            variables = np.copy(model.get_variables())
             cost = self.objective(model, data, labels)
             state = _update_state(
                 STATE_KEYS, variables=variables, nit="Initial", nfun=cost, fun=cost
@@ -227,7 +227,7 @@ class WaypointGradientDescent(SolverBaseClass):
                 cost = self.objective(model, data, labels)
                 state = _update_state(
                     STATE_KEYS,
-                    variables=model.get_variables(),
+                    variables=np.copy(model.get_variables()),
                     nit=i_run + 1,
                     nfun=cost,
                     fun=cost,
@@ -288,7 +288,7 @@ class WaypointGradientDescent(SolverBaseClass):
             if self.callback is not None:
                 state = _update_state(
                     STATE_KEYS,
-                    variables=model.get_variables(),
+                    variables=np.copy(model.get_variables()),
                     nit=i_run + 1,
                     tfun=tentative_cost,
                     nfun=new_cost,
