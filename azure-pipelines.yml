@@ -33,11 +33,16 @@ jobs:
 - template: ./build_tools/azure/templates/jobs.yml
   parameters:
     name: Linux
-    vmImage: 'ubuntu-latest'
+    vmImage: 'ubuntu-18.04'
+
+- template: ./build_tools/azure/templates/jobs.yml
+  parameters:
+    name: Windows
+    vmImage: 'vs2017-win2016'
 
 - template: ./build_tools/azure/templates/jobs.yml
   parameters:
     name: MacOs
-    vmImage: 'macOS-latest'
+    vmImage: 'macOS-10.14'
 
 # Add windows and macOS
