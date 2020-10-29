@@ -8,7 +8,7 @@ trigger:
 - develop
 
 jobs:
-- job: linting
+- job: Linting
   displayName: Linting
   pool:
     vmImage: 'ubuntu-20.04'
@@ -30,20 +30,14 @@ jobs:
         flake8 ./examples --ignore E501,E203,W503
       displayName: 'Run lint Test'
 
-- job: testing
-  displayName: Testing
-  pool:
-    vmImage: 'ubuntu-20.04'
-  dependsOn: [linting]
-  strategy:
-    matrix:
-      Python36:
-        python.version: '3.6'
-      Python37:
-        python.version: '3.7'
-      Python38:
-        python.version: '3.8'
-  steps:
-  - template: ./build_tools/azure/templates/steps.yml
+- template: ./build_tools/azure/templates/jobs.yml
+  parameters:
+    name: Linux
+    vmImage: 'ubuntu-latest'
+
+- template: ./build_tools/azure/templates/jobs.yml
+  parameters:
+    name: MacOs
+    vmImage: 'macOS-latest'
 
 # Add windows and macOS

@@ -1,0 +1,23 @@
+parameters:
+- name: name  # defaults for any parameters that aren't specified
+  default: ''
+- name: vmImage
+  default: ''
+
+jobs: test
+  - job: ${{parameters.name}}
+    dependsOn: [Linting]
+    pool:
+      vmImage: ${{parameters.vmImage}}
+    strategy:
+      matrix:
+        Python36:
+          python.version: '3.6'
+        Python37:
+          python.version: '3.7'
+        Python38:
+          python.version: '3.8'
+        Python39:
+          python.version: '3.9'
+    steps:
+    - template: build_tools/azure/templates/steps.yml
