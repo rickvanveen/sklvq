@@ -438,10 +438,11 @@ class GMLVQ(LVQBaseClass):
             return
 
         if isinstance(step_sizes, np.ndarray):
-            if step_sizes.size == 2:
+            if step_sizes.size > 1:
                 prototypes, omega = self.to_model_params_view(gradient)
                 prototypes *= step_sizes[0]
                 omega *= step_sizes[1]
+            # if size is more than 2 it just ignores the additional values.
 
     ###########################################################################################
     # Initialization functions

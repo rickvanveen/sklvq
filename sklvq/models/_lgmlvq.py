@@ -459,7 +459,7 @@ class LGMLVQ(LVQBaseClass):
             return
 
         if isinstance(step_sizes, np.ndarray):
-            if step_sizes.size == 2:
+            if step_sizes.size > 1:
                 prototypes, omegas = self.to_model_params_view(gradient)
                 prototypes *= step_sizes[0]
                 omegas *= step_sizes[1]
