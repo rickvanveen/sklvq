@@ -4,7 +4,6 @@ parameters:
 - name: vmImage
   default: ''
 - name: coverage
-  displayName: Generate coverage?
   type: boolean
   default: false
 
@@ -23,4 +22,6 @@ jobs:
           python.version: '3.8'
     steps:
     - template: ./steps.yml
+      parameters:
+        coverage: ${{ parameters.coverage }}
 

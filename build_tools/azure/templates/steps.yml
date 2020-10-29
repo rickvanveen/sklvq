@@ -1,3 +1,8 @@
+parameters:
+- name: coverage
+  type: boolean
+  default: false
+
 steps:
   - task: UsePythonVersion@0
     inputs:
