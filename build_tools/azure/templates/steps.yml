@@ -7,14 +7,19 @@ steps:
   - script: |
       python -m pip install --upgrade pip
       pip install .[tests]
+      pip install pytest pytest-azurepipelines
     displayName: 'Install test dependencies'
 
-  - script: |
-      pip install pytest pytest-azurepipelines
-      pytest ./sklvq --cov=./
-    displayName: 'Run tests and generate coverage'
+  - ${{ if eq(parameters.coverage, true) }}:
+    - script: |
+        pytest ./sklvq --cov=./
+        bash <(curl -s https://codecov.io/bash)
+      displayName: 'Run tests and upload coverage'
 
-  - script: |
-      bash <(curl -s https://codecov.io/bash)
-    displayName: 'Upload coverage report to codecov.io'
+  - ${{ if eq(parameters.coverage, false) }}:
+      - script: |
+        pip install pytest pytest-azurepipelines
+        pytest ./sklvq
+        displayName: 'Run tests'
+
 

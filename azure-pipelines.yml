@@ -34,15 +34,18 @@ jobs:
   parameters:
     name: Linux
     vmImage: 'ubuntu-18.04'
+    coverage: true
 
 - template: ./build_tools/azure/templates/jobs.yml
   parameters:
     name: Windows
     vmImage: 'vs2017-win2016'
+    coverage: false
 
 - template: ./build_tools/azure/templates/jobs.yml
   parameters:
     name: MacOs
     vmImage: 'macOS-10.14'
+    coverage: false
 
 # Add windows and macOS

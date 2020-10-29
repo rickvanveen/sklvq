@@ -3,6 +3,10 @@ parameters:
   default: ''
 - name: vmImage
   default: ''
+- name: coverage
+  displayName: Generate coverage?
+  type: boolean
+  default: false
 
 jobs:
   - job: ${{ parameters.name }}
