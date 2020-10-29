@@ -5,10 +5,10 @@ parameters:
   default: ''
 
 jobs: test
-  - job: ${{parameters.name}}
+  -job: ${{ parameters.name }}
     dependsOn: [Linting]
     pool:
-      vmImage: ${{parameters.vmImage}}
+      vmImage: ${{ parameters.vmImage }}
     strategy:
       matrix:
         Python36:
