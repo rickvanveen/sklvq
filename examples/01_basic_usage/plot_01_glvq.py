@@ -1,9 +1,12 @@
 """
+.. _GLVQ:
+
 ======================
 Generalized LVQ (GLVQ)
 ======================
 
-Example of how to use the GLVQ algorithm on the classic iris dataset.
+Example of how to fit the GLVQ `[1]`_ algorithm on the classic iris dataset.
+
 """
 import matplotlib
 import matplotlib.pyplot as plt
@@ -16,23 +19,26 @@ from sklvq import GLVQ
 matplotlib.rc("xtick", labelsize="small")
 matplotlib.rc("ytick", labelsize="small")
 
+# Contains also the target_names and feature_names, which we will use for the plots.
 iris = load_iris()
+
 data = iris.data
 labels = iris.target
 
 ###############################################################################
 # Fitting the Model
-# .......................
+# .................
+# Scale the data and create a GLVQ object with, e.g., custom distance function, activation
+# function and solver. See the API reference under documentation for defaults and other
+# possible parameters.
 
-# Create a GLVQ object and pass it a distance function, activation function and solver. See the
-# API reference under documentation for defaults and other possible parameters.
-
-# Object to perform z-transform
+# Sklearn's standardscaler to perform z-transform
 scaler = StandardScaler()
 
 # Compute (fit) and apply (transform) z-transform
 data = scaler.fit_transform(data)
 
+# The creation of the model object used to fit the data to.
 model = GLVQ(
     distance_type="squared-euclidean",
     activation_type="swish",
@@ -42,7 +48,9 @@ model = GLVQ(
 )
 
 ###############################################################################
-# Fit the GLVQ object to the X and print the performance
+# The next step is to fit the GLVQ object to the data and use the predict method to make the
+# predictions. Note that this example only works on the training data and therefor does not say
+# anything about the generalizability of the fitted model.
 
 # Train the model using the iris dataset
 model.fit(data, labels)
@@ -50,15 +58,16 @@ model.fit(data, labels)
 # Predict the labels using the trained model
 predicted_labels = model.predict(data)
 
-# Print a classification report (sklearn)
+# To get a sense of the training performance we could print the classification report.
 print(classification_report(labels, predicted_labels))
 
 ###############################################################################
-# Plotting the Prototypes
-# .......................
-
-# The GLVQ model produces prototypes as representations for the different classes. These
-# prototypes can be accessed and, e.g., plotted for visual inspection.
+# Extracting the Prototypes
+# .........................
+# The GLVQ model produces prototypes as representations for the different
+# classes. These prototypes can be accessed and, e.g., plotted for visual inspection. Note that
+# the prototypes of the model are within the z-score space and are transformed back before they
+# are plotted.
 
 colors = ["blue", "red", "green"]
 num_prototypes = model.prototypes_.shape[0]
@@ -87,3 +96,9 @@ for i, prototype in enumerate(model.prototypes_):
         )
     ax[i].set_ylabel("cm")
     ax[i].legend()
+
+###############################################################################
+# References
+# ..........
+# _`[1]` Sato, A., and Yamada, K. (1996) “Generalized Learning Vector Quantization.” Advances in
+# Neural Network Information Processing Systems, 423–429, 1996.

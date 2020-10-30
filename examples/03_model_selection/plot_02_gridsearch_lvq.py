@@ -2,10 +2,13 @@
 ===========
 Grid Search
 ===========
-"""
 
-###############################################################################
-# First, imports and load iris dataset
+Cross validation  is not the whole story as it only can tell you  the expected performance of a
+single set of (hyper) parameters. Luckily  sklearn also provides a way of trying out multiple
+settings and return the CV scores for each of them. We can use `gridsearch`_ for this.
+
+.. _gridsearch: https://scikit-learn.org/stable/modules/grid_search.html
+"""
 
 from sklearn.datasets import load_iris
 from sklearn.model_selection import GridSearchCV, RepeatedStratifiedKFold
@@ -13,32 +16,32 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
 from sklvq import GMLVQ
-
-# Slightly more interesting dataset
 data, labels = load_iris(return_X_y=True)
 
 ###############################################################################
 # We first need to create a pipeline and initialize a parameter grid we want to search.
 
-# Initialize the standardScaler (z-transform) object
+# Create the standard scaler instance
 standard_scaler = StandardScaler()
 
-# Initialize the GMLVQ model
+# Create the GMLVQ model instance
 model = GMLVQ()
 
-# Create pipeline that first scales the X and that inputs it to the GMLVQ model
+# Link them together by using sklearn's pipeline
 pipeline = make_pipeline(standard_scaler, model)
 
-# These are some of the relevant solver, distances and activation types for GMLVQ
+# We want to see the difference in performance of the two following solvers
 solvers_types = [
     "steepest-gradient-descent",
     "waypoint-gradient-descent",
 ]
 
+# Currently, the  sklvq package contains only the following distance function compatible with
+# GMLVQ. However, see the customization examples for writing your own.
 distance_types = ["adaptive-squared-euclidean"]
 
-# We are using a pipeline so we need to prepend the parameters with the name of the
-# class we want to provide the arguments to.
+# Because we are using a pipeline we need to prepend the parameters with the name of the
+# class of instance we want to provide the parameters for.
 param_grid = [
     {
         "gmlvq__solver_type": solvers_types,
@@ -52,11 +55,15 @@ param_grid = [
         "gmlvq__activation_params": [{"beta": beta} for beta in range(1, 4, 1)],
     },
 ]
+# This grid can be read as: for each solver, try each distance type with the identity function,
+# and the sigmoid activation function for each beta in the range(1, 4, 1)
 
 # Initialize a repeated stratiefiedKFold object
 repeated_kfolds = RepeatedStratifiedKFold(n_splits=5, n_repeats=5)
 
-# Provide everything to the GridsearchCV object from sklearn
+# Initilialize the gridsearch CV instance that will fit the pipeline (standard scaler, GMLVQ) to
+# the data for each of the parameter sets in the grid. Where each fit is a 5 times
+# repeated stratified 5 fold cross validation. For each set return the testing accuracy.
 search = GridSearchCV(
     pipeline,
     param_grid,
@@ -67,9 +74,11 @@ search = GridSearchCV(
     verbose=10,
 )
 
-# Fit the X as one would with any other estimator.
+# The gridsearch object can be fitted to the data.
 search.fit(data, labels)
 
 # Print the best CV score and parameters.
 print("\nBest parameter (CV score=%0.3f):" % search.best_score_)
 print(search.best_params_)
+
+#

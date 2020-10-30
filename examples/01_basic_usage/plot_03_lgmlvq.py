@@ -3,7 +3,7 @@
 Local Generalized Matrix LVQ (LGMLVQ)
 =====================================
 
-Example of how to use LGMLVQ on the classic iris dataset.
+Example of how to use LGMLVQ `[1]`_ on the classic iris dataset.
 """
 import matplotlib
 import matplotlib.pyplot as plt
@@ -17,6 +17,7 @@ from sklvq import LGMLVQ
 matplotlib.rc("xtick", labelsize="small")
 matplotlib.rc("ytick", labelsize="small")
 
+# Contains also the target_names and feature_names, which we will use for the plots.
 iris = load_iris()
 
 data = iris.data
@@ -25,16 +26,17 @@ labels = iris.target
 ###############################################################################
 # Fitting the Model
 # .................
-# Create a LGMLVQ object and pass it a distance function, activation function and solver.
-# See the API reference under documentation for defaults.
+# Scale the data and create a LGMLVQ object with, e.g., custom distance function, activation
+# function and solver. See the API reference under documentation for defaults and other
+# possible parameters.
 
-# Object to perform z-transform
+# Sklearn's standardscaler to perform z-transform
 scaler = StandardScaler()
 
 # Compute (fit) and apply (transform) z-transform
 data = scaler.fit_transform(data)
 
-# Initialize GMLVQ object
+# The creation of the model object used to fit the data to.
 model = LGMLVQ(
     relevance_params={
         "localization": "class"
@@ -45,20 +47,30 @@ model = LGMLVQ(
     solver_type="lbfgs",
 )
 
-# Train the model using the scaled X and true labels
+###############################################################################
+# The next step is to fit the LGMLVQ object to the data and use the predict method to make the
+# predictions. Note that this example only works on the training data and therefor does not say
+# anything about the generalizability of the fitted model.
+
+# Train the model using the scaled data and true labels
 model.fit(data, labels)
 
 # Predict the labels using the trained model
 predicted_labels = model.predict(data)
 
-# Print a classification report (sklearn)
+# To get a sense of the training performance we could print the classification report.
 print(classification_report(labels, predicted_labels))
 
 ###############################################################################
 # Extracting the Relevance Matrices
 # .................................
-# GMLVQ learns a "relevance matrix" which can tell us something about which features
-# are most relevant for the classification.
+# In addition to the prototypes (see GLVQ example), LGMLVQ learns a number of matrices `lambda_`
+# which can tell us something about which features are most relevant for the classification per
+# class.  The  number of relevance  matrices is determined by the number of prototypes used per
+# class as well as which localization strategy is used. It can either be a relevance matrix per
+# class (even if there are more prototypes for that class they will share the relevance matrix.
+# Or a relevance matrix per prototype, where each prototype (even if they have the same class)
+# has its own matrix.
 
 colors = ["blue", "red", "green"]
 num_prototypes = model.prototypes_.shape[0]
@@ -85,15 +97,21 @@ for i, lambda_ in enumerate(model.lambda_):
     ax[i].set_ylabel("Weight")
     ax[i].legend()
 
+###############################################################################
+# Note that each diagonal still adds up to one (See GMLVQ example). However, each diagonal
+# summarizes the importance of the features for its corresponding class versus all other classes.
 
 ###############################################################################
 # Transforming the Data
 # .....................
-# In addition to making predictions GMLVQ can transform the data using the eigenvectors of the
-# relevance matrix. And we can do this for every relevance matrix attached to the prototypes.
+# In addition to making predictions LGMLVQ can be used to transform the data using the
+# eigenvectors of the relevance matrices. In contrast to GMLVQ this can be done for each of the
+# matrices separately.
 
 # This will return a 3D shape with the first axis the different relevance matrices'
-# transformations of the data. The 2nd and 3rd axes represent the data within in this new space.
+# transformations of the data. The 2nd and 3rd axes represent the data (n_observations,
+# n_eigenvectors) within this new space.
+
 t_d = model.transform(data, omega_hat_index=[0, 1, 2])[:, :, :2]
 t_m = model.transform(model.prototypes_, omega_hat_index=[0, 1, 2])[:, :, :2]
 
@@ -133,3 +151,9 @@ for i, xy_dm in enumerate(zip(t_d, t_m)):
     ax[i].set_ylabel("Second eigenvector")
     ax[i].legend()
     ax[i].grid(True)
+
+###############################################################################
+# References
+# ..........
+# _`[1]` Schneider, P., Biehl, M., & Hammer, B. (2009). "Adaptive Relevance Matrices in Learning
+# Vector Quantization" Neural Computation, 21(12), 3532–3561, 2009.
