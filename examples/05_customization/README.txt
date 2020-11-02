@@ -4,9 +4,10 @@
 Customization
 =============
 
-The algorithms accept custom activation, discriminant, and distance functions. These custom
-functions are gladly considered to be included in the sklvq package. Please, create a pull request
-on github.
+The algorithms accept custom activation, discriminant and distance functions, as well as solvers.
+Any customization with proper testing and documentation will be considered to be included in the
+sklvq package. Please, create a pull request on github.
 
-Custom models, objectives and solvers are also welcome. However, there is currently no
-way to use them directly without altering the code.
+Custom models and objectives are also welcome. However, as they greatly impact all currently
+implemented  parts and even might work completely differently there is no easy way to make this
+similarly expandable as what currently is.
