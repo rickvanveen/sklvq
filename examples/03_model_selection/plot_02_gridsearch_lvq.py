@@ -16,6 +16,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
 from sklvq import GMLVQ
+
 data, labels = load_iris(return_X_y=True)
 
 ###############################################################################
@@ -80,5 +81,3 @@ search.fit(data, labels)
 # Print the best CV score and parameters.
 print("\nBest parameter (CV score=%0.3f):" % search.best_score_)
 print(search.best_params_)
-
-#
