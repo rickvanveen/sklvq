@@ -22,7 +22,7 @@ ModelParamsType = np.ndarray
 _PROTOTYPES_PARAMS_DEFAULTS = {"prototypes_per_class": 1}
 
 
-class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
+class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin): # lgtm [py/conflicting-attributes]
     """ Learning vector quantization base class
 
     Abstract class for implementing LVQ models. It provides abstract methods with

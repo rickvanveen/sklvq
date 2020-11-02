@@ -254,7 +254,7 @@ class GMLVQ(LVQBaseClass):
         self.set_omega(new_omega)
 
         if self._needs_normalizing():
-            GMLVQ._normalise_omega()
+            GMLVQ._normalise_omega(self.omega_)
 
     def get_model_params(self) -> ModelParamsType:
         """
