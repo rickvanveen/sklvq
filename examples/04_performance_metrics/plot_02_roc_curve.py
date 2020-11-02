@@ -21,8 +21,6 @@ matplotlib.rc("ytick", labelsize="small")
 data, labels = load_breast_cancer(return_X_y=True)
 
 ###############################################################################
-# Fitting the Model
-# .................
 # Create a GMLVQ object and pass it a distance function, activation function and solver. See the
 # API reference under documentation for defaults.
 
@@ -32,7 +30,7 @@ model = GMLVQ(
     activation_params={"beta": 2},
     solver_type="waypoint-gradient-descent",
     solver_params={"max_runs": 10, "k": 3, "step_size": np.array([0.1, 0.05])},
-    random_state=1428,
+    random_state=31415,
 )
 
 ###############################################################################

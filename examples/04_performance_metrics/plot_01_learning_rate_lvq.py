@@ -1,7 +1,7 @@
 """
-=============================
-Extracting Learning Behaviour
-=============================
+==================
+Learning Behaviour
+==================
 
 In these examples GMLVQ is used but the same applies to all the other algorithms. However,
 not each solver provides the same variables. Additionally, the options "lbfgs" and "bfgs" are
@@ -77,7 +77,6 @@ print(classification_report(labels, predicted_labels))
 
 iteration, fun = zip(*[(state["nit"], state["fun"]) for state in logger.states])
 
-fig = plt.figure()
 ax = plt.axes()
 
 ax.set_title("Learning Curve (Less is better)")
@@ -91,7 +90,6 @@ _ = ax.legend(["Cost per iteration"])
 
 tfun, nfun = zip(*[(state["tfun"], state["nfun"]) for state in logger.states])
 
-fig = plt.figure()
 ax = plt.axes()
 
 ax.set_title("Learning Curves (Less is better)")
