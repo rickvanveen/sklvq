@@ -10,7 +10,7 @@ def test_squared_euclidean():
 
     distfun = distance_class()
 
-    data = np.array([[1, 2, 3], [-1, -2, -3]])
+    data = np.array([[1, 2, 3], [-1, -2, -3]], dtype="float64")
     p = np.array([[1, 2, 3], [-1, -2, -3], [0, 0, 0]])
 
     model = DummyLVQ(p)
@@ -18,3 +18,10 @@ def test_squared_euclidean():
     check_distance(distfun, data, model)
 
     # Check force_all_finite settings
+    distfun = distance_class(force_all_finite="allow-nan")
+
+    data[0, 0] = np.nan
+    data[1, 0] = np.nan
+
+    model = DummyLVQ(p)
+    check_distance(distfun, data, model)

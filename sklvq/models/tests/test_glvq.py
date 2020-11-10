@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 from sklearn import datasets
 from sklearn import preprocessing
 from sklearn.model_selection import (
@@ -7,7 +8,32 @@ from sklearn.model_selection import (
 )
 from sklearn.pipeline import make_pipeline
 
+from sklvq.activations._identity import Identity
+
 from .. import GLVQ
+
+
+def test_glvq_hyper_parameters():
+    X, y = datasets.load_iris(return_X_y=True)
+    # Need to call fit else does not get initiated
+
+    # Activation string which does not exist
+    with pytest.raises(ValueError):
+        GLVQ(activation_type="abc123").fit(X, y)
+
+    # Activation object instead of type
+    activation_type = Identity()
+    with pytest.raises(ValueError):
+        GLVQ(activation_type=activation_type).fit(X, y)
+
+    activation_type = Identity
+    with pytest.raises(TypeError):
+        GLVQ(activation_type=activation_type, activation_params={"beta": 0}).fit(X, y)
+
+    GLVQ(activation_type=activation_type).fit(X, y)
+
+
+
 
 
 def test_glvq():

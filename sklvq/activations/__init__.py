@@ -18,5 +18,7 @@ def import_from_string(class_string, valid_strings=None) -> type:
     if valid_strings is not None:
         if not (class_string in valid_strings):
             raise ValueError("Provided activation_type is invalid.")
-
-    return _import_class_from_string(__name__, class_string)
+    try:
+        return _import_class_from_string(__name__, class_string)
+    except (ModuleNotFoundError, ImportError, TypeError):
+        raise ValueError("Provided activation_type is invalid.")
