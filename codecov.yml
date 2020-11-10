@@ -1,0 +1,2 @@
+fixes:
+  - "::sklvq/"         # move root so for codecov.io "sklvq/" => "sklvq/sklvq/"
