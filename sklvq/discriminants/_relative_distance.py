@@ -3,7 +3,7 @@ import numpy as np
 
 
 class RelativeDistance(DiscriminantBaseClass):
-    """ Relative distance function
+    """Relative distance function
 
     Class that holds the relative distance function and gradient as described in [1]_.
 
@@ -17,7 +17,7 @@ class RelativeDistance(DiscriminantBaseClass):
     __slots__ = ()
 
     def __call__(self, dist_same: np.ndarray, dist_diff: np.ndarray) -> np.ndarray:
-        r""" The relative distance discriminant function for a single sample (:math:`\mathbf{x}`):
+        r"""The relative distance discriminant function for a single sample (:math:`\mathbf{x}`):
             .. math::
 
                 \mu(\mathbf{x}) = \frac{d(\mathbf{x}, \mathbf{w}_1) - d(\mathbf{x}, \mathbf{w}_0)}{d(
@@ -44,7 +44,7 @@ class RelativeDistance(DiscriminantBaseClass):
     def gradient(
         self, dist_same: np.ndarray, dist_diff: np.ndarray, same_label: bool
     ) -> np.ndarray:
-        r""" Computes the relative distance discriminant function's gradient.
+        r"""Computes the relative distance discriminant function's gradient.
 
             1. The partial derivative with respect to the closest prototypes with the same label (same_label=True):
 

@@ -145,7 +145,10 @@ class AdaptiveMomentEstimation(SolverBaseClass):
         self.callback = callback
 
     def solve(
-        self, data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass",
+        self,
+        data: np.ndarray,
+        labels: np.ndarray,
+        model: "LVQBaseClass",
     ):
         """
 

@@ -4,7 +4,7 @@ from . import ActivationBaseClass
 
 
 class Identity(ActivationBaseClass):
-    """ Identity function
+    """Identity function
 
     Class that holds the identity function and gradient.
 
@@ -16,7 +16,7 @@ class Identity(ActivationBaseClass):
     __slots__ = ()
 
     def __call__(self, x: np.ndarray) -> np.ndarray:
-        r""" Implementation of the identity function:
+        r"""Implementation of the identity function:
             .. math::
 
                 f(\mathbf{x}) = \mathbf{x}
@@ -33,7 +33,7 @@ class Identity(ActivationBaseClass):
         return x
 
     def gradient(self, x: np.ndarray) -> np.ndarray:
-        r""" The identity functions's gradient:
+        r"""The identity functions's gradient:
             .. math::
 
                 \frac{\partial f}{\partial \mathbf{x}} = \mathbf{1}

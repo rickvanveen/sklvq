@@ -22,8 +22,10 @@ ModelParamsType = np.ndarray
 _PROTOTYPES_PARAMS_DEFAULTS = {"prototypes_per_class": 1}
 
 
-class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin): # lgtm [py/conflicting-attributes]
-    """ Learning vector quantization base class
+class LVQBaseClass(
+    ABC, BaseEstimator, ClassifierMixin
+):  # lgtm [py/conflicting-attributes]
+    """Learning vector quantization base class
 
     Abstract class for implementing LVQ models. It provides abstract methods with
     expected call signatures.
@@ -410,7 +412,10 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin): # lgtm [py/conflicting-
         self._prototypes_size = np.prod(self._prototypes_shape)
 
     def _init_prototypes(
-        self, X: np.ndarray, y: np.ndarray, prototypes_per_class=1,
+        self,
+        X: np.ndarray,
+        y: np.ndarray,
+        prototypes_per_class=1,
     ) -> None:
         """
         Initialized the prototypes, with a small random offset, to the class conditional mean.
@@ -457,7 +462,9 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin): # lgtm [py/conflicting-
         distance_params.update(self.distance_params)
 
         distance_class = init_class(
-            distances, self.distance_type, valid_class_types=self.valid_distances,
+            distances,
+            self.distance_type,
+            valid_class_types=self.valid_distances,
         )
 
         self._distance = distance_class(**distance_params)
@@ -575,7 +582,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin): # lgtm [py/conflicting-
     ###########################################################################################
 
     def fit(self, X: np.ndarray, y: np.ndarray):
-        """ Fit function
+        """Fit function
 
         Parameters
         ----------
@@ -698,7 +705,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin): # lgtm [py/conflicting-
         return exp_decision_values / np.sum(exp_decision_values, axis=1)[:, np.newaxis]
 
     def predict(self, X: np.ndarray):
-        """ Predict function
+        """Predict function
 
         The decision is made for the label of the prototype with the minimum decision value,
         as provided by the ``decision_function()``.

@@ -3,7 +3,7 @@ from ..objectives import ObjectiveBaseClass
 
 
 class BroydenFletcherGoldfarbShanno(ScipyBaseSolver):
-    r""" Broyden Fletcher Goldfarb Shanno (BFGS)
+    r"""Broyden Fletcher Goldfarb Shanno (BFGS)
 
     See the documentation of scipy for a complete parameter list and description.
 

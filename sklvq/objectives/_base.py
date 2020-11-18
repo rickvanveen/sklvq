@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 
 
 class ObjectiveBaseClass(ABC):
-    """ Objective base class
+    """Objective base class
 
     Abstract class for implementing objective functions. It provides abstract methods with
     expected call signatures.
@@ -18,9 +18,12 @@ class ObjectiveBaseClass(ABC):
 
     @abstractmethod
     def __call__(
-        self, model: "LVQBaseClass", data: np.ndarray, labels: np.ndarray,
+        self,
+        model: "LVQBaseClass",
+        data: np.ndarray,
+        labels: np.ndarray,
     ):
-        """ The objective function
+        """The objective function
 
         Parameters
         ----------
@@ -47,9 +50,12 @@ class ObjectiveBaseClass(ABC):
 
     @abstractmethod
     def gradient(
-        self, model: "LVQBaseClass", data: np.ndarray, labels: np.ndarray,
+        self,
+        model: "LVQBaseClass",
+        data: np.ndarray,
+        labels: np.ndarray,
     ):
-        """ The objective gradient
+        """The objective gradient
 
         Parameters
         ----------

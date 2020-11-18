@@ -4,7 +4,7 @@ import numpy as np
 
 
 class DiscriminantBaseClass(ABC):
-    """ Discriminant base class
+    """Discriminant base class
 
     Abstract class for implementing discriminant functions. Provides abstract methods with
     expected call signatures.

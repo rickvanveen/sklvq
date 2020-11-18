@@ -173,8 +173,7 @@ class LGMLVQ(LVQBaseClass):
 
     .. [3] Bunte, K., Schneider, P., Hammer, B., Schleif, F.-M., Villmann, T., & Biehl, M. (2012).
         "Limited Rank Matrix Learning, discriminative dimension reduction and visualization." Neural
-        Networks, 26, 159–173, 2012.
-"""
+        Networks, 26, 159–173, 2012."""
     classes_: np.ndarray
     prototypes_: np.ndarray
     prototypes_labels_: np.ndarray
@@ -470,7 +469,9 @@ class LGMLVQ(LVQBaseClass):
 
     def _init_variables(self) -> None:
         self._variables = np.empty(
-            self._prototypes_size + self._relevances_size, dtype="float64", order="C",
+            self._prototypes_size + self._relevances_size,
+            dtype="float64",
+            order="C",
         )
 
     def _check_model_params(self):

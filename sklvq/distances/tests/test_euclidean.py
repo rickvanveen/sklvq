@@ -25,4 +25,3 @@ def test_euclidean():
 
     model = DummyLVQ(p)
     check_distance(distfun, data, model)
-

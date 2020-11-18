@@ -164,9 +164,12 @@ class WaypointGradientDescent(SolverBaseClass):
         self.callback = callback
 
     def solve(
-        self, data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass",
+        self,
+        data: np.ndarray,
+        labels: np.ndarray,
+        model: "LVQBaseClass",
     ):
-        """ Solve function that gets called by the fit method of the models.
+        """Solve function that gets called by the fit method of the models.
 
         Performs the steps of the waypoint gradient descent optimization method.
 
@@ -217,7 +220,9 @@ class WaypointGradientDescent(SolverBaseClass):
 
             model.set_variables(
                 np.subtract(  # returns out=objective_gradient
-                    model.get_variables(), objective_gradient, out=objective_gradient,
+                    model.get_variables(),
+                    objective_gradient,
+                    out=objective_gradient,
                 )
             )
 
@@ -256,7 +261,9 @@ class WaypointGradientDescent(SolverBaseClass):
             model.mul_step_size(step_size, objective_gradient)
 
             new_model_variables = np.subtract(  # returns out=objective_gradient
-                model.get_variables(), objective_gradient, out=objective_gradient,
+                model.get_variables(),
+                objective_gradient,
+                out=objective_gradient,
             )
 
             # Tentative average update

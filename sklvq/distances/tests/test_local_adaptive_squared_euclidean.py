@@ -24,6 +24,16 @@ def test_adaptive_squared_euclidean():
     model.relevance_params = {"localization": "class"}
     check_distance(distfun, data, model)
 
+    # Rectangular omega
+    orec = np.array([np.eye(*shape)[:2, :] for _ in range(p.shape[0])])
+    model = DummyLVQ(p, np.array([0, 1, 2]), orec)
+
+    model.relevance_params = {"localization": "prototypes"}
+    check_distance(distfun, data, model)
+
+    model.relevance_params = {"localization": "class"}
+    check_distance(distfun, data, model)
+
     # Check force_all_finite settings
     distfun = distance_class(force_all_finite="allow-nan")
     data[0, 0] = np.nan
@@ -35,5 +45,3 @@ def test_adaptive_squared_euclidean():
 
     model.relevance_params = {"localization": "class"}
     check_distance(distfun, data, model)
-
-    # Rectangular omega

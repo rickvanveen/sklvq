@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 
 class SolverBaseClass(ABC):
-    """ Solver base class
+    """Solver base class
 
     Abstract class for implementing solvers. Provides abstract methods with expected calls
     signatures.
@@ -29,7 +29,10 @@ class SolverBaseClass(ABC):
 
     @abstractmethod
     def solve(
-        self, data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass",
+        self,
+        data: np.ndarray,
+        labels: np.ndarray,
+        model: "LVQBaseClass",
     ) -> None:
         """
         Solve updates the model it is given and does not return anything.
@@ -47,7 +50,7 @@ class SolverBaseClass(ABC):
 
 
 class ScipyBaseSolver(SolverBaseClass):
-    """ ScipyBaseSolver
+    """ScipyBaseSolver
 
     Class to wrap around scipy solvers.
 
@@ -70,7 +73,10 @@ class ScipyBaseSolver(SolverBaseClass):
         return self.objective.gradient(model, data, labels)
 
     def solve(
-        self, data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass",
+        self,
+        data: np.ndarray,
+        labels: np.ndarray,
+        model: "LVQBaseClass",
     ):
         """
         Solve updates the model it is given and does not return anything.

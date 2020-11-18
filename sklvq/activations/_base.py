@@ -4,7 +4,7 @@ import numpy as np
 
 
 class ActivationBaseClass(ABC):
-    """ Activation base class
+    """Activation base class
 
     Abstract class for implementing activation functions. Provides abstract methods with
     expected call signatures.

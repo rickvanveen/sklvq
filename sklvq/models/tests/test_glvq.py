@@ -33,9 +33,6 @@ def test_glvq_hyper_parameters():
     GLVQ(activation_type=activation_type).fit(X, y)
 
 
-
-
-
 def test_glvq():
     iris = datasets.load_iris()
 

@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 
 class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
-    """ Local adaptive squared Euclidean distance
+    """Local adaptive squared Euclidean distance
 
     Class that holds the localized adaptive squared Euclidean distance function and its gradient as
     described in [1]_ and [2]_.
@@ -49,7 +49,7 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
         self.force_all_finite = force_all_finite
 
     def __call__(self, data: np.ndarray, model: "LGMLVQ") -> np.ndarray:
-        r""" Computes the local variant of the adaptive squared Euclidean distance:
+        r"""Computes the local variant of the adaptive squared Euclidean distance:
 
             .. math::
                 d^{\Lambda}(\mathbf{w}, \mathbf{x}) = (\mathbf{x} - \mathbf{w})^{\top}
@@ -77,8 +77,12 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
         localization = model.relevance_params["localization"]
 
         distance_function = "mahalanobis"
-        if self.force_all_finite == "allow-nan" or False:
+        kwarg_str = "VI"
+
+        if self.force_all_finite == "allow-nan":
             distance_function = _nan_mahalanobis
+            # RM because VI is filtered out of the  kwargs by cdist...
+            kwarg_str = "RM"
 
         cdists = np.zeros((data.shape[0], model._prototypes_shape[0]))
 
@@ -88,7 +92,7 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
                     data,
                     np.atleast_2d(prototype),
                     distance_function,
-                    VI=model._compute_lambda(omega),
+                    **{kwarg_str: model._compute_lambda(omega)},
                 ).squeeze()
 
         if localization == "class":
@@ -100,7 +104,7 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
                     data,
                     np.atleast_2d(prototypes),
                     distance_function,
-                    VI=model._compute_lambda(omega),
+                    **{kwarg_str: model._compute_lambda(omega)},
                 )
 
         return cdists ** 2
@@ -108,7 +112,7 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
     def gradient(
         self, data: np.ndarray, model: "LGMLVQ", i_prototype: int
     ) -> np.ndarray:
-        r""" Computes the gradient of the localized adaptive squared euclidean distance function
+        r"""Computes the gradient of the localized adaptive squared euclidean distance function
         with respect to a specified prototype:
 
             .. math::

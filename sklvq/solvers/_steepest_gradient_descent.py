@@ -14,7 +14,7 @@ STATE_KEYS = ["variables", "nit", "fun", "step_size"]
 
 
 class SteepestGradientDescent(SolverBaseClass):
-    r""" Steepest gradient descent (SGD)
+    r"""Steepest gradient descent (SGD)
 
     Implements the steepest gradient descent optimization method. Can perform stochastic,
     mini-batch and batch gradient descent by changing the batch_size. Implementation is
@@ -129,9 +129,12 @@ class SteepestGradientDescent(SolverBaseClass):
         self.callback = callback
 
     def solve(
-        self, data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass",
+        self,
+        data: np.ndarray,
+        labels: np.ndarray,
+        model: "LVQBaseClass",
     ):
-        """ Solve function that gets called by the fit method of the models.
+        """Solve function that gets called by the fit method of the models.
 
         Performs the steps of the steepest gradient descent optimization method.
 
