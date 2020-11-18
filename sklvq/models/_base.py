@@ -375,7 +375,9 @@ class LVQBaseClass(
         """
         raise NotImplementedError("You should implement this!")
 
-    def _check_prototype_params(self, prototypes_per_class=1, **kwargs):
+    def _check_prototype_params(
+        self, prototypes_per_class: Union[int, np.ndarray] = 1, **kwargs
+    ):
         """
         Check prototype params, i.e., if the prototypes_per_class is set correctly.
         Additionally, it sets the size and shape of the prototypes such that these can be used
@@ -387,9 +389,6 @@ class LVQBaseClass(
 
         kwargs
 
-        Returns
-        -------
-
         """
 
         if isinstance(prototypes_per_class, int):
@@ -398,16 +397,29 @@ class LVQBaseClass(
                 self.n_features_in_,
             )
         elif isinstance(prototypes_per_class, np.ndarray):
-            if prototypes_per_class.size == self.classes_:
-                self._prototypes_shape = (
-                    np.prod(prototypes_per_class),
-                    self.n_features_in_,
+            if prototypes_per_class.size != self.classes_.size:
+                raise ValueError(
+                    "Expected the number protoypes_per_class (size = {}) to have a number of elements "
+                    "equal to the number of classes (size = {}).",
+                    prototypes_per_class.size,
+                    self.classes_.size,
                 )
-            else:
-                raise ValueError("Provided prototypes_per_class is invalid.")
 
+            if np.any(prototypes_per_class <= 0.0):
+                raise ValueError(
+                    "Prototypes_per_class ({}) cannot contain any values less than or equal to zero.",
+                    prototypes_per_class,
+                )
+
+            self._prototypes_shape = (
+                np.sum(prototypes_per_class),
+                self.n_features_in_,
+            )
         else:
-            raise ValueError("Provided prototypes_per_class is invalid.")
+            raise ValueError(
+                "Expected prototypes_per_class to be either of type int or np.ndarray, but got type: {}",
+                type(prototypes_per_class),
+            )
 
         self._prototypes_size = np.prod(self._prototypes_shape)
 
@@ -443,7 +455,7 @@ class LVQBaseClass(
             )
         else:
             raise ValueError(
-                "The provided value for the parameter 'prototypes' is invalid."
+                "The provided value for the parameter 'prototype_init' is invalid."
             )
 
     @abstractmethod

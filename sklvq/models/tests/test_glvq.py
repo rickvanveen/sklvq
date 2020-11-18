@@ -15,7 +15,19 @@ from .. import GLVQ
 
 def test_glvq_hyper_parameters():
     X, y = datasets.load_iris(return_X_y=True)
-    # Need to call fit else does not get initiated
+
+    # Prototype initialization
+    with pytest.raises(ValueError):
+        GLVQ(prototype_params={"prototypes_per_class": np.array([1, 1])}).fit(X, y)
+
+    with pytest.raises(ValueError):
+        GLVQ(prototype_params={"prototypes_per_class": np.array([1, 0, 1])}).fit(X, y)
+
+    with pytest.raises(ValueError):
+        GLVQ(prototype_init="abc").fit(X, y)
+
+    m = GLVQ(prototype_params={"prototypes_per_class": np.array([1, 2, 1])}).fit(X, y)
+    assert m.prototypes_.shape[0] == 4
 
     # Activation string which does not exist
     with pytest.raises(ValueError):
