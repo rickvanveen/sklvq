@@ -8,8 +8,8 @@ ALIASES = {}
 
 
 def import_from_string(class_string, valid_strings=None) -> type:
-    if class_string in ALIASES.keys():
-        class_string = ALIASES[class_string]
+    # if class_string in ALIASES.keys():
+    #     class_string = ALIASES[class_string]
 
     if valid_strings is not None:
         if not (class_string in valid_strings):

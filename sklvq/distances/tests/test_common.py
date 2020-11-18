@@ -66,7 +66,7 @@ def check_init_distance(distance_string):
 
 
 def test_aliases():
-    for value in ALIASES.values():
+    for value in ALIASES.keys():
         check_init_distance(value)
 
 

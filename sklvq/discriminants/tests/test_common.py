@@ -17,5 +17,5 @@ def check_init_discriminant(discriminant_string):
 
 
 def test_aliases():
-    for value in ALIASES.values():
+    for value in ALIASES.keys():
         check_init_discriminant(value)

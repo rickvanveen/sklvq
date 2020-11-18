@@ -17,5 +17,5 @@ def check_init_activation(activation_string):
 
 
 def test_aliases():
-    for value in ALIASES.values():
+    for value in ALIASES.keys():
         check_init_activation(value)
