@@ -469,9 +469,7 @@ class LGMLVQ(LVQBaseClass):
 
     def _init_variables(self) -> None:
         self._variables = np.empty(
-            self._prototypes_size + self._relevances_size,
-            dtype="float64",
-            order="C",
+            self._prototypes_size + self._relevances_size, dtype="float64", order="C",
         )
 
     def _check_model_params(self):
@@ -549,19 +547,12 @@ class LGMLVQ(LVQBaseClass):
 
     def _after_fit(self, X: np.ndarray, y: np.ndarray):
         self.lambda_ = LGMLVQ._compute_lambdas(self.omega_)
-        # self.lambda_ = np.einsum("ikj, ikl -> ijl", self.omega_, self.omega_)
 
-        eigenvalues, omega_hat = np.linalg.eig(self.lambda_)
+        # Eigenvalues and column eigenvectors returned in ascending order
+        eigenvalues, omega_hat = np.linalg.eigh(self.lambda_)
 
-        sorted_indices = np.flip(np.argsort(eigenvalues, axis=1), axis=1)
-        eigenvalues, omega_hat = zip(
-            *[
-                (lk[ii], ek[:, ii])
-                for (ii, lk, ek) in zip(sorted_indices, eigenvalues, omega_hat)
-            ]
-        )
-        self.eigenvalues_ = np.array(eigenvalues)
-        self.omega_hat_ = np.array(omega_hat)
+        self.eigenvalues_ = np.flip(eigenvalues, axis=1)
+        self.omega_hat_ = np.flip(omega_hat, axis=2)
 
     def _needs_normalizing(self):
         return self.relevance_params["normalization"]
