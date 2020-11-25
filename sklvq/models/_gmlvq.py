@@ -449,9 +449,7 @@ class GMLVQ(LVQBaseClass):
 
     def _init_variables(self) -> None:
         self._variables = np.empty(
-            self._prototypes_size + self._relevances_size,
-            dtype="float64",
-            order="C",
+            self._prototypes_size + self._relevances_size, dtype="float64", order="C",
         )
 
     def _check_model_params(self):
@@ -510,13 +508,14 @@ class GMLVQ(LVQBaseClass):
     ###########################################################################################
 
     def _after_fit(self, X: np.ndarray, y: np.ndarray):
-        # self.lambda_ = self.omega_.T.dot(self.omega_)
         self.lambda_ = GMLVQ._compute_lambda(self.omega_)
 
-        eigenvalues, omega_hat = np.linalg.eig(self.lambda_)
-        sorted_indices = np.argsort(eigenvalues)[::-1]
-        self.eigenvalues_ = eigenvalues[sorted_indices]
-        self.omega_hat_ = omega_hat[:, sorted_indices]
+        # Eigenvalues and column eigenvectors returen in ascending order
+        eigenvalues, omega_hat = np.linalg.eigh(self.lambda_)
+
+        # Flip (reverse the order to descending) before assigning.
+        self.eigenvalues_ = np.flip(eigenvalues)
+        self.omega_hat_ = np.flip(omega_hat, axis=0)
 
     @staticmethod
     def _compute_lambda(omega):
