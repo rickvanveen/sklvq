@@ -24,6 +24,7 @@ iris = load_iris()
 
 data = iris.data
 labels = iris.target
+feature_names = [name[:-5] for name in iris.feature_names]
 
 ###############################################################################
 # Fitting the Model
@@ -75,7 +76,7 @@ relevance_matrix = model.lambda_
 # Plot the diagonal of the relevance matrix
 fig, ax = plt.subplots()
 fig.suptitle("Relevance Matrix Diagonal")
-ax.bar([name[:-5] for name in iris.feature_names], np.diagonal(relevance_matrix))
+ax.bar(feature_names, np.diagonal(relevance_matrix))
 ax.set_ylabel("Weight")
 ax.grid(False)
 
@@ -136,20 +137,20 @@ ax.grid(True)
 # Plot the eigenvalues of the eigenvectors of the relevance matrix.
 fig, ax = plt.subplots()
 fig.suptitle("Eigenvalues")
-ax.bar(range(0, 4), model.eigenvalues_)
+ax.bar(range(0, len(model.eigenvalues_)), model.eigenvalues_)
 ax.set_ylabel("Weight")
 ax.grid(False)
 
 # Plot the first two eigenvectors of the relevance matrix, which  is called `omega_hat`.
 fig, ax = plt.subplots()
 fig.suptitle("First Eigenvector")
-ax.bar([name[:-5] for name in iris.feature_names], model.omega_hat_[:, 0])
+ax.bar(feature_names, model.omega_hat_[:, 0])
 ax.set_ylabel("Weight")
 ax.grid(False)
 
 fig, ax = plt.subplots()
 fig.suptitle("Second Eigenvector")
-ax.bar([name[:-5] for name in iris.feature_names], model.omega_hat_[:, 1])
+ax.bar(feature_names, model.omega_hat_[:, 1])
 ax.set_ylabel("Weight")
 ax.grid(False)
 
