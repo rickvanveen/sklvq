@@ -52,3 +52,8 @@ predicted_labels = pipeline.predict(data)
 
 # Print a classification report (sklearn)
 print(classification_report(labels, predicted_labels))
+
+###############################################################################
+# When inspecting the resulting classifier and its prototypes,
+# e.g., in a plot overlaid on a scatter plot of the data, don't forget to apply the scaling to the data:
+transformed_data = pipeline.transform(data)

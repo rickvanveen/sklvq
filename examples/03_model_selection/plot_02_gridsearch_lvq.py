@@ -81,3 +81,8 @@ search.fit(data, labels)
 # Print the best CV score and parameters.
 print("\nBest parameter (CV score=%0.3f):" % search.best_score_)
 print(search.best_params_)
+
+###############################################################################
+# When inspecting the resulting classifier and its prototypes,
+# e.g., in a plot overlaid on a scatter plot of the data, don't forget to apply the scaling to the data:
+transformed_data = search.transform(data)
