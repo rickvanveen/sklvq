@@ -111,7 +111,7 @@ y_m = transformed_model[:, 1]
 fig, ax = plt.subplots()
 fig.suptitle("Discriminative projection Iris data and GMLVQ prototypes")
 colors = ["blue", "red", "green"]
-for cls, i in enumerate(model.classes_):
+for i, cls in enumerate(model.classes_):
     ii = cls == labels
     ax.scatter(
         x_d[ii],

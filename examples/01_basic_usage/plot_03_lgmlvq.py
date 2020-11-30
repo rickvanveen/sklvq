@@ -122,7 +122,7 @@ colors = ["blue", "red", "green"]
 for i, xy_dm in enumerate(zip(t_d, t_m)):
     xy_d = xy_dm[0]
     xy_m = xy_dm[1]
-    for cls, j in enumerate(model.classes_):
+    for j, cls in enumerate(model.classes_):
         ii = cls == labels
         ax[i].scatter(
             xy_d[ii, 0],
