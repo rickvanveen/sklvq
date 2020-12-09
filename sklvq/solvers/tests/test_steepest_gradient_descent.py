@@ -3,6 +3,8 @@ import pytest
 
 from .._steepest_gradient_descent import SteepestGradientDescent
 from sklvq.objectives import GeneralizedLearningObjective
+from sklvq.models import GLVQ
+from sklearn.datasets import load_iris
 
 
 def test_steepest_gradient_descent():
@@ -34,3 +36,8 @@ def test_steepest_gradient_descent():
 
     with pytest.raises(ValueError):
         SteepestGradientDescent(objective, callback=0)
+
+    model = GLVQ()
+    X, y = load_iris(return_X_y=True)
+    with pytest.raises(ValueError):
+        SteepestGradientDescent(objective, batch_size=100000).solve(X, y, model)

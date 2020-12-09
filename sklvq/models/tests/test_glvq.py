@@ -61,10 +61,12 @@ def test_glvq():
     estimator = GLVQ(random_state=31415)
     pipeline = make_pipeline(preprocessing.StandardScaler(), estimator)
 
+    scipy_solvers_types = [
+        "lbfgs",
+        "bfgs"
+    ]
     # Run each solver ones
     solvers_types = [
-        "lbfgs",
-        "bfgs",
         "steepest-gradient-descent",
         "waypoint-gradient-descent",
         "adaptive-moment-estimation",
@@ -78,6 +80,13 @@ def test_glvq():
     activation_types = ["identity", "sigmoid", "soft-plus", "swish"]
 
     param_grid = [
+        {
+            "glvq__solver_type": scipy_solvers_types,
+            "glvq__solver_params": [{"jac": None}, {}],
+            "glvq__discriminant_type": discriminant_types,
+            "glvq__distance_type": distance_types,
+            "glvq__activation_type": activation_types,
+        },
         {
             "glvq__solver_type": solvers_types,
             "glvq__discriminant_type": discriminant_types,
