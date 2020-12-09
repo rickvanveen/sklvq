@@ -65,9 +65,10 @@ def check_init_distance(distance_string):
     return distatance_class
 
 
-def test_aliases():
-    for value in ALIASES.keys():
-        check_init_distance(value)
+# When there are distance functions with aliases re-enable
+# def test_aliases():
+#     for value in ALIASES.keys():
+#         check_init_distance(value)
 
 
 def check_distance(distfun, data, model):

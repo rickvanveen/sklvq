@@ -20,10 +20,13 @@ def test_gmlvq():
     solvers_types = [
         "lbfgs",
         "bfgs",
-        "steepest-gradient-descent",
         "waypoint-gradient-descent",
         "adaptive-moment-estimation",
     ]
+    stochastic_solver_types = [
+        "steepest-gradient-descent",
+    ]
+
     discriminant_types = ["relative-distance"]
 
     # Every compatible distance
@@ -38,7 +41,17 @@ def test_gmlvq():
             "gmlvq__discriminant_type": discriminant_types,
             "gmlvq__distance_type": distance_types,
             "gmlvq__activation_type": activation_types,
-        }
+        },
+        {
+            "gmlvq__solver_type": stochastic_solver_types,
+            "gmlvq__solver_params": [
+                {"batch_size": 1, "step_size": np.array([0.1, 0.01])},
+                {"batch_size": 2, "step_size": np.array([0.1, 0.01])},
+            ],
+            "gmlvq__discriminant_type": discriminant_types,
+            "gmlvq__distance_type": distance_types,
+            "gmlvq__activation_type": activation_types,
+        },
     ]
 
     repeated_kfolds = RepeatedStratifiedKFold(n_splits=2, n_repeats=1)

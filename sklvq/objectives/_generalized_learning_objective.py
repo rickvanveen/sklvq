@@ -258,7 +258,7 @@ def _compute_distance(data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass
         # Faster if num_samples == 1
         ii_same = np.atleast_2d(labels == prototypes_labels)
     elif num_samples < num_prototypes:
-        # Faster to go over the labels if there are less then the prototypes.
+        # Faster to go over the labels if there are less than the prototypes.
         ii_same = np.array([label == prototypes_labels for label in labels])
     else:
         # List comprehension of the prototypes. This are all slight improvements to computation
