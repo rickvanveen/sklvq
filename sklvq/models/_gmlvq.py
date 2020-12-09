@@ -163,8 +163,7 @@ class GMLVQ(LVQBaseClass):
 
     .. [3] Bunte, K., Schneider, P., Hammer, B., Schleif, F.-M., Villmann, T., & Biehl, M. (2012).
         "Limited Rank Matrix Learning, discriminative dimension reduction and visualization." Neural
-        Networks, 26, 159–173, 2012.
-"""
+        Networks, 26, 159–173, 2012."""
     classes_: np.ndarray
     prototypes_: np.ndarray
     prototypes_labels_: np.ndarray
@@ -438,10 +437,11 @@ class GMLVQ(LVQBaseClass):
             return
 
         if isinstance(step_sizes, np.ndarray):
-            if step_sizes.size == 2:
+            if step_sizes.size > 1:
                 prototypes, omega = self.to_model_params_view(gradient)
                 prototypes *= step_sizes[0]
                 omega *= step_sizes[1]
+            # if size is more than 2 it just ignores the additional values.
 
     ###########################################################################################
     # Initialization functions
@@ -508,13 +508,14 @@ class GMLVQ(LVQBaseClass):
     ###########################################################################################
 
     def _after_fit(self, X: np.ndarray, y: np.ndarray):
-        # self.lambda_ = self.omega_.T.dot(self.omega_)
         self.lambda_ = GMLVQ._compute_lambda(self.omega_)
 
-        eigenvalues, omega_hat = np.linalg.eig(self.lambda_)
-        sorted_indices = np.argsort(eigenvalues)[::-1]
-        self.eigenvalues_ = eigenvalues[sorted_indices]
-        self.omega_hat_ = omega_hat[:, sorted_indices]
+        # Eigenvalues and column eigenvectors returen in ascending order
+        eigenvalues, omega_hat = np.linalg.eigh(self.lambda_)
+
+        # Flip (reverse the order to descending) before assigning.
+        self.eigenvalues_ = np.flip(eigenvalues)
+        self.omega_hat_ = np.flip(omega_hat, axis=0)
 
     @staticmethod
     def _compute_lambda(omega):

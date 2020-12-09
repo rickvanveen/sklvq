@@ -5,7 +5,7 @@ from typing import Union
 
 
 class SoftPlus(ActivationBaseClass):
-    """ Soft+ function
+    """Soft+ function
 
     Class that holds the soft+ function and gradient as discussed in [1]_
 
@@ -37,7 +37,7 @@ class SoftPlus(ActivationBaseClass):
         self.beta = beta
 
     def __call__(self, x: np.ndarray) -> np.ndarray:
-        r""" Implements the soft+ function:
+        r"""Implements the soft+ function:
             .. math::
 
                 f(\mathbf{x}) = \ln(1 + e^{\beta \cdot \mathbf{x}})
@@ -54,7 +54,7 @@ class SoftPlus(ActivationBaseClass):
         return np.log(1 + np.exp(self.beta * x))
 
     def gradient(self, x: np.ndarray) -> np.ndarray:
-        r""" Implements the sigmoid function's gradient:
+        r"""Implements the sigmoid function's gradient:
             .. math::
 
                 \frac{\partial f}{\partial \mathbf{x}} = \frac{\beta \cdot e^{\beta \cdot \mathbf{x}}}{1 + e^{\beta \cdot \mathbf{x}}}

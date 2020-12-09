@@ -22,8 +22,10 @@ ModelParamsType = np.ndarray
 _PROTOTYPES_PARAMS_DEFAULTS = {"prototypes_per_class": 1}
 
 
-class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
-    """ Learning vector quantization base class
+class LVQBaseClass(
+    ABC, BaseEstimator, ClassifierMixin
+):  # lgtm [py/conflicting-attributes]
+    """Learning vector quantization base class
 
     Abstract class for implementing LVQ models. It provides abstract methods with
     expected call signatures.
@@ -373,7 +375,9 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         """
         raise NotImplementedError("You should implement this!")
 
-    def _check_prototype_params(self, prototypes_per_class=1, **kwargs):
+    def _check_prototype_params(
+        self, prototypes_per_class: Union[int, np.ndarray] = 1, **kwargs
+    ):
         """
         Check prototype params, i.e., if the prototypes_per_class is set correctly.
         Additionally, it sets the size and shape of the prototypes such that these can be used
@@ -385,9 +389,6 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
 
         kwargs
 
-        Returns
-        -------
-
         """
 
         if isinstance(prototypes_per_class, int):
@@ -396,21 +397,37 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
                 self.n_features_in_,
             )
         elif isinstance(prototypes_per_class, np.ndarray):
-            if prototypes_per_class.size == self.classes_:
-                self._prototypes_shape = (
-                    np.prod(prototypes_per_class),
-                    self.n_features_in_,
+            if prototypes_per_class.size != self.classes_.size:
+                raise ValueError(
+                    "Expected the number protoypes_per_class (size = {}) to have a number of elements "
+                    "equal to the number of classes (size = {}).",
+                    prototypes_per_class.size,
+                    self.classes_.size,
                 )
-            else:
-                raise ValueError("Provided prototypes_per_class is invalid.")
 
+            if np.any(prototypes_per_class <= 0.0):
+                raise ValueError(
+                    "Prototypes_per_class ({}) cannot contain any values less than or equal to zero.",
+                    prototypes_per_class,
+                )
+
+            self._prototypes_shape = (
+                np.sum(prototypes_per_class),
+                self.n_features_in_,
+            )
         else:
-            raise ValueError("Provided prototypes_per_class is invalid.")
+            raise ValueError(
+                "Expected prototypes_per_class to be either of type int or np.ndarray, but got type: {}",
+                type(prototypes_per_class),
+            )
 
         self._prototypes_size = np.prod(self._prototypes_shape)
 
     def _init_prototypes(
-        self, X: np.ndarray, y: np.ndarray, prototypes_per_class=1,
+        self,
+        X: np.ndarray,
+        y: np.ndarray,
+        prototypes_per_class=1,
     ) -> None:
         """
         Initialized the prototypes, with a small random offset, to the class conditional mean.
@@ -438,7 +455,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
             )
         else:
             raise ValueError(
-                "The provided value for the parameter 'prototypes' is invalid."
+                "The provided value for the parameter 'prototype_init' is invalid."
             )
 
     @abstractmethod
@@ -457,7 +474,9 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         distance_params.update(self.distance_params)
 
         distance_class = init_class(
-            distances, self.distance_type, valid_class_types=self.valid_distances,
+            distances,
+            self.distance_type,
+            valid_class_types=self.valid_distances,
         )
 
         self._distance = distance_class(**distance_params)
@@ -575,7 +594,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
     ###########################################################################################
 
     def fit(self, X: np.ndarray, y: np.ndarray):
-        """ Fit function
+        """Fit function
 
         Parameters
         ----------
@@ -698,7 +717,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):
         return exp_decision_values / np.sum(exp_decision_values, axis=1)[:, np.newaxis]
 
     def predict(self, X: np.ndarray):
-        """ Predict function
+        """Predict function
 
         The decision is made for the label of the prototype with the minimum decision value,
         as provided by the ``decision_function()``.

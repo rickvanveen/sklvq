@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 from sklearn import datasets
 from sklearn import preprocessing
 from sklearn.model_selection import (
@@ -7,7 +8,52 @@ from sklearn.model_selection import (
 )
 from sklearn.pipeline import make_pipeline
 
+from sklvq.activations._identity import Identity
+
 from .. import GLVQ
+
+
+def test_glvq_hyper_parameters():
+    X, y = datasets.load_iris(return_X_y=True)
+
+    # Prototype initialization
+    with pytest.raises(ValueError):
+        GLVQ(prototype_params={"prototypes_per_class": np.array([1, 1])}).fit(X, y)
+
+    with pytest.raises(ValueError):
+        GLVQ(prototype_params={"prototypes_per_class": np.array([1, 0, 1])}).fit(X, y)
+
+    with pytest.raises(ValueError):
+        GLVQ(prototype_init="abc").fit(X, y)
+
+    m = GLVQ(prototype_params={"prototypes_per_class": np.array([1, 2, 1])}).fit(X, y)
+    assert m.prototypes_.shape[0] == 4
+
+    # Activation string which does not exist
+    with pytest.raises(ValueError):
+        GLVQ(activation_type="abc123").fit(X, y)
+
+    # Activation object instead of type
+    activation_type = Identity()
+    with pytest.raises(ValueError):
+        GLVQ(activation_type=activation_type).fit(X, y)
+
+    activation_type = Identity
+    with pytest.raises(TypeError):
+        GLVQ(activation_type=activation_type, activation_params={"beta": 0}).fit(X, y)
+
+    m = GLVQ(activation_type=activation_type).fit(X, y)
+
+    p = m.prototypes_
+    m.set_model_params(np.random.random(size=(3, 4)))
+    assert np.shares_memory(p, m.get_variables())
+    assert np.all(m.get_variables() == m.prototypes_.ravel())
+
+    model_params = m.to_model_params_view(m.get_variables())
+    assert np.all(m.prototypes_.shape == model_params.shape)
+    assert np.shares_memory(m.prototypes_, m.get_variables())
+    assert np.shares_memory(model_params, m.get_variables())
+
 
 
 def test_glvq():

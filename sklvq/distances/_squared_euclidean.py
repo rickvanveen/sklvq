@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 
 class SquaredEuclidean(DistanceBaseClass):
-    """ Squared Euclidean distance
+    """Squared Euclidean distance
 
     Parameters
     ----------
@@ -56,13 +56,13 @@ class SquaredEuclidean(DistanceBaseClass):
             Evaluation of the distance between each sample and prototype of the model.
         """
         distance_function = "sqeuclidean"
-        if self.force_all_finite == "allow-nan" or False:
+        if self.force_all_finite == "allow-nan":
             distance_function = _nan_squared_euclidean
 
         return cdist(data, model.prototypes_, distance_function)
 
     def gradient(self, data: np.ndarray, model: "GLVQ", i_prototype: int) -> np.ndarray:
-        r""" Computes the gradient of the squared euclidean distance, with respect to a single
+        r"""Computes the gradient of the squared euclidean distance, with respect to a single
         prototype:
 
             .. math::
@@ -87,7 +87,7 @@ class SquaredEuclidean(DistanceBaseClass):
         distance_gradient = -2 * (data - model.get_model_params()[i_prototype, :])
 
         # In case of nans replace nan values by 0.0
-        if self.force_all_finite == "allow-nan" or False:
+        if self.force_all_finite == "allow-nan":
             distance_gradient[np.isnan(distance_gradient)] = 0.0
 
         # Return 1d array (the original memory)

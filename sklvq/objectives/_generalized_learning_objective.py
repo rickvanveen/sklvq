@@ -25,7 +25,7 @@ DISCRIMINANT_FUNCTIONS = [
 
 
 class GeneralizedLearningObjective(ObjectiveBaseClass):
-    """ Generalized learning objective
+    """Generalized learning objective
 
     Class that holds the generalized learning objective function and its gradient as described
     in [1]_.
@@ -81,9 +81,12 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
         self.discriminant = discriminant_class(**discriminant_params)
 
     def __call__(
-        self, model: "LVQBaseClass", data: np.ndarray, labels: np.ndarray,
+        self,
+        model: "LVQBaseClass",
+        data: np.ndarray,
+        labels: np.ndarray,
     ) -> np.ndarray:
-        r""" Computes the generalized learning objective:
+        r"""Computes the generalized learning objective:
 
             .. math::
 
@@ -114,9 +117,12 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
         return np.sum(self.activation(self.discriminant(dist_same, dist_diff)))
 
     def gradient(
-        self, model: "LVQBaseClass", data: np.ndarray, labels: np.ndarray,
+        self,
+        model: "LVQBaseClass",
+        data: np.ndarray,
+        labels: np.ndarray,
     ) -> np.ndarray:
-        r""" Computes the generalized learning objective's gradient with respect to the
+        r"""Computes the generalized learning objective's gradient with respect to the
         prototype with a different label:
 
             .. math::
@@ -235,8 +241,8 @@ def _find_min(indices: np.ndarray, distances: np.ndarray) -> (np.ndarray, np.nda
 
 
 def _compute_distance(data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass"):
-    """ Computes the distances between each prototype and each observation and finds all indices
-    where the shortest distance is that of the prototype with the same label and with a different label. """
+    """Computes the distances between each prototype and each observation and finds all indices
+    where the shortest distance is that of the prototype with the same label and with a different label."""
     prototypes_labels = model.prototypes_labels_
 
     # Step 1: Compute distances between X and the model (how is depending on model and coupled

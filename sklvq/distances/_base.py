@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 
 
 class DistanceBaseClass(ABC):
-    """ Distance base class
+    """Distance base class
 
     Abstract class for implementing distance functions. It provides abstract methods with
     expected call signatures.
@@ -46,7 +46,7 @@ class DistanceBaseClass(ABC):
     def gradient(
         self, data: np.ndarray, model: "LVQBaseClass", i_prototype: int
     ) -> np.ndarray:
-        """ The distance gradient method.
+        """The distance gradient method.
 
         Parameters
         ----------

@@ -5,7 +5,7 @@ from . import ActivationBaseClass
 
 
 class Sigmoid(ActivationBaseClass):
-    """ Sigmoid function
+    """Sigmoid function
 
     Class that holds the sigmoid function and gradient as discussed in [1]_
 
@@ -38,7 +38,7 @@ class Sigmoid(ActivationBaseClass):
         self.beta = beta
 
     def __call__(self, x: np.ndarray) -> np.ndarray:
-        r""" Computes the sigmoid function:
+        r"""Computes the sigmoid function:
             .. math::
 
                 f(\mathbf{x}) = \frac{1}{e^{-\beta \cdot \mathbf{x}} + 1}
@@ -55,7 +55,7 @@ class Sigmoid(ActivationBaseClass):
         return np.asarray(1.0 / (np.exp(-self.beta * x) + 1.0))
 
     def gradient(self, x: np.ndarray) -> np.ndarray:
-        r""" Computes the sigmoid function's gradient with respect to x:
+        r"""Computes the sigmoid function's gradient with respect to x:
            .. math::
 
                \frac{\partial f}{\partial \mathbf{x}} = \frac{(\beta \cdot e^{\beta \cdot \mathbf{x})}}{(e^{\beta \cdot \mathbf{x}} + 1)^2}

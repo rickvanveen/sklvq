@@ -5,7 +5,7 @@ from typing import Union
 
 
 class Swish(ActivationBaseClass):
-    """ Swish function
+    """Swish function
 
     Class that holds the swish function and gradient as discussed in [1]_
 
@@ -37,7 +37,7 @@ class Swish(ActivationBaseClass):
         self.beta = beta
 
     def __call__(self, x: np.ndarray) -> np.ndarray:
-        r""" Implements the swish function:
+        r"""Implements the swish function:
             .. math::
 
                 f(\mathbf{x}) = \frac{\mathbf{x}}{1 + e^{-\beta \cdot \mathbf{x}}}
@@ -54,7 +54,7 @@ class Swish(ActivationBaseClass):
         return _swish(x, self.beta)
 
     def gradient(self, x: np.ndarray) -> np.ndarray:
-        r""" Implements the sigmoid function's gradient:
+        r"""Implements the sigmoid function's gradient:
             .. math::
 
                 \frac{\partial f}{\partial \mathbf{x}} = \beta \cdot f(\mathbf{x}) + (\frac{1}{1 + e^{-\beta \cdot \mathbf{x}}}) \cdot (1 - \beta \cdot f(\mathbf{x}))

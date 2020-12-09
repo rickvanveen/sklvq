@@ -13,8 +13,9 @@ from sklvq.discriminants import DiscriminantBaseClass
 data, labels = load_iris(return_X_y=True)
 
 ###############################################################################
-# The sklvq contains a single discriminant function and additions are very welcome. Note that
-# they should (at the moment) work with the sklvq.objectives.GeneralizedLearningObjective.
+# The sklvq package contains a single discriminant function and additions are very welcome. Note
+# that they should work with the sklvq.objectives.GeneralizedLearningObjective, i.e.,
+# passing additional or different arguments is not possible.
 
 
 # The discriminative function is depended on the objective function. This determines the

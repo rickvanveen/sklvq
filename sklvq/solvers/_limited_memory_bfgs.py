@@ -3,7 +3,7 @@ from ..objectives import ObjectiveBaseClass
 
 
 class LimitedMemoryBfgs(ScipyBaseSolver):
-    r""" Limited memory variant of BFGS (L-BFGS)
+    r"""Limited memory variant of BFGS (L-BFGS)
 
     See the documentation of scipy for the parameter list and description.
 

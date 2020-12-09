@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 
 class AdaptiveSquaredEuclidean(DistanceBaseClass):
-    """ Adaptive squared Euclidean distance
+    """Adaptive squared Euclidean distance
 
     Class that holds the adaptive squared Euclidean distance function and its gradient as
     described in [1]_ and [2]_.
@@ -43,7 +43,7 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
         self.force_all_finite = force_all_finite
 
     def __call__(self, data: np.ndarray, model: "GMLVQ") -> np.ndarray:
-        r""" Computes the adaptive squared Euclidean distance:
+        r"""Computes the adaptive squared Euclidean distance:
 
             .. math::
                 d^{\Lambda}(\mathbf{w}, \mathbf{x}) = (\mathbf{x} - \mathbf{w})^{\top}
@@ -66,12 +66,13 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
            Evaluation of the distance between each sample in the data and prototype of the model.
         """
 
-        if self.force_all_finite == "allow-nan" or False:
+        if self.force_all_finite == "allow-nan":
+            # RM because VI is filtered out of the  kwargs by cdist...
             return cdist(
                 data,
                 model.prototypes_,
                 _nan_mahalanobis,
-                relevance_matrix=model._compute_lambda(model.omega_),
+                RM=model._compute_lambda(model.omega_),
             )
 
         return (
@@ -87,7 +88,7 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
     def gradient(
         self, data: np.ndarray, model: "GMLVQ", i_prototype: int
     ) -> np.ndarray:
-        r""" Computes the gradient of the adaptive squared euclidean distance function,
+        r"""Computes the gradient of the adaptive squared euclidean distance function,
         with respect to a single prototype:
 
             .. math::
@@ -147,11 +148,11 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
         return distance_gradient
 
 
-def _nan_mahalanobis(sample, prototype, relevance_matrix=None):
+def _nan_mahalanobis(sample, prototype, RM=None):
     # The NaNLVQ variant of the mahalanobis distance
     difference = sample - prototype
     difference[np.isnan(difference)] = 0.0
-    return difference.dot(relevance_matrix).dot(difference.T)
+    return difference.dot(RM).dot(difference.T)
     # return np.einsum("i, ij, j ->", difference, relevance_matrix, difference)
 
 

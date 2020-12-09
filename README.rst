@@ -8,7 +8,7 @@
 .. |ReadTheDocs| image:: https://readthedocs.org/projects/sklvq/badge/?version=latest
 .. _ReadTheDocs: https://sklvq.readthedocs.io/en/latest/?badge=latest
 
-.. |CodeCov| image:: https://codecov.io/gh/rickvanveen/sklvq/branch/master/graph/badge.svg
+.. |CodeCov| image:: https://codecov.io/gh/rickvanveen/sklvq/branch/develop/graph/badge.svg
 .. _CodeCov: https://codecov.io/gh/rickvanveen/sklvq
 
 .. |CodeStyleBlack| image:: https://img.shields.io/badge/code%20style-black-000000.svg

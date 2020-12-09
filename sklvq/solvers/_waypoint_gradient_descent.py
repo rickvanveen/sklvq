@@ -164,9 +164,12 @@ class WaypointGradientDescent(SolverBaseClass):
         self.callback = callback
 
     def solve(
-        self, data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass",
+        self,
+        data: np.ndarray,
+        labels: np.ndarray,
+        model: "LVQBaseClass",
     ):
-        """ Solve function that gets called by the fit method of the models.
+        """Solve function that gets called by the fit method of the models.
 
         Performs the steps of the waypoint gradient descent optimization method.
 
@@ -188,7 +191,7 @@ class WaypointGradientDescent(SolverBaseClass):
         step_size = self.step_size
 
         if self.callback is not None:
-            variables = model.get_variables()
+            variables = np.copy(model.get_variables())
             cost = self.objective(model, data, labels)
             state = _update_state(
                 STATE_KEYS, variables=variables, nit="Initial", nfun=cost, fun=cost
@@ -217,7 +220,9 @@ class WaypointGradientDescent(SolverBaseClass):
 
             model.set_variables(
                 np.subtract(  # returns out=objective_gradient
-                    model.get_variables(), objective_gradient, out=objective_gradient,
+                    model.get_variables(),
+                    objective_gradient,
+                    out=objective_gradient,
                 )
             )
 
@@ -227,7 +232,7 @@ class WaypointGradientDescent(SolverBaseClass):
                 cost = self.objective(model, data, labels)
                 state = _update_state(
                     STATE_KEYS,
-                    variables=model.get_variables(),
+                    variables=np.copy(model.get_variables()),
                     nit=i_run + 1,
                     nfun=cost,
                     fun=cost,
@@ -256,7 +261,9 @@ class WaypointGradientDescent(SolverBaseClass):
             model.mul_step_size(step_size, objective_gradient)
 
             new_model_variables = np.subtract(  # returns out=objective_gradient
-                model.get_variables(), objective_gradient, out=objective_gradient,
+                model.get_variables(),
+                objective_gradient,
+                out=objective_gradient,
             )
 
             # Tentative average update
@@ -288,7 +295,7 @@ class WaypointGradientDescent(SolverBaseClass):
             if self.callback is not None:
                 state = _update_state(
                     STATE_KEYS,
-                    variables=model.get_variables(),
+                    variables=np.copy(model.get_variables()),
                     nit=i_run + 1,
                     tfun=tentative_cost,
                     nfun=new_cost,

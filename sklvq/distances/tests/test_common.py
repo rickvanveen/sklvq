@@ -58,15 +58,15 @@ def check_init_distance(distance_string):
 
     assert isinstance(distatance_class, type)
 
-    distance_inistance = distatance_class()
+    distance_instance = distatance_class()
 
-    assert isinstance(distance_inistance, DistanceBaseClass)
+    assert isinstance(distance_instance, DistanceBaseClass)
 
     return distatance_class
 
 
 def test_aliases():
-    for value in ALIASES.values():
+    for value in ALIASES.keys():
         check_init_distance(value)
 
 
@@ -79,7 +79,7 @@ def check_distance(distfun, data, model):
     # 'Never' negative
     assert np.all(distfun(data, model) >= 0.0)
 
-    # a to b is equal to b to a (at the moment)
+    # a to b is equal to b to a
     assert dists[1, 0] == dists[0, 1]
 
     # Same values in negative direction is same as the samples in the positive direction.

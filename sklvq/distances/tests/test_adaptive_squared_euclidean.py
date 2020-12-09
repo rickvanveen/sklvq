@@ -11,14 +11,20 @@ def test_adaptive_squared_euclidean():
     distfun = distance_class()
 
     # Some X and prototypes
-    data = np.array([[1, 2, 3], [-1, -2, -3]])
+    data = np.array([[1, 2, 3], [-1, -2, -3]], dtype="float64")
     p = np.array([[1, 2, 3], [-1, -2, -3], [0, 0, 0]])
     o = np.identity(data.shape[1])
 
     model = DummyLVQ(p, None, o)
+    check_distance(distfun, data, model)
 
+    # Rectangular omega
+    model = DummyLVQ(p, None, o[:2, :])
     check_distance(distfun, data, model)
 
     # Check force_all_finite settings
-
-    # Rectangular omega
+    distfun = distance_class(force_all_finite="allow-nan")
+    data[0, 0] = np.nan
+    data[1, 0] = np.nan
+    model = DummyLVQ(p, None, o)
+    check_distance(distfun, data, model)

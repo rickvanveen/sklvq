@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 
 class Euclidean(DistanceBaseClass):
-    """ Euclidean distance function
+    """Euclidean distance function
 
     Class that holds the euclidean distance function and its gradient.
 
@@ -36,7 +36,7 @@ class Euclidean(DistanceBaseClass):
         self.force_all_finite = force_all_finite
 
     def __call__(self, data: np.ndarray, model: "GLVQ") -> np.ndarray:
-        r""" Computes the Euclidean distance:
+        r"""Computes the Euclidean distance:
             .. math::
 
                 d(\mathbf{w}, \mathbf{x}) = \sqrt{(\mathbf{x} - \mathbf{w})^{\top} (\mathbf{x} - \mathbf{w})},
@@ -57,13 +57,13 @@ class Euclidean(DistanceBaseClass):
             Evaluation of the distance between each sample and prototype of the model.
         """
         distance_function = "euclidean"
-        if self.force_all_finite == "allow-nan" or False:
+        if self.force_all_finite == "allow-nan":
             distance_function = _nan_euclidean
 
         return cdist(data, model.prototypes_, distance_function)
 
     def gradient(self, data: np.ndarray, model: "GLVQ", i_prototype: int) -> np.ndarray:
-        r""" Computes the gradient of the euclidean distance with respect to a single
+        r"""Computes the gradient of the euclidean distance with respect to a single
         prototype:
 
             .. math::
