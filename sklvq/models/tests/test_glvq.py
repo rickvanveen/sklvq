@@ -55,7 +55,6 @@ def test_glvq_hyper_parameters():
     assert np.shares_memory(model_params, m.get_variables())
 
 
-
 def test_glvq():
     iris = datasets.load_iris()
 

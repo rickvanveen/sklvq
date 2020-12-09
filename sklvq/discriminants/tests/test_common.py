@@ -1,6 +1,5 @@
 from sklvq import discriminants
 from sklvq._utils import init_class
-from sklvq.discriminants import ALIASES
 from sklvq.discriminants import DiscriminantBaseClass
 
 

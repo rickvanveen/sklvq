@@ -2,7 +2,6 @@ import numpy as np
 
 from sklvq import distances
 from sklvq._utils import init_class
-from sklvq.distances import ALIASES
 from sklvq.distances import DistanceBaseClass
 
 

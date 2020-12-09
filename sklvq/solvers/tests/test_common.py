@@ -77,3 +77,19 @@ def test_scipy_solvers_callback(solver):
     pipeline = make_pipeline(preprocessing.StandardScaler(), estimator)
 
     pipeline.fit(iris.data, iris.target)
+
+
+# def check_init_solver(solver_string):
+#     distatance_class = init_class(distances, distance_string)
+#
+#     assert isinstance(distatance_class, type)
+#
+#     distance_instance = distatance_class()
+#
+#     assert isinstance(distance_instance, DistanceBaseClass)
+#
+#     return distatance_class
+#
+# def test_aliases():
+#     for value in ALIASES.keys():
+#         check_init_activation(value)

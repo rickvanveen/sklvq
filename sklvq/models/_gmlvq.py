@@ -449,7 +449,9 @@ class GMLVQ(LVQBaseClass):
 
     def _init_variables(self) -> None:
         self._variables = np.empty(
-            self._prototypes_size + self._relevances_size, dtype="float64", order="C",
+            self._prototypes_size + self._relevances_size,
+            dtype="float64",
+            order="C",
         )
 
     def _check_model_params(self):
