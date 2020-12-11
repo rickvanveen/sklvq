@@ -6,10 +6,6 @@ from sklearn.utils.validation import check_is_fitted, check_array
 from . import LVQBaseClass
 from ..objectives import GeneralizedLearningObjective
 
-from .. import distances
-from .._utils import init_class
-
-
 ModelParamsType = Tuple[np.ndarray, np.ndarray]
 
 DISTANCES = [
