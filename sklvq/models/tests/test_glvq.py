@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+from sklearn.base import clone
 from sklearn import datasets
 from sklearn import preprocessing
 from sklearn.model_selection import (
@@ -7,7 +8,6 @@ from sklearn.model_selection import (
     RepeatedStratifiedKFold,
 )
 from sklearn.pipeline import make_pipeline
-
 from sklvq.activations._identity import Identity
 
 from .. import GLVQ
@@ -18,15 +18,15 @@ def test_glvq_hyper_parameters():
 
     # Prototype initialization
     with pytest.raises(ValueError):
-        GLVQ(prototype_params={"prototypes_per_class": np.array([1, 1])}).fit(X, y)
+        GLVQ(prototype_n_per_class=np.array([1, 1])).fit(X, y)
 
     with pytest.raises(ValueError):
-        GLVQ(prototype_params={"prototypes_per_class": np.array([1, 0, 1])}).fit(X, y)
+        GLVQ(prototype_n_per_class=np.array([1, 0, 1])).fit(X, y)
 
     with pytest.raises(ValueError):
         GLVQ(prototype_init="abc").fit(X, y)
 
-    m = GLVQ(prototype_params={"prototypes_per_class": np.array([1, 2, 1])}).fit(X, y)
+    m = GLVQ(prototype_n_per_class=np.array([1, 2, 1])).fit(X, y)
     assert m.prototypes_.shape[0] == 4
 
     # Activation string which does not exist
@@ -61,10 +61,7 @@ def test_glvq():
     estimator = GLVQ(random_state=31415)
     pipeline = make_pipeline(preprocessing.StandardScaler(), estimator)
 
-    scipy_solvers_types = [
-        "lbfgs",
-        "bfgs"
-    ]
+    scipy_solvers_types = ["lbfgs", "bfgs"]
     # Run each solver ones
     solvers_types = [
         "steepest-gradient-descent",
@@ -92,7 +89,7 @@ def test_glvq():
             "glvq__discriminant_type": discriminant_types,
             "glvq__distance_type": distance_types,
             "glvq__activation_type": activation_types,
-        }
+        },
     ]
 
     repeated_kfolds = RepeatedStratifiedKFold(n_splits=2, n_repeats=1)
@@ -113,3 +110,10 @@ def test_glvq():
 
     print("\nBest parameter (CV roc_auc=%0.3f):" % search.best_score_)
     print(search.best_params_)
+
+
+def test_glvq_clone():
+    model = GLVQ(prototype_n_per_class=1000)
+    print(model.prototype_n_per_class)
+    clone_model = clone(model)
+    print(clone_model.prototype_n_per_class)

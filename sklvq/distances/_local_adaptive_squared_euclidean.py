@@ -43,10 +43,7 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
 
     """
 
-    __slots__ = "force_all_finite"
-
-    def __init__(self, force_all_finite=True):
-        self.force_all_finite = force_all_finite
+    __slots__ = ()
 
     def __call__(self, data: np.ndarray, model: "LGMLVQ") -> np.ndarray:
         r"""Computes the local variant of the adaptive squared Euclidean distance:
@@ -74,19 +71,18 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
         """
         prototypes_, omegas_ = model.get_model_params()
         prototypes_labels_ = model.prototypes_labels_
-        localization = model.relevance_params["localization"]
 
         distance_function = "mahalanobis"
         kwarg_str = "VI"
 
-        if self.force_all_finite == "allow-nan":
+        if model.force_all_finite == "allow-nan":
             distance_function = _nan_mahalanobis
             # RM because VI is filtered out of the  kwargs by cdist...
             kwarg_str = "RM"
 
         cdists = np.zeros((data.shape[0], model._prototypes_shape[0]))
 
-        if localization == "prototypes":
+        if model.relevance_localization == "prototypes":
             for i, (prototype, omega) in enumerate(zip(prototypes_, omegas_)):
                 cdists[:, i] = cdist(
                     data,
@@ -95,7 +91,7 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
                     **{kwarg_str: model._compute_lambda(omega)},
                 ).squeeze()
 
-        if localization == "class":
+        if model.relevance_localization == "class":
             for i, omega in enumerate(omegas_):
                 # Prototype labels are indices to model.classes_ so all prototypes with 'index'
                 # i as label have the same class.
@@ -154,7 +150,7 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
         # Difference we need for both the prototype and omega part.
         difference = data - prototype
 
-        if self.force_all_finite == "allow-nan":
+        if model.force_all_finite == "allow-nan":
             difference[np.isnan(difference)] = 0.0
 
         _prototype_gradient(

@@ -1,4 +1,5 @@
 import numpy as np
+from sklearn.base import clone
 from sklearn import datasets
 from sklearn import preprocessing
 from sklearn.model_selection import (
@@ -34,6 +35,7 @@ def test_lgmlvq():
 
     param_grid = [
         {
+
             "lgmlvq__solver_type": solvers_types,
             "lgmlvq__discriminant_type": discriminant_types,
             "lgmlvq__distance_type": distance_types,

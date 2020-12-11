@@ -1,4 +1,5 @@
 import numpy as np
+from sklearn.base import clone
 from sklearn import datasets
 from sklearn import preprocessing
 from sklearn.model_selection import (
@@ -37,12 +38,14 @@ def test_gmlvq():
 
     param_grid = [
         {
+            "gmlvq__relevance_normalization": [True, False],
             "gmlvq__solver_type": solvers_types,
             "gmlvq__discriminant_type": discriminant_types,
             "gmlvq__distance_type": distance_types,
             "gmlvq__activation_type": activation_types,
         },
         {
+            "gmlvq__relevance_normalization": [True, False],
             "gmlvq__solver_type": stochastic_solver_types,
             "gmlvq__solver_params": [
                 {"batch_size": 1, "step_size": np.array([0.1, 0.01])},

@@ -145,7 +145,7 @@ class GLVQ(LVQBaseClass):
         solver_type: Union[str, type] = "steepest-gradient-descent",
         solver_params: dict = None,
         prototype_init: str = "class-conditional-mean",
-        prototype_params: dict = None,
+        prototype_n_per_class: Union[int, np.ndarray] = 1,
         random_state: Union[int, np.random.RandomState] = None,
         force_all_finite: Union[str, bool] = True,
     ):
@@ -162,7 +162,7 @@ class GLVQ(LVQBaseClass):
             solver_params,
             SOLVERS,
             prototype_init,
-            prototype_params,
+            prototype_n_per_class,
             random_state,
             force_all_finite,
         )
@@ -206,7 +206,7 @@ class GLVQ(LVQBaseClass):
 
         Parameters
         ----------
-        var_buffers : ndarray
+        var_buffer : ndarray
             Array with the same size as the model's variables array as returned
             by ``get_variables()``.
 
@@ -314,10 +314,10 @@ class GLVQ(LVQBaseClass):
         self._variables = np.empty(self._prototypes_size, dtype="float64", order="C")
 
     def _check_model_params(self):
-        self._check_prototype_params(**self.prototype_params)
+        self._check_prototype_params()
 
     def _init_model_params(self, X, y) -> None:
-        self._init_prototypes(X, y, **self.prototype_params)
+        self._init_prototypes(X, y)
 
     def _init_objective(self):
         self._objective = GeneralizedLearningObjective(
