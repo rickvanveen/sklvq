@@ -456,9 +456,7 @@ class GMLVQ(LVQBaseClass):
         self._init_prototypes(X, y)
         self._init_relevances()
 
-    def _check_relevances_params(
-        self
-    ):
+    def _check_relevances_params(self):
         relevance_normalization = self.relevance_normalization
         if not isinstance(relevance_normalization, bool):
             raise ValueError("Provided normalization is invalid.")
@@ -466,8 +464,11 @@ class GMLVQ(LVQBaseClass):
         relevance_n_components = self.relevance_n_components
         if relevance_n_components == "all":
             self._relevances_shape = (self.n_features_in_, self.n_features_in_)
-        elif self.relevance_n_components >= 1 and relevance_n_components <= self.n_features_in_:
-            self._relevances_shape = (self.n_features_in_, relevance_n_components)
+        elif (
+            self.relevance_n_components >= 1
+            and relevance_n_components <= self.n_features_in_
+        ):
+            self._relevances_shape = (relevance_n_components, self.n_features_in_)
         else:
             raise ValueError("Provided n_components is invalid.")
 
