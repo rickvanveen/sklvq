@@ -69,7 +69,7 @@ def test_adaptive_squared_euclidean():
     model.set_prototypes(p)
     model.set_omega(o)
 
-    nan_data = data
+    nan_data = np.copy(data)
     nan_data[0, 0] = np.nan
     nan_data[1, 0] = np.nan
 
