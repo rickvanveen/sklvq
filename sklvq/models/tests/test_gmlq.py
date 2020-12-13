@@ -1,5 +1,5 @@
 import numpy as np
-from sklearn.base import clone
+
 from sklearn import datasets
 from sklearn import preprocessing
 from sklearn.model_selection import (
