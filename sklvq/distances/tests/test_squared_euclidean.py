@@ -28,4 +28,3 @@ def test_squared_euclidean():
     data[1, 0] = np.nan
 
     check_distance(model._distance, data, model)
-

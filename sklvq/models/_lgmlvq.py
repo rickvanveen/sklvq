@@ -484,7 +484,7 @@ class LGMLVQ(LVQBaseClass):
         if relevance_n_components == "all":
             shape = (self.n_features_in_, self.n_features_in_)
         elif 1 <= relevance_n_components <= self.n_features_in_:
-            shape = (self.n_features_in_, relevance_n_components)
+            shape = (relevance_n_components, self.n_features_in_)
         else:
             raise ValueError("Provided n_components is invalid.")
 
