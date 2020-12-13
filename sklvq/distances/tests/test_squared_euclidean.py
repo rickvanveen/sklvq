@@ -1,27 +1,31 @@
 import numpy as np
 
-from .test_common import DummyLVQ
 from .test_common import check_distance
 from .test_common import check_init_distance
 
+from sklvq.models import GLVQ
+
 
 def test_squared_euclidean():
-    distance_class = check_init_distance("squared-euclidean")
+    check_init_distance("squared-euclidean")
 
-    distfun = distance_class()
-
-    data = np.array([[1, 2, 3], [-1, -2, -3]], dtype="float64")
+    data = np.array([[1, 2, 3], [-1, -2, -3], [0, 0, 0]], dtype="float64")
     p = np.array([[1, 2, 3], [-1, -2, -3], [0, 0, 0]])
 
-    model = DummyLVQ(p)
+    model = GLVQ(distance_type="squared-euclidean")
+    model.fit(data, np.array([0, 1, 2]))
+    model.set_prototypes(p)
 
-    check_distance(distfun, data, model)
+    check_distance(model._distance, data, model)
 
     # Check force_all_finite settings
-    distfun = distance_class(force_all_finite="allow-nan")
+
+    model = GLVQ(distance_type="squared-euclidean", force_all_finite="allow-nan")
+    model.fit(data, np.array([0, 1, 2]))
+    model.set_prototypes(p)
 
     data[0, 0] = np.nan
     data[1, 0] = np.nan
 
-    model = DummyLVQ(p)
-    check_distance(distfun, data, model)
+    check_distance(model._distance, data, model)
+
