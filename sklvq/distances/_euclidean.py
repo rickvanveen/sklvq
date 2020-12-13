@@ -30,10 +30,7 @@ class Euclidean(DistanceBaseClass):
     Compatible with the :class:`.GLVQ` algorithm (only).
     """
 
-    __slots__ = "force_all_finite"
-
-    def __init__(self, force_all_finite=True):
-        self.force_all_finite = force_all_finite
+    __slots__ = ()
 
     def __call__(self, data: np.ndarray, model: "GLVQ") -> np.ndarray:
         r"""Computes the Euclidean distance:
@@ -57,7 +54,7 @@ class Euclidean(DistanceBaseClass):
             Evaluation of the distance between each sample and prototype of the model.
         """
         distance_function = "euclidean"
-        if self.force_all_finite == "allow-nan":
+        if model.force_all_finite == "allow-nan":
             distance_function = _nan_euclidean
 
         return cdist(data, model.prototypes_, distance_function)
@@ -89,7 +86,7 @@ class Euclidean(DistanceBaseClass):
 
         difference = data - prototype
 
-        if self.force_all_finite == "allow-nan" or False:
+        if model.force_all_finite == "allow-nan" or False:
             difference[np.isnan(difference)] = 0.0
 
         # Euclidean distance to single prototype. Equal to: np.sqrt(np.sum((data - prototype)**2))
