@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 
 import numpy as np
 from sklearn.utils import shuffle
@@ -91,7 +91,7 @@ class SteepestGradientDescent(SolverBaseClass):
         objective: ObjectiveBaseClass,
         max_runs: int = 10,
         batch_size: int = 1,
-        step_size: float = 0.1,
+        step_size: Union[float, np.ndarray] = 0.1,
         callback: callable = None,
     ):
         super().__init__(objective)
@@ -111,7 +111,7 @@ class SteepestGradientDescent(SolverBaseClass):
             )
         self.batch_size = batch_size
 
-        if np.all(step_size <= 0):
+        if np.any(step_size <= 0):
             raise ValueError(
                 "{}:  Expected step_size to be > 0, but got step_size = {}".format(
                     type(self).__name__, step_size
@@ -162,9 +162,6 @@ class SteepestGradientDescent(SolverBaseClass):
 
         if batch_size > data.shape[0]:
             raise ValueError("Provided batch_size is invalid.")
-
-        if batch_size <= 0:
-            batch_size = data.shape[0]
 
         for i_run in range(0, self.max_runs):
             # Randomize order of samples

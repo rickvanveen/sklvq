@@ -36,10 +36,7 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
     _`[2]` Schneider, P., Biehl, M., & Hammer, B. (2009). Adaptive Relevance Matrices in Learning
     Vector Quantization. Neural Computation, 21(12), 3532–3561."""
 
-    __slots__ = "force_all_finite"
-
-    def __init__(self, force_all_finite=True):
-        self.force_all_finite = force_all_finite
+    __slots__ = ()
 
     def __call__(self, data: np.ndarray, model: "GMLVQ") -> np.ndarray:
         r"""Computes the adaptive squared Euclidean distance:
@@ -65,7 +62,7 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
            Evaluation of the distance between each sample in the data and prototype of the model.
         """
 
-        if self.force_all_finite == "allow-nan":
+        if model.force_all_finite == "allow-nan":
             # RM because VI is filtered out of the  kwargs by cdist...
             return cdist(
                 data,
@@ -128,7 +125,7 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
 
         difference = data - prototype
 
-        if self.force_all_finite == "allow-nan":
+        if model.force_all_finite == "allow-nan":
             difference[np.isnan(difference)] = 0.0
 
         # Prototype gradient directly computed in the distance_gradient

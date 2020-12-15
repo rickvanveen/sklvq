@@ -18,6 +18,9 @@ import os
 import sphinx_rtd_theme
 from sphinx_gallery.sorting import FileNameSortKey
 
+import sphinx
+from distutils.version import LooseVersion
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -46,9 +49,6 @@ extensions = [
 numpydoc_show_class_members = False
 
 # pngmath / imgmath compatibility layer for different sphinx versions
-import sphinx
-from distutils.version import LooseVersion
-
 if LooseVersion(sphinx.__version__) < LooseVersion("1.4"):
     extensions.append("sphinx.ext.pngmath")
 else:
@@ -324,8 +324,9 @@ sphinx_gallery_conf = {
     "backreferences_dir": os.path.join("generated"),
     "reference_url": {"sklvq": None},
     "within_subsection_order": FileNameSortKey,
-    'abort_on_example_error': True,
+    "abort_on_example_error": True,
 }
+
 
 def setup(app):
     # a copy button to copy snippet of code from the documentation

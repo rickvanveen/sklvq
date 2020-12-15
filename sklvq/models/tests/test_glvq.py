@@ -1,5 +1,5 @@
 import numpy as np
-import pytest
+
 from sklearn import datasets
 from sklearn import preprocessing
 from sklearn.model_selection import (
@@ -8,41 +8,12 @@ from sklearn.model_selection import (
 )
 from sklearn.pipeline import make_pipeline
 
-from sklvq.activations._identity import Identity
-
 from .. import GLVQ
 
 
-def test_glvq_hyper_parameters():
+def test_shared_memory_glvq():
     X, y = datasets.load_iris(return_X_y=True)
-
-    # Prototype initialization
-    with pytest.raises(ValueError):
-        GLVQ(prototype_params={"prototypes_per_class": np.array([1, 1])}).fit(X, y)
-
-    with pytest.raises(ValueError):
-        GLVQ(prototype_params={"prototypes_per_class": np.array([1, 0, 1])}).fit(X, y)
-
-    with pytest.raises(ValueError):
-        GLVQ(prototype_init="abc").fit(X, y)
-
-    m = GLVQ(prototype_params={"prototypes_per_class": np.array([1, 2, 1])}).fit(X, y)
-    assert m.prototypes_.shape[0] == 4
-
-    # Activation string which does not exist
-    with pytest.raises(ValueError):
-        GLVQ(activation_type="abc123").fit(X, y)
-
-    # Activation object instead of type
-    activation_type = Identity()
-    with pytest.raises(ValueError):
-        GLVQ(activation_type=activation_type).fit(X, y)
-
-    activation_type = Identity
-    with pytest.raises(TypeError):
-        GLVQ(activation_type=activation_type, activation_params={"beta": 0}).fit(X, y)
-
-    m = GLVQ(activation_type=activation_type).fit(X, y)
+    m = GLVQ(activation_type="identity").fit(X, y)
 
     p = m.prototypes_
     m.set_model_params(np.random.random(size=(3, 4)))
@@ -55,17 +26,15 @@ def test_glvq_hyper_parameters():
     assert np.shares_memory(model_params, m.get_variables())
 
 
-
 def test_glvq():
     iris = datasets.load_iris()
 
     estimator = GLVQ(random_state=31415)
     pipeline = make_pipeline(preprocessing.StandardScaler(), estimator)
 
+    scipy_solvers_types = ["lbfgs", "bfgs"]
     # Run each solver ones
     solvers_types = [
-        "lbfgs",
-        "bfgs",
         "steepest-gradient-descent",
         "waypoint-gradient-descent",
         "adaptive-moment-estimation",
@@ -80,11 +49,18 @@ def test_glvq():
 
     param_grid = [
         {
+            "glvq__solver_type": scipy_solvers_types,
+            "glvq__solver_params": [{"jac": None}, {}],
+            "glvq__discriminant_type": discriminant_types,
+            "glvq__distance_type": distance_types,
+            "glvq__activation_type": activation_types,
+        },
+        {
             "glvq__solver_type": solvers_types,
             "glvq__discriminant_type": discriminant_types,
             "glvq__distance_type": distance_types,
             "glvq__activation_type": activation_types,
-        }
+        },
     ]
 
     repeated_kfolds = RepeatedStratifiedKFold(n_splits=2, n_repeats=1)

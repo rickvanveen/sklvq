@@ -20,12 +20,6 @@ SOLVERS = [
     "waypoint-gradient-descent",
 ]
 
-_RELEVANCES_PARAMS_DEFAULS = {
-    "normalization": True,
-    "localization": "prototypes",
-    "n_components": "all",
-}
-
 
 class LGMLVQ(LVQBaseClass):
     r"""Localized Generalized Matrix Learning Vector Quantization
@@ -194,9 +188,11 @@ class LGMLVQ(LVQBaseClass):
         solver_type: Union[str, type] = "steepest-gradient-descent",
         solver_params: dict = None,
         prototype_init: Union[str, np.ndarray] = "class-conditional-mean",
-        prototype_params: dict = None,
+        prototype_n_per_class: [int, np.ndarray] = 1,
         relevance_init: Union[str, np.ndarray] = "identity",
-        relevance_params: dict = None,
+        relevance_normalization: bool = True,
+        relevance_n_components: Union[str, int] = "all",
+        relevance_localization: str = "prototypes",
         random_state: Union[int, np.random.RandomState] = None,
         force_all_finite: Union[str, int] = True,
     ):
@@ -205,10 +201,9 @@ class LGMLVQ(LVQBaseClass):
         self.discriminant_type = discriminant_type
         self.discriminant_params = discriminant_params
         self.relevance_init = relevance_init
-        relevance_params = self._init_model_params_options(
-            relevance_params, _RELEVANCES_PARAMS_DEFAULS
-        )
-        self.relevance_params = relevance_params
+        self.relevance_normalization = relevance_normalization
+        self.relevance_n_components = relevance_n_components
+        self.relevance_localization = relevance_localization
 
         super(LGMLVQ, self).__init__(
             distance_type,
@@ -218,7 +213,7 @@ class LGMLVQ(LVQBaseClass):
             solver_params,
             SOLVERS,
             prototype_init,
-            prototype_params,
+            prototype_n_per_class,
             random_state,
             force_all_finite,
         )
@@ -239,13 +234,13 @@ class LGMLVQ(LVQBaseClass):
 
         """
         np.copyto(self._variables, new_variables)
-        if self._needs_normalizing():
+        if self.relevance_normalization:
             LGMLVQ._normalize_omega(self.to_omega(self._variables))
 
     def set_model_params(self, new_model_params: ModelParamsType):
         """
         Changes the model's internal parameters. Copies the values of model_params into
-        ``self.prototypes_`` and ``self.omega_`` therefor updating the ``self.variables_``
+        ``self.prototypes_`` and ``self.omega_`` therefore updating the ``self.variables_``
         array.
 
         Parameters
@@ -260,7 +255,7 @@ class LGMLVQ(LVQBaseClass):
         self.set_prototypes(new_prototypes)
         self.set_omega(new_omega)
 
-        if self._needs_normalizing():
+        if self.relevance_normalization:
             LGMLVQ._normalize_omega(self.omega_)
 
     def get_model_params(self) -> ModelParamsType:
@@ -281,7 +276,7 @@ class LGMLVQ(LVQBaseClass):
 
     def get_omega(self):
         """
-        Convenience function to return ``self.omega_``
+        Function to return ``self.omega_`` (consistency)
 
         Returns
         -------
@@ -434,8 +429,6 @@ class LGMLVQ(LVQBaseClass):
             self.prototypes_labels_[i_prototype], :, :
         ].ravel()
 
-        assert np.shares_memory(omega_view, gradient)
-
         np.add(omega_view, partial_gradient[n_features:], out=omega_view)
 
     def mul_step_size(
@@ -470,37 +463,46 @@ class LGMLVQ(LVQBaseClass):
 
     def _init_variables(self) -> None:
         self._variables = np.empty(
-            self._prototypes_size + self._relevances_size, dtype="float64", order="C",
+            self._prototypes_size + self._relevances_size,
+            dtype="float64",
+            order="C",
         )
 
     def _check_model_params(self):
-        self._check_prototype_params(**self.prototype_params)
-        self._check_relevances_params(**self.relevance_params)
+        self._check_prototype_params()
+        self._check_relevances_params()
 
     def _init_model_params(self, X, y) -> None:
-        self._init_prototypes(X, y, **self.prototype_params)
-        self._init_relevances(**self.relevance_params)
+        self._init_prototypes(X, y)
+        self._init_relevances()
 
-    def _check_relevances_params(
-        self,
-        normalization: bool = True,
-        localization: str = "prototypes",
-        n_components: Union[str, int] = "all",
-    ):
-        if not isinstance(normalization, bool):
+    def _check_relevances_params(self):
+        relevance_normalization = self.relevance_normalization
+        if not isinstance(relevance_normalization, bool):
             raise ValueError("Provided normalization is invalid.")
 
-        if n_components == "all":
-            shape = (self.n_features_in_, self.n_features_in_)
-        elif 1 <= n_components <= self.n_features_in_:
-            shape = (self.n_features_in_, n_components)
+        relevance_n_components = self.relevance_n_components
+        if isinstance(relevance_n_components, str):
+            if relevance_n_components == "all":
+                shape = (self.n_features_in_, self.n_features_in_)
+            else:
+                raise ValueError("Provided n_components is invalid.")
+        elif isinstance(relevance_n_components, int):
+            if (
+                self.relevance_n_components >= 1
+                and relevance_n_components <= self.n_features_in_
+            ):
+                shape = (relevance_n_components, self.n_features_in_)
+            else:
+                raise ValueError("Provided n_components is invalid.")
         else:
             raise ValueError("Provided n_components is invalid.")
 
-        if isinstance(localization, str):
-            if localization == "prototypes":
+        relevance_localization = self.relevance_localization
+        if isinstance(relevance_localization, str):
+            if relevance_localization == "prototypes":
                 self._relevances_shape = (self._prototypes_shape[0], *shape)
-            elif localization == "class":
+            elif relevance_localization == "class":
                 self._relevances_shape = (self.classes_.size, *shape)
             else:
                 raise ValueError("Provided localization is invalid.")
@@ -509,7 +511,7 @@ class LGMLVQ(LVQBaseClass):
 
         self._relevances_size = np.prod(self._relevances_shape)
 
-    def _init_relevances(self, normalization: bool = True, **kwargs):
+    def _init_relevances(self):
         self.omega_ = self.to_omega(self._variables)
 
         if isinstance(self.relevance_init, str):
@@ -531,7 +533,7 @@ class LGMLVQ(LVQBaseClass):
         else:
             raise ValueError("Provided relevance_init is invalid.")
 
-        if normalization:
+        if self.relevance_normalization:
             LGMLVQ._normalize_omega(self.omega_)
 
     def _init_objective(self):
@@ -552,11 +554,9 @@ class LGMLVQ(LVQBaseClass):
         # Eigenvalues and column eigenvectors returned in ascending order
         eigenvalues, omega_hat = np.linalg.eigh(self.lambda_)
 
+        # Rounding error cause eigenvalues to be very small negative numbers sometimes...
         self.eigenvalues_ = np.flip(eigenvalues, axis=1)
         self.omega_hat_ = np.flip(omega_hat, axis=2)
-
-    def _needs_normalizing(self):
-        return self.relevance_params["normalization"]
 
     @staticmethod
     def _compute_lambda(omega):
@@ -626,7 +626,9 @@ class LGMLVQ(LVQBaseClass):
 
         if scale:
             transformation_matrix = np.einsum(
-                "ik, ijk -> ijk", np.sqrt(self.eigenvalues_), transformation_matrix
+                "ik, ijk -> ijk",
+                np.sqrt(np.absolute(self.eigenvalues_)),
+                transformation_matrix,
             )
         transformed_data = np.einsum("jk, ikl -> ijl", X, transformation_matrix)
 

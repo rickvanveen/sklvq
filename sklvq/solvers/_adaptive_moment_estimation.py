@@ -103,7 +103,7 @@ class AdaptiveMomentEstimation(SolverBaseClass):
             )
         self.max_runs = max_runs
 
-        if 0 > beta1 > 1.0:
+        if beta1 <= 0 or beta1 > 1.0:
             raise ValueError(
                 "{}:  Expected beta1 to be > 0 and <= 1.0 but got beta1 = {}".format(
                     type(self).__name__, beta1
@@ -111,7 +111,7 @@ class AdaptiveMomentEstimation(SolverBaseClass):
             )
         self.beta1 = beta1
 
-        if 0 > beta2 > 1.0:
+        if beta2 <= 0 or beta2 > 1.0:
             raise ValueError(
                 "{}:  Expected beta1 to be > 0 and <= 1.0 but got beta2 = {}".format(
                     type(self).__name__, beta2
@@ -119,7 +119,7 @@ class AdaptiveMomentEstimation(SolverBaseClass):
             )
         self.beta2 = beta2
 
-        if np.all(step_size <= 0):
+        if np.any(step_size <= 0):
             raise ValueError(
                 "{}:  Expected step_size to be > 0, but got step_size = {}".format(
                     type(self).__name__, step_size
