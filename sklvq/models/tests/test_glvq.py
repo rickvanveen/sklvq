@@ -8,41 +8,13 @@ from sklearn.model_selection import (
     RepeatedStratifiedKFold,
 )
 from sklearn.pipeline import make_pipeline
-from sklvq.activations._identity import Identity
 
 from .. import GLVQ
 
 
-def test_glvq_hyper_parameters():
+def test_shared_memory_glvq():
     X, y = datasets.load_iris(return_X_y=True)
-
-    # Prototype initialization
-    with pytest.raises(ValueError):
-        GLVQ(prototype_n_per_class=np.array([1, 1])).fit(X, y)
-
-    with pytest.raises(ValueError):
-        GLVQ(prototype_n_per_class=np.array([1, 0, 1])).fit(X, y)
-
-    with pytest.raises(ValueError):
-        GLVQ(prototype_init="abc").fit(X, y)
-
-    m = GLVQ(prototype_n_per_class=np.array([1, 2, 1])).fit(X, y)
-    assert m.prototypes_.shape[0] == 4
-
-    # Activation string which does not exist
-    with pytest.raises(ValueError):
-        GLVQ(activation_type="abc123").fit(X, y)
-
-    # Activation object instead of type
-    activation_type = Identity()
-    with pytest.raises(ValueError):
-        GLVQ(activation_type=activation_type).fit(X, y)
-
-    activation_type = Identity
-    with pytest.raises(TypeError):
-        GLVQ(activation_type=activation_type, activation_params={"beta": 0}).fit(X, y)
-
-    m = GLVQ(activation_type=activation_type).fit(X, y)
+    m = GLVQ(activation_type="identity").fit(X, y)
 
     p = m.prototypes_
     m.set_model_params(np.random.random(size=(3, 4)))
@@ -53,7 +25,6 @@ def test_glvq_hyper_parameters():
     assert np.all(m.prototypes_.shape == model_params.shape)
     assert np.shares_memory(m.prototypes_, m.get_variables())
     assert np.shares_memory(model_params, m.get_variables())
-
 
 def test_glvq():
     iris = datasets.load_iris()
@@ -110,10 +81,3 @@ def test_glvq():
 
     print("\nBest parameter (CV roc_auc=%0.3f):" % search.best_score_)
     print(search.best_params_)
-
-
-def test_glvq_clone():
-    model = GLVQ(prototype_n_per_class=1000)
-    print(model.prototype_n_per_class)
-    clone_model = clone(model)
-    print(clone_model.prototype_n_per_class)

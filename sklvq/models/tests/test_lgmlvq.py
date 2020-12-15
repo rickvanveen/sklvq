@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 
 from sklearn import datasets
 from sklearn import preprocessing
@@ -9,6 +10,22 @@ from sklearn.model_selection import (
 from sklearn.pipeline import make_pipeline
 
 from .. import LGMLVQ
+
+
+def test_lgmlvq_hyper_params():
+    X, y = datasets.load_iris(return_X_y=True)
+
+    model = LGMLVQ(prototype_n_per_class=6, relevance_localization="prototypes").fit(X, y)
+    assert model.omega_.shape[0] == (model.classes_.size * 6)
+
+    model = LGMLVQ(prototype_n_per_class=6, relevance_localization="class").fit(X, y)
+    assert model.omega_.shape[0] == model.classes_.size
+
+    with pytest.raises(ValueError):
+        LGMLVQ(prototype_n_per_class=6, relevance_localization="abc").fit(X, y)
+
+    with pytest.raises(ValueError):
+        LGMLVQ(prototype_n_per_class=6, relevance_localization=8).fit(X, y)
 
 
 def test_lgmlvq():

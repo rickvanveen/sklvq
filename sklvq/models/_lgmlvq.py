@@ -254,7 +254,7 @@ class LGMLVQ(LVQBaseClass):
         self.set_prototypes(new_prototypes)
         self.set_omega(new_omega)
 
-        if self.relevance_normalization():
+        if self.relevance_normalization:
             LGMLVQ._normalize_omega(self.omega_)
 
     def get_model_params(self) -> ModelParamsType:
@@ -481,10 +481,19 @@ class LGMLVQ(LVQBaseClass):
             raise ValueError("Provided normalization is invalid.")
 
         relevance_n_components = self.relevance_n_components
-        if relevance_n_components == "all":
-            shape = (self.n_features_in_, self.n_features_in_)
-        elif 1 <= relevance_n_components <= self.n_features_in_:
-            shape = (relevance_n_components, self.n_features_in_)
+        if isinstance(relevance_n_components, str):
+            if relevance_n_components == "all":
+                shape = (self.n_features_in_, self.n_features_in_)
+            else:
+                raise ValueError("Provided n_components is invalid.")
+        elif isinstance(relevance_n_components, int):
+            if (
+                self.relevance_n_components >= 1
+                and relevance_n_components <= self.n_features_in_
+            ):
+                shape = (relevance_n_components, self.n_features_in_)
+            else:
+                raise ValueError("Provided n_components is invalid.")
         else:
             raise ValueError("Provided n_components is invalid.")
 

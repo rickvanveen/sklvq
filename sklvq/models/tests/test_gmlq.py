@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 
 from sklearn import datasets
 from sklearn import preprocessing
