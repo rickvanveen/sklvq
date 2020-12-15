@@ -7,7 +7,7 @@ from . import ActivationBaseClass
 class Sigmoid(ActivationBaseClass):
     """Sigmoid function
 
-    Class that holds the sigmoid function and gradient as discussed in [1]_
+    Class that holds the sigmoid function and gradient as discussed in `[1]`_
 
     Parameters
     ----------
@@ -20,10 +20,8 @@ class Sigmoid(ActivationBaseClass):
 
     References
     ----------
-    .. [1] Villmann, T., Ravichandran, J., Villmann, A., Nebel, D., & Kaden, M. (2019). "Activation
-        Functions for Generalized Learning Vector Quantization - A Performance Comparison", 2019.
-
-    """
+    _`[1]` Villmann, T., Ravichandran, J., Villmann, A., Nebel, D., & Kaden, M. (2019). "Activation
+    Functions for Generalized Learning Vector Quantization - A Performance Comparison", 2019."""
 
     __slots__ = "beta"
 

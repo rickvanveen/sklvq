@@ -16,8 +16,8 @@ STATE_KEYS = ["variables", "nit", "fun", "nfun", "tfun", "step_size"]
 class WaypointGradientDescent(SolverBaseClass):
     r""" Waypoint gradient descent (WGD)
 
-    Implements the waypoint average optimization algorithm [1]_. Implementation and description is
-    inspired by [2]_.
+    Implements the waypoint average optimization algorithm `[1]`_. Implementation and description is
+    inspired by `[2]`_.
 
     The algorithm keeps a rolling average of the last ``k`` model parameters. After ``k`` steps the
     algorithms will compare the cost of the average model parameters (:math:`\hat{
@@ -95,15 +95,14 @@ class WaypointGradientDescent(SolverBaseClass):
 
     References
     ----------
-    .. [1] Papari, G., and Bunte, K., and Biehl, M. (2011) "Waypoint averaging and step size
-        control in learning by gradient descent" Mittweida Workshop on Computational
-        Intelligence (MIWOCI) 2011.
-    .. [2] LeKander, M., Biehl, M., & De Vries, H. (2017). "Empirical evaluation of gradient
-        methods for matrix learning vector quantization." 12th International Workshop on
-        Self-Organizing Maps and Learning Vector Quantization, Clustering and Data
-        Visualization, WSOM 2017.
+    _`[1]` Papari, G., and Bunte, K., and Biehl, M. (2011) "Waypoint averaging and step size
+    control in learning by gradient descent" Mittweida Workshop on Computational
+    Intelligence (MIWOCI) 2011.
 
-    """
+    _`[2]` LeKander, M., Biehl, M., & De Vries, H. (2017). "Empirical evaluation of gradient
+    methods for matrix learning vector quantization." 12th International Workshop on
+    Self-Organizing Maps and Learning Vector Quantization, Clustering and Data
+    Visualization, WSOM 2017."""
 
     def __init__(
         self,

@@ -31,8 +31,8 @@ class GMLVQ(LVQBaseClass):
     r"""Generalized Matrix Learning Vector Quantization
 
     This model uses the :class:`sklvq.objectives.GeneralizedLearningObjective` as its objective
-    function [1]_. In addition to learning the positions of the prototypes it learns a relevance
-    matrix that is used in the distance functions [2]_.
+    function `[1]`_. In addition to learning the positions of the prototypes it learns a relevance
+    matrix that is used in the distance functions `[2]`_.
 
     Parameters
     ----------
@@ -110,7 +110,7 @@ class GMLVQ(LVQBaseClass):
         Default will initiate the omega matrices to be the identity matrix. Other behaviour can
         be implemented by providing a custom omega as numpy array. E.g. a randomly initialized
         square matrix (n_features, n_features). The rank of the matrix can be reduced by
-        providing a square matrix of shape ([1, n_features), n_features)  [3]_.
+        providing a square matrix of shape ([1, n_features), n_features)  `[3]`_.
 
     relevance_params: dict = None,
         Containing the following parameters (keys):
@@ -147,7 +147,7 @@ class GMLVQ(LVQBaseClass):
 
     omega_hat_: ndarray
         The omega matrix found by the eigenvalue decomposition of the relevance matrix ``lambda_``.
-        The eigenvectors (columns of ``omega_hat_``) can be used to transform the X [3]_.
+        The eigenvectors (columns of ``omega_hat_``) can be used to transform the X `[3]`_.
 
     eigenvalues_: ndarray
         The corresponding eigenvalues to ``omega_hat_`` found by the eigenvalue decomposition of
@@ -155,15 +155,16 @@ class GMLVQ(LVQBaseClass):
 
     References
     ----------
-    .. [1] Sato, A., and Yamada, K. (1996) "Generalized Learning Vector Quantization."
-        Advances in Neural Network Information Processing Systems, 423–429, 1996.
+    _`[1]` Sato, A., and Yamada, K. (1996) "Generalized Learning Vector Quantization."
+    Advances in Neural Network Information Processing Systems, 423–429, 1996.
 
-    .. [2] Schneider, P., Biehl, M., & Hammer, B. (2009). "Adaptive Relevance Matrices in
-        Learning Vector Quantization" Neural Computation, 21(12), 3532–3561, 2009.
+    _`[2]` Schneider, P., Biehl, M., & Hammer, B. (2009). "Adaptive Relevance Matrices in
+    Learning Vector Quantization" Neural Computation, 21(12), 3532–3561, 2009.
 
-    .. [3] Bunte, K., Schneider, P., Hammer, B., Schleif, F.-M., Villmann, T., & Biehl, M. (2012).
-        "Limited Rank Matrix Learning, discriminative dimension reduction and visualization." Neural
-        Networks, 26, 159–173, 2012."""
+    _`[3]` Bunte, K., Schneider, P., Hammer, B., Schleif, F.-M., Villmann, T., & Biehl, M. (2012).
+    "Limited Rank Matrix Learning, discriminative dimension reduction and visualization." Neural
+    Networks, 26, 159–173, 2012."""
+
     classes_: np.ndarray
     prototypes_: np.ndarray
     prototypes_labels_: np.ndarray

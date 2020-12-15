@@ -25,7 +25,7 @@ _PROTOTYPES_PARAMS_DEFAULTS = {"prototypes_per_class": 1}
 class LVQBaseClass(
     ABC, BaseEstimator, ClassifierMixin
 ):  # lgtm [py/conflicting-attributes]
-    """Learning vector quantization base class
+    """Learning Vector Quantization base class
 
     Abstract class for implementing LVQ models. It provides abstract methods with
     expected call signatures.

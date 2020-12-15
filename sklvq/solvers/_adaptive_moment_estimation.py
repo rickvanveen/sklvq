@@ -16,7 +16,7 @@ STATE_KEYS = ["variables", "nit", "fun", "m_hat", "v_hat"]
 class AdaptiveMomentEstimation(SolverBaseClass):
     r"""Adaptive moment estimation (ADAM)
 
-    Implementation and description inspired by [1]_.
+    Implementation and description inspired by `[1]`_.
 
     Adam maintains two moving averages of the gradient (:math:`m, v`), which get updated for
     every sample at each epoch/run until the maximum runs (``max_runs``) has been reached:
@@ -79,12 +79,10 @@ class AdaptiveMomentEstimation(SolverBaseClass):
 
     References
     ----------
-    .. [1] LeKander, M., Biehl, M., & De Vries, H. (2017). "Empirical evaluation of gradient
-        methods for matrix learning vector quantization." 12th International Workshop on
-        Self-Organizing Maps and Learning Vector Quantization, Clustering and Data
-        Visualization, WSOM 2017.
-
-    """
+    _`[1]` LeKander, M., Biehl, M., & De Vries, H. (2017). "Empirical evaluation of gradient
+    methods for matrix learning vector quantization." 12th International Workshop on
+    Self-Organizing Maps and Learning Vector Quantization, Clustering and Data
+    Visualization, WSOM 2017."""
 
     def __init__(
         self,

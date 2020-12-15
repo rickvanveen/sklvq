@@ -7,7 +7,7 @@ from typing import Union
 class SoftPlus(ActivationBaseClass):
     """Soft+ function
 
-    Class that holds the soft+ function and gradient as discussed in [1]_
+    Class that holds the soft+ function and gradient as discussed in `[1]`_
 
     Parameters
     ----------
@@ -20,9 +20,8 @@ class SoftPlus(ActivationBaseClass):
 
     References
     ----------
-    .. [1] Villmann, T., Ravichandran, J., Villmann, A., Nebel, D., & Kaden, M. (2019). "Activation
-        Functions for Generalized Learning Vector Quantization - A Performance Comparison", 2019.
-    """
+    _`[1]` Villmann, T., Ravichandran, J., Villmann, A., Nebel, D., & Kaden, M. (2019). "Activation
+    Functions for Generalized Learning Vector Quantization - A Performance Comparison", 2019."""
 
     __slots__ = "beta"
 
