@@ -5,7 +5,7 @@ from . import SolverBaseClass
 from ..objectives import ObjectiveBaseClass
 from ._base import _update_state
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 
 if TYPE_CHECKING:
     from sklvq.models import LVQBaseClass
@@ -109,7 +109,7 @@ class WaypointGradientDescent(SolverBaseClass):
         self,
         objective: ObjectiveBaseClass,
         max_runs: int = 10,
-        step_size: float = 0.1,
+        step_size: Union[float, np.ndarray] = 0.1,
         loss: float = 2 / 3,
         gain: float = 1.1,
         k: int = 3,

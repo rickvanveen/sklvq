@@ -430,6 +430,7 @@ class GMLVQ(LVQBaseClass):
             gradient *= step_sizes
             return
 
+        # else it's a np.ndarray...
         if isinstance(step_sizes, np.ndarray):
             if step_sizes.size > 1:
                 prototypes, omega = self.to_model_params_view(gradient)

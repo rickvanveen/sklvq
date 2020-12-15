@@ -99,6 +99,9 @@ def test_shared_hyper_params(estimator):
         estimator(relevance_normalization="True").fit(X, y)
 
     with pytest.raises(ValueError):
+        estimator(relevance_normalization=6.0).fit(X, y)
+
+    with pytest.raises(ValueError):
         estimator(relevance_n_components="none").fit(X, y)
 
     with pytest.raises(ValueError):
@@ -106,6 +109,9 @@ def test_shared_hyper_params(estimator):
 
     with pytest.raises(ValueError):
         estimator(relevance_n_components=-120).fit(X, y)
+
+    with pytest.raises(ValueError):
+        estimator(relevance_n_components=6.0).fit(X, y)
 
     with pytest.raises(ValueError):
         estimator(relevance_init="abc").fit(X, y)
