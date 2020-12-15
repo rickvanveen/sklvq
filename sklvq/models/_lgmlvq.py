@@ -625,7 +625,9 @@ class LGMLVQ(LVQBaseClass):
 
         if scale:
             transformation_matrix = np.einsum(
-                "ik, ijk -> ijk", np.sqrt(np.absolute(self.eigenvalues_)), transformation_matrix
+                "ik, ijk -> ijk",
+                np.sqrt(np.absolute(self.eigenvalues_)),
+                transformation_matrix,
             )
         transformed_data = np.einsum("jk, ikl -> ijl", X, transformation_matrix)
 

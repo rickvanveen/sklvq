@@ -575,7 +575,9 @@ class GMLVQ(LVQBaseClass):
 
         transformation_matrix = self.omega_hat_
         if scale:
-            transformation_matrix = np.sqrt(np.absolute(self.eigenvalues_)) * transformation_matrix
+            transformation_matrix = (
+                np.sqrt(np.absolute(self.eigenvalues_)) * transformation_matrix
+            )
 
         data_new = X.dot(transformation_matrix)
 

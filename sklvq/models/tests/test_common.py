@@ -119,5 +119,3 @@ def test_shared_hyper_params(estimator):
     assert not np.all(np.isnan(X_hat))
 
     assert pytest.approx(X_hat, estimator().fit_transform(X, y, scale=True))
-
-
