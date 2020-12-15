@@ -44,11 +44,10 @@ def check_distance(distfun, data, model):
         gradient_size = model.prototypes_[0, :].size
 
         if isinstance(model, (GMLVQ, LGMLVQ)):
-            if model.omega_ is not None:
-                if model.omega_.ndim == 3:
-                    gradient_size += model.omega_[0, :, :].size
-                else:
-                    gradient_size += model.omega_.size
+            if model.omega_.ndim == 3:
+                gradient_size += model.omega_[0, :, :].size
+            else:
+                gradient_size += model.omega_.size
 
         # Size of num_samples x single prototype...
         assert gradient.shape == (data.shape[0], gradient_size)
