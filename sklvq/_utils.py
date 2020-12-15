@@ -27,13 +27,8 @@ def _import_class_from_string(package_string: str, class_string: str) -> type:
 
     try:
         module = import_module("." + module_string, package_string)
-    except ModuleNotFoundError:
-        raise ImportError(
-            "{}.{} is not part of our collection".format(module_string, class_string)
-        )
-    try:
         specified_class = getattr(module, class_string)
-    except (AttributeError, TypeError):
+    except (ModuleNotFoundError, AttributeError, TypeError):
         raise ImportError(
             "{}.{} is not part of our collection".format(module_string, class_string)
         )
