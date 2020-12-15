@@ -1,4 +1,5 @@
 from importlib import import_module
+from typing import List
 
 
 def _parse_module_string(parameter_string: str) -> str:
@@ -26,17 +27,29 @@ def _import_class_from_string(package_string: str, class_string: str) -> type:
 
     try:
         module = import_module("." + module_string, package_string)
-    except ModuleNotFoundError:
-        raise ImportError(
-            "{}.{} is not part of our collection".format(module_string, class_string)
-        )
-    try:
         specified_class = getattr(module, class_string)
-    except (AttributeError, TypeError):
+    except (ModuleNotFoundError, AttributeError, TypeError):
         raise ImportError(
             "{}.{} is not part of our collection".format(module_string, class_string)
         )
     return specified_class
+
+
+def _import_from_string(
+    package,
+    class_string: str,
+    aliases: dict,
+    param_name: str,
+    valid_strings: List[str] = None,
+) -> type:
+    if class_string in aliases.keys():
+        class_string = aliases[class_string]
+
+    if valid_strings is not None:
+        if not (class_string in valid_strings):
+            raise ValueError(f"Provided {param_name} is invalid.")
+
+    return _import_class_from_string(package, class_string)
 
 
 def init_class(package, class_type, valid_class_types=None):

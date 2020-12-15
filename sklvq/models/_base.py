@@ -19,8 +19,6 @@ from typing import Tuple, Union, List
 
 ModelParamsType = np.ndarray
 
-_PROTOTYPES_PARAMS_DEFAULTS = {"prototypes_per_class": 1}
-
 
 class LVQBaseClass(
     ABC, BaseEstimator, ClassifierMixin
@@ -66,7 +64,7 @@ class LVQBaseClass(
         solver_params: dict = None,
         valid_solvers: List[str] = None,
         prototype_init: Union[str, np.ndarray] = "class-conditional-mean",
-        prototype_params: dict = None,
+        prototype_n_per_class: int = 1,
         random_state: Union[int, np.random.RandomState] = None,
         force_all_finite: Union[str, bool] = True,
     ):
@@ -83,26 +81,10 @@ class LVQBaseClass(
         self.valid_solvers = valid_solvers
 
         self.prototype_init = prototype_init
-        prototype_params = self._init_model_params_options(
-            prototype_params, _PROTOTYPES_PARAMS_DEFAULTS
-        )
-        self.prototype_params = prototype_params
+        self.prototype_n_per_class = prototype_n_per_class
 
         self.random_state = random_state
         self.force_all_finite = force_all_finite
-
-    @staticmethod
-    def _init_model_params_options(parameter_params, parameter_params_defaults):
-        # Helper function to intialize certain model parameter settings. Used for
-        # prototype_params, and relevance_params (GMLVQ, LGMLVQ).
-        if parameter_params is None:
-            return parameter_params_defaults
-
-        for key in parameter_params_defaults.keys():
-            if key not in parameter_params:
-                parameter_params[key] = parameter_params_defaults[key]
-
-        return parameter_params
 
     ###########################################################################################
     # The "Getter" and "Setter" that are used by the solvers to set and get model params.
@@ -375,50 +357,42 @@ class LVQBaseClass(
         """
         raise NotImplementedError("You should implement this!")
 
-    def _check_prototype_params(
-        self, prototypes_per_class: Union[int, np.ndarray] = 1, **kwargs
-    ):
+    def _check_prototype_params(self):
         """
         Check prototype params, i.e., if the prototypes_per_class is set correctly.
         Additionally, it sets the size and shape of the prototypes such that these can be used
         for the creation of the ``self._variables`` and view ``self.prototypes_``.
-
-        Parameters
-        ----------
-        prototypes_per_class: int, default = 1
-
-        kwargs
-
         """
+        prototype_n_per_class = self.prototype_n_per_class
 
-        if isinstance(prototypes_per_class, int):
+        if isinstance(prototype_n_per_class, int):
             self._prototypes_shape = (
-                prototypes_per_class * self.classes_.size,
+                prototype_n_per_class * self.classes_.size,
                 self.n_features_in_,
             )
-        elif isinstance(prototypes_per_class, np.ndarray):
-            if prototypes_per_class.size != self.classes_.size:
+        elif isinstance(prototype_n_per_class, np.ndarray):
+            if prototype_n_per_class.size != self.classes_.size:
                 raise ValueError(
                     "Expected the number protoypes_per_class (size = {}) to have a number of elements "
                     "equal to the number of classes (size = {}).",
-                    prototypes_per_class.size,
+                    prototype_n_per_class.size,
                     self.classes_.size,
                 )
 
-            if np.any(prototypes_per_class <= 0.0):
+            if np.any(prototype_n_per_class <= 0.0):
                 raise ValueError(
                     "Prototypes_per_class ({}) cannot contain any values less than or equal to zero.",
-                    prototypes_per_class,
+                    prototype_n_per_class,
                 )
 
             self._prototypes_shape = (
-                np.sum(prototypes_per_class),
+                np.sum(prototype_n_per_class),
                 self.n_features_in_,
             )
         else:
             raise ValueError(
                 "Expected prototypes_per_class to be either of type int or np.ndarray, but got type: {}",
-                type(prototypes_per_class),
+                type(prototype_n_per_class),
             )
 
         self._prototypes_size = np.prod(self._prototypes_shape)
@@ -427,7 +401,6 @@ class LVQBaseClass(
         self,
         X: np.ndarray,
         y: np.ndarray,
-        prototypes_per_class=1,
     ) -> None:
         """
         Initialized the prototypes, with a small random offset, to the class conditional mean.
@@ -440,7 +413,7 @@ class LVQBaseClass(
 
         """
         self.prototypes_labels_ = np.repeat(
-            np.arange(0, self.classes_.size), prototypes_per_class
+            np.arange(0, self.classes_.size), self.prototype_n_per_class
         )
 
         # Sets initial value for prototypes....
@@ -469,17 +442,13 @@ class LVQBaseClass(
         """
         Initializes the ``self.distance``.
         """
-        # Get the distance function and prepare parameters
-        distance_params = {"force_all_finite": self.force_all_finite}
-        distance_params.update(self.distance_params)
-
         distance_class = init_class(
             distances,
             self.distance_type,
             valid_class_types=self.valid_distances,
         )
 
-        self._distance = distance_class(**distance_params)
+        self._distance = distance_class(**self.distance_params)
 
     def _init_solver(self) -> None:
         """
