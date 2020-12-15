@@ -553,6 +553,7 @@ class LGMLVQ(LVQBaseClass):
         # Eigenvalues and column eigenvectors returned in ascending order
         eigenvalues, omega_hat = np.linalg.eigh(self.lambda_)
 
+        # Rounding error cause eigenvalues to be very small negative numbers sometimes...
         self.eigenvalues_ = np.flip(eigenvalues, axis=1)
         self.omega_hat_ = np.flip(omega_hat, axis=2)
 
@@ -624,7 +625,7 @@ class LGMLVQ(LVQBaseClass):
 
         if scale:
             transformation_matrix = np.einsum(
-                "ik, ijk -> ijk", np.sqrt(self.eigenvalues_), transformation_matrix
+                "ik, ijk -> ijk", np.sqrt(np.absolute(self.eigenvalues_)), transformation_matrix
             )
         transformed_data = np.einsum("jk, ikl -> ijl", X, transformation_matrix)
 

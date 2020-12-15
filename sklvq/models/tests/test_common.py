@@ -91,7 +91,7 @@ def test_shared_memory(estimator):
     assert np.shares_memory(old_variables, m.get_variables())
 
 
-@pytest.mark.parametrize("estimator", [GMLVQ, LGMLVQ])
+@pytest.mark.parametrize("estimator", [LGMLVQ])
 def test_shared_hyper_params(estimator):
     X, y = datasets.load_iris(return_X_y=True)
 
@@ -102,12 +102,22 @@ def test_shared_hyper_params(estimator):
         estimator(relevance_n_components="none").fit(X, y)
 
     with pytest.raises(ValueError):
-        estimator(relevance_n_components=1e10).fit(X, y)
+        estimator(relevance_n_components=120).fit(X, y)
 
     with pytest.raises(ValueError):
-        estimator(relevance_n_components=-1e10).fit(X, y)
+        estimator(relevance_n_components=-120).fit(X, y)
 
     with pytest.raises(ValueError):
         estimator(relevance_init="abc").fit(X, y)
 
     estimator(relevance_init="random").fit(X, y)
+
+    with pytest.raises(ValueError):
+        estimator(relevance_init=6).fit(X, y)
+
+    X_hat = estimator().fit(X, y).transform(X, scale=True)
+    assert not np.all(np.isnan(X_hat))
+
+    assert pytest.approx(X_hat, estimator().fit_transform(X, y, scale=True))
+
+
