@@ -50,7 +50,9 @@ def test_common_hyper_parameters(estimator):
 
     activation_type = Identity
     with pytest.raises(TypeError):
-        estimator(activation_type=activation_type, activation_params={"beta": 0}).fit(X, y)
+        estimator(activation_type=activation_type, activation_params={"beta": 0}).fit(
+            X, y
+        )
 
 
 @pytest.mark.parametrize("estimator", [GMLVQ, LGMLVQ])
@@ -77,8 +79,8 @@ def test_shared_memory(estimator):
 
     old_variables = m.get_variables()
 
-    p = (np.random.random(size=p.shape))
-    o = (np.random.random(size=o.shape))
+    p = np.random.random(size=p.shape)
+    o = np.random.random(size=o.shape)
 
     m.set_model_params((p, o))
     assert np.all(m.prototypes_.shape == p.shape)

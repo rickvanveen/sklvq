@@ -1,6 +1,5 @@
 import numpy as np
-import pytest
-from sklearn.base import clone
+
 from sklearn import datasets
 from sklearn import preprocessing
 from sklearn.model_selection import (
@@ -25,6 +24,7 @@ def test_shared_memory_glvq():
     assert np.all(m.prototypes_.shape == model_params.shape)
     assert np.shares_memory(m.prototypes_, m.get_variables())
     assert np.shares_memory(model_params, m.get_variables())
+
 
 def test_glvq():
     iris = datasets.load_iris()
