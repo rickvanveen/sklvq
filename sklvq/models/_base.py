@@ -324,7 +324,6 @@ class LVQBaseClass(
         Should check the model parameters. I.e., call check_prototype_params with parameters and
         other model parameters that there might be.
         """
-        pass
 
     @abstractmethod
     def _init_model_params(self, X, y):
@@ -539,7 +538,6 @@ class LVQBaseClass(
         X : ndarray with shape (number of observations, number of dimensions)
         y : ndarray with size equal to the number of observations
         """
-        pass
 
     ###########################################################################################
     # Public API functions
