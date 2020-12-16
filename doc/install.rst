@@ -14,14 +14,17 @@ Dependencies
 
 The sklvq toolbox requires the following packages to be installed:
 
-* numpy (>=1.18.2)
-* scipy (>=1.4.1)
-* scikit-learn (>=0.23.1)
+* numpy
+* scipy
+* scikit-learn
 
 Installation
 ------------
+Sklvq can be installed using pip::
 
-Currently, one has to clone the repository and run the setup.py file. The following (terminal/cmd) commands can be used to clone the repository and install sklvq with all dependencies::
+    pip install sklvq
+
+Another option is to clone the repository and run the setup.py file. The following (terminal/cmd) commands can be used to clone the repository and install sklvq with all dependencies::
 
     git clone https://github.com/rickvanveen/sklvq.git
     cd sklvq
@@ -42,15 +45,15 @@ Dependencies
 In addition to the regular dependencies, sklvq requires a number of packages for testing and building the documentation:
 
 Testing:
-    * pytest (>=5.4.1)
-    * pytest-cov (>=2.8.1)
+    * pytest
+    * pytest-cov
 
 Documentation:
-    * sphinx (>=3.0.3)
-    * sphinx-gallery (>=0.6.2)
-    * sphinx_rtd_theme (>=0.4.3)
-    * numpydoc (>=0.9.2)
-    * matplotlib (>=3.2.1)
+    * sphinx
+    * sphinx-gallery
+    * sphinx_rtd_theme
+    * numpydoc
+    * matplotlib
 
 Installation
 ------------
