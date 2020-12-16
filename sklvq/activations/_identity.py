@@ -47,4 +47,5 @@ class Identity(ActivationBaseClass):
         ndarray of shape (x.shape)
             Elementwise evaluation of the identity function's gradient.
         """
+
         return np.ones_like(x)

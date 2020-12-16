@@ -2,8 +2,8 @@
 API Reference
 =============
 
-If you would like to use sklvq algorithms the most or only interesting part to look at will be
-the "Predictors and Transformers" section. However, the other section can provide information
+If you would like to use sklvq algorithms the most relevant part to look at is
+the "Predictors and Transformers" section. However, the other sections provide information
 about accepted parameters their range and default values.
 
 Predictors and Transformers

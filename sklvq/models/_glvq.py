@@ -26,7 +26,7 @@ class GLVQ(LVQBaseClass):
     r"""Generalized Learning Vector Quantization
 
     This model uses the :class:`sklvq.objectives.GeneralizedLearningObjective` as its objective
-    function [1]_.
+    function `[1]`_.
 
     Parameters
     ----------
@@ -91,20 +91,16 @@ class GLVQ(LVQBaseClass):
         Default will initiate the prototypes to the class conditional mean with a small random
         offset. Custom numpy array can be passed to change the initial positions of the prototypes.
 
-    prototype_params: dict = None,
-        Containing the following parameters (keys):
-
-        - "prototypes_per_class":  int or ndarray, optional, default=1
-            Default will generate single prototype per class. In the case of unequal number of
-            prototypes per class is needed, provide the labels as  np.ndarray. For example,
-            prototypes_per_class = np.array([0, 0, 1, 2, 2, 2]) this will result in a  total of 6
-            prototypes with the first two classes with index 0, then one with class index 1,
-            and three with class index 2. Note: labels are indexes to classes\_ attribute, which is
-            equal to np.unique(labels)
+    prototype_n_per_class: int or np.ndarray, optional, default=1
+        Default will generate single prototype per class. In the case of unequal number of
+        prototypes per class is needed, provide this as np.ndarray. For example,
+        prototype_n_per_class = np.array([1, 6, 3]) this will result in one prototype for the first class,
+        six for the second, and three for the third. Note that the order needs to be the same as the on in the
+        classes\_ attribute, which is equal to calling np.unique(labels).
 
     random_state : int, RandomState instance, default=None
-        Determines random number generation. Used in random offset of prototypes and shuffling of
-        the X in the solvers.
+        Set the random number generation for reproducibility purposes. Used in random offset of prototypes and
+        shuffling of the data in the solvers.
 
     force_all_finite : {True, "allow-nan"}, default=True
         Whether to raise an error on np.inf, np.nan, pd.NA in array. The possibilities are:
@@ -125,9 +121,8 @@ class GLVQ(LVQBaseClass):
 
     References
     ----------
-    .. [1] Sato, A., and Yamada, K. (1996) "Generalized Learning Vector Quantization."
-        Advances in Neural Network Information Processing Systems, 423–429, 1996.
-
+    _`[1]` Sato, A., and Yamada, K. (1996) "Generalized Learning Vector Quantization."
+    Advances in Neural Network Information Processing Systems, 423–429, 1996.
     """
 
     classes_: np.ndarray
@@ -145,7 +140,7 @@ class GLVQ(LVQBaseClass):
         solver_type: Union[str, type] = "steepest-gradient-descent",
         solver_params: dict = None,
         prototype_init: str = "class-conditional-mean",
-        prototype_params: dict = None,
+        prototype_n_per_class: Union[int, np.ndarray] = 1,
         random_state: Union[int, np.random.RandomState] = None,
         force_all_finite: Union[str, bool] = True,
     ):
@@ -162,7 +157,7 @@ class GLVQ(LVQBaseClass):
             solver_params,
             SOLVERS,
             prototype_init,
-            prototype_params,
+            prototype_n_per_class,
             random_state,
             force_all_finite,
         )
@@ -179,7 +174,6 @@ class GLVQ(LVQBaseClass):
         -------
         ndarray
              Returns a view of the prototypes as ndarray.
-
         """
         return self.get_prototypes()
 
@@ -192,7 +186,6 @@ class GLVQ(LVQBaseClass):
         ----------
         new_model_params : ndarray of shape (n_prototypes, n_features)
             In the   case the prototypes.
-
         """
         self.set_prototypes(new_model_params)
 
@@ -206,7 +199,7 @@ class GLVQ(LVQBaseClass):
 
         Parameters
         ----------
-        var_buffers : ndarray
+        var_buffer : ndarray
             Array with the same size as the model's variables array as returned
             by ``get_variables()``.
 
@@ -214,7 +207,6 @@ class GLVQ(LVQBaseClass):
         -------
         ndarray
             Returns the prototypes as ndarray.
-
         """
         return self.to_prototypes_view(var_buffer)
 
@@ -233,7 +225,6 @@ class GLVQ(LVQBaseClass):
         -------
         ndarray of shape (n_prototypes, n_features)
             Prototype view into the var_buffer.
-
         """
         return var_buffer.reshape(self._prototypes_shape)
 
@@ -257,7 +248,6 @@ class GLVQ(LVQBaseClass):
         -------
         ndarray
             Same shape and size as input, but normalized.
-
         """
         LVQBaseClass._normalize_prototypes(self.to_prototypes_view(var_buffer))
 
@@ -280,7 +270,6 @@ class GLVQ(LVQBaseClass):
 
         i_prototype : int
             The index of the prototype to which the partial gradient was  computed.
-
         """
         n_features = self.n_features_in_
 
@@ -302,7 +291,6 @@ class GLVQ(LVQBaseClass):
             The scalar or list of values containing the step sizes.
         gradient : ndarray
             Same shape as the ``get_variables()`` would return.
-
         """
         gradient *= step_size
 
@@ -314,10 +302,10 @@ class GLVQ(LVQBaseClass):
         self._variables = np.empty(self._prototypes_size, dtype="float64", order="C")
 
     def _check_model_params(self):
-        self._check_prototype_params(**self.prototype_params)
+        self._check_prototype_params()
 
     def _init_model_params(self, X, y) -> None:
-        self._init_prototypes(X, y, **self.prototype_params)
+        self._init_prototypes(X, y)
 
     def _init_objective(self):
         self._objective = GeneralizedLearningObjective(

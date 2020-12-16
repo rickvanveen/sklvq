@@ -28,7 +28,7 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
     """Generalized learning objective
 
     Class that holds the generalized learning objective function and its gradient as described
-    in [1]_.
+    in `[1]`_.
 
     Parameters
     ----------
@@ -52,10 +52,8 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
 
     References
     ----------
-    .. [1] Sato, A., and Yamada, K. (1996) "Generalized Learning Vector Quantization."
-        Advances in Neural Network Information Processing Systems, 423–429, 1996.
-
-    """
+    _`[1]` Sato, A., and Yamada, K. (1996) "Generalized Learning Vector Quantization."
+    Advances in Neural Network Information Processing Systems, 423–429, 1996."""
 
     def __init__(
         self,
@@ -258,7 +256,7 @@ def _compute_distance(data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass
         # Faster if num_samples == 1
         ii_same = np.atleast_2d(labels == prototypes_labels)
     elif num_samples < num_prototypes:
-        # Faster to go over the labels if there are less then the prototypes.
+        # Faster to go over the labels if there are less than the prototypes.
         ii_same = np.array([label == prototypes_labels for label in labels])
     else:
         # List comprehension of the prototypes. This are all slight improvements to computation

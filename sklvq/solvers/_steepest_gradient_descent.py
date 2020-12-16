@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 
 import numpy as np
 from sklearn.utils import shuffle
@@ -18,7 +18,7 @@ class SteepestGradientDescent(SolverBaseClass):
 
     Implements the steepest gradient descent optimization method. Can perform stochastic,
     mini-batch and batch gradient descent by changing the batch_size. Implementation is
-    inspired by the description given in [1]_.
+    inspired by the description given in `[1]`_.
 
     The algorithm performs the following update of the model parameters (:math:`\mathbf{\theta}`) per
     batch. This process is repeated multiple times (per step) when the ``batch_size`` (:math:`M`)
@@ -81,11 +81,10 @@ class SteepestGradientDescent(SolverBaseClass):
 
     References
     ----------
-    .. [1] LeKander, M., Biehl, M., & De Vries, H. (2017). "Empirical evaluation of gradient
-        methods for matrix learning vector quantization." 12th International Workshop on
-        Self-Organizing Maps and Learning Vector Quantization, Clustering and Data
-        Visualization, WSOM 2017.
-
+    _`[1]` LeKander, M., Biehl, M., & De Vries, H. (2017). "Empirical evaluation of gradient
+    methods for matrix learning vector quantization." 12th International Workshop on
+    Self-Organizing Maps and Learning Vector Quantization, Clustering and Data
+    Visualization, WSOM 2017.
     """
 
     def __init__(
@@ -93,7 +92,7 @@ class SteepestGradientDescent(SolverBaseClass):
         objective: ObjectiveBaseClass,
         max_runs: int = 10,
         batch_size: int = 1,
-        step_size: float = 0.1,
+        step_size: Union[float, np.ndarray] = 0.1,
         callback: callable = None,
     ):
         super().__init__(objective)
@@ -113,7 +112,7 @@ class SteepestGradientDescent(SolverBaseClass):
             )
         self.batch_size = batch_size
 
-        if np.all(step_size <= 0):
+        if np.any(step_size <= 0):
             raise ValueError(
                 "{}:  Expected step_size to be > 0, but got step_size = {}".format(
                     type(self).__name__, step_size
@@ -164,9 +163,6 @@ class SteepestGradientDescent(SolverBaseClass):
 
         if batch_size > data.shape[0]:
             raise ValueError("Provided batch_size is invalid.")
-
-        if batch_size <= 0:
-            batch_size = data.shape[0]
 
         for i_run in range(0, self.max_runs):
             # Randomize order of samples

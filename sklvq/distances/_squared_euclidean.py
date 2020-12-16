@@ -28,10 +28,7 @@ class SquaredEuclidean(DistanceBaseClass):
     Compatible with the :class:`.GLVQ` algorithm (only).
     """
 
-    __slots__ = "force_all_finite"
-
-    def __init__(self, force_all_finite=True):
-        self.force_all_finite = force_all_finite
+    __slots__ = ()
 
     def __call__(self, data: np.ndarray, model: "GLVQ") -> np.ndarray:
         r"""
@@ -56,7 +53,7 @@ class SquaredEuclidean(DistanceBaseClass):
             Evaluation of the distance between each sample and prototype of the model.
         """
         distance_function = "sqeuclidean"
-        if self.force_all_finite == "allow-nan":
+        if model.force_all_finite == "allow-nan":
             distance_function = _nan_squared_euclidean
 
         return cdist(data, model.prototypes_, distance_function)
@@ -82,12 +79,11 @@ class SquaredEuclidean(DistanceBaseClass):
         -------
         gradient : ndarray with shape (n_samples, n_features)
             The gradient of the prototype with respect to every sample in the data.
-
         """
         distance_gradient = -2 * (data - model.get_model_params()[i_prototype, :])
 
         # In case of nans replace nan values by 0.0
-        if self.force_all_finite == "allow-nan":
+        if model.force_all_finite == "allow-nan":
             distance_gradient[np.isnan(distance_gradient)] = 0.0
 
         # Return 1d array (the original memory)

@@ -1,6 +1,5 @@
 from sklvq import discriminants
 from sklvq._utils import init_class
-from sklvq.discriminants import ALIASES
 from sklvq.discriminants import DiscriminantBaseClass
 
 
@@ -16,6 +15,7 @@ def check_init_discriminant(discriminant_string):
     return discriminant_class
 
 
-def test_aliases():
-    for value in ALIASES.keys():
-        check_init_discriminant(value)
+# When there are discriminant functions with aliases re-enable
+# def test_aliases():
+#     for value in ALIASES.keys():
+#         check_init_discriminant(value)

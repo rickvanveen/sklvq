@@ -16,7 +16,7 @@ STATE_KEYS = ["variables", "nit", "fun", "m_hat", "v_hat"]
 class AdaptiveMomentEstimation(SolverBaseClass):
     r"""Adaptive moment estimation (ADAM)
 
-    Implementation and description inspired by [1]_.
+    Implementation and description inspired by `[1]`_.
 
     Adam maintains two moving averages of the gradient (:math:`m, v`), which get updated for
     every sample at each epoch/run until the maximum runs (``max_runs``) has been reached:
@@ -79,11 +79,10 @@ class AdaptiveMomentEstimation(SolverBaseClass):
 
     References
     ----------
-    .. [1] LeKander, M., Biehl, M., & De Vries, H. (2017). "Empirical evaluation of gradient
-        methods for matrix learning vector quantization." 12th International Workshop on
-        Self-Organizing Maps and Learning Vector Quantization, Clustering and Data
-        Visualization, WSOM 2017.
-
+    _`[1]` LeKander, M., Biehl, M., & De Vries, H. (2017). "Empirical evaluation of gradient
+    methods for matrix learning vector quantization." 12th International Workshop on
+    Self-Organizing Maps and Learning Vector Quantization, Clustering and Data
+    Visualization, WSOM 2017.
     """
 
     def __init__(
@@ -105,7 +104,7 @@ class AdaptiveMomentEstimation(SolverBaseClass):
             )
         self.max_runs = max_runs
 
-        if 0 > beta1 > 1.0:
+        if beta1 <= 0 or beta1 > 1.0:
             raise ValueError(
                 "{}:  Expected beta1 to be > 0 and <= 1.0 but got beta1 = {}".format(
                     type(self).__name__, beta1
@@ -113,7 +112,7 @@ class AdaptiveMomentEstimation(SolverBaseClass):
             )
         self.beta1 = beta1
 
-        if 0 > beta2 > 1.0:
+        if beta2 <= 0 or beta2 > 1.0:
             raise ValueError(
                 "{}:  Expected beta1 to be > 0 and <= 1.0 but got beta2 = {}".format(
                     type(self).__name__, beta2
@@ -121,7 +120,7 @@ class AdaptiveMomentEstimation(SolverBaseClass):
             )
         self.beta2 = beta2
 
-        if np.all(step_size <= 0):
+        if np.any(step_size <= 0):
             raise ValueError(
                 "{}:  Expected step_size to be > 0, but got step_size = {}".format(
                     type(self).__name__, step_size
@@ -151,14 +150,12 @@ class AdaptiveMomentEstimation(SolverBaseClass):
         model: "LVQBaseClass",
     ):
         """
-
         Parameters
         ----------
         data : ndarray of shape (number of observations, number of dimensions)
         labels : ndarray of size (number of observations)
         model : LVQBaseClass
             The initial model that will be changed and holds the results at the end
-
         """
 
         # Administration
