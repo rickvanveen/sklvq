@@ -21,6 +21,9 @@ from sphinx_gallery.sorting import FileNameSortKey
 import sphinx
 from distutils.version import LooseVersion
 
+from sklvq import __version__
+# __version__ = "0.1"
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -83,8 +86,6 @@ copyright = u"2020, Rick van Veen"
 # built documents.
 #
 # The short X.Y version.
-# from sklvq import __version__
-__version__ = "0.1"
 version = __version__
 # The full version, including alpha/beta/rc tags.
 release = __version__
@@ -312,10 +313,10 @@ texinfo_documents = [
 # intersphinx configuration
 intersphinx_mapping = {
     "python": ("https://docs.python.org/{.major}".format(sys.version_info), None),
-    "numpy": ("https://docs.scipy.org/doc/numpy/", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
     "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
     "matplotlib": ("https://matplotlib.org/", None),
-    "sklearn": ("http://scikit-learn.org/stable", None),
+    "sklearn": ("https://scikit-learn.org/stable", None),
 }
 
 # sphinx-gallery configuration

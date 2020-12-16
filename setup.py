@@ -16,7 +16,7 @@ with codecs.open("README.rst", encoding="utf-8-sig") as f:
 MAINTAINER = "Rick van Veen"
 MAINTAINER_EMAIL = "r.van.veen133@gmail.com"
 URL = "https://github.com/rickvanveen/sklvq"
-LICENSE = "GNU Affero General Public License v3.0"
+LICENSE = "The 3-Clause BSD License"
 DOWNLOAD_URL = "https://github.com/rickvanveen/sklvq"
 VERSION = __version__
 INSTALL_REQUIRES = ["numpy>=1.14.0", "scipy>=1.1.0", "scikit-learn>=0.23.2"]
@@ -50,9 +50,11 @@ setup(
     version=VERSION,
     download_url=DOWNLOAD_URL,
     long_description=LONG_DESCRIPTION,
-    zip_safe=False,  # the package can run out of an .egg file
+    long_description_content_type="text/x-rst",
+    zip_safe=False,
     classifiers=CLASSIFIERS,
     packages=find_packages(),
     install_requires=INSTALL_REQUIRES,
     extras_require=EXTRAS_REQUIRE,
+    python_requires='>=3.6'
 )
