@@ -23,7 +23,7 @@ ModelParamsType = np.ndarray
 class LVQBaseClass(
     ABC, BaseEstimator, ClassifierMixin
 ):  # lgtm [py/conflicting-attributes]
-    """Learning vector quantization base class
+    """Learning Vector Quantization base class
 
     Abstract class for implementing LVQ models. It provides abstract methods with
     expected call signatures.
@@ -35,7 +35,6 @@ class LVQBaseClass(
     See also
     --------
     GLVQ, GMLVQ, LGMLVQ
-
     """
 
     # Public attributes
@@ -99,7 +98,6 @@ class LVQBaseClass(
         -------
         _variables : ndarray
             returns the model's _variables array.
-
         """
         return self._variables
 
@@ -112,7 +110,6 @@ class LVQBaseClass(
         ----------
         new_variables : ndarray
             1d numpy array that contains all the model parameters in continuous memory
-
         """
         np.copyto(self._variables, new_variables)
 
@@ -126,7 +123,6 @@ class LVQBaseClass(
         -------
         ndarray or tuple
             View or tuple of views of the model's parameters.
-
         """
         raise NotImplementedError("You should implement this!")
 
@@ -142,7 +138,6 @@ class LVQBaseClass(
         ----------
         new_model_params : ndarray or tuple
             Array or tuple of arrays of the new model's parameters.
-
         """
         raise NotImplementedError("You should implement this!")
 
@@ -160,7 +155,6 @@ class LVQBaseClass(
         -------
         prototypes : ndarray of shape (n_prototypes, n_features)
             View into ``self._variables`` with shape specified above.
-
         """
         return self.prototypes_
 
@@ -196,7 +190,6 @@ class LVQBaseClass(
         -------
         ndarray or tuple
             Should return a view or tuple of views of the model parameters in appropriate shapes.
-
         """
         raise NotImplementedError("You should implement this!")
 
@@ -216,7 +209,6 @@ class LVQBaseClass(
         -------
         ndarray of shape (n_prototypes, n_features)
             View into the var_buffer.
-
         """
         raise NotImplementedError("You should implement this!")
 
@@ -242,7 +234,6 @@ class LVQBaseClass(
         ndarray or tuple
             Same shape and size as input, but normalized. How to normalize depends on model
             implementation.
-
         """
         raise NotImplementedError("You should implement this!")
 
@@ -264,7 +255,6 @@ class LVQBaseClass(
         -------
         ndarray of same shape as input
             Normalized prototypes.
-
         """
         np.divide(
             prototypes,
@@ -279,7 +269,7 @@ class LVQBaseClass(
     @abstractmethod
     def add_partial_gradient(self, gradient, partial_gradient, i_prototype) -> None:
         r"""
-        To increase performance the distance gradient returns only the relevant values.
+        To increase performance, the distance gradient methods (should) return only the relevant values.
         I.e., the gradient of the prototype i_prototype and potentially other parameters linked to
         this prototype. This partial gradient needs to added (overwrite) to the correct parts of
         the actual gradient and this is what this function should do.
@@ -294,7 +284,6 @@ class LVQBaseClass(
 
         i_prototype : int
             The index of the prototype to which the partial gradient was  computed.
-
         """
         raise NotImplementedError("You should implement this!")
 
@@ -314,7 +303,6 @@ class LVQBaseClass(
             The scalar or list of values containing the step sizes.
         gradient : ndarray
             Same shape as the ``get_variables()`` would return.
-
         """
         raise NotImplementedError("You should implement this!")
 
@@ -327,7 +315,6 @@ class LVQBaseClass(
         r"""
         Should initialize the variables, 1d numpy array to hold all model parameters. Should
         store these in self._variables.
-
         """
         raise NotImplementedError("You should implement this!")
 
@@ -336,9 +323,7 @@ class LVQBaseClass(
         r"""
         Should check the model parameters. I.e., call check_prototype_params with parameters and
         other model parameters that there might be.
-
         """
-        pass
 
     @abstractmethod
     def _init_model_params(self, X, y):
@@ -353,7 +338,6 @@ class LVQBaseClass(
             The X
         y : ndarray, with shape (n_samples)
             The labels
-
         """
         raise NotImplementedError("You should implement this!")
 
@@ -410,7 +394,6 @@ class LVQBaseClass(
         ----------
         X : ndarray with shape (number of observations, number of dimensions)
         y : ndarray with size equal to the number of observations
-
         """
         self.prototypes_labels_ = np.repeat(
             np.arange(0, self.classes_.size), self.prototype_n_per_class
@@ -491,7 +474,6 @@ class LVQBaseClass(
         -------
         X : ndarray with same shape (and values) as input
         labels : ndarray of indexes to self.classes_
-
         """
         # Check X
         X, labels = self._validate_data(
@@ -519,7 +501,7 @@ class LVQBaseClass(
         """
         Should initialize:
             1. self._variables and algorithm specific parameters which should be
-               views into self._variables.
+               views into self._variables (share memory).
             2. The distance function in self.distance
             3. The objective function in self._objective
             4. The solver function in self._solver
@@ -556,14 +538,14 @@ class LVQBaseClass(
         X : ndarray with shape (number of observations, number of dimensions)
         y : ndarray with size equal to the number of observations
         """
-        pass
 
     ###########################################################################################
     # Public API functions
     ###########################################################################################
 
     def fit(self, X: np.ndarray, y: np.ndarray):
-        """Fit function
+        """Fit function that provides the general implementation of the LVQ algorithms. It checks the data, calls
+         before_fit method, calls the solve method of the solver, and the after_fit method.
 
         Parameters
         ----------
@@ -574,7 +556,6 @@ class LVQBaseClass(
         -------
         self
             The trained model
-
         """
         # Check X and check and transform labels.
         X, y_index = self._check_data_and_labels(X, y)
@@ -608,7 +589,6 @@ class LVQBaseClass(
         Returns
         -------
         ndarray of shape (n_observations, n_classes)
-
         """
         # Of shape n_observations , n_prototypes
         distances = self._distance(X, self)
@@ -641,7 +621,6 @@ class LVQBaseClass(
         decision_values : ndarray
             Binary case shape is (n_observations,) and the multiclass case (n_observations,
             n_classes)
-
         """
         # SciKit-learn list of checked params before predict
         check_is_fitted(self)
@@ -668,7 +647,6 @@ class LVQBaseClass(
         Returns
         -------
         confidence_scores : ndarray of shape (n_observations, n_classes)
-
         """
         # SciKit-learn list of checked params before predict
         check_is_fitted(self)
@@ -680,7 +658,7 @@ class LVQBaseClass(
         decision_values = self._multiclass_decision_function(X)
 
         # Softmax function (keeps the same scipy.stats.rankdata)
-        #  Very  arbitrary  0.01, which also might not always work?
+        # Very  arbitrary  0.01, which also might not always work?
         exp_decision_values = np.exp(0.01 * decision_values)
 
         return exp_decision_values / np.sum(exp_decision_values, axis=1)[:, np.newaxis]
@@ -700,7 +678,6 @@ class LVQBaseClass(
         -------
         ndarray of shape (n_observations)
             Returns the predicted labels.
-
         """
         # SciKit-learn list of checked params before predict
         check_is_fitted(self)

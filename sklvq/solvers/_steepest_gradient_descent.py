@@ -18,7 +18,7 @@ class SteepestGradientDescent(SolverBaseClass):
 
     Implements the steepest gradient descent optimization method. Can perform stochastic,
     mini-batch and batch gradient descent by changing the batch_size. Implementation is
-    inspired by the description given in [1]_.
+    inspired by the description given in `[1]`_.
 
     The algorithm performs the following update of the model parameters (:math:`\mathbf{\theta}`) per
     batch. This process is repeated multiple times (per step) when the ``batch_size`` (:math:`M`)
@@ -81,11 +81,10 @@ class SteepestGradientDescent(SolverBaseClass):
 
     References
     ----------
-    .. [1] LeKander, M., Biehl, M., & De Vries, H. (2017). "Empirical evaluation of gradient
-        methods for matrix learning vector quantization." 12th International Workshop on
-        Self-Organizing Maps and Learning Vector Quantization, Clustering and Data
-        Visualization, WSOM 2017.
-
+    _`[1]` LeKander, M., Biehl, M., & De Vries, H. (2017). "Empirical evaluation of gradient
+    methods for matrix learning vector quantization." 12th International Workshop on
+    Self-Organizing Maps and Learning Vector Quantization, Clustering and Data
+    Visualization, WSOM 2017.
     """
 
     def __init__(

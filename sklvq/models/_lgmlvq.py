@@ -25,8 +25,8 @@ class LGMLVQ(LVQBaseClass):
     r"""Localized Generalized Matrix Learning Vector Quantization
 
     This model uses the :class:`sklvq.objectives.GeneralizedLearningObjective` as its objective
-    function [1]_. In addition to learning the positions of the prototypes it learns a set
-    of relevance matrices in a localized manner, that are used in the distance functions [2]_.
+    function `[1]`_. In addition to learning the positions of the prototypes it learns a set
+    of relevance matrices in a localized manner, that are used in the distance functions `[2]`_.
 
     Parameters
     ----------
@@ -91,38 +91,33 @@ class LGMLVQ(LVQBaseClass):
         Default will initiate the prototypes to the class conditional mean with a small random
         offset. Custom numpy array can be passed to change the initial positions of the prototypes.
 
-    prototype_params: dict = None,
-        Containing the following parameters (keys):
-
-        - "prototypes_per_class":  int or ndarray, optional, default=1
-            Default will generate single prototype per class. In the case of unequal number of
-            prototypes per class is needed, provide the labels as  np.ndarray. For example,
-            prototypes_per_class = np.array([0, 0, 1, 2, 2, 2]) this will result in a  total of 6
-            prototypes with the first two classes with index 0, then one with class index 1,
-            and three with class index 2. Note: labels are indexes to classes\_ attribute, which is
-            equal to np.unique(labels)
+    prototype_n_per_class: int or np.ndarray, optional, default=1
+        Default will generate single prototype per class. In the case of unequal number of
+        prototypes per class is needed, provide this as np.ndarray. For example,
+        prototype_n_per_class = np.array([1, 6, 3]) this will result in one prototype for the first class,
+        six for the second, and three for the third. Note that the order needs to be the same as the on in the
+        classes\_ attribute, which is equal to calling np.unique(labels).
 
     relevance_init : {"identity", "random"} or np.ndarray, default="identity"
-        Default will initiate the omega matrices to be the identity matrix. Other behaviour can
-        be implemented by providing a custom omega as numpy array. E.g. a randomly initialized
-        square matrix (n_features, n_features). The rank of the matrix can be reduced by
-        providing a square matrix of shape ([1, n_features), n_features)  [3]_.
+       Default will initiate the omega matrices to be the identity matrix. The rank of the matrix can be reduced by
+        setting the ``relevance_n_components`` attribute `[3]`_.
 
-     relevance_params: dict = None,
-        Containing the following parameters (keys):
+    relevance_normalization: bool, optional, default=True
+        Flag to indicate whether to normalize omega, whenever it is updated, such that the trace of the relevance matrix
+        is equal to 1.
 
-        - "normalized_omega" : {True, False}, default=True
-            Flag to indicate whether to normalize omega such that the trace of the relevance matrix
-            is (approximately) equal to 1.
+    relevance_n_components: str {"all"} or int, optional, default="all"
+        For a square relevance matrix use the string "all" (default). For a rectangular relevance matrix use set the
+        number of components explicitly by providing it as an int.
 
-        - "localization" : {"prototype", "class"}, default="prototype"
-            Setting that controls the localization of the relevance matrices. Either per prototypes,
-            where each prototype has its own relevance matrix. Or per class where each class has its
-            own relevance matrix and if more then a single prototype per class is used it would be
-            shared between these prototypes.
+    relevance_localization: {"prototypes", "class"}, default="prototypes"
+        Setting that controls the localization of the relevance matrices. Either per prototype,
+        where each prototype has its own relevance matrix. Or per class where each class has its
+        own relevance matrix. Note that when one prototype per class is used, changing this setting has no effect.
 
     random_state : int, RandomState instance, default=None
-        Determines random number generation.
+        Set the random number generation for reproducibility purposes. Used in random offset of prototypes and
+        shuffling of the data in the solvers. Potentially, also used in the random generation of relevance matrix.
 
     force_all_finite : {True, "allow-nan"}, default=True
         Whether to raise an error on np.inf, np.nan, pd.NA in array. The possibilities are:
@@ -151,7 +146,7 @@ class LGMLVQ(LVQBaseClass):
     omega_hat_: ndarray
         The omega matrices found by the eigenvalue decomposition of the relevance matrices
         ``lambda_``. The eigenvectors (columns of ``omega_hat_``) can be used to transform the data
-         [3]_. This results in multiple possible transformations, one per relevance matrix.
+         `[3]`_. This results in multiple possible transformations, one per relevance matrix.
 
     eigenvalues_: ndarray
         The corresponding eigenvalues to ``omega_hat_`` found by the eigenvalue decomposition of
@@ -159,15 +154,17 @@ class LGMLVQ(LVQBaseClass):
 
     References
     ----------
-    .. [1] Sato, A., and Yamada, K. (1996) "Generalized Learning Vector Quantization."
-        Advances in Neural Network Information Processing Systems, 423–429, 1996.
+    _`[1]` Sato, A., and Yamada, K. (1996) "Generalized Learning Vector Quantization."
+    Advances in Neural Network Information Processing Systems, 423–429, 1996.
 
-    .. [2] Schneider, P., Biehl, M., & Hammer, B. (2009). "Adaptive Relevance Matrices in
-        Learning Vector Quantization" Neural Computation, 21(12), 3532–3561, 2009.
+    _`[2]` Schneider, P., Biehl, M., & Hammer, B. (2009). "Adaptive Relevance Matrices in
+    Learning Vector Quantization" Neural Computation, 21(12), 3532–3561, 2009.
 
-    .. [3] Bunte, K., Schneider, P., Hammer, B., Schleif, F.-M., Villmann, T., & Biehl, M. (2012).
-        "Limited Rank Matrix Learning, discriminative dimension reduction and visualization." Neural
-        Networks, 26, 159–173, 2012."""
+    _`[3]` Bunte, K., Schneider, P., Hammer, B., Schleif, F.-M., Villmann, T., & Biehl, M. (2012).
+    "Limited Rank Matrix Learning, discriminative dimension reduction and visualization." Neural
+    Networks, 26, 159–173, 2012.
+    """
+
     classes_: np.ndarray
     prototypes_: np.ndarray
     prototypes_labels_: np.ndarray
@@ -230,7 +227,6 @@ class LGMLVQ(LVQBaseClass):
         ----------
         new_variables : ndarray
             1d numpy array that contains all the model parameters in continuous memory
-
         """
         np.copyto(self._variables, new_variables)
         if self.relevance_normalization:
@@ -247,7 +243,6 @@ class LGMLVQ(LVQBaseClass):
         new_model_params : tuple of ndarrays
             Shapes depend on  initialization but in the case of a square relevance matrix:
             tuple((n_prototypes, n_features), (n_matrices, n_features, n_features))
-
         """
         new_prototypes, new_omega = new_model_params
 
@@ -265,7 +260,6 @@ class LGMLVQ(LVQBaseClass):
         -------
         ndarray
              Returns a tuple of views, i.e., the prototypes and omega matrix.
-
         """
         return self.prototypes_, self.omega_
 
@@ -280,7 +274,6 @@ class LGMLVQ(LVQBaseClass):
         Returns
         -------
             ndarray, with shape depending on initialization of omega.
-
         """
         return self.omega_
 
@@ -292,7 +285,6 @@ class LGMLVQ(LVQBaseClass):
         Parameters
         ----------
         omega : ndarray with same shape as ``self.omega_``
-
         """
         np.copyto(self.omega_, omega)
 
@@ -302,7 +294,6 @@ class LGMLVQ(LVQBaseClass):
 
     def to_model_params_view(self, var_buffer: np.ndarray) -> ModelParamsType:
         """
-
         Parameters
         ----------
         var_buffer : ndarray
@@ -313,7 +304,6 @@ class LGMLVQ(LVQBaseClass):
         -------
         tuple
             Returns a tuple with the prototypes and omega matrices as ndarrays.
-
         """
         return (
             self.to_prototypes_view(var_buffer),
@@ -335,7 +325,6 @@ class LGMLVQ(LVQBaseClass):
         -------
         ndarray of shape (n_prototypes, n_features)
             Prototype view into the var_buffer.
-
         """
         return var_buffer[: self._prototypes_size].reshape(self._prototypes_shape)
 
@@ -355,7 +344,6 @@ class LGMLVQ(LVQBaseClass):
         ndarray
             Shape depending on initialization but in case of a square matrix (n_matrices,
             n_features, n_features).
-
         """
         return var_buffer[self._prototypes_size :].reshape(self._relevances_shape)
 
@@ -374,7 +362,6 @@ class LGMLVQ(LVQBaseClass):
         var_buffer : ndarray
             Array with the same size as the model's variables array as returned
             by ``get_variables()``.
-
         """
         (prototypes, omega) = self.to_model_params_view(var_buffer)
 
@@ -414,7 +401,6 @@ class LGMLVQ(LVQBaseClass):
 
         i_prototype : int
             The index of the prototype to which the partial gradient was  computed.
-
         """
         n_features = self.n_features_in_
 
@@ -444,7 +430,6 @@ class LGMLVQ(LVQBaseClass):
             The scalar or list of values containing the step sizes.
         gradient : ndarray
             Same shape as the ``get_variables()`` would return.
-
         """
         if isinstance(step_sizes, int) | isinstance(step_sizes, float):
             gradient *= step_sizes
@@ -573,7 +558,6 @@ class LGMLVQ(LVQBaseClass):
 
     def fit_transform(self, X: np.ndarray, y: np.ndarray, **trans_params) -> np.ndarray:
         r"""
-
         Parameters
         ----------
         X : ndarray with shape (n_samples, n_features)
@@ -587,7 +571,6 @@ class LGMLVQ(LVQBaseClass):
         -------
         The data projected on columns of ``omega_hat_`` with shape (n_matrices, n_samples,
         n_columns)
-
         """
         return self.fit(X, y).transform(X, **trans_params)
 
@@ -598,7 +581,6 @@ class LGMLVQ(LVQBaseClass):
         omega_hat_index: Union[int, List[int]] = 0,
     ) -> np.ndarray:
         r"""
-
         Parameters
         ----------
         X : np.ndarray with shape (n_samples, n_features)
@@ -613,7 +595,6 @@ class LGMLVQ(LVQBaseClass):
         -------
         The data projected on columns of ``omega_hat_`` with shape (n_matrices, n_samples,
         n_columns)
-
         """
         check_is_fitted(self)
 

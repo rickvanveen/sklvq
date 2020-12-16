@@ -19,7 +19,7 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
     """Local adaptive squared Euclidean distance
 
     Class that holds the localized adaptive squared Euclidean distance function and its gradient as
-    described in [1]_ and [2]_.
+    described in `[1]`_ and `[2]`_.
 
     Parameters
     ----------
@@ -37,10 +37,10 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
 
     References
     ----------
-    .. [1] Schneider, P. (2010). Advanced methods for prototype-based classification. Groningen.
-    .. [2] Schneider, P., Biehl, M., & Hammer, B. (2009). Adaptive Relevance Matrices in Learning
-           Vector Quantization. Neural Computation, 21(12), 3532–3561.
+    _`[1]` Schneider, P. (2010). Advanced methods for prototype-based classification. Groningen.
 
+    _`[2]` Schneider, P., Biehl, M., & Hammer, B. (2009). Adaptive Relevance Matrices in Learning
+    Vector Quantization. Neural Computation, 21(12), 3532–3561.
     """
 
     __slots__ = ()

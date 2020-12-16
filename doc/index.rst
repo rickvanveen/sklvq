@@ -2,18 +2,17 @@
 Welcome to scikit-learning vector quantization's documentation!
 ===============================================================
 
-Scikit-learning vector quantization (sklvq) is a scikit-learn compatible implementation of
-some expandable Learning Vector Quantization algorithms. The main purpose is to make it easier to
+Scikit-learning vector quantization (sklvq) is a scikit-learn compatible and expandable implementation of
+Learning Vector Quantization (LVQ) algorithms. The main purpose is to make it easier to
 compare results by providing a central point for the implementations of the LVQ algorithms.
 
 Currently the package implements three algorithms from the LVQ family, all based on the
 generalized learning objective, i.e., Generalized Learning Vector Quantization (GLVQ),
-Generalized Matrix Learning Vector Quantization (GMLVQ) and Local Generalized Matrix Learning
-Vector Quantization (LGMLVQ).
+Generalized Matrix LVQ (GMLVQ) and Local Generalized Matrix LVQ (LGMLVQ).
 
-The package provides a number of different activation, discriminant, distance and solver methods.
-Please see the Getting started, Documentation and Tutorial - Examples sections on the left
-instructions.
+The package provides a number of activation, discriminant, distance, and solver methods.
+Please see the Getting started, Documentation, and Tutorial - Examples sections on the left
+side.
 
 .. toctree::
    :maxdepth: 2

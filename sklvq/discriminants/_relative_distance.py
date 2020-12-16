@@ -5,14 +5,12 @@ import numpy as np
 class RelativeDistance(DiscriminantBaseClass):
     """Relative distance function
 
-    Class that holds the relative distance function and gradient as described in [1]_.
+    Class that holds the relative distance function and gradient as described in `[1]`_.
 
     References
     ----------
-    .. [1] Sato, A., and Yamada, K. (1996) "Generalized Learning Vector Quantization."
-        Advances in Neural Network Information Processing Systems, 423–429, 1996.
-
-    """
+    _`[1]` Sato, A., and Yamada, K. (1996) "Generalized Learning Vector Quantization."
+    Advances in Neural Network Information Processing Systems, 423–429, 1996."""
 
     __slots__ = ()
 

@@ -28,7 +28,7 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
     """Generalized learning objective
 
     Class that holds the generalized learning objective function and its gradient as described
-    in [1]_.
+    in `[1]`_.
 
     Parameters
     ----------
@@ -52,10 +52,8 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
 
     References
     ----------
-    .. [1] Sato, A., and Yamada, K. (1996) "Generalized Learning Vector Quantization."
-        Advances in Neural Network Information Processing Systems, 423–429, 1996.
-
-    """
+    _`[1]` Sato, A., and Yamada, K. (1996) "Generalized Learning Vector Quantization."
+    Advances in Neural Network Information Processing Systems, 423–429, 1996."""
 
     def __init__(
         self,
