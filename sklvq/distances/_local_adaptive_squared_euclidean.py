@@ -40,7 +40,8 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
     _`[1]` Schneider, P. (2010). Advanced methods for prototype-based classification. Groningen.
 
     _`[2]` Schneider, P., Biehl, M., & Hammer, B. (2009). Adaptive Relevance Matrices in Learning
-    Vector Quantization. Neural Computation, 21(12), 3532–3561."""
+    Vector Quantization. Neural Computation, 21(12), 3532–3561.
+    """
 
     __slots__ = ()
 

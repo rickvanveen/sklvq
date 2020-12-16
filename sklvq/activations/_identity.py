@@ -10,7 +10,8 @@ class Identity(ActivationBaseClass):
 
     See also
     --------
-    Sigmoid, SoftPlus, Swish"""
+    Sigmoid, SoftPlus, Swish
+    """
 
     __slots__ = ()
 

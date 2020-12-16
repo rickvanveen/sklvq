@@ -80,7 +80,6 @@ class Euclidean(DistanceBaseClass):
         -------
         ndarray with shape (n_samples, n_features)
             The gradient of the prototype with respect to every sample in the data.
-
         """
         prototype = model.get_model_params()[i_prototype, :]
 

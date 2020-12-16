@@ -21,7 +21,8 @@ class SoftPlus(ActivationBaseClass):
     References
     ----------
     _`[1]` Villmann, T., Ravichandran, J., Villmann, A., Nebel, D., & Kaden, M. (2019). "Activation
-    Functions for Generalized Learning Vector Quantization - A Performance Comparison", 2019."""
+    Functions for Generalized Learning Vector Quantization - A Performance Comparison", 2019.
+    """
 
     __slots__ = "beta"
 

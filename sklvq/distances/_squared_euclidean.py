@@ -79,7 +79,6 @@ class SquaredEuclidean(DistanceBaseClass):
         -------
         gradient : ndarray with shape (n_samples, n_features)
             The gradient of the prototype with respect to every sample in the data.
-
         """
         distance_gradient = -2 * (data - model.get_model_params()[i_prototype, :])
 

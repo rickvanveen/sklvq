@@ -35,7 +35,6 @@ class LVQBaseClass(
     See also
     --------
     GLVQ, GMLVQ, LGMLVQ
-
     """
 
     # Public attributes
@@ -99,7 +98,6 @@ class LVQBaseClass(
         -------
         _variables : ndarray
             returns the model's _variables array.
-
         """
         return self._variables
 
@@ -112,7 +110,6 @@ class LVQBaseClass(
         ----------
         new_variables : ndarray
             1d numpy array that contains all the model parameters in continuous memory
-
         """
         np.copyto(self._variables, new_variables)
 
@@ -126,7 +123,6 @@ class LVQBaseClass(
         -------
         ndarray or tuple
             View or tuple of views of the model's parameters.
-
         """
         raise NotImplementedError("You should implement this!")
 
@@ -142,7 +138,6 @@ class LVQBaseClass(
         ----------
         new_model_params : ndarray or tuple
             Array or tuple of arrays of the new model's parameters.
-
         """
         raise NotImplementedError("You should implement this!")
 
@@ -160,7 +155,6 @@ class LVQBaseClass(
         -------
         prototypes : ndarray of shape (n_prototypes, n_features)
             View into ``self._variables`` with shape specified above.
-
         """
         return self.prototypes_
 
@@ -196,7 +190,6 @@ class LVQBaseClass(
         -------
         ndarray or tuple
             Should return a view or tuple of views of the model parameters in appropriate shapes.
-
         """
         raise NotImplementedError("You should implement this!")
 
@@ -216,7 +209,6 @@ class LVQBaseClass(
         -------
         ndarray of shape (n_prototypes, n_features)
             View into the var_buffer.
-
         """
         raise NotImplementedError("You should implement this!")
 
@@ -242,7 +234,6 @@ class LVQBaseClass(
         ndarray or tuple
             Same shape and size as input, but normalized. How to normalize depends on model
             implementation.
-
         """
         raise NotImplementedError("You should implement this!")
 
@@ -264,7 +255,6 @@ class LVQBaseClass(
         -------
         ndarray of same shape as input
             Normalized prototypes.
-
         """
         np.divide(
             prototypes,
@@ -294,7 +284,6 @@ class LVQBaseClass(
 
         i_prototype : int
             The index of the prototype to which the partial gradient was  computed.
-
         """
         raise NotImplementedError("You should implement this!")
 
@@ -314,7 +303,6 @@ class LVQBaseClass(
             The scalar or list of values containing the step sizes.
         gradient : ndarray
             Same shape as the ``get_variables()`` would return.
-
         """
         raise NotImplementedError("You should implement this!")
 
@@ -327,7 +315,6 @@ class LVQBaseClass(
         r"""
         Should initialize the variables, 1d numpy array to hold all model parameters. Should
         store these in self._variables.
-
         """
         raise NotImplementedError("You should implement this!")
 
@@ -336,7 +323,6 @@ class LVQBaseClass(
         r"""
         Should check the model parameters. I.e., call check_prototype_params with parameters and
         other model parameters that there might be.
-
         """
         pass
 
@@ -353,7 +339,6 @@ class LVQBaseClass(
             The X
         y : ndarray, with shape (n_samples)
             The labels
-
         """
         raise NotImplementedError("You should implement this!")
 
@@ -410,7 +395,6 @@ class LVQBaseClass(
         ----------
         X : ndarray with shape (number of observations, number of dimensions)
         y : ndarray with size equal to the number of observations
-
         """
         self.prototypes_labels_ = np.repeat(
             np.arange(0, self.classes_.size), self.prototype_n_per_class
@@ -491,7 +475,6 @@ class LVQBaseClass(
         -------
         X : ndarray with same shape (and values) as input
         labels : ndarray of indexes to self.classes_
-
         """
         # Check X
         X, labels = self._validate_data(
@@ -575,7 +558,6 @@ class LVQBaseClass(
         -------
         self
             The trained model
-
         """
         # Check X and check and transform labels.
         X, y_index = self._check_data_and_labels(X, y)
@@ -609,7 +591,6 @@ class LVQBaseClass(
         Returns
         -------
         ndarray of shape (n_observations, n_classes)
-
         """
         # Of shape n_observations , n_prototypes
         distances = self._distance(X, self)
@@ -642,7 +623,6 @@ class LVQBaseClass(
         decision_values : ndarray
             Binary case shape is (n_observations,) and the multiclass case (n_observations,
             n_classes)
-
         """
         # SciKit-learn list of checked params before predict
         check_is_fitted(self)
@@ -669,7 +649,6 @@ class LVQBaseClass(
         Returns
         -------
         confidence_scores : ndarray of shape (n_observations, n_classes)
-
         """
         # SciKit-learn list of checked params before predict
         check_is_fitted(self)
@@ -701,7 +680,6 @@ class LVQBaseClass(
         -------
         ndarray of shape (n_observations)
             Returns the predicted labels.
-
         """
         # SciKit-learn list of checked params before predict
         check_is_fitted(self)
