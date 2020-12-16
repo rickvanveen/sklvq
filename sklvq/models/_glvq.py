@@ -122,7 +122,8 @@ class GLVQ(LVQBaseClass):
     References
     ----------
     _`[1]` Sato, A., and Yamada, K. (1996) "Generalized Learning Vector Quantization."
-    Advances in Neural Network Information Processing Systems, 423–429, 1996."""
+    Advances in Neural Network Information Processing Systems, 423–429, 1996.
+    """
 
     classes_: np.ndarray
     prototypes_: np.ndarray
@@ -173,7 +174,6 @@ class GLVQ(LVQBaseClass):
         -------
         ndarray
              Returns a view of the prototypes as ndarray.
-
         """
         return self.get_prototypes()
 
@@ -186,7 +186,6 @@ class GLVQ(LVQBaseClass):
         ----------
         new_model_params : ndarray of shape (n_prototypes, n_features)
             In the   case the prototypes.
-
         """
         self.set_prototypes(new_model_params)
 
@@ -208,7 +207,6 @@ class GLVQ(LVQBaseClass):
         -------
         ndarray
             Returns the prototypes as ndarray.
-
         """
         return self.to_prototypes_view(var_buffer)
 
@@ -227,7 +225,6 @@ class GLVQ(LVQBaseClass):
         -------
         ndarray of shape (n_prototypes, n_features)
             Prototype view into the var_buffer.
-
         """
         return var_buffer.reshape(self._prototypes_shape)
 
@@ -251,7 +248,6 @@ class GLVQ(LVQBaseClass):
         -------
         ndarray
             Same shape and size as input, but normalized.
-
         """
         LVQBaseClass._normalize_prototypes(self.to_prototypes_view(var_buffer))
 
@@ -274,7 +270,6 @@ class GLVQ(LVQBaseClass):
 
         i_prototype : int
             The index of the prototype to which the partial gradient was  computed.
-
         """
         n_features = self.n_features_in_
 
@@ -296,7 +291,6 @@ class GLVQ(LVQBaseClass):
             The scalar or list of values containing the step sizes.
         gradient : ndarray
             Same shape as the ``get_variables()`` would return.
-
         """
         gradient *= step_size
 

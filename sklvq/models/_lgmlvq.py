@@ -162,7 +162,8 @@ class LGMLVQ(LVQBaseClass):
 
     _`[3]` Bunte, K., Schneider, P., Hammer, B., Schleif, F.-M., Villmann, T., & Biehl, M. (2012).
     "Limited Rank Matrix Learning, discriminative dimension reduction and visualization." Neural
-    Networks, 26, 159–173, 2012."""
+    Networks, 26, 159–173, 2012.
+    """
 
     classes_: np.ndarray
     prototypes_: np.ndarray
@@ -226,7 +227,6 @@ class LGMLVQ(LVQBaseClass):
         ----------
         new_variables : ndarray
             1d numpy array that contains all the model parameters in continuous memory
-
         """
         np.copyto(self._variables, new_variables)
         if self.relevance_normalization:
@@ -243,7 +243,6 @@ class LGMLVQ(LVQBaseClass):
         new_model_params : tuple of ndarrays
             Shapes depend on  initialization but in the case of a square relevance matrix:
             tuple((n_prototypes, n_features), (n_matrices, n_features, n_features))
-
         """
         new_prototypes, new_omega = new_model_params
 
@@ -261,7 +260,6 @@ class LGMLVQ(LVQBaseClass):
         -------
         ndarray
              Returns a tuple of views, i.e., the prototypes and omega matrix.
-
         """
         return self.prototypes_, self.omega_
 
@@ -276,7 +274,6 @@ class LGMLVQ(LVQBaseClass):
         Returns
         -------
             ndarray, with shape depending on initialization of omega.
-
         """
         return self.omega_
 
@@ -288,7 +285,6 @@ class LGMLVQ(LVQBaseClass):
         Parameters
         ----------
         omega : ndarray with same shape as ``self.omega_``
-
         """
         np.copyto(self.omega_, omega)
 
@@ -298,7 +294,6 @@ class LGMLVQ(LVQBaseClass):
 
     def to_model_params_view(self, var_buffer: np.ndarray) -> ModelParamsType:
         """
-
         Parameters
         ----------
         var_buffer : ndarray
@@ -309,7 +304,6 @@ class LGMLVQ(LVQBaseClass):
         -------
         tuple
             Returns a tuple with the prototypes and omega matrices as ndarrays.
-
         """
         return (
             self.to_prototypes_view(var_buffer),
@@ -331,7 +325,6 @@ class LGMLVQ(LVQBaseClass):
         -------
         ndarray of shape (n_prototypes, n_features)
             Prototype view into the var_buffer.
-
         """
         return var_buffer[: self._prototypes_size].reshape(self._prototypes_shape)
 
@@ -351,7 +344,6 @@ class LGMLVQ(LVQBaseClass):
         ndarray
             Shape depending on initialization but in case of a square matrix (n_matrices,
             n_features, n_features).
-
         """
         return var_buffer[self._prototypes_size :].reshape(self._relevances_shape)
 
@@ -370,7 +362,6 @@ class LGMLVQ(LVQBaseClass):
         var_buffer : ndarray
             Array with the same size as the model's variables array as returned
             by ``get_variables()``.
-
         """
         (prototypes, omega) = self.to_model_params_view(var_buffer)
 
@@ -410,7 +401,6 @@ class LGMLVQ(LVQBaseClass):
 
         i_prototype : int
             The index of the prototype to which the partial gradient was  computed.
-
         """
         n_features = self.n_features_in_
 
@@ -440,7 +430,6 @@ class LGMLVQ(LVQBaseClass):
             The scalar or list of values containing the step sizes.
         gradient : ndarray
             Same shape as the ``get_variables()`` would return.
-
         """
         if isinstance(step_sizes, int) | isinstance(step_sizes, float):
             gradient *= step_sizes
@@ -569,7 +558,6 @@ class LGMLVQ(LVQBaseClass):
 
     def fit_transform(self, X: np.ndarray, y: np.ndarray, **trans_params) -> np.ndarray:
         r"""
-
         Parameters
         ----------
         X : ndarray with shape (n_samples, n_features)
@@ -583,7 +571,6 @@ class LGMLVQ(LVQBaseClass):
         -------
         The data projected on columns of ``omega_hat_`` with shape (n_matrices, n_samples,
         n_columns)
-
         """
         return self.fit(X, y).transform(X, **trans_params)
 
@@ -594,7 +581,6 @@ class LGMLVQ(LVQBaseClass):
         omega_hat_index: Union[int, List[int]] = 0,
     ) -> np.ndarray:
         r"""
-
         Parameters
         ----------
         X : np.ndarray with shape (n_samples, n_features)
@@ -609,7 +595,6 @@ class LGMLVQ(LVQBaseClass):
         -------
         The data projected on columns of ``omega_hat_`` with shape (n_matrices, n_samples,
         n_columns)
-
         """
         check_is_fitted(self)
 

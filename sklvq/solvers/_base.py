@@ -21,7 +21,6 @@ class SolverBaseClass(ABC):
     --------
     SteepestGradientDescent, WaypointGradientDescent, AdaptiveMomentEstimation,
     BroydenFletcherGoldfarbShanno, LimitedMemoryBfgs
-
     """
 
     def __init__(self, objective: ObjectiveBaseClass):

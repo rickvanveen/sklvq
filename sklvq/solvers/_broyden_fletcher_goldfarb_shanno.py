@@ -15,7 +15,6 @@ class BroydenFletcherGoldfarbShanno(ScipyBaseSolver):
     callback: callable
         Differently from the non-scipy solvers the signature is callback(xk) with xk the current
         set of variables, which are the  model parameters flattened to one 1D array.
-
     """
 
     def __init__(self, objective: ObjectiveBaseClass, **kwargs):

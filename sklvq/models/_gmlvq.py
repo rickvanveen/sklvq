@@ -218,7 +218,6 @@ class GMLVQ(LVQBaseClass):
         ----------
         new_variables : ndarray
             1d numpy array that contains all the model parameters in continuous memory
-
         """
         np.copyto(self._variables, new_variables)
         if self.relevance_normalization:
@@ -237,7 +236,6 @@ class GMLVQ(LVQBaseClass):
         new_model_params : tuple of ndarrays
             Shapes depend on  initialization but in the case of a square relevance matrix:
             tuple((n_prototypes, n_features), (n_features, n_features))
-
         """
         new_prototypes, new_omega = new_model_params
 
@@ -255,7 +253,6 @@ class GMLVQ(LVQBaseClass):
         -------
         ndarray
              Returns a tuple of views, i.e., the prototypes and omega matrix.
-
         """
         return self.prototypes_, self.omega_
 
@@ -270,7 +267,6 @@ class GMLVQ(LVQBaseClass):
         Returns
         -------
             ndarray, with shape depending on initialization of omega.
-
         """
         return self.omega_
 
@@ -282,7 +278,6 @@ class GMLVQ(LVQBaseClass):
         Parameters
         ----------
         omega : ndarray with same shape as ``self.omega_``
-
         """
         np.copyto(self.omega_, omega)
 
@@ -303,7 +298,6 @@ class GMLVQ(LVQBaseClass):
         -------
         tuple
             Returns a tuple with the prototypes and omega matrix as ndarrays.
-
         """
         return (
             self.to_prototypes_view(var_buffer),
@@ -325,7 +319,6 @@ class GMLVQ(LVQBaseClass):
         -------
         ndarray of shape (n_prototypes, n_features)
             Prototype view into the var_buffer.
-
         """
         return var_buffer[: self._prototypes_size].reshape(self._prototypes_shape)
 
@@ -345,7 +338,6 @@ class GMLVQ(LVQBaseClass):
         ndarray
             Shape depending on initialization but in case of a square matrix (n_features,
             n_features.
-
         """
         return var_buffer[self._prototypes_size :].reshape(self._relevances_shape)
 
@@ -364,7 +356,6 @@ class GMLVQ(LVQBaseClass):
         var_buffer : ndarray
             Array with the same size as the model's variables array as returned
             by ``get_variables()``.
-
         """
         (prototypes, omega) = self.to_model_params_view(var_buffer)
 
@@ -394,7 +385,6 @@ class GMLVQ(LVQBaseClass):
 
         i_prototype : int
             The index of the prototype to which the partial gradient was  computed.
-
         """
         n_features = self.n_features_in_
 
@@ -422,7 +412,6 @@ class GMLVQ(LVQBaseClass):
             The scalar or list of values containing the step sizes.
         gradient : ndarray
             Same shape as the ``get_variables()`` would return.
-
         """
         if isinstance(step_sizes, int) | isinstance(step_sizes, float):
             gradient *= step_sizes
@@ -535,7 +524,6 @@ class GMLVQ(LVQBaseClass):
         self, data: np.ndarray, y: np.ndarray, **transform_params
     ) -> np.ndarray:
         r"""
-
         Parameters
         ----------
         data : ndarray with shape (n_samples, n_features)
@@ -548,13 +536,11 @@ class GMLVQ(LVQBaseClass):
         Returns
         -------
         The data projected on columns of ``omega_hat_`` with shape (n_samples, n_columns)
-
         """
         return self.fit(data, y).transform(data, **transform_params)
 
     def transform(self, X: np.ndarray, scale: bool = False) -> np.ndarray:
         r"""
-
         Parameters
         ----------
         X : np.ndarray with shape (n_samples, n_features)
@@ -566,7 +552,6 @@ class GMLVQ(LVQBaseClass):
         Returns
         -------
         The data projected on columns of ``omega_hat_`` with shape (n_samples, n_columns)
-
         """
         X = check_array(X)
 

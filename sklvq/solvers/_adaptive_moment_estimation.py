@@ -82,7 +82,8 @@ class AdaptiveMomentEstimation(SolverBaseClass):
     _`[1]` LeKander, M., Biehl, M., & De Vries, H. (2017). "Empirical evaluation of gradient
     methods for matrix learning vector quantization." 12th International Workshop on
     Self-Organizing Maps and Learning Vector Quantization, Clustering and Data
-    Visualization, WSOM 2017."""
+    Visualization, WSOM 2017.
+    """
 
     def __init__(
         self,
@@ -149,14 +150,12 @@ class AdaptiveMomentEstimation(SolverBaseClass):
         model: "LVQBaseClass",
     ):
         """
-
         Parameters
         ----------
         data : ndarray of shape (number of observations, number of dimensions)
         labels : ndarray of size (number of observations)
         model : LVQBaseClass
             The initial model that will be changed and holds the results at the end
-
         """
 
         # Administration

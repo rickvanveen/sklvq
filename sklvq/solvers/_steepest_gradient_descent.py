@@ -84,7 +84,8 @@ class SteepestGradientDescent(SolverBaseClass):
     _`[1]` LeKander, M., Biehl, M., & De Vries, H. (2017). "Empirical evaluation of gradient
     methods for matrix learning vector quantization." 12th International Workshop on
     Self-Organizing Maps and Learning Vector Quantization, Clustering and Data
-    Visualization, WSOM 2017."""
+    Visualization, WSOM 2017.
+    """
 
     def __init__(
         self,
