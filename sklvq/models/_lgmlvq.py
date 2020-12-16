@@ -91,38 +91,33 @@ class LGMLVQ(LVQBaseClass):
         Default will initiate the prototypes to the class conditional mean with a small random
         offset. Custom numpy array can be passed to change the initial positions of the prototypes.
 
-    prototype_params: dict = None,
-        Containing the following parameters (keys):
-
-        - "prototypes_per_class":  int or ndarray, optional, default=1
-            Default will generate single prototype per class. In the case of unequal number of
-            prototypes per class is needed, provide the labels as  np.ndarray. For example,
-            prototypes_per_class = np.array([0, 0, 1, 2, 2, 2]) this will result in a  total of 6
-            prototypes with the first two classes with index 0, then one with class index 1,
-            and three with class index 2. Note: labels are indexes to classes\_ attribute, which is
-            equal to np.unique(labels)
+    prototype_n_per_class: int or np.ndarray, optional, default=1
+        Default will generate single prototype per class. In the case of unequal number of
+        prototypes per class is needed, provide this as np.ndarray. For example,
+        prototype_n_per_class = np.array([1, 6, 3]) this will result in one prototype for the first class,
+        six for the second, and three for the third. Note that the order needs to be the same as the on in the
+        classes\_ attribute, which is equal to calling np.unique(labels).
 
     relevance_init : {"identity", "random"} or np.ndarray, default="identity"
-        Default will initiate the omega matrices to be the identity matrix. Other behaviour can
-        be implemented by providing a custom omega as numpy array. E.g. a randomly initialized
-        square matrix (n_features, n_features). The rank of the matrix can be reduced by
-        providing a square matrix of shape ([1, n_features), n_features)  `[3]`_.
+       Default will initiate the omega matrices to be the identity matrix. The rank of the matrix can be reduced by
+        setting the ``relevance_n_components`` attribute `[3]`_.
 
-     relevance_params: dict = None,
-        Containing the following parameters (keys):
+    relevance_normalization: bool, optional, default=True
+        Flag to indicate whether to normalize omega, whenever it is updated, such that the trace of the relevance matrix
+        is equal to 1.
 
-        - "normalized_omega" : {True, False}, default=True
-            Flag to indicate whether to normalize omega such that the trace of the relevance matrix
-            is (approximately) equal to 1.
+    relevance_n_components: str {"all"} or int, optional, default="all"
+        For a square relevance matrix use the string "all" (default). For a rectangular relevance matrix use set the
+        number of components explicitly by providing it as an int.
 
-        - "localization" : {"prototype", "class"}, default="prototype"
-            Setting that controls the localization of the relevance matrices. Either per prototypes,
-            where each prototype has its own relevance matrix. Or per class where each class has its
-            own relevance matrix and if more then a single prototype per class is used it would be
-            shared between these prototypes.
+    relevance_localization: {"prototypes", "class"}, default="prototypes"
+        Setting that controls the localization of the relevance matrices. Either per prototype,
+        where each prototype has its own relevance matrix. Or per class where each class has its
+        own relevance matrix. Note that when one prototype per class is used, changing this setting has no effect.
 
     random_state : int, RandomState instance, default=None
-        Determines random number generation.
+        Set the random number generation for reproducibility purposes. Used in random offset of prototypes and
+        shuffling of the data in the solvers. Potentially, also used in the random generation of relevance matrix.
 
     force_all_finite : {True, "allow-nan"}, default=True
         Whether to raise an error on np.inf, np.nan, pd.NA in array. The possibilities are:

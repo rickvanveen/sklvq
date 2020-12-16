@@ -279,7 +279,7 @@ class LVQBaseClass(
     @abstractmethod
     def add_partial_gradient(self, gradient, partial_gradient, i_prototype) -> None:
         r"""
-        To increase performance the distance gradient returns only the relevant values.
+        To increase performance, the distance gradient methods (should) return only the relevant values.
         I.e., the gradient of the prototype i_prototype and potentially other parameters linked to
         this prototype. This partial gradient needs to added (overwrite) to the correct parts of
         the actual gradient and this is what this function should do.
@@ -519,7 +519,7 @@ class LVQBaseClass(
         """
         Should initialize:
             1. self._variables and algorithm specific parameters which should be
-               views into self._variables.
+               views into self._variables (share memory).
             2. The distance function in self.distance
             3. The objective function in self._objective
             4. The solver function in self._solver
@@ -563,7 +563,8 @@ class LVQBaseClass(
     ###########################################################################################
 
     def fit(self, X: np.ndarray, y: np.ndarray):
-        """Fit function
+        """Fit function that provides the general implementation of the LVQ algorithms. It checks the data, calls
+         before_fit method, calls the solve method of the solver, and the after_fit method.
 
         Parameters
         ----------
@@ -680,7 +681,7 @@ class LVQBaseClass(
         decision_values = self._multiclass_decision_function(X)
 
         # Softmax function (keeps the same scipy.stats.rankdata)
-        #  Very  arbitrary  0.01, which also might not always work?
+        # Very  arbitrary  0.01, which also might not always work?
         exp_decision_values = np.exp(0.01 * decision_values)
 
         return exp_decision_values / np.sum(exp_decision_values, axis=1)[:, np.newaxis]

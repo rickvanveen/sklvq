@@ -91,20 +91,16 @@ class GLVQ(LVQBaseClass):
         Default will initiate the prototypes to the class conditional mean with a small random
         offset. Custom numpy array can be passed to change the initial positions of the prototypes.
 
-    prototype_params: dict = None,
-        Containing the following parameters (keys):
-
-        - "prototypes_per_class":  int or ndarray, optional, default=1
-            Default will generate single prototype per class. In the case of unequal number of
-            prototypes per class is needed, provide the labels as  np.ndarray. For example,
-            prototypes_per_class = np.array([0, 0, 1, 2, 2, 2]) this will result in a  total of 6
-            prototypes with the first two classes with index 0, then one with class index 1,
-            and three with class index 2. Note: labels are indexes to classes\_ attribute, which is
-            equal to np.unique(labels)
+    prototype_n_per_class: int or np.ndarray, optional, default=1
+        Default will generate single prototype per class. In the case of unequal number of
+        prototypes per class is needed, provide this as np.ndarray. For example,
+        prototype_n_per_class = np.array([1, 6, 3]) this will result in one prototype for the first class,
+        six for the second, and three for the third. Note that the order needs to be the same as the on in the
+        classes\_ attribute, which is equal to calling np.unique(labels).
 
     random_state : int, RandomState instance, default=None
-        Determines random number generation. Used in random offset of prototypes and shuffling of
-        the X in the solvers.
+        Set the random number generation for reproducibility purposes. Used in random offset of prototypes and
+        shuffling of the data in the solvers.
 
     force_all_finite : {True, "allow-nan"}, default=True
         Whether to raise an error on np.inf, np.nan, pd.NA in array. The possibilities are:
