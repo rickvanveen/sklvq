@@ -175,7 +175,7 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
                     discriminant_score[ii_winner_same],
                     dist_same[ii_winner_same],
                     dist_diff[ii_winner_same],
-                    True,
+                    True,  # Indicating same label
                     data[ii_winner_same, :],
                     model,
                     i_prototype,
@@ -189,13 +189,20 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
                     discriminant_score[ii_winner_diff],
                     dist_same[ii_winner_diff],
                     dist_diff[ii_winner_diff],
-                    False,
+                    False,  # Indicating diff label
                     data[ii_winner_diff, :],
                     model,
                     i_prototype,
                 )
 
         return gradient_buffer
+
+    # # apply regularization...
+    # def _regularization_gradient(self, gradient_buffer, gradient_update):
+    #     # TODO: model.add_partial_regularization(gradient_buffer, gradient_update)
+    #     # return +- regularization * np.linalg.pinv(omega) (GMLVQ)
+    #     # return +- regularization * np.linalg.pinv(omegas) (LGMLVQ)
+    #     pass
 
     def _partial_gradient(
         self,
