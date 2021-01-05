@@ -68,14 +68,10 @@ class LVQBaseClass(
         force_all_finite: Union[str, bool] = True,
     ):
         self.distance_type = distance_type
-        if distance_params is None:
-            distance_params = {}
         self.distance_params = distance_params
         self.valid_distances = valid_distances
 
         self.solver_type = solver_type
-        if solver_params is None:
-            solver_params = {}
         self.solver_params = solver_params
         self.valid_solvers = valid_solvers
 
@@ -430,15 +426,20 @@ class LVQBaseClass(
             self.distance_type,
             valid_class_types=self.valid_distances,
         )
-
-        self._distance = distance_class(**self.distance_params)
+        if self.distance_params is not None:
+            self._distance = distance_class(**self.distance_params)
+        else:
+            self._distance = distance_class()
 
     def _init_solver(self) -> None:
         """
         Should initialize the ``self._solver``. Depends on the algorithm.
         """
         solver_class = init_class(solvers, self.solver_type, self.valid_solvers)
-        self._solver = solver_class(self._objective, **self.solver_params)
+        if self.solver_params is not None:
+            self._solver = solver_class(self._objective, **self.solver_params)
+        else:
+            self._solver = solver_class(self._objective)
 
     ###########################################################################################
     # Data and label validation

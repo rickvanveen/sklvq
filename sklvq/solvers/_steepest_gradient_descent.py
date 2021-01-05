@@ -161,8 +161,11 @@ class SteepestGradientDescent(SolverBaseClass):
 
         batch_size = self.batch_size
 
+        # Less than 0 is caught in init.
         if batch_size > data.shape[0]:
             raise ValueError("Provided batch_size is invalid.")
+        elif batch_size == 0:
+            batch_size = data.shape[0]
 
         for i_run in range(0, self.max_runs):
             # Randomize order of samples
