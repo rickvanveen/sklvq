@@ -65,6 +65,7 @@ def test_lgmlvq():
             "lgmlvq__relevance_normalization": [True, False],
             "lgmlvq__solver_type": stochastic_solver_types,
             "lgmlvq__solver_params": [
+                {"batch_size": 0, "step_size": np.array([0.1, 0.001])},
                 {"batch_size": 1, "step_size": np.array([0.1, 0.01])},
                 {"batch_size": 2, "step_size": np.array([0.1, 0.01])},
             ],
