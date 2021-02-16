@@ -5,7 +5,7 @@ import numpy as np
 from sklearn.utils.validation import check_is_fitted, check_array
 
 from . import LVQBaseClass
-from ..objectives import GeneralizedLearningObjective, RegularizedGeneralizedLearningObjective
+from ..objectives import GeneralizedLearningObjective
 
 ModelParamsType = Tuple[np.ndarray, np.ndarray]
 
@@ -491,21 +491,12 @@ class GMLVQ(LVQBaseClass):
             GMLVQ._normalise_omega(self.omega_)
 
     def _init_objective(self):
-        args = (
+        self._objective = GeneralizedLearningObjective(
             self.activation_type,
             self.activation_params,
             self.discriminant_type,
             self.discriminant_params,
         )
-        params = {}
-
-        if self.relevance_regularization != 0:
-            objective_class = RegularizedGeneralizedLearningObjective
-            params = {"regularization": self.relevance_regularization}
-        else:
-            objective_class = GeneralizedLearningObjective
-
-        self._objective = objective_class(*args, **params)
 
     ###########################################################################################
     # Other Algorithm specific stuff.
