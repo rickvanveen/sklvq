@@ -517,10 +517,12 @@ class GMLVQ(LVQBaseClass):
         # Eigenvalues and column eigenvectors return in ascending order
         eigenvalues, omega_hat = np.linalg.eigh(self.lambda_)
 
-        # Rounding error cause eigenvalues to be very small negative numbers sometimes...
         # Flip (reverse the order to descending) before assigning.
         self.eigenvalues_ = np.flip(eigenvalues)
-        self.omega_hat_ = np.flip(omega_hat, axis=0)
+
+        # eigenvectors are column matrix in ascending order. Flip the columns and transpose the matrix
+        # to get the descending ordered row matrix.
+        self.omega_hat_ = np.flip(omega_hat, axis=1).T
 
     @staticmethod
     def _compute_lambda(omega):
@@ -571,9 +573,9 @@ class GMLVQ(LVQBaseClass):
         transformation_matrix = self.omega_hat_
         if scale:
             transformation_matrix = (
-                np.sqrt(np.absolute(self.eigenvalues_)) * transformation_matrix
+                np.sqrt(np.absolute(self.eigenvalues_[:, None])) * transformation_matrix
             )
 
-        data_new = X.dot(transformation_matrix)
+        data_new = X.dot(transformation_matrix.T)
 
         return data_new
