@@ -6,7 +6,7 @@
 .. _AzurePipelines: https://dev.azure.com/rvanveen133/sklvq/
 
 .. |ReadTheDocs| image:: https://readthedocs.org/projects/sklvq/badge/?version=stable
-.. _ReadTheDocs: https://sklvq.readthedocs.io/en/latest/?badge=latest
+.. _ReadTheDocs: https://sklvq.readthedocs.io/en/latest/?badge=stable
 
 .. |CodeCov| image:: https://codecov.io/gh/rickvanveen/sklvq/branch/master/graph/badge.svg
 .. _CodeCov: https://codecov.io/gh/rickvanveen/sklvq
