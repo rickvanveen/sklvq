@@ -197,13 +197,6 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
 
         return gradient_buffer
 
-    # # apply regularization...
-    # def _regularization_gradient(self, gradient_buffer, gradient_update):
-    #     # TODO: model.add_partial_regularization(gradient_buffer, gradient_update)
-    #     # return +- regularization * np.linalg.pinv(omega) (GMLVQ)
-    #     # return +- regularization * np.linalg.pinv(omegas) (LGMLVQ)
-    #     pass
-
     def _partial_gradient(
         self,
         gradient_buffer,
