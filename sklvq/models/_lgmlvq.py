@@ -538,9 +538,8 @@ class LGMLVQ(LVQBaseClass):
         # Eigenvalues and column eigenvectors returned in ascending order
         eigenvalues, omega_hat = np.linalg.eigh(self.lambda_)
 
-        # Rounding error cause eigenvalues to be very small negative numbers sometimes...
         self.eigenvalues_ = np.flip(eigenvalues, axis=1)
-        self.omega_hat_ = np.flip(omega_hat, axis=2)
+        self.omega_hat_ = np.transpose(np.flip(omega_hat, axis=2), axes=(0, 2, 1))
 
     @staticmethod
     def _compute_lambda(omega):
@@ -593,8 +592,8 @@ class LGMLVQ(LVQBaseClass):
 
         Returns
         -------
-        The data projected on columns of ``omega_hat_`` with shape (n_matrices, n_samples,
-        n_columns)
+        The data projected on columns of ``omega_hat_`` with shape (n_samples,
+        n_columns, n_matrices)
         """
         check_is_fitted(self)
 
@@ -602,17 +601,19 @@ class LGMLVQ(LVQBaseClass):
 
         transformation_matrix = self.omega_hat_[omega_hat_index, :, :]
         if transformation_matrix.ndim != 3:
-            transformation_matrix = np.expand_dims(transformation_matrix, 0)
+            transformation_matrix = transformation_matrix[None, :, :]
 
         if scale:
-            transformation_matrix = np.einsum(
-                "ik, ijk -> ijk",
-                np.sqrt(np.absolute(self.eigenvalues_)),
-                transformation_matrix,
-            )
-        transformed_data = np.einsum("jk, ikl -> ijl", X, transformation_matrix)
+            eigenvalues = np.sqrt(np.absolute(self.eigenvalues_[omega_hat_index, :]))
 
-        return np.squeeze(transformed_data)
+            transformation_matrix = (
+                np.expand_dims(eigenvalues, axis=eigenvalues.ndim)
+                * transformation_matrix
+            )
+
+        transformed_data = np.einsum("in, jmn -> imj", X, transformation_matrix)
+
+        return transformed_data.squeeze()
 
     def _more_tags(self):
         # For some reason lgmlvq (with default settings) does not perform well on one of the test
