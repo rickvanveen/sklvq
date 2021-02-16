@@ -175,7 +175,7 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
                     discriminant_score[ii_winner_same],
                     dist_same[ii_winner_same],
                     dist_diff[ii_winner_same],
-                    True,
+                    True,  # Indicating same label
                     data[ii_winner_same, :],
                     model,
                     i_prototype,
@@ -189,7 +189,7 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
                     discriminant_score[ii_winner_diff],
                     dist_same[ii_winner_diff],
                     dist_diff[ii_winner_diff],
-                    False,
+                    False,  # Indicating diff label
                     data[ii_winner_diff, :],
                     model,
                     i_prototype,

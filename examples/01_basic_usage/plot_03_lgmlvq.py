@@ -106,12 +106,14 @@ for i, lambda_ in enumerate(model.lambda_):
 # eigenvectors of the relevance matrices. In contrast to GMLVQ this can be done for each of the
 # matrices separately.
 
-# This will return a 3D shape with the first axis the different relevance matrices'
-# transformations of the data. The 2nd and 3rd axes represent the data (n_observations,
-# n_eigenvectors) within this new space.
+# This will return a 3D shape with the 1st and 2nd axes representing the data (n_observations,
+# n_eigenvectors). The third axis are the different relevance matrices
 
-t_d = model.transform(data, omega_hat_index=[0, 1, 2])[:, :, :2]
-t_m = model.transform(model.prototypes_, omega_hat_index=[0, 1, 2])[:, :, :2]
+t_d = model.transform(data, omega_hat_index=[0, 1, 2])[:, :2, :]
+t_d = np.transpose(t_d, axes=(2, 0, 1))  # shape that is easier to work with
+
+t_m = model.transform(model.prototypes_, omega_hat_index=[0, 1, 2])[:, :2, :]
+t_m = np.transpose(t_m, axes=(2, 0, 1))  # shape that is easier to work with
 
 fig, ax = plt.subplots(num_prototypes, 1, figsize=(6.4, 14.4))
 fig.tight_layout(pad=6.0)
