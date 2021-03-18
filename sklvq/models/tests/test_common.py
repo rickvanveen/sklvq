@@ -125,3 +125,31 @@ def test_shared_hyper_params(estimator):
     assert not np.all(np.isnan(X_hat))
 
     assert pytest.approx(X_hat, estimator().fit_transform(X, y, scale=True))
+
+
+@pytest.mark.parametrize("estimator", [GLVQ, GMLVQ, LGMLVQ])
+def test_prediction(estimator):
+    X, y = datasets.load_iris(return_X_y=True)
+    # create 2 class data
+    X = X[y != 2]
+    y = y[y != 2]
+
+    # Prototype initialization
+    model = estimator().fit(X, y)
+    c_pred = model.predict(X) == 1
+    c_df = model.decision_function(X) > 0
+    c_proba = [v[1] for v in model.predict_proba(X) > 0.5]
+    assert all(c_pred == c_df)
+    assert all(c_pred == c_proba)
+
+    # choosing a different threshold should typically lead to a different labeling;
+    # note that LGMLVQ has df values very close to +-1
+    assert not all(model.predict(X, df_threshold=0.05) == model.predict(X, df_threshold=0.95))
+
+    c_pred = model.predict(X, df_threshold=0.2) == 1
+    c_df = model.decision_function(X) > 0.2
+    c_proba = [v[1] for v in model.predict_proba(X) > (0.2+1)/2]
+    assert all(c_pred == c_df)
+    assert all(c_pred == c_proba)
+
+

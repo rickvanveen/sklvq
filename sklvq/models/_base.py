@@ -579,8 +579,8 @@ class LVQBaseClass(
         Computes the decision values and returns shape (n_observations, n_classes). The values
         are constructed by computing: the distance between an observation and the prototype with
         a different label minus the distance between that observation and the closest prototype
-        with the same label, where "the same" is defined to be the index of the column the value
-        is being computed for.
+        with the same label, normalized by the sum of these distances, where "the same" is
+        defined to be the index of the column the value is being computed for.
 
         Parameters
         ----------
@@ -599,9 +599,9 @@ class LVQBaseClass(
 
         # return n_observations, n_classes
         for i, _ in enumerate(self.classes_):
-            decision_values[:, i] = distances[:, self.prototypes_labels_ != i].min(
-                axis=1
-            ) - distances[:, self.prototypes_labels_ == i].min(axis=1)
+            d_diff = distances[:, self.prototypes_labels_ != i].min(axis=1)
+            d_same = distances[:, self.prototypes_labels_ == i].min(axis=1)
+            decision_values[:, i] = (d_diff - d_same) / (d_diff + d_same)
 
         return decision_values
 
@@ -655,31 +655,44 @@ class LVQBaseClass(
         # Input validation
         X = check_array(X, force_all_finite=self.force_all_finite)
 
-        # Between -1  and 1
+        # Between -1 and 1
         decision_values = self._multiclass_decision_function(X)
 
-        # Softmax function (keeps the same scipy.stats.rankdata)
-        # Very  arbitrary  0.01, which also might not always work?
-        exp_decision_values = np.exp(0.01 * decision_values)
+        # Between 0 and 1
+        if self.classes_.size == 2:
+            return (decision_values + 1) / 2.0
+        else:
+            # Softmax function (keeps the same scipy.stats.rankdata)
+            exp_decision_values = np.exp(decision_values)
+            return exp_decision_values / np.sum(exp_decision_values, axis=1)[:, np.newaxis]
 
-        return exp_decision_values / np.sum(exp_decision_values, axis=1)[:, np.newaxis]
-
-    def predict(self, X: np.ndarray):
+    def predict(self, X: np.ndarray, df_threshold: float = None, proba_threshold: float = None):
         """Predict function
 
         The decision is made for the label of the prototype with the minimum decision value,
         as provided by the ``decision_function()``.
+        To choose a different cutoff point for 2-class data (e.g., based upon ROC analysis),
+        ``dv_threshold`` or ``proba_threshold`` can be set
 
         Parameters
         ----------
          X  : ndarray
             The data.
+         df_threshold : float
+            threshold for ``decision_function()`` values (default 0.0)
+         proba_threshold : float
+            threshold for ``predict_proba()`` values (default 0.5)
 
         Returns
         -------
         ndarray of shape (n_observations)
             Returns the predicted labels.
         """
+        if proba_threshold is not None:
+            df_threshold = proba_threshold * 2 - 1
+        if df_threshold is None:
+            df_threshold = 0.0
+
         # SciKit-learn list of checked params before predict
         check_is_fitted(self)
 
@@ -688,7 +701,7 @@ class LVQBaseClass(
         decision_values = self.decision_function(X)
 
         if self.classes_.size == 2:
-            return self.classes_[(decision_values > 0).astype(np.int)]
+            return self.classes_[(decision_values > df_threshold).astype(np.int)]
 
         # Lower value is the closest prototype.
         return self.classes_[decision_values.argmax(axis=1)]
