@@ -62,7 +62,7 @@ class LVQBaseClass(
         solver_type: Union[str, type] = "steepest-gradient-descent",
         solver_params: dict = None,
         valid_solvers: List[str] = None,
-        prototype_init: Union[str, np.ndarray] = "class-conditional-mean",
+        prototype_init: str = "class-conditional-mean",
         prototype_n_per_class: int = 1,
         random_state: Union[int, np.random.RandomState] = None,
         force_all_finite: Union[str, bool] = True,
