@@ -39,6 +39,9 @@ def test_steepest_gradient_descent():
         AdaptiveMomentEstimation(objective, step_size=[1, -1])
 
     with pytest.raises(ValueError):
+        AdaptiveMomentEstimation(objective, step_size=-1)
+
+    with pytest.raises(ValueError):
         AdaptiveMomentEstimation(objective, step_size=np.array([1, 0]))
 
     with pytest.raises(ValueError):
