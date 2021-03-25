@@ -109,7 +109,7 @@ class WaypointGradientDescent(SolverBaseClass):
         self,
         objective: ObjectiveBaseClass,
         max_runs: int = 10,
-        step_size: Union[float, np.ndarray] = 0.1,
+        step_size: Union[float, list, tuple, np.ndarray] = 0.1,
         loss: float = 2 / 3,
         gain: float = 1.1,
         k: int = 3,
@@ -124,12 +124,16 @@ class WaypointGradientDescent(SolverBaseClass):
             )
         self.max_runs = max_runs
 
+        if not isinstance(step_size, np.ndarray):
+            step_size = np.array(step_size)
+
         if np.any(step_size <= 0):
             raise ValueError(
                 "{}:  Expected step_size to be > 0, but got step_size = {}".format(
                     type(self).__name__, step_size
                 )
             )
+
         self.step_size = step_size
 
         if loss <= 0 or loss > 1:

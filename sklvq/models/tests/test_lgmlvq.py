@@ -66,8 +66,8 @@ def test_lgmlvq():
             "lgmlvq__solver_type": stochastic_solver_types,
             "lgmlvq__solver_params": [
                 {"batch_size": 0, "step_size": np.array([0.1, 0.001])},
-                {"batch_size": 1, "step_size": np.array([0.1, 0.01])},
-                {"batch_size": 2, "step_size": np.array([0.1, 0.01])},
+                {"batch_size": 1, "step_size": [0.1, 0.01]},
+                {"batch_size": 2, "step_size": (0.1, 0.01)},
             ],
             "lgmlvq__discriminant_type": discriminant_types,
             "lgmlvq__distance_type": distance_types,
