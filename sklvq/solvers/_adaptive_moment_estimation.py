@@ -120,12 +120,20 @@ class AdaptiveMomentEstimation(SolverBaseClass):
             )
         self.beta2 = beta2
 
-        if np.any(step_size <= 0):
+        if np.size(step_size) > 1:
+            raise ValueError(
+                "{}:  Expected step_size to be a single float, but got step_size = {}".format(
+                    type(self).__name__, step_size
+                )
+            )
+
+        if step_size <= 0:
             raise ValueError(
                 "{}:  Expected step_size to be > 0, but got step_size = {}".format(
                     type(self).__name__, step_size
                 )
             )
+
         self.step_size = step_size
 
         if epsilon < 0:

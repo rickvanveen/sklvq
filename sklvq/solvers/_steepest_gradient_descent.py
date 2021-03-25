@@ -92,7 +92,7 @@ class SteepestGradientDescent(SolverBaseClass):
         objective: ObjectiveBaseClass,
         max_runs: int = 10,
         batch_size: int = 1,
-        step_size: Union[float, np.ndarray] = 0.1,
+        step_size: Union[float, list, np.ndarray] = 0.1,
         callback: callable = None,
     ):
         super().__init__(objective)
@@ -118,6 +118,9 @@ class SteepestGradientDescent(SolverBaseClass):
                     type(self).__name__, step_size
                 )
             )
+        if not isinstance(step_size, np.ndarray):
+            step_size = np.array(step_size)
+
         self.step_size = step_size
 
         if callback is not None:
