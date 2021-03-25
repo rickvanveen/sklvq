@@ -92,7 +92,7 @@ class SteepestGradientDescent(SolverBaseClass):
         objective: ObjectiveBaseClass,
         max_runs: int = 10,
         batch_size: int = 1,
-        step_size: Union[float, list, np.ndarray] = 0.1,
+        step_size: Union[float, list, tuple, np.ndarray] = 0.1,
         callback: callable = None,
     ):
         super().__init__(objective)

@@ -49,8 +49,8 @@ def test_gmlvq():
             "gmlvq__solver_type": stochastic_solver_types,
             "gmlvq__solver_params": [
                 {"batch_size": 0, "step_size": np.array([0.1, 0.001])},
-                {"batch_size": 1, "step_size": np.array([0.1, 0.01])},
-                {"batch_size": 2, "step_size": np.array([0.1, 0.01])},
+                {"batch_size": 1, "step_size": [0.1, 0.01]},
+                {"batch_size": 2, "step_size": (0.1, 0.01)},
             ],
             "gmlvq__discriminant_type": discriminant_types,
             "gmlvq__distance_type": distance_types,

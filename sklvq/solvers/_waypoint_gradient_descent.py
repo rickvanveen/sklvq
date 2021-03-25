@@ -109,7 +109,7 @@ class WaypointGradientDescent(SolverBaseClass):
         self,
         objective: ObjectiveBaseClass,
         max_runs: int = 10,
-        step_size: Union[float, list, np.ndarray] = 0.1,
+        step_size: Union[float, list, tuple, np.ndarray] = 0.1,
         loss: float = 2 / 3,
         gain: float = 1.1,
         k: int = 3,
