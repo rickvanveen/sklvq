@@ -20,6 +20,7 @@ __all__ = [
 ALIASES = {
     "sgd": "steepest-gradient-descent",
     "bgd": "steepest-gradient-descent",
+    "wgd": "waypoint-gradient-descent",
     "bfgs": "broyden-fletcher-goldfarb-shanno",
     "lbfgs": "limited-memory-bfgs",
     "adam": "adaptive-moment-estimation",
