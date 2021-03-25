@@ -112,14 +112,15 @@ class SteepestGradientDescent(SolverBaseClass):
             )
         self.batch_size = batch_size
 
+        if not isinstance(step_size, np.ndarray):
+            step_size = np.array(step_size)
+
         if np.any(step_size <= 0):
             raise ValueError(
                 "{}:  Expected step_size to be > 0, but got step_size = {}".format(
                     type(self).__name__, step_size
                 )
             )
-        if not isinstance(step_size, np.ndarray):
-            step_size = np.array(step_size)
 
         self.step_size = step_size
 
