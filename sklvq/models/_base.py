@@ -688,7 +688,7 @@ class LVQBaseClass(
         decision_values = self.decision_function(X)
 
         if self.classes_.size == 2:
-            return self.classes_[(decision_values > 0).astype(np.int)]
+            return self.classes_[(decision_values > 0).astype(int)]
 
         # Lower value is the closest prototype.
         return self.classes_[decision_values.argmax(axis=1)]
