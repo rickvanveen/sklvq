@@ -661,37 +661,32 @@ class LVQBaseClass(
         # Between 0 and 1
         if self.classes_.size == 2:
             return (decision_values + 1) / 2.0
-        else:
-            # Softmax function (keeps the same scipy.stats.rankdata)
-            exp_decision_values = np.exp(decision_values)
-            return exp_decision_values / np.sum(exp_decision_values, axis=1)[:, np.newaxis]
 
-    def predict(self, X: np.ndarray, df_threshold: float = None, proba_threshold: float = None):
+        # Softmax function (keeps the same scipy.stats.rankdata)
+        exp_decision_values = np.exp(decision_values)
+        return exp_decision_values / np.sum(exp_decision_values, axis=1)[:, np.newaxis]
+
+    def predict(self, X: np.ndarray, threshold: float = 0.5):
         """Predict function
 
         The decision is made for the label of the prototype with the minimum decision value,
         as provided by the ``decision_function()``.
-        To choose a different cutoff point for 2-class data (e.g., based upon ROC analysis),
-        ``dv_threshold`` or ``proba_threshold`` can be set
+        To choose a different cutoff point (e.g., based upon ROC analysis for 2-class data),
+        ``threshold`` can be set, which acts on the values from ``predict_proba()``
 
         Parameters
         ----------
          X  : ndarray
             The data.
-         df_threshold : float
-            threshold for ``decision_function()`` values (default 0.0)
-         proba_threshold : float
-            threshold for ``predict_proba()`` values (default 0.5)
+         threshold : float
+            threshold for ``predict_proba()`` values (default 0.5), should be in the interval [0,1]
 
         Returns
         -------
         ndarray of shape (n_observations)
             Returns the predicted labels.
         """
-        if proba_threshold is not None:
-            df_threshold = proba_threshold * 2 - 1
-        if df_threshold is None:
-            df_threshold = 0.0
+        df_threshold = threshold * 2.0 - 1
 
         # SciKit-learn list of checked params before predict
         check_is_fitted(self)

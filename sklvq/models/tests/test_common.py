@@ -151,5 +151,3 @@ def test_prediction(estimator):
     c_proba = [v[1] for v in model.predict_proba(X) > (0.2+1)/2]
     assert all(c_pred == c_df)
     assert all(c_pred == c_proba)
-
-
