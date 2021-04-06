@@ -92,7 +92,7 @@ class SteepestGradientDescent(SolverBaseClass):
         objective: ObjectiveBaseClass,
         max_runs: int = 10,
         batch_size: int = 1,
-        step_size: Union[float, np.ndarray] = 0.1,
+        step_size: Union[float, list, tuple, np.ndarray] = 0.1,
         callback: callable = None,
     ):
         super().__init__(objective)
@@ -112,12 +112,16 @@ class SteepestGradientDescent(SolverBaseClass):
             )
         self.batch_size = batch_size
 
+        if not isinstance(step_size, np.ndarray):
+            step_size = np.array(step_size)
+
         if np.any(step_size <= 0):
             raise ValueError(
                 "{}:  Expected step_size to be > 0, but got step_size = {}".format(
                     type(self).__name__, step_size
                 )
             )
+
         self.step_size = step_size
 
         if callback is not None:
@@ -164,7 +168,8 @@ class SteepestGradientDescent(SolverBaseClass):
         # Less than 0 is caught in init.
         if batch_size > data.shape[0]:
             raise ValueError("Provided batch_size is invalid.")
-        elif batch_size == 0:
+
+        if batch_size == 0:
             batch_size = data.shape[0]
 
         for i_run in range(0, self.max_runs):
