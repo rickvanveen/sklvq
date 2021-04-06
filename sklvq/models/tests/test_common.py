@@ -144,9 +144,9 @@ def test_prediction(estimator):
 
     # choosing a different threshold should typically lead to a different labeling;
     # note that LGMLVQ has df values very close to +-1
-    assert not all(model.predict(X, df_threshold=0.05) == model.predict(X, df_threshold=0.95))
+    assert not all(model.predict(X, threshold=0.03) == model.predict(X, threshold=0.97))
 
-    c_pred = model.predict(X, df_threshold=0.2) == 1
+    c_pred = model.predict(X, threshold=0.2) == 1
     c_df = model.decision_function(X) > 0.2
     c_proba = [v[1] for v in model.predict_proba(X) > (0.2+1)/2]
     assert all(c_pred == c_df)
