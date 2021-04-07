@@ -138,11 +138,13 @@ class GMLVQ(LVQBaseClass):
         The relevance matrix ``omega_.T.dot(omega_)``
 
     omega_hat_: ndarray
-        The omega matrix found by the eigenvalue decomposition of the relevance matrix ``lambda_``.
-        The eigenvectors (columns of ``omega_hat_``) can be used to transform the X `[3]`_.
+        The ``eigenvectors_`` scaled by the square root of the ``eigenvalues_`` `[3]`_.
+
+    eigenvectors_: ndarray
+        The eigenvectors found by the eigenvalue decomposition of the relevance matrix ``lambda_``
 
     eigenvalues_: ndarray
-        The corresponding eigenvalues to ``omega_hat_`` found by the eigenvalue decomposition of
+        The corresponding eigenvalues to ``eigenvectors_`` found by the eigenvalue decomposition of
         the relevance matrix ``lambda_``
 
     References
