@@ -506,14 +506,17 @@ class GMLVQ(LVQBaseClass):
         self.lambda_ = GMLVQ._compute_lambda(self.omega_)
 
         # Eigenvalues and column eigenvectors return in ascending order
-        eigenvalues, omega_hat = np.linalg.eigh(self.lambda_)
+        eigenvalues, eigenvectors = np.linalg.eigh(self.lambda_)
 
         # Flip (reverse the order to descending) before assigning.
         self.eigenvalues_ = np.flip(eigenvalues)
 
         # eigenvectors are column matrix in ascending order. Flip the columns and transpose the matrix
         # to get the descending ordered row matrix.
-        self.omega_hat_ = np.flip(omega_hat, axis=1).T
+        self.eigenvectors_ = np.flip(eigenvectors, axis=1).T
+
+        # In literature omega_hat contains the "scaled" eigenvectors.
+        self.omega_hat_ = np.sqrt(np.absolute(self.eigenvalues_[:, None])) * self.eigenvectors_
 
     @staticmethod
     def _compute_lambda(omega):
@@ -558,15 +561,9 @@ class GMLVQ(LVQBaseClass):
         The data projected on columns of ``omega_hat_`` with shape (n_samples, n_columns)
         """
         X = check_array(X)
-
         check_is_fitted(self)
 
-        transformation_matrix = self.omega_hat_
         if scale:
-            transformation_matrix = (
-                np.sqrt(np.absolute(self.eigenvalues_[:, None])) * transformation_matrix
-            )
+            return X.dot(self.omega_hat_.T)
 
-        data_new = X.dot(transformation_matrix.T)
-
-        return data_new
+        return X.dot(self.eigenvectors_.T)
