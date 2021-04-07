@@ -106,6 +106,10 @@ class GMLVQ(LVQBaseClass):
         Flag to indicate whether to normalize omega, whenever it is updated, such that the trace of the relevance matrix
         is equal to 1.
 
+    relevance_correction: np.ndarray, optional
+        Matrix that will be used to project out any contribution from unwanted directions in omega_ during training.
+        When set this will be applied every update step before the ``relevance_normalization`` is applied.
+
     relevance_n_components: str {"all"} or int, optional, default="all"
         For a square relevance matrix use the string "all" (default). For a rectangular relevance matrix use set the
         number of components explicitly by providing it as an int.
@@ -179,6 +183,7 @@ class GMLVQ(LVQBaseClass):
         prototype_n_per_class: Union[int, np.ndarray] = 1,
         relevance_init="identity",
         relevance_normalization: bool = True,
+        relevance_correction: np.ndarray = None,
         relevance_n_components: Union[str, int] = "all",
         relevance_regularization: Union[int, float] = 0,
         random_state: Union[int, np.random.RandomState] = None,
@@ -190,6 +195,7 @@ class GMLVQ(LVQBaseClass):
         self.discriminant_params = discriminant_params
         self.relevance_init = relevance_init
         self.relevance_normalization = relevance_normalization
+        self.relevance_correction = relevance_correction
         self.relevance_n_components = relevance_n_components
         self.relevance_regularization = relevance_regularization
 
@@ -222,6 +228,10 @@ class GMLVQ(LVQBaseClass):
             1d numpy array that contains all the model parameters in continuous memory
         """
         np.copyto(self._variables, new_variables)
+
+        if self.relevance_correction:
+            self._correct_omega(self.omega_)
+
         if self.relevance_normalization:
             GMLVQ._normalise_omega(self.omega_)
 
@@ -243,6 +253,9 @@ class GMLVQ(LVQBaseClass):
 
         self.set_prototypes(new_prototypes)
         self.set_omega(new_omega)
+
+        if self.relevance_correction:
+            self._correct_omega(self.omega_)
 
         if self.relevance_normalization:
             GMLVQ._normalise_omega(self.omega_)
@@ -367,6 +380,10 @@ class GMLVQ(LVQBaseClass):
     @staticmethod
     def _normalise_omega(omega: np.ndarray) -> None:
         np.divide(omega, np.sqrt(np.einsum("ji, ji", omega, omega)), out=omega)
+
+    def _correct_omega(self, omega: np.ndarray) -> None:
+        #TODO check exact computation.
+        np.dot(omega, self.relevance_correction, out=omega)
 
     ###########################################################################################
     # Solver helper functions
