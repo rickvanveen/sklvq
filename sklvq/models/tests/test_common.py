@@ -148,6 +148,15 @@ def test_prediction(estimator):
 
     c_pred = model.predict(X, threshold=0.2) == 1
     c_df = model.decision_function(X) > 0.2
-    c_proba = [v[1] for v in model.predict_proba(X) > (0.2+1)/2]
+    c_proba = [v[1] for v in model.predict_proba(X) > (0.2 + 1) / 2]
     assert all(c_pred == c_df)
     assert all(c_pred == c_proba)
+
+    with pytest.raises(ValueError):
+        model.predict(X, threshold=-1)
+
+    with pytest.raises(ValueError):
+        model.predict(X, threshold=2.0)
+
+    with pytest.raises(TypeError):
+        model.predict(X, threshold="0.5")
