@@ -5,7 +5,7 @@ import numpy as np
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.utils import check_random_state
 from sklearn.utils.multiclass import check_classification_targets
-from sklearn.utils.validation import check_is_fitted, check_array
+from sklearn.utils.validation import check_is_fitted, check_array, check_scalar
 
 from .. import distances
 from .. import solvers
@@ -579,8 +579,8 @@ class LVQBaseClass(
         Computes the decision values and returns shape (n_observations, n_classes). The values
         are constructed by computing: the distance between an observation and the prototype with
         a different label minus the distance between that observation and the closest prototype
-        with the same label, where "the same" is defined to be the index of the column the value
-        is being computed for.
+        with the same label, normalized by the sum of these distances, where "the same" is
+        defined to be the index of the column the value is being computed for.
 
         Parameters
         ----------
@@ -592,16 +592,16 @@ class LVQBaseClass(
         ndarray of shape (n_observations, n_classes)
         """
         # Of shape n_observations , n_prototypes
-        distances = self._distance(X, self)
+        _distances = self._distance(X, self)
 
         # Allocation n_observations, n_classes
         decision_values = np.zeros((X.shape[0], self.classes_.size))
 
         # return n_observations, n_classes
         for i, _ in enumerate(self.classes_):
-            decision_values[:, i] = distances[:, self.prototypes_labels_ != i].min(
-                axis=1
-            ) - distances[:, self.prototypes_labels_ == i].min(axis=1)
+            d_diff = _distances[:, self.prototypes_labels_ != i].min(axis=1)
+            d_same = _distances[:, self.prototypes_labels_ == i].min(axis=1)
+            decision_values[:, i] = (d_diff - d_same) / (d_diff + d_same)
 
         return decision_values
 
@@ -655,25 +655,32 @@ class LVQBaseClass(
         # Input validation
         X = check_array(X, force_all_finite=self.force_all_finite)
 
-        # Between -1  and 1
+        # Between -1 and 1
         decision_values = self._multiclass_decision_function(X)
 
-        # Softmax function (keeps the same scipy.stats.rankdata)
-        # Very  arbitrary  0.01, which also might not always work?
-        exp_decision_values = np.exp(0.01 * decision_values)
+        # Between 0 and 1
+        if self.classes_.size == 2:
+            return (decision_values + 1) / 2.0
 
+        # Softmax function (keeps the same scipy.stats.rankdata)
+        exp_decision_values = np.exp(decision_values)
         return exp_decision_values / np.sum(exp_decision_values, axis=1)[:, np.newaxis]
 
-    def predict(self, X: np.ndarray):
+    def predict(self, X: np.ndarray, threshold: Union[int, float] = 0.5):
         """Predict function
 
         The decision is made for the label of the prototype with the minimum decision value,
         as provided by the ``decision_function()``.
+        To choose a different cutoff point (e.g., based upon ROC analysis for 2-class data),
+        ``threshold`` can be set, which acts on the values from ``predict_proba()``.
+        The threshold value won't be used when the model has been fitted to data with more than 2 classes.
 
         Parameters
         ----------
          X  : ndarray
             The data.
+         threshold : float
+            threshold for ``predict_proba()`` values (default 0.5), should be in the interval [0,1]
 
         Returns
         -------
@@ -683,12 +690,18 @@ class LVQBaseClass(
         # SciKit-learn list of checked params before predict
         check_is_fitted(self)
 
+        # Check range of threshold
+        check_scalar(threshold, "threshold", (int, float), min_val=0, max_val=1)
+
+        # Convert threshold to (normalized) decision function range [-1, 1]
+        df_threshold = threshold * 2.0 - 1
+
         # Input validation
         # X = self._validate_data(X, force_all_finite=self.force_all_finite)
         decision_values = self.decision_function(X)
 
         if self.classes_.size == 2:
-            return self.classes_[(decision_values > 0).astype(int)]
+            return self.classes_[(decision_values > df_threshold).astype(np.int)]
 
         # Lower value is the closest prototype.
         return self.classes_[decision_values.argmax(axis=1)]
