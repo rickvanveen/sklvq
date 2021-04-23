@@ -225,7 +225,7 @@ class GMLVQ(LVQBaseClass):
         """
         np.copyto(self._variables, new_variables)
         if self.relevance_normalization:
-            GMLVQ._normalise_omega(self.omega_)
+            GMLVQ._normalize_omega(self.omega_)
 
     def set_model_params(self, new_model_params: ModelParamsType):
         """
@@ -247,7 +247,7 @@ class GMLVQ(LVQBaseClass):
         self.set_omega(new_omega)
 
         if self.relevance_normalization:
-            GMLVQ._normalise_omega(self.omega_)
+            GMLVQ._normalize_omega(self.omega_)
 
     def get_model_params(self) -> ModelParamsType:
         """
@@ -364,10 +364,10 @@ class GMLVQ(LVQBaseClass):
         (prototypes, omega) = self.to_model_params_view(var_buffer)
 
         self._normalize_prototypes(prototypes)
-        self._normalise_omega(omega)
+        self._normalize_omega(omega)
 
     @staticmethod
-    def _normalise_omega(omega: np.ndarray) -> None:
+    def _normalize_omega(omega: np.ndarray) -> None:
         np.divide(omega, np.sqrt(np.einsum("ji, ji", omega, omega)), out=omega)
 
     ###########################################################################################
@@ -490,7 +490,7 @@ class GMLVQ(LVQBaseClass):
             raise ValueError("Provided relevance_init is invalid.")
 
         if self.relevance_normalization:
-            GMLVQ._normalise_omega(self.omega_)
+            GMLVQ._normalize_omega(self.omega_)
 
     def _init_objective(self):
         self._objective = GeneralizedLearningObjective(
@@ -518,7 +518,9 @@ class GMLVQ(LVQBaseClass):
         self.eigenvectors_ = np.flip(eigenvectors, axis=1).T
 
         # In literature omega_hat contains the "scaled" eigenvectors.
-        self.omega_hat_ = np.sqrt(np.absolute(self.eigenvalues_[:, None])) * self.eigenvectors_
+        self.omega_hat_ = (
+            np.sqrt(np.absolute(self.eigenvalues_[:, None])) * self.eigenvectors_
+        )
 
     @staticmethod
     def _compute_lambda(omega):
@@ -562,10 +564,11 @@ class GMLVQ(LVQBaseClass):
         -------
         The data projected on columns of ``omega_hat_`` with shape (n_samples, n_columns)
         """
-        X = check_array(X)
         check_is_fitted(self)
 
-        if scale:
-            return X.dot(self.omega_hat_.T)
+        X = check_array(X)
 
-        return X.dot(self.eigenvectors_.T)
+        if scale:
+            return np.matmul(X, self.omega_hat_.T)
+
+        return np.matmul(X, self.eigenvectors_.T)
