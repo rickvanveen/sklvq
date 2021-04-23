@@ -510,6 +510,9 @@ class GMLVQ(LVQBaseClass):
         # Eigenvalues and column eigenvectors return in ascending order
         eigenvalues, eigenvectors = np.linalg.eigh(self.lambda_)
 
+        # Dealing with numerical errors. (eigenvalues of lambda should not be negative)
+        eigenvalues[eigenvalues < 0] = 0
+
         # Flip (reverse the order to descending) before assigning.
         self.eigenvalues_ = np.flip(eigenvalues)
 
@@ -519,7 +522,7 @@ class GMLVQ(LVQBaseClass):
 
         # In literature omega_hat contains the "scaled" eigenvectors.
         self.omega_hat_ = (
-            np.sqrt(np.absolute(self.eigenvalues_[:, None])) * self.eigenvectors_
+            np.sqrt(self.eigenvalues_[:, None]) * self.eigenvectors_
         )
 
     @staticmethod

@@ -537,6 +537,9 @@ class LGMLVQ(LVQBaseClass):
         # Eigenvalues and column eigenvectors returned in ascending order
         eigenvalues, eigenvectors = np.linalg.eigh(self.lambda_)
 
+        # Dealing with numerical errors. (eigenvalues of lambda should not be negative)
+        eigenvalues[eigenvalues < 0] = 0
+
         # The eigh returns everything in ascending order so we need to flip it
         self.eigenvalues_ = np.flip(eigenvalues, axis=1)
         # We also transpose the matrices
@@ -544,7 +547,7 @@ class LGMLVQ(LVQBaseClass):
 
         # Now omega_hat_ contains the scaled eigenvectors
         self.omega_hat_ = (
-            np.sqrt(np.absolute(self.eigenvalues_[:, :, None])) * self.eigenvectors_
+            np.sqrt(self.eigenvalues_[:, :, None]) * self.eigenvectors_
         )
 
     @staticmethod
