@@ -382,8 +382,10 @@ class GMLVQ(LVQBaseClass):
         np.divide(omega, np.sqrt(np.einsum("ji, ji", omega, omega)), out=omega)
 
     def _correct_omega(self, omega: np.ndarray) -> None:
-        #TODO check exact computation.
-        np.dot(omega, self.relevance_correction, out=omega)
+        # Note matmul is faster for larger matrices, for smaller dot is faster.
+        np.matmul(omega.T, self.relevance_correction, out=omega.T)
+        # Note the Transpose operation in the out makes sure the transposed result is not written to omega but to
+        # omega transpose and thus omega keeps its row order (and now further transposes are necessary).
 
     ###########################################################################################
     # Solver helper functions
