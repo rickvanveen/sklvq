@@ -380,10 +380,6 @@ class LGMLVQ(LVQBaseClass):
             ),
             out=omega,
         )
-        # denominator = np.sqrt(np.einsum("ikj, ikj -> i", omega, omega)).reshape(
-        #     omega.shape[0], 1, 1
-        # )
-        # omega /= denominator
 
     ###########################################################################################
     # Solver helper functions
