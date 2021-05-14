@@ -47,7 +47,7 @@ model = LGMLVQ(
 
 ###############################################################################
 # The next step is to fit the LGMLVQ object to the data and use the predict method to make the
-# predictions. Note that this example only works on the training data and therefor does not say
+# predictions. Note that this example only works on the training data and therefore does not say
 # anything about the generalizability of the fitted model.
 
 # Train the model using the scaled data and true labels

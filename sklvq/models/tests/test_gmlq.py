@@ -75,3 +75,14 @@ def test_gmlvq():
 
     print("\nBest parameter (CV score=%0.3f):" % search.best_score_)
     print(search.best_params_)
+
+
+def test_gmlvq_():
+    X, y = datasets.load_iris(return_X_y=True)
+    model = GMLVQ().fit(X, y)
+
+    assert np.all(np.isclose(model.lambda_, GMLVQ._compute_lambda(model.omega_hat_)))
+    assert np.all(np.isclose(np.linalg.norm(model.eigenvectors_, axis=1), 1.0))
+
+
+

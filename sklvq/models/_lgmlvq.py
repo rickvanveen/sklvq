@@ -144,13 +144,16 @@ class LGMLVQ(LVQBaseClass):
         The relevance matrices ``omega_.T.dot(omega_)`` per matrix.
 
     omega_hat_: ndarray
-        The omega matrices found by the eigenvalue decomposition of the relevance matrices
-        ``lambda_``. The eigenvectors (columns of ``omega_hat_``) can be used to transform the data
-         `[3]`_. This results in multiple possible transformations, one per relevance matrix.
+        The ``eigenvectors_`` scaled by the square root of the ``eigenvalues_``. The rows of ``omega_hat_``
+        can be used to transform the data `[3]`_. This results in multiple possible
+        transformations, one per relevance matrix.
+
+    eigenvectors_: ndarray
+        The eigenvectors found by the eigenvalue decomposition of the relevance matrix ``lambda_``
 
     eigenvalues_: ndarray
-        The corresponding eigenvalues to ``omega_hat_`` found by the eigenvalue decomposition of
-        the relevance matrices ``lambda_``
+        The corresponding eigenvalues to ``eigenvectors_`` found by the eigenvalue decomposition of
+        the relevance matrix ``lambda_``
 
     References
     ----------
@@ -377,10 +380,6 @@ class LGMLVQ(LVQBaseClass):
             ),
             out=omega,
         )
-        # denominator = np.sqrt(np.einsum("ikj, ikj -> i", omega, omega)).reshape(
-        #     omega.shape[0], 1, 1
-        # )
-        # omega /= denominator
 
     ###########################################################################################
     # Solver helper functions
@@ -536,10 +535,20 @@ class LGMLVQ(LVQBaseClass):
         self.lambda_ = LGMLVQ._compute_lambdas(self.omega_)
 
         # Eigenvalues and column eigenvectors returned in ascending order
-        eigenvalues, omega_hat = np.linalg.eigh(self.lambda_)
+        eigenvalues, eigenvectors = np.linalg.eigh(self.lambda_)
 
+        # Dealing with numerical errors. (eigenvalues of lambda should not be negative)
+        eigenvalues[eigenvalues < 0] = 0
+
+        # The eigh returns everything in ascending order so we need to flip it
         self.eigenvalues_ = np.flip(eigenvalues, axis=1)
-        self.omega_hat_ = np.transpose(np.flip(omega_hat, axis=2), axes=(0, 2, 1))
+        # We also transpose the matrices
+        self.eigenvectors_ = np.transpose(np.flip(eigenvectors, axis=2), axes=(0, 2, 1))
+
+        # Now omega_hat_ contains the scaled eigenvectors
+        self.omega_hat_ = (
+            np.sqrt(self.eigenvalues_[:, :, None]) * self.eigenvectors_
+        )
 
     @staticmethod
     def _compute_lambda(omega):
@@ -596,20 +605,15 @@ class LGMLVQ(LVQBaseClass):
         n_columns, n_matrices)
         """
         check_is_fitted(self)
-
         X = check_array(X)
 
-        transformation_matrix = self.omega_hat_[omega_hat_index, :, :]
+        if scale:
+            transformation_matrix = self.omega_hat_[omega_hat_index, :, :]
+        else:
+            transformation_matrix = self.eigenvectors_[omega_hat_index, :, :]
+
         if transformation_matrix.ndim != 3:
             transformation_matrix = transformation_matrix[None, :, :]
-
-        if scale:
-            eigenvalues = np.sqrt(np.absolute(self.eigenvalues_[omega_hat_index, :]))
-
-            transformation_matrix = (
-                np.expand_dims(eigenvalues, axis=eigenvalues.ndim)
-                * transformation_matrix
-            )
 
         transformed_data = np.einsum("in, jmn -> imj", X, transformation_matrix)
 
