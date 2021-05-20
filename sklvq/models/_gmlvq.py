@@ -231,7 +231,7 @@ class GMLVQ(LVQBaseClass):
         """
         np.copyto(self._variables, new_variables)
 
-        if self.relevance_correction:
+        if not (self.relevance_correction is None):
             self._correct_omega(self.omega_)
 
         if self.relevance_normalization:
