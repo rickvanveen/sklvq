@@ -230,6 +230,7 @@ class GMLVQ(LVQBaseClass):
             1d numpy array that contains all the model parameters in continuous memory
         """
         np.copyto(self._variables, new_variables)
+	
 
         if not (self.relevance_correction is None):
             self._correct_omega(self.omega_)
@@ -256,7 +257,7 @@ class GMLVQ(LVQBaseClass):
         self.set_prototypes(new_prototypes)
         self.set_omega(new_omega)
 
-        if self.relevance_correction:
+        if not(self.relevance_correction is None):
             self._correct_omega(self.omega_)
 
         if self.relevance_normalization:
@@ -385,7 +386,8 @@ class GMLVQ(LVQBaseClass):
 
     def _correct_omega(self, omega: np.ndarray) -> None:
         # Note matmul is faster for larger matrices, for smaller dot is faster.
-        np.matmul(omega.T, self.relevance_correction, out=omega.T)
+        np.matmul(omega, self.relevance_correction.T, out=omega)
+        #np.matmul(omega.T, self.relevance_correction, out=omega.T)
         # Note the Transpose operation in the out makes sure the transposed result is not written to omega but to
         # omega transpose and thus omega keeps its row order (and now further transposes are necessary).
 
@@ -491,6 +493,7 @@ class GMLVQ(LVQBaseClass):
 
         self._relevances_size = np.prod(self._relevances_shape)
 
+	# corrected for the 1st omega
     def _init_relevances(self):
         self.omega_ = self.to_omega(self._variables)
 
@@ -508,6 +511,9 @@ class GMLVQ(LVQBaseClass):
         else:
             raise ValueError("Provided relevance_init is invalid.")
 
+        if not (self.relevance_correction is None):
+           self._correct_omega(self.omega_)
+            
         if self.relevance_normalization:
             GMLVQ._normalize_omega(self.omega_)
 
