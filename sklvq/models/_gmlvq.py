@@ -386,8 +386,7 @@ class GMLVQ(LVQBaseClass):
 
     def _correct_omega(self, omega: np.ndarray) -> None:
         # Note matmul is faster for larger matrices, for smaller dot is faster.
-        np.matmul(self.relevance_correction,omega,out=omega.T)
-        # will this still keep omega as a row matrix when there is a omega.T in out???????????????????????????????????????????????????        
+        np.matmul(self.relevance_correction,omega,out=omega.T)       
         # Note the Transpose operation in the out makes sure the transposed result is not written to omega but to
         # omega transpose and thus omega keeps its row order (and now further transposes are necessary).
 
