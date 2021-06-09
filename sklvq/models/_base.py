@@ -252,9 +252,12 @@ class LVQBaseClass(
         ndarray of same shape as input
             Normalized prototypes.
         """
+        norm = np.linalg.norm(prototypes, axis=1, keepdims=True)
+        norm[norm == 0] = 1.0
+
         np.divide(
             prototypes,
-            np.linalg.norm(prototypes, axis=1, keepdims=True),
+            norm,
             out=prototypes,
         )
 
