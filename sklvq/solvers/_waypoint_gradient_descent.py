@@ -1,5 +1,7 @@
 import numpy as np
 from sklearn.utils import shuffle
+from sklearn.metrics import roc_auc_score
+import copy
 
 from . import SolverBaseClass
 from ..objectives import ObjectiveBaseClass
@@ -10,7 +12,7 @@ from typing import TYPE_CHECKING, Union
 if TYPE_CHECKING:
     from sklvq.models import LVQBaseClass
 
-STATE_KEYS = ["variables", "nit", "fun", "nfun", "tfun", "step_size"]
+STATE_KEYS = ["model", "omega_matrix", "prototypes", "variables", "label_score", "auc", "nit", "fun", "nfun", "tfun", "step_size"]
 
 
 class WaypointGradientDescent(SolverBaseClass):
@@ -192,9 +194,14 @@ class WaypointGradientDescent(SolverBaseClass):
 
         if self.callback is not None:
             variables = np.copy(model.get_variables())
+            label_score = np.copy(model.decision_function(data))
+            auc = np.copy(roc_auc_score(y_true=labels, y_score=label_score))
             cost = self.objective(model, data, labels)
+            omega_matrix = np.copy(model.omega_)
+            prototypes = np.copy(model.prototypes_)
+            print("test")
             state = _update_state(
-                STATE_KEYS, variables=variables, nit="Initial", nfun=cost, fun=cost
+                STATE_KEYS, model=copy.copy(model), omega_matrix=omega_matrix, prototypes=prototypes, label_score=label_score, auc=auc, variables=variables, nit="Initial", nfun=cost, fun=cost
             )
             if self.callback(state):
                 return
@@ -232,7 +239,12 @@ class WaypointGradientDescent(SolverBaseClass):
                 cost = self.objective(model, data, labels)
                 state = _update_state(
                     STATE_KEYS,
+                    model=copy.copy(model),
                     variables=np.copy(model.get_variables()),
+                    omega_matrix = np.copy(model.omega_),
+                    prototypes = np.copy(model.prototypes_),
+                    label_score = np.copy(model.decision_function(data)),
+                    auc = np.copy(roc_auc_score(y_true=labels, y_score=label_score)),
                     nit=i_run + 1,
                     nfun=cost,
                     fun=cost,
@@ -295,7 +307,12 @@ class WaypointGradientDescent(SolverBaseClass):
             if self.callback is not None:
                 state = _update_state(
                     STATE_KEYS,
+                    model=copy.copy(model),
                     variables=np.copy(model.get_variables()),
+                    omega_matrix = np.copy(model.omega_),
+                    prototypes = np.copy(model.prototypes_),
+                    label_score = np.copy(model.decision_function(data)),
+                    auc = np.copy(roc_auc_score(y_true=labels, y_score=label_score)),
                     nit=i_run + 1,
                     tfun=tentative_cost,
                     nfun=new_cost,
