@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sklvq.models import LVQBaseClass
 
-STATE_KEYS = ["variables", "nit", "fun", "m_hat", "v_hat"]
+STATE_KEYS = ["model", "nit", "fun", "m_hat", "v_hat"]
 
 
 class AdaptiveMomentEstimation(SolverBaseClass):
@@ -170,7 +170,7 @@ class AdaptiveMomentEstimation(SolverBaseClass):
         if self.callback is not None:
             state = _update_state(
                 STATE_KEYS,
-                variables=np.copy(model.get_variables()),
+                model=model,
                 nit="Initial",
                 fun=self.objective(model, data, labels),
             )
@@ -221,7 +221,7 @@ class AdaptiveMomentEstimation(SolverBaseClass):
             if self.callback is not None:
                 state = _update_state(
                     STATE_KEYS,
-                    variables=np.copy(model.get_variables()),
+                    model=model,
                     nit=i_run + 1,
                     fun=self.objective(model, data, labels),
                     m_hat=m_hat,

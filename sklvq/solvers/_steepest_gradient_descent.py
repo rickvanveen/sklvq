@@ -10,7 +10,7 @@ from ..objectives import ObjectiveBaseClass
 if TYPE_CHECKING:
     from sklvq.models import LVQBaseClass
 
-STATE_KEYS = ["variables", "nit", "fun", "step_size"]
+STATE_KEYS = ["model", "nit", "fun", "step_size"]
 
 
 class SteepestGradientDescent(SolverBaseClass):
@@ -152,7 +152,7 @@ class SteepestGradientDescent(SolverBaseClass):
         if self.callback is not None:
             state = _update_state(
                 STATE_KEYS,
-                variables=np.copy(model.get_variables()),
+                model=model,
                 nit="Initial",
                 fun=self.objective(model, data, labels),
             )
@@ -208,7 +208,7 @@ class SteepestGradientDescent(SolverBaseClass):
             if self.callback is not None:
                 state = _update_state(
                     STATE_KEYS,
-                    variables=np.copy(model.get_variables()),
+                    model=model,
                     nit=i_run + 1,
                     fun=self.objective(model, data, labels),
                     step_size=step_size,
