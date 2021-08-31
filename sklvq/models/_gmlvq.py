@@ -231,7 +231,7 @@ class GMLVQ(LVQBaseClass):
         """
         np.copyto(self._variables, new_variables)
 
-        if self.relevance_correction:
+        if self.relevance_correction is not None:
             self._correct_omega(self.omega_)
 
         if self.relevance_normalization:
@@ -256,7 +256,7 @@ class GMLVQ(LVQBaseClass):
         self.set_prototypes(new_prototypes)
         self.set_omega(new_omega)
 
-        if self.relevance_correction:
+        if self.relevance_correction is not None:
             self._correct_omega(self.omega_)
 
         if self.relevance_normalization:
@@ -508,6 +508,9 @@ class GMLVQ(LVQBaseClass):
         else:
             raise ValueError("Provided relevance_init is invalid.")
 
+        if self.relevance_correction is not None:
+            self._correct_omega(self.omega_)
+
         if self.relevance_normalization:
             GMLVQ._normalize_omega(self.omega_)
 
@@ -540,9 +543,7 @@ class GMLVQ(LVQBaseClass):
         self.eigenvectors_ = np.flip(eigenvectors, axis=1).T
 
         # In literature omega_hat contains the "scaled" eigenvectors.
-        self.omega_hat_ = (
-            np.sqrt(self.eigenvalues_[:, None]) * self.eigenvectors_
-        )
+        self.omega_hat_ = np.sqrt(self.eigenvalues_[:, None]) * self.eigenvectors_
 
     @staticmethod
     def _compute_lambda(omega):
