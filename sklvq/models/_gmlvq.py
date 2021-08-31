@@ -385,9 +385,9 @@ class GMLVQ(LVQBaseClass):
 
     def _correct_omega(self, omega: np.ndarray) -> None:
         # Note matmul is faster for larger matrices, for smaller dot is faster.
-        np.matmul(omega.T, self.relevance_correction, out=omega.T)
+        np.matmul(omega, self.relevance_correction, out=omega)
         # Note the Transpose operation in the out makes sure the transposed result is not written to omega but to
-        # omega transpose and thus omega keeps its row order (and now further transposes are necessary).
+        # omega transpose and thus omega keeps its row order (and no further transposes are necessary).
 
     ###########################################################################################
     # Solver helper functions
