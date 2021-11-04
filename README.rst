@@ -28,7 +28,7 @@ Documentation with install instruction and examples can be found here: https://s
 If you find any bugs or have any other suggestions on how to improve the code then please use the issue tracker on
 github (https://github.com/rickvanveen/sklvq/issues).
 
-Please cite the following publication if you decide using the code in your researc::
+Please cite the following publication if you decide using the code in your research::
 
   @article{vanVeen2021,
     author  = {Rick van Veen and Michael Biehl and Gert-Jan de Vries},
