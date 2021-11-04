@@ -27,3 +27,16 @@ Documentation with install instruction and examples can be found here: https://s
 
 If you find any bugs or have any other suggestions on how to improve the code then please use the issue tracker on
 github (https://github.com/rickvanveen/sklvq/issues).
+
+Please cite the following publication if you decide using the code in your researc::
+
+  @article{vanVeen2021,
+    author  = {Rick van Veen and Michael Biehl and Gert-Jan de Vries},
+    title   = {sklvq: Scikit Learning Vector Quantization},
+    journal = {Journal of Machine Learning Research},
+    year    = {2021},
+    volume  = {22},
+    number  = {231},
+    pages   = {1-6},
+    url     = {http://jmlr.org/papers/v22/21-0029.html}
+  }
