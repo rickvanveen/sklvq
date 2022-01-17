@@ -138,11 +138,13 @@ class GMLVQ(LVQBaseClass):
         The relevance matrix ``omega_.T.dot(omega_)``
 
     omega_hat_: ndarray
-        The omega matrix found by the eigenvalue decomposition of the relevance matrix ``lambda_``.
-        The eigenvectors (columns of ``omega_hat_``) can be used to transform the X `[3]`_.
+        The ``eigenvectors_`` scaled by the square root of the ``eigenvalues_`` `[3]`_.
+
+    eigenvectors_: ndarray
+        The eigenvectors found by the eigenvalue decomposition of the relevance matrix ``lambda_``
 
     eigenvalues_: ndarray
-        The corresponding eigenvalues to ``omega_hat_`` found by the eigenvalue decomposition of
+        The corresponding eigenvalues to ``eigenvectors_`` found by the eigenvalue decomposition of
         the relevance matrix ``lambda_``
 
     References
@@ -223,7 +225,7 @@ class GMLVQ(LVQBaseClass):
         """
         np.copyto(self._variables, new_variables)
         if self.relevance_normalization:
-            GMLVQ._normalise_omega(self.omega_)
+            GMLVQ._normalize_omega(self.omega_)
 
     def set_model_params(self, new_model_params: ModelParamsType):
         """
@@ -245,7 +247,7 @@ class GMLVQ(LVQBaseClass):
         self.set_omega(new_omega)
 
         if self.relevance_normalization:
-            GMLVQ._normalise_omega(self.omega_)
+            GMLVQ._normalize_omega(self.omega_)
 
     def get_model_params(self) -> ModelParamsType:
         """
@@ -362,10 +364,10 @@ class GMLVQ(LVQBaseClass):
         (prototypes, omega) = self.to_model_params_view(var_buffer)
 
         self._normalize_prototypes(prototypes)
-        self._normalise_omega(omega)
+        self._normalize_omega(omega)
 
     @staticmethod
-    def _normalise_omega(omega: np.ndarray) -> None:
+    def _normalize_omega(omega: np.ndarray) -> None:
         np.divide(omega, np.sqrt(np.einsum("ji, ji", omega, omega)), out=omega)
 
     ###########################################################################################
@@ -488,7 +490,7 @@ class GMLVQ(LVQBaseClass):
             raise ValueError("Provided relevance_init is invalid.")
 
         if self.relevance_normalization:
-            GMLVQ._normalise_omega(self.omega_)
+            GMLVQ._normalize_omega(self.omega_)
 
     def _init_objective(self):
         self._objective = GeneralizedLearningObjective(
@@ -506,14 +508,22 @@ class GMLVQ(LVQBaseClass):
         self.lambda_ = GMLVQ._compute_lambda(self.omega_)
 
         # Eigenvalues and column eigenvectors return in ascending order
-        eigenvalues, omega_hat = np.linalg.eigh(self.lambda_)
+        eigenvalues, eigenvectors = np.linalg.eigh(self.lambda_)
+
+        # Dealing with numerical errors. (eigenvalues of lambda should not be negative)
+        eigenvalues[eigenvalues < 0] = 0
 
         # Flip (reverse the order to descending) before assigning.
         self.eigenvalues_ = np.flip(eigenvalues)
 
         # eigenvectors are column matrix in ascending order. Flip the columns and transpose the matrix
         # to get the descending ordered row matrix.
-        self.omega_hat_ = np.flip(omega_hat, axis=1).T
+        self.eigenvectors_ = np.flip(eigenvectors, axis=1).T
+
+        # In literature omega_hat contains the "scaled" eigenvectors.
+        self.omega_hat_ = (
+            np.sqrt(self.eigenvalues_[:, None]) * self.eigenvectors_
+        )
 
     @staticmethod
     def _compute_lambda(omega):
@@ -557,16 +567,11 @@ class GMLVQ(LVQBaseClass):
         -------
         The data projected on columns of ``omega_hat_`` with shape (n_samples, n_columns)
         """
-        X = check_array(X)
-
         check_is_fitted(self)
 
-        transformation_matrix = self.omega_hat_
+        X = check_array(X)
+
         if scale:
-            transformation_matrix = (
-                np.sqrt(np.absolute(self.eigenvalues_[:, None])) * transformation_matrix
-            )
+            return np.matmul(X, self.omega_hat_.T)
 
-        data_new = X.dot(transformation_matrix.T)
-
-        return data_new
+        return np.matmul(X, self.eigenvectors_.T)

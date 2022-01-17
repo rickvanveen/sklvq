@@ -92,3 +92,11 @@ def test_lgmlvq():
 
     print("\nBest parameter (CV score=%0.3f):" % search.best_score_)
     print(search.best_params_)
+
+
+def test_lgmlvq_relevances():
+    X, y = datasets.load_iris(return_X_y=True)
+    model = LGMLVQ().fit(X, y)
+
+    assert np.all(np.isclose(model.lambda_, LGMLVQ._compute_lambdas(model.omega_hat_)))
+    assert np.all(np.isclose(np.linalg.norm(model.eigenvectors_, axis=1), 1.0))
