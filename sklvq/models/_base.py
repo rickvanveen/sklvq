@@ -348,12 +348,15 @@ class LVQBaseClass(
         """
         prototype_n_per_class = self.prototype_n_per_class
 
+        # Should not only be int but scalar?
         if isinstance(prototype_n_per_class, int):
             self._prototypes_shape = (
                 prototype_n_per_class * self.classes_.size,
                 self.n_features_in_,
             )
-        elif isinstance(prototype_n_per_class, np.ndarray):
+        elif isinstance(prototype_n_per_class, (list, np.ndarray)):
+            prototype_n_per_class = np.asarray(prototype_n_per_class)
+
             if prototype_n_per_class.size != self.classes_.size:
                 raise ValueError(
                     "Expected the number protoypes_per_class (size = {}) to have a number of elements "
