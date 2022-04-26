@@ -1,5 +1,7 @@
 import numpy as np
 from sklearn.utils import shuffle
+from sklearn.metrics import roc_auc_score
+import copy
 
 from . import SolverBaseClass
 from ..objectives import ObjectiveBaseClass
@@ -10,7 +12,7 @@ from typing import TYPE_CHECKING, Union
 if TYPE_CHECKING:
     from sklvq.models import LVQBaseClass
 
-STATE_KEYS = ["variables", "nit", "fun", "nfun", "tfun", "step_size"]
+STATE_KEYS = ["model", "nit", "fun", "nfun", "tfun", "step_size"]
 
 
 class WaypointGradientDescent(SolverBaseClass):
@@ -191,10 +193,9 @@ class WaypointGradientDescent(SolverBaseClass):
         step_size = self.step_size
 
         if self.callback is not None:
-            variables = np.copy(model.get_variables())
             cost = self.objective(model, data, labels)
             state = _update_state(
-                STATE_KEYS, variables=variables, nit="Initial", nfun=cost, fun=cost
+                STATE_KEYS,model=model, nit="Initial", nfun=cost, fun=cost
             )
             if self.callback(state):
                 return
@@ -232,7 +233,7 @@ class WaypointGradientDescent(SolverBaseClass):
                 cost = self.objective(model, data, labels)
                 state = _update_state(
                     STATE_KEYS,
-                    variables=np.copy(model.get_variables()),
+                    model=model,
                     nit=i_run + 1,
                     nfun=cost,
                     fun=cost,
@@ -295,7 +296,7 @@ class WaypointGradientDescent(SolverBaseClass):
             if self.callback is not None:
                 state = _update_state(
                     STATE_KEYS,
-                    variables=np.copy(model.get_variables()),
+                    model=model,
                     nit=i_run + 1,
                     tfun=tentative_cost,
                     nfun=new_cost,
