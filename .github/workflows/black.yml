@@ -13,7 +13,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Lint black code style
       - uses: psf/black@stable
         with:
           options: "--check --verbose"
