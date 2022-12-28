@@ -1,12 +1,19 @@
 name: Black
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ "master", "develop"]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ "master", "develop"]
 
 jobs:
   lint:
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Lint black code style
       - uses: psf/black@stable
         with:
           options: "--check --verbose"
