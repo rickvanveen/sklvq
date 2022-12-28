@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 from sklearn.datasets import load_iris
 from sklearn.metrics import classification_report
 from sklearn.preprocessing import StandardScaler
+import numpy as np
 
 from sklvq import GLVQ
 
@@ -78,7 +79,7 @@ fig.suptitle("Prototype of each class")
 
 for i, prototype in enumerate(model.prototypes_):
     # Reverse the z-transform to go back to the original feature space.
-    prototype = scaler.inverse_transform(prototype)
+    prototype = scaler.inverse_transform(np.atleast_2d(prototype)).squeeze()
 
     ax[i].bar(
         range(num_features),
