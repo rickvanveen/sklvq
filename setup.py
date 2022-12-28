@@ -11,7 +11,7 @@ with open(ver_file) as f:
 
 DISTNAME = "sklvq"
 DESCRIPTION = "A collection of Learning Vector Quantization algorithms compatible with scikit-learn"
-with codecs.open("README.rst", encoding="utf-8-sig") as f:
+with codecs.open("README.md", encoding="utf-8-sig") as f:
     LONG_DESCRIPTION = f.read()
 MAINTAINER = "Rick van Veen"
 MAINTAINER_EMAIL = "r.van.veen133@gmail.com"
