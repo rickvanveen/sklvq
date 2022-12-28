@@ -1,0 +1,34 @@
+name: CodeCov
+
+on:
+  push:
+    branches: [ "master", "develop"]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ "master", "develop"]
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python_version: [ '3.8', '3.9', '3.10' ]
+    env:
+      PYTHON: ${{ matrix.python_version }}
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup Python
+      uses: actions/setup-python@master
+      with:
+        python-version: ${{ matrix.python_version }}
+    - name: Generate coverage report
+      run: |
+        pip install .[tests]
+        pytest sklvq --cov=./ --cov-report=xml
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        env_vars: PYTHON
+        fail_ci_if_error: true
+        verbose: true
