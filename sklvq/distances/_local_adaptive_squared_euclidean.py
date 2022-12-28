@@ -103,7 +103,7 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
                     **{kwarg_str: model._compute_lambda(omega)},
                 )
 
-        return cdists ** 2
+        return cdists**2
 
     def gradient(
         self, data: np.ndarray, model: "LGMLVQ", i_prototype: int

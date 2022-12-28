@@ -40,7 +40,11 @@ class CustomSquaredEuclidean(DistanceBaseClass):
     # The call function needs to return a matrix with the number of X points on the
     # rows and the columns the distance to the prototypes.
     def __call__(self, data: np.ndarray, model: "LVQBaseClass") -> np.ndarray:
-        return pairwise_distances(data, model.prototypes_, **self.metric_kwargs,)
+        return pairwise_distances(
+            data,
+            model.prototypes_,
+            **self.metric_kwargs,
+        )
 
     # The gradient is slightly more difficult as the gradient (with respect to 1
     # prototype) needs to be provided in a vector the size of all the prototypes.

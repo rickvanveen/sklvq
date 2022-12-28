@@ -714,7 +714,7 @@ class LVQBaseClass(
 
 
 def _conditional_mean(p_labels: np.ndarray, data: np.ndarray, d_labels: np.ndarray):
-    """ Implements the conditional mean (ignoring nan values), i.e., mean per class"""
+    """Implements the conditional mean (ignoring nan values), i.e., mean per class"""
     return np.array(
         [np.nanmean(data[p_label == d_labels, :], axis=0) for p_label in p_labels]
     )

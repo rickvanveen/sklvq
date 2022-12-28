@@ -45,7 +45,10 @@ class CustomSteepestGradientDescent(SolverBaseClass):
         self.callback = callback
 
     def solve(
-        self, data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass",
+        self,
+        data: np.ndarray,
+        labels: np.ndarray,
+        model: "LVQBaseClass",
     ):
         # Calls the callback function is provided with the initial values.
         if self.callback is not None:

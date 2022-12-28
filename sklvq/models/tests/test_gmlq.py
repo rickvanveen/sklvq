@@ -83,6 +83,3 @@ def test_gmlvq_():
 
     assert np.all(np.isclose(model.lambda_, GMLVQ._compute_lambda(model.omega_hat_)))
     assert np.all(np.isclose(np.linalg.norm(model.eigenvectors_, axis=1), 1.0))
-
-
-

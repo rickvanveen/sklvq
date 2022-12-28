@@ -207,12 +207,12 @@ class AdaptiveMomentEstimation(SolverBaseClass):
                 # Update biased (init 0) moving gradient averages m and v.
                 m = (self.beta1 * m) + ((1 - self.beta1) * objective_gradient)
 
-                v = (self.beta2 * v) + ((1 - self.beta2) * objective_gradient ** 2)
+                v = (self.beta2 * v) + ((1 - self.beta2) * objective_gradient**2)
 
                 # Update unbiased moving gradient averages
-                m_hat = m / (1 - self.beta1 ** p)
+                m_hat = m / (1 - self.beta1**p)
 
-                v_hat = v / (1 - self.beta2 ** p)
+                v_hat = v / (1 - self.beta2**p)
 
                 objective_gradient = (
                     self.step_size * m_hat / (np.sqrt(v_hat) + self.epsilon)

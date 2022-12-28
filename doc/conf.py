@@ -22,6 +22,7 @@ import sphinx
 from distutils.version import LooseVersion
 
 from sklvq import __version__
+
 # __version__ = "0.1"
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -78,8 +79,8 @@ plot_gallery = "True"
 master_doc = "index"
 
 # General information about the project.
-project = u"sklvq"
-copyright = u"2020, Rick van Veen"
+project = "sklvq"
+copyright = "2020, Rick van Veen"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -234,8 +235,8 @@ latex_documents = [
     (
         "index",
         "sklvq.tex",
-        u"sklvq Documentation",
-        u"Rick van Veen",
+        "sklvq Documentation",
+        "Rick van Veen",
         "manual",
     ),
 ]
@@ -269,8 +270,8 @@ man_pages = [
     (
         "index",
         "sklvq",
-        u"sklvq Documentation",
-        [u"Rick van Veen"],
+        "sklvq Documentation",
+        ["Rick van Veen"],
         1,
     )
 ]
@@ -288,8 +289,8 @@ texinfo_documents = [
     (
         "index",
         "sklvq",
-        u"sklvq Documentation",
-        u"Rick van Veen",
+        "sklvq Documentation",
+        "Rick van Veen",
         "sklvq",
         "One line description of project.",
         "Miscellaneous",

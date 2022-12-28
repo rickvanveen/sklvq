@@ -521,9 +521,7 @@ class GMLVQ(LVQBaseClass):
         self.eigenvectors_ = np.flip(eigenvectors, axis=1).T
 
         # In literature omega_hat contains the "scaled" eigenvectors.
-        self.omega_hat_ = (
-            np.sqrt(self.eigenvalues_[:, None]) * self.eigenvectors_
-        )
+        self.omega_hat_ = np.sqrt(self.eigenvalues_[:, None]) * self.eigenvectors_
 
     @staticmethod
     def _compute_lambda(omega):

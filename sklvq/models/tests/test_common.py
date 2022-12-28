@@ -90,6 +90,7 @@ def test_shared_memory(estimator):
 
     assert np.shares_memory(old_variables, m.get_variables())
 
+
 @pytest.mark.parametrize("estimator", [GMLVQ, LGMLVQ])
 def test_shared_hyper_params(estimator):
     X, y = datasets.load_iris(return_X_y=True)

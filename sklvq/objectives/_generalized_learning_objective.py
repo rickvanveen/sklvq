@@ -229,7 +229,7 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
 
 
 def _find_min(indices: np.ndarray, distances: np.ndarray) -> (np.ndarray, np.ndarray):
-    """ Helper function to find the minimum distance and the index of this distance. """
+    """Helper function to find the minimum distance and the index of this distance."""
     # Set the irrelevant distances to infinity.
     dist_temp = np.where(indices, distances, np.inf)
     # Find the indices of the closest prototype (column)

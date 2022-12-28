@@ -546,9 +546,7 @@ class LGMLVQ(LVQBaseClass):
         self.eigenvectors_ = np.transpose(np.flip(eigenvectors, axis=2), axes=(0, 2, 1))
 
         # Now omega_hat_ contains the scaled eigenvectors
-        self.omega_hat_ = (
-            np.sqrt(self.eigenvalues_[:, :, None]) * self.eigenvectors_
-        )
+        self.omega_hat_ = np.sqrt(self.eigenvalues_[:, :, None]) * self.eigenvectors_
 
     @staticmethod
     def _compute_lambda(omega):
