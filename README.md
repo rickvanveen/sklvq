@@ -1,7 +1,7 @@
 [![ReadTheDocs](https://readthedocs.org/projects/sklvq/badge/?version=latest)](https://sklvq.readthedocs.io/en/latest/?badge=latest)
 [![CodeCov](https://codecov.io/gh/rickvanveen/sklvq/branch/develop/graph/badge.svg)](https://codecov.io/gh/rickvanveen/sklvq)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![CodeFactor](https://www.codefactor.io/repository/github/rickvanveen/sklvq/badge)](https://www.codefactor.io/repository/github/rickvanveen/sklvq)
+[![CodeFactor](https://www.codefactor.io/repository/github/rickvanveen/sklvq/badge/develop)](https://www.codefactor.io/repository/github/rickvanveen/sklvq/overview/develop)
 [![CodeQL](https://github.com/rickvanveen/sklvq/workflows/CodeQL/badge.svg)](https://github.com/rickvanveen/sklvq/actions?query=workflow%3ACodeQL)
 
 # sklvq: Scikit Learning Vector Quantization
