@@ -12,4 +12,3 @@ jobs:
           options: "--check --verbose"
           src: "."
           jupyter: false
-          target-version: "3.10"
