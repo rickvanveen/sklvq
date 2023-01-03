@@ -23,8 +23,8 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        python install .[tests]
+        pip install --upgrade pip
+        pip install .[tests]
     - name: Run tests and generate coverage report
       run: |
         pytest sklvq --cov=./ --cov-report=xml
