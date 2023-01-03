@@ -19,7 +19,7 @@ URL = "https://github.com/rickvanveen/sklvq"
 LICENSE = "The 3-Clause BSD License"
 DOWNLOAD_URL = "https://github.com/rickvanveen/sklvq"
 VERSION = __version__
-INSTALL_REQUIRES = ["numpy>=1.14.0", "scipy>=1.1.0", "scikit-learn>=0.23.2"]
+INSTALL_REQUIRES = ["numpy>=1.17.3", "scipy>=1.3.2", "scikit-learn>=1.2.0"]
 CLASSIFIERS = [
     "Intended Audience :: Science/Research",
     "Intended Audience :: Developers",
@@ -31,9 +31,9 @@ CLASSIFIERS = [
     "Operating System :: POSIX",
     "Operating System :: Unix",
     "Operating System :: MacOS",
-    "Programming Language :: Python :: 3.6",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
 ]
 EXTRAS_REQUIRE = {
     "tests": ["pytest", "pytest-cov", "coverage", "pandas"],
@@ -57,11 +57,11 @@ setup(
     version=VERSION,
     download_url=DOWNLOAD_URL,
     long_description=LONG_DESCRIPTION,
-    long_description_content_type="text/x-rst",
+    long_description_content_type="text/markdown",
     zip_safe=False,
     classifiers=CLASSIFIERS,
     packages=find_packages(),
     install_requires=INSTALL_REQUIRES,
     extras_require=EXTRAS_REQUIRE,
-    python_requires=">=3.6",
+    python_requires=">=3.8",
 )
