@@ -1,4 +1,4 @@
-name: Test & Upload to TestPyPI
+name: PyPI
 
 # Controls when the action will run. 
 on:
@@ -24,7 +24,7 @@ jobs:
       # Sets up python3
       - uses: actions/setup-python@v4
         with:
-          python-version: 3.10 
+          python-version: "3.10"
 
       # Installs and upgrades pip, installs other dependencies and installs the package from setup.py
       - name: "Installs and upgrades pip, installs other dependencies and installs the package from setup.py"
