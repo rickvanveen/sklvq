@@ -120,10 +120,10 @@ def test_shared_hyper_params(estimator):
     with pytest.raises(ValueError):
         estimator(relevance_init=6).fit(X, y)
 
-    X_hat = estimator().fit(X, y).transform(X, scale=True)
+    X_hat = estimator(random_state = 1048).fit(X, y).transform(X, scale=True)
     assert not np.all(np.isnan(X_hat))
 
-    assert pytest.approx(X_hat, estimator().fit_transform(X, y, scale=True))
+    assert pytest.approx(X_hat) == estimator(random_state = 1048).fit_transform(X, y, scale=True)
 
 
 @pytest.mark.parametrize("estimator", [GLVQ, GMLVQ, LGMLVQ])
