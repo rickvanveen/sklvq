@@ -109,6 +109,7 @@ class GMLVQ(LVQBaseClass):
     relevance_correction: np.ndarray, optional
         Matrix that will be used to project out any contribution from unwanted directions in omega_ during training.
         When set this will be applied every update step before the ``relevance_normalization`` is applied.
+        The correction matrix is responsible for a mapping where the unwanted directions are removed `[4]`_.
 
     relevance_n_components: str {"all"} or int, optional, default="all"
         For a square relevance matrix use the string "all" (default). For a rectangular relevance matrix use set the
@@ -161,7 +162,11 @@ class GMLVQ(LVQBaseClass):
 
     _`[3]` Bunte, K., Schneider, P., Hammer, B., Schleif, F.-M., Villmann, T., & Biehl, M. (2012).
     "Limited Rank Matrix Learning, discriminative dimension reduction and visualization." Neural
-    Networks, 26, 159–173, 2012."""
+    Networks, 26, 159–173, 2012.
+    
+    _[4] van Veen, R., van Veen, R., Tamboli, N. R. B., Lövdal, ... & Biehl, M. (2024). 
+    Subspace corrected relevance learning with application in neuroimaging. 
+    Artificial Intelligence in Medicine, 149, 102786, 2024."""
 
     classes_: np.ndarray
     prototypes_: np.ndarray
@@ -386,8 +391,6 @@ class GMLVQ(LVQBaseClass):
     def _correct_omega(self, omega: np.ndarray) -> None:
         # Note matmul is faster for larger matrices, for smaller dot is faster.
         np.matmul(omega, self.relevance_correction, out=omega)
-        # Note the Transpose operation in the out makes sure the transposed result is not written to omega but to
-        # omega transpose and thus omega keeps its row order (and no further transposes are necessary).
 
     ###########################################################################################
     # Solver helper functions
