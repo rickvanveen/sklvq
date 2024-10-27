@@ -98,7 +98,7 @@ class ScipyBaseSolver(SolverBaseClass):
             model.get_variables(),
             method=self.method,
             args=(model, data, labels),
-            **params
+            **params,
         )
 
         # Update model

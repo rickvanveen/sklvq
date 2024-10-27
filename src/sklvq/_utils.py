@@ -46,7 +46,7 @@ def _import_from_string(
         class_string = aliases[class_string]
 
     if valid_strings is not None:
-        if not (class_string in valid_strings):
+        if class_string not in valid_strings:
             raise ValueError(f"Provided {param_name} is invalid.")
 
     return _import_class_from_string(package, class_string)
