@@ -1,5 +1,6 @@
-from ._base import DiscriminantBaseClass
 import numpy as np
+
+from sklvq.discriminants._base import DiscriminantBaseClass
 
 
 class RelativeDistance(DiscriminantBaseClass):

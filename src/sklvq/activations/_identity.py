@@ -1,6 +1,6 @@
 import numpy as np
 
-from . import ActivationBaseClass
+from sklvq.activations._base import ActivationBaseClass
 
 
 class Identity(ActivationBaseClass):

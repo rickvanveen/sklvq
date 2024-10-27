@@ -1,5 +1,5 @@
-from . import ScipyBaseSolver
-from ..objectives import ObjectiveBaseClass
+from sklvq.objectives._base import ObjectiveBaseClass
+from sklvq.solvers._base import ScipyBaseSolver
 
 
 class LimitedMemoryBfgs(ScipyBaseSolver):
@@ -18,4 +18,4 @@ class LimitedMemoryBfgs(ScipyBaseSolver):
     """
 
     def __init__(self, objective: ObjectiveBaseClass, **kwargs):
-        super(LimitedMemoryBfgs, self).__init__(objective, method="L-BFGS-B", **kwargs)
+        super().__init__(objective, method="L-BFGS-B", **kwargs)

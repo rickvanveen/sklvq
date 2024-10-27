@@ -5,6 +5,7 @@ Local Generalized Matrix LVQ (LGMLVQ)
 
 Example of how to use LGMLVQ `[1]`_ on the classic iris dataset.
 """
+
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np

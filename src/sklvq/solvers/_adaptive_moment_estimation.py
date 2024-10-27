@@ -1,14 +1,15 @@
-import numpy as np
-from sklearn.utils import shuffle
-
-from . import SolverBaseClass
-from ..objectives import ObjectiveBaseClass
-from ._base import _update_state
+from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import numpy as np
+from sklearn.utils import shuffle
+
+from sklvq.solvers._base import SolverBaseClass, _update_state
+
 if TYPE_CHECKING:
-    from sklvq.models import LVQBaseClass
+    from sklvq.models._base import LVQBaseClass
+    from sklvq.objectives._base import ObjectiveBaseClass
 
 STATE_KEYS = ["variables", "nit", "fun", "m_hat", "v_hat"]
 
@@ -93,69 +94,49 @@ class AdaptiveMomentEstimation(SolverBaseClass):
         beta2: float = 0.999,
         step_size: float = 0.001,
         epsilon: float = 1e-4,
-        callback: callable = None,
+        callback: callable | None = None,
     ):
         super().__init__(objective)
         if max_runs <= 0:
-            raise ValueError(
-                "{}:  Expected max_runs to be > 0, but got max_runs = {}".format(
-                    type(self).__name__, max_runs
-                )
-            )
+            msg = f"{type(self).__name__}:  Expected max_runs to be > 0, but got max_runs = {max_runs}"
+            raise ValueError(msg)
         self.max_runs = max_runs
 
         if beta1 <= 0 or beta1 > 1.0:
-            raise ValueError(
-                "{}:  Expected beta1 to be > 0 and <= 1.0 but got beta1 = {}".format(
-                    type(self).__name__, beta1
-                )
-            )
+            msg = f"{type(self).__name__}:  Expected beta1 to be > 0 and <= 1.0 but got beta1 = {beta1}"
+            raise ValueError(msg)
         self.beta1 = beta1
 
         if beta2 <= 0 or beta2 > 1.0:
-            raise ValueError(
-                "{}:  Expected beta1 to be > 0 and <= 1.0 but got beta2 = {}".format(
-                    type(self).__name__, beta2
-                )
-            )
+            msg = f"{type(self).__name__}:  Expected beta1 to be > 0 and <= 1.0 but got beta2 = {beta2}"
+            raise ValueError(msg)
         self.beta2 = beta2
 
         if np.size(step_size) > 1:
-            raise ValueError(
-                "{}:  Expected step_size to be a single float, but got step_size = {}".format(
-                    type(self).__name__, step_size
-                )
-            )
+            msg = f"{type(self).__name__}:  Expected step_size to be a single float, but got step_size = {step_size}"
+            raise ValueError(msg)
 
         if step_size <= 0:
-            raise ValueError(
-                "{}:  Expected step_size to be > 0, but got step_size = {}".format(
-                    type(self).__name__, step_size
-                )
-            )
+            msg = f"{type(self).__name__}:  Expected step_size to be > 0, but got step_size = {step_size}"
+            raise ValueError(msg)
 
         self.step_size = step_size
 
         if epsilon < 0:
-            raise ValueError(
-                "{}:  Expected epsilon to be > 0, but got epsilon = {}".format(
-                    type(self).__name__, epsilon
-                )
-            )
+            msg = f"{type(self).__name__}:  Expected epsilon to be > 0, but got epsilon = {epsilon}"
+            raise ValueError(msg)
         self.epsilon = epsilon
 
-        if callback is not None:
-            if not callable(callback):
-                raise ValueError(
-                    "{}:  callback is not callable.".format(type(self).__name__)
-                )
+        if callback is not None and not callable(callback):
+            msg = f"{type(self).__name__}:  callback is not callable."
+            raise ValueError(msg)
         self.callback = callback
 
     def solve(
         self,
         data: np.ndarray,
         labels: np.ndarray,
-        model: "LVQBaseClass",
+        model: LVQBaseClass,
     ):
         """
         Parameters
@@ -185,24 +166,18 @@ class AdaptiveMomentEstimation(SolverBaseClass):
             if self.callback(state):
                 return
 
-        for i_run in range(0, self.max_runs):
+        for i_run in range(self.max_runs):
             # Randomize order of X
-            shuffled_indices = shuffle(
-                range(0, labels.size), random_state=model.random_state_
-            )
+            shuffled_indices = shuffle(range(labels.size), random_state=model.random_state_)
 
             shuffled_data = data[shuffled_indices, np.newaxis, :]
             shuffled_labels = labels[shuffled_indices, np.newaxis]
 
-            for i_sample, (sample, sample_label) in enumerate(
-                zip(shuffled_data, shuffled_labels)
-            ):
+            for _i_sample, (sample, sample_label) in enumerate(zip(shuffled_data, shuffled_labels)):
                 # Update power
                 p += 1
 
-                objective_gradient = self.objective.gradient(
-                    model, sample, sample_label
-                )
+                objective_gradient = self.objective.gradient(model, sample, sample_label)
 
                 # Update biased (init 0) moving gradient averages m and v.
                 m = (self.beta1 * m) + ((1 - self.beta1) * objective_gradient)
@@ -214,9 +189,7 @@ class AdaptiveMomentEstimation(SolverBaseClass):
 
                 v_hat = v / (1 - self.beta2**p)
 
-                objective_gradient = (
-                    self.step_size * m_hat / (np.sqrt(v_hat) + self.epsilon)
-                )
+                objective_gradient = self.step_size * m_hat / (np.sqrt(v_hat) + self.epsilon)
 
                 model.set_variables(
                     np.subtract(  # returns out=objective_gradient

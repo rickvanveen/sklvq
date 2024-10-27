@@ -1,6 +1,6 @@
-from ._base import DiscriminantBaseClass
-from ._relative_distance import RelativeDistance
 from sklvq._utils import _import_from_string
+from sklvq.discriminants._base import DiscriminantBaseClass
+from sklvq.discriminants._relative_distance import RelativeDistance
 
 __all__ = ["DiscriminantBaseClass", "RelativeDistance"]
 

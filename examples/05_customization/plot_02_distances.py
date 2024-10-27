@@ -3,6 +3,7 @@
 Distance Functions
 ==================
 """
+
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -29,7 +30,6 @@ data, labels = load_iris(return_X_y=True)
 
 
 class CustomSquaredEuclidean(DistanceBaseClass):
-
     # The distance implementations use the sklearn pairwise distance function.
     def __init__(self, **other_kwargs):
         self.metric_kwargs = {"metric": "euclidean", "squared": True}

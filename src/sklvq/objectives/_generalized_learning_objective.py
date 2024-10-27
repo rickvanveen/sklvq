@@ -1,15 +1,15 @@
-import numpy as np
+from __future__ import annotations
 
-from ..objectives._base import ObjectiveBaseClass
-from .. import activations, discriminants
-
-from typing import Union
 from typing import TYPE_CHECKING
 
-from .._utils import init_class
+import numpy as np
+
+from sklvq import activations, discriminants
+from sklvq._utils import init_class
+from sklvq.objectives._base import ObjectiveBaseClass
 
 if TYPE_CHECKING:
-    from ..models import LVQBaseClass
+    from sklvq.models._base import LVQBaseClass
 
 
 ACTIVATION_FUNCTIONS = [
@@ -53,34 +53,30 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
     References
     ----------
     _`[1]` Sato, A., and Yamada, K. (1996) "Generalized Learning Vector Quantization."
-    Advances in Neural Network Information Processing Systems, 423–429, 1996."""
+    Advances in Neural Network Information Processing Systems, 423-429, 1996."""
 
     def __init__(
         self,
-        activation_type: Union[str, type],
+        activation_type: str | type,
         activation_params: dict,
-        discriminant_type: Union[str, type],
+        discriminant_type: str | type,
         discriminant_params: dict,
     ):
         if activation_params is None:
             activation_params = {}
 
-        activation_class = init_class(
-            activations, activation_type, ACTIVATION_FUNCTIONS
-        )
+        activation_class = init_class(activations, activation_type, ACTIVATION_FUNCTIONS)
         self.activation = activation_class(**activation_params)
 
         if discriminant_params is None:
             discriminant_params = {}
 
-        discriminant_class = init_class(
-            discriminants, discriminant_type, DISCRIMINANT_FUNCTIONS
-        )
+        discriminant_class = init_class(discriminants, discriminant_type, DISCRIMINANT_FUNCTIONS)
         self.discriminant = discriminant_class(**discriminant_params)
 
     def __call__(
         self,
-        model: "LVQBaseClass",
+        model: LVQBaseClass,
         data: np.ndarray,
         labels: np.ndarray,
     ) -> np.ndarray:
@@ -116,7 +112,7 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
 
     def gradient(
         self,
-        model: "LVQBaseClass",
+        model: LVQBaseClass,
         data: np.ndarray,
         labels: np.ndarray,
     ) -> np.ndarray:
@@ -155,16 +151,14 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
 
         """
 
-        dist_same, dist_diff, i_dist_same, i_dist_diff = _compute_distance(
-            data, labels, model
-        )
+        dist_same, dist_diff, i_dist_same, i_dist_diff = _compute_distance(data, labels, model)
         discriminant_score = self.discriminant(dist_same, dist_diff)
 
         # Pre-allocation, needs to be zero.
         gradient_buffer = np.zeros(model.get_variables().size)
 
         # For each prototype
-        for i_prototype in range(0, model.prototypes_labels_.size):
+        for i_prototype in range(model.prototypes_labels_.size):
             # Find for which samples it is the closest/winner AND has the same label
             # ii_winner_same = i_prototype == i_dist_same
             if i_prototype in i_dist_same:
@@ -212,12 +206,10 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
         activation_gradient = self.activation.gradient(discriminant_score)
 
         #  Computes the following partial derivatives: du/ddi, with i = 2
-        discriminant_gradient = self.discriminant.gradient(
-            dist_same, dist_diff, winner_same
-        )
+        discriminant_gradient = self.discriminant.gradient(dist_same, dist_diff, winner_same)
 
         # Computes the following partial derivatives: ddi/dwi, with i = 2
-        distance_gradient = model._distance.gradient(data, model, i_prototype)
+        distance_gradient = model._distance.gradient(data, model, i_prototype)  # noqa: SLF001
 
         # The distance vectors weighted by the activation and discriminant partial
         # derivatives.
@@ -228,7 +220,7 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
         )
 
 
-def _find_min(indices: np.ndarray, distances: np.ndarray) -> (np.ndarray, np.ndarray):
+def _find_min(indices: np.ndarray, distances: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     """Helper function to find the minimum distance and the index of this distance."""
     # Set the irrelevant distances to infinity.
     dist_temp = np.where(indices, distances, np.inf)
@@ -238,14 +230,14 @@ def _find_min(indices: np.ndarray, distances: np.ndarray) -> (np.ndarray, np.nda
     return dist_temp[np.arange(i_dist_min.size), i_dist_min], i_dist_min
 
 
-def _compute_distance(data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass"):
+def _compute_distance(data: np.ndarray, labels: np.ndarray, model: LVQBaseClass):
     """Computes the distances between each prototype and each observation and finds all indices
     where the shortest distance is that of the prototype with the same label and with a different label."""
     prototypes_labels = model.prototypes_labels_
 
     # Step 1: Compute distances between X and the model (how is depending on model and coupled
     # distance function)
-    distances = model._distance(data, model)
+    distances = model._distance(data, model)  # noqa: SLF001
 
     # Step 2: Find for all samples the distance between closest prototype with same label (d1)
     # and different label (d2). ii_same marks for all samples the prototype with the same label.
@@ -261,9 +253,7 @@ def _compute_distance(data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass
     else:
         # List comprehension of the prototypes. This are all slight improvements to computation
         # time, as list comprehension takes quite some time.
-        ii_same = np.transpose(
-            [labels == prototype_label for prototype_label in prototypes_labels]
-        )
+        ii_same = np.transpose([labels == prototype_label for prototype_label in prototypes_labels])
 
     # For each prototype mark the samples that have a different label
     ii_diff = ~ii_same

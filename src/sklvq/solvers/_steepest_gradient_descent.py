@@ -1,14 +1,15 @@
-from typing import TYPE_CHECKING, Union
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 import numpy as np
 from sklearn.utils import shuffle
 
-from . import SolverBaseClass
-from ._base import _update_state
-from ..objectives import ObjectiveBaseClass
+from sklvq.solvers._base import SolverBaseClass, _update_state
 
 if TYPE_CHECKING:
     from sklvq.models import LVQBaseClass
+    from sklvq.objectives._base import ObjectiveBaseClass
 
 STATE_KEYS = ["variables", "nit", "fun", "step_size"]
 
@@ -92,50 +93,39 @@ class SteepestGradientDescent(SolverBaseClass):
         objective: ObjectiveBaseClass,
         max_runs: int = 10,
         batch_size: int = 1,
-        step_size: Union[float, list, tuple, np.ndarray] = 0.1,
-        callback: callable = None,
+        step_size: float | list | tuple | np.ndarray = 0.1,
+        callback: callable | None = None,
     ):
         super().__init__(objective)
         if max_runs <= 0:
-            raise ValueError(
-                "{}:  Expected max_runs to be > 0, but got max_runs = {}".format(
-                    type(self).__name__, max_runs
-                )
-            )
+            msg = f"{type(self).__name__}:  Expected max_runs to be > 0, but got max_runs = {max_runs}"
+            raise ValueError(msg)
         self.max_runs = max_runs
 
         if batch_size < 0:
-            raise ValueError(
-                "{}:  Expected batch_size to be >= 0, but got batch_size = {}".format(
-                    type(self).__name__, batch_size
-                )
-            )
+            msg = f"{type(self).__name__}:  Expected batch_size to be >= 0, but got batch_size = {batch_size}"
+            raise ValueError(msg)
         self.batch_size = batch_size
 
         if not isinstance(step_size, np.ndarray):
             step_size = np.array(step_size)
 
         if np.any(step_size <= 0):
-            raise ValueError(
-                "{}:  Expected step_size to be > 0, but got step_size = {}".format(
-                    type(self).__name__, step_size
-                )
-            )
+            msg = f"{type(self).__name__}:  Expected step_size to be > 0, but got step_size = {step_size}"
+            raise ValueError(msg)
 
         self.step_size = step_size
 
-        if callback is not None:
-            if not callable(callback):
-                raise ValueError(
-                    "{}:  callback is not callable.".format(type(self).__name__)
-                )
+        if callback is not None and not callable(callback):
+            msg = f"{type(self).__name__}:  callback is not callable."
+            raise ValueError(msg)
         self.callback = callback
 
     def solve(
         self,
         data: np.ndarray,
         labels: np.ndarray,
-        model: "LVQBaseClass",
+        model: LVQBaseClass,
     ):
         """Solve function that gets called by the fit method of the models.
 
@@ -167,16 +157,15 @@ class SteepestGradientDescent(SolverBaseClass):
 
         # Less than 0 is caught in init.
         if batch_size > data.shape[0]:
-            raise ValueError("Provided batch_size is invalid.")
+            msg = "Provided batch_size is invalid."
+            raise ValueError(msg)
 
         if batch_size == 0:
             batch_size = data.shape[0]
 
-        for i_run in range(0, self.max_runs):
+        for i_run in range(self.max_runs):
             # Randomize order of samples
-            shuffled_indices = shuffle(
-                np.array(range(0, labels.size)), random_state=model.random_state_
-            )
+            shuffled_indices = shuffle(np.array(range(labels.size)), random_state=model.random_state_)
 
             # Divide the shuffled indices into batches (not necessarily equal size,
             # see documentation of numpy.array_split).

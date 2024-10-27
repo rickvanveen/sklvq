@@ -8,6 +8,7 @@ Generalized LVQ (GLVQ)
 Example of how to fit the GLVQ `[1]`_ algorithm on the classic iris dataset.
 
 """
+
 import matplotlib
 import matplotlib.pyplot as plt
 from sklearn.datasets import load_iris

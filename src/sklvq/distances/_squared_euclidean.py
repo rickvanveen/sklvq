@@ -1,13 +1,14 @@
-import numpy as np
-
-from scipy.spatial.distance import cdist
-
-from ._base import DistanceBaseClass
+from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import numpy as np
+from scipy.spatial.distance import cdist
+
+from sklvq.distances._base import DistanceBaseClass
+
 if TYPE_CHECKING:
-    from ..models import GLVQ
+    from sklvq.models import GLVQ
 
 
 class SquaredEuclidean(DistanceBaseClass):
@@ -30,7 +31,7 @@ class SquaredEuclidean(DistanceBaseClass):
 
     __slots__ = ()
 
-    def __call__(self, data: np.ndarray, model: "GLVQ") -> np.ndarray:
+    def __call__(self, data: np.ndarray, model: GLVQ) -> np.ndarray:
         r"""
          Computes the squared Euclidean distance:
             .. math::
@@ -58,7 +59,7 @@ class SquaredEuclidean(DistanceBaseClass):
 
         return cdist(data, model.prototypes_, distance_function)
 
-    def gradient(self, data: np.ndarray, model: "GLVQ", i_prototype: int) -> np.ndarray:
+    def gradient(self, data: np.ndarray, model: GLVQ, i_prototype: int) -> np.ndarray:
         r"""Computes the gradient of the squared euclidean distance, with respect to a single
         prototype:
 

@@ -1,14 +1,15 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import numpy as np
 from sklearn.utils import shuffle
 
-from . import SolverBaseClass
-from ..objectives import ObjectiveBaseClass
-from ._base import _update_state
-
-from typing import TYPE_CHECKING, Union
+from sklvq.solvers._base import SolverBaseClass, _update_state
 
 if TYPE_CHECKING:
     from sklvq.models import LVQBaseClass
+    from sklvq.objectives._base import ObjectiveBaseClass
 
 STATE_KEYS = ["variables", "nit", "fun", "nfun", "tfun", "step_size"]
 
@@ -109,69 +110,52 @@ class WaypointGradientDescent(SolverBaseClass):
         self,
         objective: ObjectiveBaseClass,
         max_runs: int = 10,
-        step_size: Union[float, list, tuple, np.ndarray] = 0.1,
+        step_size: float | list | tuple | np.ndarray = 0.1,
         loss: float = 2 / 3,
         gain: float = 1.1,
         k: int = 3,
-        callback: callable = None,
+        callback: callable | None = None,
     ):
         super().__init__(objective)
         if max_runs <= k or max_runs <= 0:
-            raise ValueError(
-                "{}:  Expected 0 < max_runs > k, but got max_runs = {}".format(
-                    type(self).__name__, max_runs
-                )
-            )
+            msg = f"{type(self).__name__}:  Expected 0 < max_runs > k, but got max_runs = {max_runs}"
+            raise ValueError(msg)
         self.max_runs = max_runs
 
         if not isinstance(step_size, np.ndarray):
             step_size = np.array(step_size)
 
         if np.any(step_size <= 0):
-            raise ValueError(
-                "{}:  Expected step_size to be > 0, but got step_size = {}".format(
-                    type(self).__name__, step_size
-                )
-            )
+            msg = f"{type(self).__name__}:  Expected step_size to be > 0, but got step_size = {step_size}"
+            raise ValueError(msg)
 
         self.step_size = step_size
 
         if loss <= 0 or loss > 1:
-            raise ValueError(
-                "{}: Expected loss to be > 0 and < 1, but got loss = {}".format(
-                    type(self).__name__, loss
-                )
-            )
+            msg = f"{type(self).__name__}: Expected loss to be > 0 and < 1, but got loss = {loss}"
+            raise ValueError(msg)
         self.loss = loss
 
         if gain < 1:
-            raise ValueError(
-                "{}: Expected gain to be >= 1, but got gain = {}".format(
-                    type(self).__name__, gain
-                )
-            )
+            msg = f"{type(self).__name__}: Expected gain to be >= 1, but got gain = {gain}"
+            raise ValueError(msg)
         self.gain = gain
 
         if k <= 1:
-            raise ValueError(
-                "{}: Expected k to be >= 2, but got k = {}".format(
-                    type(self).__name__, k
-                )
-            )
+            msg = f"{type(self).__name__}: Expected k to be >= 2, but got k = {k}"
+            raise ValueError(msg)
         self.k = k
 
-        if callback is not None:
-            if not callable(callback):
-                raise ValueError(
-                    "{}:  callback is not callable.".format(type(self).__name__)
-                )
+        if callback is not None and not callable(callback):
+            msg = f"{type(self).__name__}:  callback is not callable."
+            raise ValueError(msg)
         self.callback = callback
 
     def solve(
         self,
         data: np.ndarray,
         labels: np.ndarray,
-        model: "LVQBaseClass",
+        model: LVQBaseClass,
     ):
         """Solve function that gets called by the fit method of the models.
 
@@ -197,24 +181,18 @@ class WaypointGradientDescent(SolverBaseClass):
         if self.callback is not None:
             variables = np.copy(model.get_variables())
             cost = self.objective(model, data, labels)
-            state = _update_state(
-                STATE_KEYS, variables=variables, nit="Initial", nfun=cost, fun=cost
-            )
+            state = _update_state(STATE_KEYS, variables=variables, nit="Initial", nfun=cost, fun=cost)
             if self.callback(state):
                 return
 
         # Initial runs to get enough gradients to average.
-        for i_run in range(0, self.k):
-            shuffled_indices = shuffle(
-                range(0, labels.size), random_state=model.random_state_
-            )
+        for i_run in range(self.k):
+            shuffled_indices = shuffle(range(labels.size), random_state=model.random_state_)
 
             shuffled_data = data[shuffled_indices, :]
             shuffled_labels = labels[shuffled_indices]
 
-            objective_gradient = self.objective.gradient(
-                model, shuffled_data, shuffled_labels
-            )
+            objective_gradient = self.objective.gradient(model, shuffled_data, shuffled_labels)
 
             # Normalize the gradient by gradient/norm(gradient)
             model.normalize_variables(objective_gradient)
@@ -247,16 +225,12 @@ class WaypointGradientDescent(SolverBaseClass):
 
         # The remainder of the runs
         for i_run in range(self.k, self.max_runs):
-            shuffled_indices = shuffle(
-                range(0, labels.size), random_state=model.random_state_
-            )
+            shuffled_indices = shuffle(range(labels.size), random_state=model.random_state_)
 
             shuffled_data = data[shuffled_indices, :]
             shuffled_labels = labels[shuffled_indices]
 
-            objective_gradient = self.objective.gradient(
-                model, shuffled_data, shuffled_labels
-            )
+            objective_gradient = self.objective.gradient(model, shuffled_data, shuffled_labels)
 
             # Normalize the gradient by gradient/norm(gradient)
             model.normalize_variables(objective_gradient)

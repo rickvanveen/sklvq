@@ -8,6 +8,7 @@ not each solver provides the same variables. Additionally, the options "lbfgs" a
 implemented in scipy and their callbacks are different from the others. See Scipy's documentation
 for further information.
 """
+
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np

@@ -1,11 +1,12 @@
+from __future__ import annotations
+
 from typing import Tuple
-from typing import Union
 
 import numpy as np
-from sklearn.utils.validation import check_is_fitted, check_array
+from sklearn.utils.validation import check_array, check_is_fitted
 
-from . import LVQBaseClass
-from ..objectives import GeneralizedLearningObjective
+from sklvq.models._base import LVQBaseClass
+from sklvq.objectives._generalized_learning_objective import GeneralizedLearningObjective
 
 ModelParamsType = Tuple[np.ndarray, np.ndarray]
 
@@ -150,14 +151,14 @@ class GMLVQ(LVQBaseClass):
     References
     ----------
     _`[1]` Sato, A., and Yamada, K. (1996) "Generalized Learning Vector Quantization."
-    Advances in Neural Network Information Processing Systems, 423–429, 1996.
+    Advances in Neural Network Information Processing Systems, 423-429, 1996.
 
     _`[2]` Schneider, P., Biehl, M., & Hammer, B. (2009). "Adaptive Relevance Matrices in
-    Learning Vector Quantization" Neural Computation, 21(12), 3532–3561, 2009.
+    Learning Vector Quantization" Neural Computation, 21(12), 3532-3561, 2009.
 
     _`[3]` Bunte, K., Schneider, P., Hammer, B., Schleif, F.-M., Villmann, T., & Biehl, M. (2012).
     "Limited Rank Matrix Learning, discriminative dimension reduction and visualization." Neural
-    Networks, 26, 159–173, 2012."""
+    Networks, 26, 159-173, 2012."""
 
     classes_: np.ndarray
     prototypes_: np.ndarray
@@ -169,22 +170,22 @@ class GMLVQ(LVQBaseClass):
 
     def __init__(
         self,
-        distance_type: Union[str, type] = "adaptive-squared-euclidean",
-        distance_params: dict = None,
-        activation_type: Union[str, type] = "sigmoid",
-        activation_params: dict = None,
-        discriminant_type: Union[str, type] = "relative-distance",
-        discriminant_params: dict = None,
-        solver_type: Union[str, type] = "steepest-gradient-descent",
-        solver_params: dict = None,
-        prototype_init: Union[str, np.ndarray] = "class-conditional-mean",
-        prototype_n_per_class: Union[int, np.ndarray] = 1,
+        distance_type: str | type = "adaptive-squared-euclidean",
+        distance_params: dict | None = None,
+        activation_type: str | type = "sigmoid",
+        activation_params: dict | None = None,
+        discriminant_type: str | type = "relative-distance",
+        discriminant_params: dict | None = None,
+        solver_type: str | type = "steepest-gradient-descent",
+        solver_params: dict | None = None,
+        prototype_init: str | np.ndarray = "class-conditional-mean",
+        prototype_n_per_class: int | np.ndarray = 1,
         relevance_init="identity",
-        relevance_normalization: bool = True,
-        relevance_n_components: Union[str, int] = "all",
-        relevance_regularization: Union[int, float] = 0,
-        random_state: Union[int, np.random.RandomState] = None,
-        force_all_finite: Union[str, bool] = True,
+        relevance_normalization: bool = True,  # noqa: FBT001, FBT002
+        relevance_n_components: str | int = "all",
+        relevance_regularization: float = 0,
+        random_state: int | np.random.RandomState = None,
+        force_all_finite: str | bool = True,  # noqa: FBT002
     ):
         self.activation_type = activation_type
         self.activation_params = activation_params
@@ -195,7 +196,7 @@ class GMLVQ(LVQBaseClass):
         self.relevance_n_components = relevance_n_components
         self.relevance_regularization = relevance_regularization
 
-        super(GMLVQ, self).__init__(
+        super().__init__(
             distance_type,
             distance_params,
             DISTANCES,
@@ -402,9 +403,7 @@ class GMLVQ(LVQBaseClass):
         omega_view = gradient[self.prototypes_.size :]
         np.add(omega_view, partial_gradient[n_features:], out=omega_view)
 
-    def mul_step_size(
-        self, step_sizes: Union[int, float, np.ndarray], gradient: np.ndarray
-    ) -> None:
+    def mul_step_size(self, step_sizes: float | np.ndarray, gradient: np.ndarray) -> None:
         """
         If step sizes is a scalar value just multiplies the gradient with the step size. If it
         is an array (with same length as number of model parameters) each model parameter is
@@ -422,11 +421,10 @@ class GMLVQ(LVQBaseClass):
             return
 
         # else it's a np.ndarray...
-        if isinstance(step_sizes, np.ndarray):
-            if step_sizes.size > 1:
-                prototypes, omega = self.to_model_params_view(gradient)
-                prototypes *= step_sizes[0]
-                omega *= step_sizes[1]
+        if isinstance(step_sizes, np.ndarray) and step_sizes.size > 1:
+            prototypes, omega = self.to_model_params_view(gradient)
+            prototypes *= step_sizes[0]
+            omega *= step_sizes[1]
             # if size is more than 2 it just ignores the additional values.
 
     ###########################################################################################
@@ -451,24 +449,25 @@ class GMLVQ(LVQBaseClass):
     def _check_relevances_params(self):
         relevance_normalization = self.relevance_normalization
         if not isinstance(relevance_normalization, bool):
-            raise ValueError("Provided normalization is invalid.")
+            msg = "Provided normalization is invalid."
+            raise ValueError(msg)
 
         relevance_n_components = self.relevance_n_components
         if isinstance(relevance_n_components, str):
             if relevance_n_components == "all":
                 self._relevances_shape = (self.n_features_in_, self.n_features_in_)
             else:
-                raise ValueError("Provided n_components is invalid.")
+                msg = "Provided n_components is invalid."
+                raise ValueError(msg)
         elif isinstance(relevance_n_components, int):
-            if (
-                self.relevance_n_components >= 1
-                and relevance_n_components <= self.n_features_in_
-            ):
+            if self.relevance_n_components >= 1 and relevance_n_components <= self.n_features_in_:
                 self._relevances_shape = (relevance_n_components, self.n_features_in_)
             else:
-                raise ValueError("Provided n_components is invalid.")
+                msg = "Provided n_components is invalid."
+                raise ValueError(msg)
         else:
-            raise ValueError("Provided n_components is invalid.")
+            msg = "Provided n_components is invalid."
+            raise ValueError(msg)
 
         self._relevances_size = np.prod(self._relevances_shape)
 
@@ -479,15 +478,13 @@ class GMLVQ(LVQBaseClass):
             if self.relevance_init == "identity":
                 self.set_omega(np.eye(*self._relevances_shape))
             elif self.relevance_init == "random":
-                self.set_omega(
-                    self.random_state_.uniform(
-                        low=0, high=1, size=self._relevances_shape
-                    )
-                )
+                self.set_omega(self.random_state_.uniform(low=0, high=1, size=self._relevances_shape))
             else:
-                raise ValueError("Provided relevance_init is invalid.")
+                msg = "Provided relevance_init is invalid."
+                raise ValueError(msg)
         else:
-            raise ValueError("Provided relevance_init is invalid.")
+            msg = "Provided relevance_init is invalid."
+            raise ValueError(msg)
 
         if self.relevance_normalization:
             GMLVQ._normalize_omega(self.omega_)
@@ -504,7 +501,7 @@ class GMLVQ(LVQBaseClass):
     # Other Algorithm specific stuff.
     ###########################################################################################
 
-    def _after_fit(self, X: np.ndarray, y: np.ndarray):
+    def _after_fit(self, X: np.ndarray, y: np.ndarray):  # noqa: ARG002, N803
         self.lambda_ = GMLVQ._compute_lambda(self.omega_)
 
         # Eigenvalues and column eigenvectors return in ascending order
@@ -532,9 +529,7 @@ class GMLVQ(LVQBaseClass):
     # Transformer related functions
     ###########################################################################################
 
-    def fit_transform(
-        self, data: np.ndarray, y: np.ndarray, **transform_params
-    ) -> np.ndarray:
+    def fit_transform(self, data: np.ndarray, y: np.ndarray, **transform_params) -> np.ndarray:
         r"""
         Parameters
         ----------
@@ -551,7 +546,7 @@ class GMLVQ(LVQBaseClass):
         """
         return self.fit(data, y).transform(data, **transform_params)
 
-    def transform(self, X: np.ndarray, scale: bool = False) -> np.ndarray:
+    def transform(self, X: np.ndarray, scale: bool = False) -> np.ndarray:  # noqa: FBT001, FBT002, N803
         r"""
         Parameters
         ----------
@@ -567,7 +562,7 @@ class GMLVQ(LVQBaseClass):
         """
         check_is_fitted(self)
 
-        X = check_array(X)
+        X = check_array(X)  # noqa: N806
 
         if scale:
             return np.matmul(X, self.omega_hat_.T)

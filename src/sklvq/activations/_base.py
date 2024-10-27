@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
+ABC_METHOD_NOT_IMPL_MSG = "You should implement this!"
+
 
 class ActivationBaseClass(ABC):
     """Activation base class
@@ -33,7 +35,7 @@ class ActivationBaseClass(ABC):
             Should perform an elementwise evaluation of some activation function.
 
         """
-        raise NotImplementedError("You should implement this!")
+        raise NotImplementedError(ABC_METHOD_NOT_IMPL_MSG)
 
     @abstractmethod
     def gradient(self, x: np.ndarray) -> np.ndarray:
@@ -50,4 +52,4 @@ class ActivationBaseClass(ABC):
             Should return the elementwise evaluation of the activation function's gradient.
 
         """
-        raise NotImplementedError("You should implement this!")
+        raise NotImplementedError(ABC_METHOD_NOT_IMPL_MSG)

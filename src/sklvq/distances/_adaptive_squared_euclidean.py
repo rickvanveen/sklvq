@@ -1,12 +1,12 @@
-from . import DistanceBaseClass
+from typing import TYPE_CHECKING
 
 import numpy as np
 from scipy.spatial.distance import cdist
 
-from typing import TYPE_CHECKING
+from sklvq.distances._base import DistanceBaseClass
 
 if TYPE_CHECKING:
-    from ..models import GMLVQ
+    from sklvq.models import GMLVQ
 
 
 class AdaptiveSquaredEuclidean(DistanceBaseClass):
@@ -34,7 +34,7 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
     _`[1]` Schneider, P. (2010). Advanced methods for prototype-based classification. Groningen.
 
     _`[2]` Schneider, P., Biehl, M., & Hammer, B. (2009). Adaptive Relevance Matrices in Learning
-    Vector Quantization. Neural Computation, 21(12), 3532–3561."""
+    Vector Quantization. Neural Computation, 21(12), 3532-3561."""
 
     __slots__ = ()
 
@@ -68,7 +68,7 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
                 data,
                 model.prototypes_,
                 _nan_mahalanobis,
-                RM=model._compute_lambda(model.omega_),
+                RM=model._compute_lambda(model.omega_),  # noqa: SLF001
             )
 
         return (
@@ -76,14 +76,12 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
                 data,
                 model.prototypes_,
                 "mahalanobis",
-                VI=model._compute_lambda(model.omega_),
+                VI=model._compute_lambda(model.omega_),  # noqa: SLF001
             )
             ** 2
         )
 
-    def gradient(
-        self, data: np.ndarray, model: "GMLVQ", i_prototype: int
-    ) -> np.ndarray:
+    def gradient(self, data: np.ndarray, model: "GMLVQ", i_prototype: int) -> np.ndarray:
         r"""Computes the gradient of the adaptive squared euclidean distance function,
         with respect to a single prototype:
 
@@ -119,9 +117,7 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
 
         (num_samples, _) = data.shape
 
-        distance_gradient = np.empty(
-            (num_samples, prototype.size + omega.size), dtype="float64", order="C"
-        )
+        distance_gradient = np.empty((num_samples, prototype.size + omega.size), dtype="float64", order="C")
 
         difference = data - prototype
 
@@ -129,14 +125,10 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
             difference[np.isnan(difference)] = 0.0
 
         # Prototype gradient directly computed in the distance_gradient
-        _prototype_gradient(
-            difference, omega, out=distance_gradient[:, : prototype.size]
-        )
+        _prototype_gradient(difference, omega, out=distance_gradient[:, : prototype.size])
 
         # Omega view created in to hold the shape the _omega_gradient functions needs to output in.
-        distance_gradient_omega_view = distance_gradient[:, prototype.size :].reshape(
-            (num_samples, *omega.shape)
-        )
+        distance_gradient_omega_view = distance_gradient[:, prototype.size :].reshape((num_samples, *omega.shape))
         # Omega gradient indirectly computed in the distance_gradient via the view of the memory
         # in a different shape.
         _omega_gradient(difference, omega, out=distance_gradient_omega_view)
@@ -144,7 +136,7 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
         return distance_gradient
 
 
-def _nan_mahalanobis(sample, prototype, RM=None):
+def _nan_mahalanobis(sample, prototype, RM=None):  # noqa: N803
     # The NaNLVQ variant of the mahalanobis distance
     difference = sample - prototype
     difference[np.isnan(difference)] = 0.0
@@ -152,9 +144,7 @@ def _nan_mahalanobis(sample, prototype, RM=None):
     # return np.einsum("i, ij, j ->", difference, relevance_matrix, difference)
 
 
-def _prototype_gradient(
-    difference: np.ndarray, omega: np.ndarray, out=None
-) -> np.ndarray:
+def _prototype_gradient(difference: np.ndarray, omega: np.ndarray, out=None) -> np.ndarray:
     # The gradient with respect to a prototype. Equivalent to np.dot(-2.0 * difference.dot(
     # omega.T.dot(omega)).
     return np.einsum("ji,ik ->jk", -2.0 * difference, np.dot(omega.T, omega), out=out)
@@ -162,6 +152,4 @@ def _prototype_gradient(
 
 def _omega_gradient(difference: np.ndarray, omega: np.ndarray, out=None) -> np.ndarray:
     # The gradient with respect to the omega matrix.
-    return np.einsum(
-        "ij,jk->jik", np.dot(omega, difference.T), (2.0 * difference), out=out
-    )
+    return np.einsum("ij,jk->jik", np.dot(omega, difference.T), (2.0 * difference), out=out)

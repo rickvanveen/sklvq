@@ -1,13 +1,12 @@
-import numpy as np
-
-from scipy.spatial.distance import cdist
-
-from ._base import DistanceBaseClass
-
 from typing import TYPE_CHECKING
 
+import numpy as np
+from scipy.spatial.distance import cdist
+
+from sklvq.distances._base import DistanceBaseClass
+
 if TYPE_CHECKING:
-    from ..models import GLVQ
+    from sklvq.models import GLVQ
 
 
 class Euclidean(DistanceBaseClass):
@@ -96,7 +95,7 @@ class Euclidean(DistanceBaseClass):
 
         distance_gradient = -1 * difference / denominator[:, np.newaxis]
 
-        return distance_gradient
+        return distance_gradient  # noqa: RET504
 
 
 def _nan_euclidean(u: np.ndarray, v: np.ndarray) -> np.ndarray:

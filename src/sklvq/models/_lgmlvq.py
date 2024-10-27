@@ -1,10 +1,12 @@
-from typing import Tuple, Union, List
+from __future__ import annotations
+
+from typing import Tuple
 
 import numpy as np
-from sklearn.utils.validation import check_is_fitted, check_array
+from sklearn.utils.validation import check_array, check_is_fitted
 
-from . import LVQBaseClass
-from ..objectives import GeneralizedLearningObjective
+from sklvq.models._base import LVQBaseClass
+from sklvq.objectives._generalized_learning_objective import GeneralizedLearningObjective
 
 ModelParamsType = Tuple[np.ndarray, np.ndarray]
 
@@ -158,14 +160,14 @@ class LGMLVQ(LVQBaseClass):
     References
     ----------
     _`[1]` Sato, A., and Yamada, K. (1996) "Generalized Learning Vector Quantization."
-    Advances in Neural Network Information Processing Systems, 423–429, 1996.
+    Advances in Neural Network Information Processing Systems, 423-429, 1996.
 
     _`[2]` Schneider, P., Biehl, M., & Hammer, B. (2009). "Adaptive Relevance Matrices in
-    Learning Vector Quantization" Neural Computation, 21(12), 3532–3561, 2009.
+    Learning Vector Quantization" Neural Computation, 21(12), 3532-3561, 2009.
 
     _`[3]` Bunte, K., Schneider, P., Hammer, B., Schleif, F.-M., Villmann, T., & Biehl, M. (2012).
     "Limited Rank Matrix Learning, discriminative dimension reduction and visualization." Neural
-    Networks, 26, 159–173, 2012.
+    Networks, 26, 159-173, 2012.
     """
 
     classes_: np.ndarray
@@ -178,22 +180,22 @@ class LGMLVQ(LVQBaseClass):
 
     def __init__(
         self,
-        distance_type: Union[str, type] = "local-adaptive-squared-euclidean",
-        distance_params: dict = None,
-        activation_type: Union[str, type] = "identity",
-        activation_params: dict = None,
-        discriminant_type: Union[str, type] = "relative-distance",
-        discriminant_params: dict = None,
-        solver_type: Union[str, type] = "steepest-gradient-descent",
-        solver_params: dict = None,
-        prototype_init: Union[str, np.ndarray] = "class-conditional-mean",
-        prototype_n_per_class: [int, np.ndarray] = 1,
-        relevance_init: Union[str, np.ndarray] = "identity",
-        relevance_normalization: bool = True,
-        relevance_n_components: Union[str, int] = "all",
+        distance_type: str | type = "local-adaptive-squared-euclidean",
+        distance_params: dict | None = None,
+        activation_type: str | type = "identity",
+        activation_params: dict | None = None,
+        discriminant_type: str | type = "relative-distance",
+        discriminant_params: dict | None = None,
+        solver_type: str | type = "steepest-gradient-descent",
+        solver_params: dict | None = None,
+        prototype_init: str | np.ndarray = "class-conditional-mean",
+        prototype_n_per_class: list[int, np.ndarray] = 1,
+        relevance_init: str | np.ndarray = "identity",
+        relevance_normalization: bool = True,  # noqa: FBT001, FBT002
+        relevance_n_components: str | int = "all",
         relevance_localization: str = "prototypes",
-        random_state: Union[int, np.random.RandomState] = None,
-        force_all_finite: Union[str, int] = True,
+        random_state: int | np.random.RandomState = None,
+        force_all_finite: str | int = True,  # noqa: FBT002
     ):
         self.activation_type = activation_type
         self.activation_params = activation_params
@@ -204,7 +206,7 @@ class LGMLVQ(LVQBaseClass):
         self.relevance_n_components = relevance_n_components
         self.relevance_localization = relevance_localization
 
-        super(LGMLVQ, self).__init__(
+        super().__init__(
             distance_type,
             distance_params,
             DISTANCES,
@@ -375,9 +377,7 @@ class LGMLVQ(LVQBaseClass):
     def _normalize_omega(omega: np.ndarray) -> None:
         np.divide(
             omega,
-            np.sqrt(np.einsum("ikj, ikj -> i", omega, omega)).reshape(
-                omega.shape[0], 1, 1
-            ),
+            np.sqrt(np.einsum("ikj, ikj -> i", omega, omega)).reshape(omega.shape[0], 1, 1),
             out=omega,
         )
 
@@ -409,15 +409,11 @@ class LGMLVQ(LVQBaseClass):
             partial_gradient[:n_features],
             out=prots_view[i_prototype, :],
         )
-        omega_view = self.to_omega(gradient)[
-            self.prototypes_labels_[i_prototype], :, :
-        ].ravel()
+        omega_view = self.to_omega(gradient)[self.prototypes_labels_[i_prototype], :, :].ravel()
 
         np.add(omega_view, partial_gradient[n_features:], out=omega_view)
 
-    def mul_step_size(
-        self, step_sizes: Union[int, float, np.ndarray], gradient: np.ndarray
-    ) -> None:
+    def mul_step_size(self, step_sizes: float | np.ndarray, gradient: np.ndarray) -> None:
         """
         If step sizes is a scalar value just multiplies the gradient with the step size. If it
         is an array (with same length as number of model parameters) each model parameter is
@@ -434,11 +430,10 @@ class LGMLVQ(LVQBaseClass):
             gradient *= step_sizes
             return
 
-        if isinstance(step_sizes, np.ndarray):
-            if step_sizes.size > 1:
-                prototypes, omegas = self.to_model_params_view(gradient)
-                prototypes *= step_sizes[0]
-                omegas *= step_sizes[1]
+        if isinstance(step_sizes, np.ndarray) and step_sizes.size > 1:
+            prototypes, omegas = self.to_model_params_view(gradient)
+            prototypes *= step_sizes[0]
+            omegas *= step_sizes[1]
 
     ###########################################################################################
     # Initialization function
@@ -462,24 +457,25 @@ class LGMLVQ(LVQBaseClass):
     def _check_relevances_params(self):
         relevance_normalization = self.relevance_normalization
         if not isinstance(relevance_normalization, bool):
-            raise ValueError("Provided normalization is invalid.")
+            msg = "Provided normalization is invalid."
+            raise ValueError(msg)
 
         relevance_n_components = self.relevance_n_components
         if isinstance(relevance_n_components, str):
             if relevance_n_components == "all":
                 shape = (self.n_features_in_, self.n_features_in_)
             else:
-                raise ValueError("Provided n_components is invalid.")
+                msg = "Provided n_components is invalid."
+                raise ValueError(msg)
         elif isinstance(relevance_n_components, int):
-            if (
-                self.relevance_n_components >= 1
-                and relevance_n_components <= self.n_features_in_
-            ):
+            if self.relevance_n_components >= 1 and relevance_n_components <= self.n_features_in_:
                 shape = (relevance_n_components, self.n_features_in_)
             else:
-                raise ValueError("Provided n_components is invalid.")
+                msg = "Provided n_components is invalid."
+                raise ValueError(msg)
         else:
-            raise ValueError("Provided n_components is invalid.")
+            msg = "Provided n_components is invalid."
+            raise ValueError(msg)
 
         relevance_localization = self.relevance_localization
         if isinstance(relevance_localization, str):
@@ -488,9 +484,11 @@ class LGMLVQ(LVQBaseClass):
             elif relevance_localization == "class":
                 self._relevances_shape = (self.classes_.size, *shape)
             else:
-                raise ValueError("Provided localization is invalid.")
+                msg = "Provided localization is invalid."
+                raise ValueError(msg)
         else:
-            raise ValueError("Provided localization is invalid.")
+            msg = "Provided localization is invalid."
+            raise ValueError(msg)
 
         self._relevances_size = np.prod(self._relevances_shape)
 
@@ -500,21 +498,15 @@ class LGMLVQ(LVQBaseClass):
         if isinstance(self.relevance_init, str):
             if self.relevance_init == "identity":
                 identity = np.eye(*self._relevances_shape[1:])
-                self.set_omega(
-                    np.repeat(
-                        identity[np.newaxis, :, :], self._relevances_shape[0], axis=0
-                    )
-                )
+                self.set_omega(np.repeat(identity[np.newaxis, :, :], self._relevances_shape[0], axis=0))
             elif self.relevance_init == "random":
-                self.set_omega(
-                    self.random_state_.uniform(
-                        low=0, high=1, size=self._relevances_shape
-                    )
-                )
+                self.set_omega(self.random_state_.uniform(low=0, high=1, size=self._relevances_shape))
             else:
-                raise ValueError("Provided relevance_init is invalid.")
+                msg = "Provided relevance_init is invalid."
+                raise ValueError(msg)
         else:
-            raise ValueError("Provided relevance_init is invalid.")
+            msg = "Provided relevance_init is invalid."
+            raise ValueError(msg)
 
         if self.relevance_normalization:
             LGMLVQ._normalize_omega(self.omega_)
@@ -531,7 +523,7 @@ class LGMLVQ(LVQBaseClass):
     # Other Algorithm specific stuff.
     ###########################################################################################
 
-    def _after_fit(self, X: np.ndarray, y: np.ndarray):
+    def _after_fit(self, X: np.ndarray, y: np.ndarray):  # noqa: ARG002, N803
         self.lambda_ = LGMLVQ._compute_lambdas(self.omega_)
 
         # Eigenvalues and column eigenvectors returned in ascending order
@@ -562,7 +554,7 @@ class LGMLVQ(LVQBaseClass):
     # Transformer related functions
     ###########################################################################################
 
-    def fit_transform(self, X: np.ndarray, y: np.ndarray, **trans_params) -> np.ndarray:
+    def fit_transform(self, X: np.ndarray, y: np.ndarray, **trans_params) -> np.ndarray:  # noqa: N803
         r"""
         Parameters
         ----------
@@ -582,9 +574,9 @@ class LGMLVQ(LVQBaseClass):
 
     def transform(
         self,
-        X: np.ndarray,
-        scale: bool = False,
-        omega_hat_index: Union[int, List[int]] = 0,
+        X: np.ndarray,  # noqa: N803
+        scale: bool = False,  # noqa: FBT001, FBT002
+        omega_hat_index: int | list[int] = 0,
     ) -> np.ndarray:
         r"""
         Parameters
@@ -603,14 +595,14 @@ class LGMLVQ(LVQBaseClass):
         n_columns, n_matrices)
         """
         check_is_fitted(self)
-        X = check_array(X)
+        X = check_array(X)  # noqa: N806
 
         if scale:
             transformation_matrix = self.omega_hat_[omega_hat_index, :, :]
         else:
             transformation_matrix = self.eigenvectors_[omega_hat_index, :, :]
 
-        if transformation_matrix.ndim != 3:
+        if transformation_matrix.ndim != 3:  # noqa: PLR2004
             transformation_matrix = transformation_matrix[None, :, :]
 
         transformed_data = np.einsum("in, jmn -> imj", X, transformation_matrix)

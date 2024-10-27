@@ -1,14 +1,18 @@
-from abc import ABC, abstractmethod
-from typing import List, Any
-from typing import TYPE_CHECKING
+from __future__ import annotations
 
-import numpy as np
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING, Any
+
 import scipy.optimize as spo
 
-from ..objectives import ObjectiveBaseClass
-
 if TYPE_CHECKING:
-    from ..models import LVQBaseClass
+    import numpy as np
+
+    from sklvq.models._base import LVQBaseClass
+    from sklvq.objectives._base import ObjectiveBaseClass
+
+
+ABC_METHOD_NOT_IMPL_MSG = "You should implement this!"
 
 
 class SolverBaseClass(ABC):
@@ -31,7 +35,7 @@ class SolverBaseClass(ABC):
         self,
         data: np.ndarray,
         labels: np.ndarray,
-        model: "LVQBaseClass",
+        model: LVQBaseClass,
     ) -> None:
         """
         Solve updates the model it is given and does not return anything.
@@ -45,7 +49,7 @@ class SolverBaseClass(ABC):
         model : LVQBaseClass
             The initial model that will also hold the final result
         """
-        raise NotImplementedError("You should implement this!")
+        raise NotImplementedError(ABC_METHOD_NOT_IMPL_MSG)
 
 
 class ScipyBaseSolver(SolverBaseClass):
@@ -75,7 +79,7 @@ class ScipyBaseSolver(SolverBaseClass):
         self,
         data: np.ndarray,
         labels: np.ndarray,
-        model: "LVQBaseClass",
+        model: LVQBaseClass,
     ):
         """
         Solve updates the model it is given and does not return anything.
@@ -105,7 +109,7 @@ class ScipyBaseSolver(SolverBaseClass):
         model.set_variables(result.x)
 
 
-def _update_state(state_keys: List[str], **kwargs: Any) -> dict:
+def _update_state(state_keys: list[str], **kwargs: Any) -> dict:
     # Helper function that can be used to update state dict. The state_keys is a  list of strings
     # indicating the keys the dictionary should hold. If not provided in the kwargs they are set
     # to None.

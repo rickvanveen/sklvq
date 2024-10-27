@@ -8,7 +8,8 @@ dynamic = ["version"]
 description = "A collection of Learning Vector Quantization algorithms compatible with scikit-learn"
 readme = "README.md"
 license = "BSD-3-Clause"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
+
 maintainers = [{ name = "Rick van Veen", email = "r.van.veen133@gmail.com" }]
 classifiers = [
     "Intended Audience :: Developers",
@@ -19,6 +20,7 @@ classifiers = [
     "Operating System :: POSIX",
     "Operating System :: Unix",
     "Programming Language :: Python",
+    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Topic :: Scientific/Engineering",
     "Topic :: Software Development",
@@ -45,6 +47,13 @@ Source = "https://github.com/rickvanveen/sklvq"
 
 [tool.hatch.version]
 path = "src/sklvq/__about__.py"
+
+[tool.hatch.envs.hatch-static-analysis]
+config-path = "ruff.toml"
+
+[tool.ruff]
+extend = "ruff.toml"
+target-version = "py311"
 
 [tool.hatch.envs.hatch-test]
 features = ["tests"]

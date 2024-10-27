@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
+ABC_METHOD_NOT_IMPL_MSG = "You should implement this!"
 
 class DiscriminantBaseClass(ABC):
     """Discriminant base class
@@ -35,11 +36,11 @@ class DiscriminantBaseClass(ABC):
         ndarray : with shape (n_samples, 1)
             Should perform a elementwise evaluation of a discriminant function.
         """
-        raise NotImplementedError("You should implement this!")
+        raise NotImplementedError(ABC_METHOD_NOT_IMPL_MSG)
 
     @abstractmethod
     def gradient(
-        self, dist_same: np.ndarray, dist_diff: np.ndarray, same_label: bool
+        self, dist_same: np.ndarray, dist_diff: np.ndarray, *, same_label: bool
     ) -> np.ndarray:
         """
         Should implement the discriminant function's  gradient
@@ -60,4 +61,4 @@ class DiscriminantBaseClass(ABC):
             Should perform a elementwise evaluation of a discriminant function's gradient.
 
         """
-        raise NotImplementedError("You should implement this!")
+        raise NotImplementedError(ABC_METHOD_NOT_IMPL_MSG)

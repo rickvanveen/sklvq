@@ -25,7 +25,7 @@ def test_common_hyper_parameters(estimator):
     with pytest.raises(ValueError):
         estimator(prototype_n_per_class=np.array([1, 1])).fit(X, y)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
         estimator(prototype_n_per_class="100").fit(
             np.array([[1, 2, 3], [1, 2, 3]]), np.array([1, 2])
         )

@@ -1,10 +1,10 @@
 # Typing
-from typing import Union
+from __future__ import annotations
 
 import numpy as np
 
-from . import LVQBaseClass
-from ..objectives import GeneralizedLearningObjective
+from sklvq.models._base import LVQBaseClass
+from sklvq.objectives._generalized_learning_objective import GeneralizedLearningObjective
 
 ModelParamsType = np.ndarray
 
@@ -122,7 +122,7 @@ class GLVQ(LVQBaseClass):
     References
     ----------
     _`[1]` Sato, A., and Yamada, K. (1996) "Generalized Learning Vector Quantization."
-    Advances in Neural Network Information Processing Systems, 423–429, 1996.
+    Advances in Neural Network Information Processing Systems, 423-429, 1996.
     """
 
     classes_: np.ndarray
@@ -131,25 +131,25 @@ class GLVQ(LVQBaseClass):
 
     def __init__(
         self,
-        distance_type: Union[str, type] = "squared-euclidean",
-        distance_params: dict = None,
-        activation_type: Union[str, type] = "sigmoid",
-        activation_params: dict = None,
-        discriminant_type: Union[str, type] = "relative-distance",
-        discriminant_params: dict = None,
-        solver_type: Union[str, type] = "steepest-gradient-descent",
-        solver_params: dict = None,
+        distance_type: str | type = "squared-euclidean",
+        distance_params: dict | None = None,
+        activation_type: str | type = "sigmoid",
+        activation_params: dict | None = None,
+        discriminant_type: str | type = "relative-distance",
+        discriminant_params: dict | None = None,
+        solver_type: str | type = "steepest-gradient-descent",
+        solver_params: dict | None = None,
         prototype_init: str = "class-conditional-mean",
-        prototype_n_per_class: Union[int, np.ndarray] = 1,
-        random_state: Union[int, np.random.RandomState] = None,
-        force_all_finite: Union[str, bool] = True,
+        prototype_n_per_class: int | np.ndarray = 1,
+        random_state: int | np.random.RandomState = None,
+        force_all_finite: str | bool = True,  # noqa: FBT002
     ):
         self.activation_type = activation_type
         self.activation_params = activation_params
         self.discriminant_type = discriminant_type
         self.discriminant_params = discriminant_params
 
-        super(GLVQ, self).__init__(
+        super().__init__(
             distance_type,
             distance_params,
             DISTANCES,
@@ -249,7 +249,7 @@ class GLVQ(LVQBaseClass):
         ndarray
             Same shape and size as input, but normalized.
         """
-        LVQBaseClass._normalize_prototypes(self.to_prototypes_view(var_buffer))
+        LVQBaseClass._normalize_prototypes(self.to_prototypes_view(var_buffer))  # noqa: SLF001
 
     ###########################################################################################
     # Solver helper functions
@@ -280,7 +280,7 @@ class GLVQ(LVQBaseClass):
             out=prots_view[i_prototype, :],
         )
 
-    def mul_step_size(self, step_size: Union[int, float], gradient: np.ndarray) -> None:
+    def mul_step_size(self, step_size: float, gradient: np.ndarray) -> None:
         """
         As GLVQ only has prototypes that are optimized the step_size should be a single float
         and can just be used to multiply the gradient inplace.

@@ -1,5 +1,5 @@
-from . import ScipyBaseSolver
-from ..objectives import ObjectiveBaseClass
+from sklvq.objectives._base import ObjectiveBaseClass
+from sklvq.solvers._base import ScipyBaseSolver
 
 
 class BroydenFletcherGoldfarbShanno(ScipyBaseSolver):
@@ -18,6 +18,4 @@ class BroydenFletcherGoldfarbShanno(ScipyBaseSolver):
     """
 
     def __init__(self, objective: ObjectiveBaseClass, **kwargs):
-        super(BroydenFletcherGoldfarbShanno, self).__init__(
-            objective, method="BFGS", **kwargs
-        )
+        super().__init__(objective, method="BFGS", **kwargs)

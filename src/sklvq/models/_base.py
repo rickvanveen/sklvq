@@ -1,28 +1,28 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
 import numpy as np
-
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.utils import check_random_state
 from sklearn.utils.multiclass import check_classification_targets
-from sklearn.utils.validation import check_is_fitted, check_array, check_scalar
+from sklearn.utils.validation import check_array, check_is_fitted, check_scalar
 
-from .. import distances
-from .. import solvers
-from ..solvers import SolverBaseClass
-from .._utils import init_class
+from sklvq import distances, solvers
+from sklvq._utils import init_class
 
-from ..distances import DistanceBaseClass
-from ..objectives import GeneralizedLearningObjective
-
-from typing import Tuple, Union, List
+if TYPE_CHECKING:
+    from sklvq.distances import DistanceBaseClass
+    from sklvq.objectives import GeneralizedLearningObjective
+    from sklvq.solvers import SolverBaseClass
 
 ModelParamsType = np.ndarray
 
+ABC_METHOD_NOT_IMPL_MSG = "You should implement this!"
 
-class LVQBaseClass(
-    ABC, BaseEstimator, ClassifierMixin
-):  # lgtm [py/conflicting-attributes]
+
+class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):  # lgtm [py/conflicting-attributes]
     """Learning Vector Quantization base class
 
     Abstract class for implementing LVQ models. It provides abstract methods with
@@ -41,13 +41,13 @@ class LVQBaseClass(
     prototypes_: np.ndarray
 
     # "Private" attributes
-    _distance: Union[DistanceBaseClass, object]
+    _distance: DistanceBaseClass | object
     _objective: GeneralizedLearningObjective
-    _solver: Union[SolverBaseClass, object]
+    _solver: SolverBaseClass | object
 
     # Related to model parameters
     _prototypes_size: int
-    _prototypes_shape: Tuple
+    _prototypes_shape: tuple
 
     # _variables stores the  model parameters (e.g., prototypes) in 1D format. The
     # get_prototypes() and other model parameter functions should return a view into this 1D
@@ -56,16 +56,16 @@ class LVQBaseClass(
 
     def __init__(
         self,
-        distance_type: Union[str, type] = "squared-euclidean",
-        distance_params: dict = None,
-        valid_distances: List[str] = None,
-        solver_type: Union[str, type] = "steepest-gradient-descent",
-        solver_params: dict = None,
-        valid_solvers: List[str] = None,
+        distance_type: str | type = "squared-euclidean",
+        distance_params: dict | None = None,
+        valid_distances: list[str] | None = None,
+        solver_type: str | type = "steepest-gradient-descent",
+        solver_params: dict | None = None,
+        valid_solvers: list[str] | None = None,
         prototype_init: str = "class-conditional-mean",
         prototype_n_per_class: int = 1,
-        random_state: Union[int, np.random.RandomState] = None,
-        force_all_finite: Union[str, bool] = True,
+        random_state: int | np.random.RandomState = None,
+        force_all_finite: str | bool = True,  # noqa: FBT002
     ):
         self.distance_type = distance_type
         self.distance_params = distance_params
@@ -110,7 +110,7 @@ class LVQBaseClass(
         np.copyto(self._variables, new_variables)
 
     @abstractmethod
-    def get_model_params(self) -> Union[tuple, np.ndarray]:
+    def get_model_params(self) -> tuple | np.ndarray:
         r"""
         Should return a view or tuple of views (in correct shape) of the model's parameters.
         Implementation depends on specific model as model parameters may differ per model.
@@ -120,10 +120,10 @@ class LVQBaseClass(
         ndarray or tuple
             View or tuple of views of the model's parameters.
         """
-        raise NotImplementedError("You should implement this!")
+        raise NotImplementedError(ABC_METHOD_NOT_IMPL_MSG)
 
     @abstractmethod
-    def set_model_params(self, new_model_params: Union[tuple, np.ndarray]):
+    def set_model_params(self, new_model_params: tuple | np.ndarray):
         r"""
         Should modify the ``self._variables`` array. Accepts the new_model_params in the shape of
         the model's parameters, e.g., prototypes or (prototypes, relevance_matrix).
@@ -135,7 +135,7 @@ class LVQBaseClass(
         new_model_params : ndarray or tuple
             Array or tuple of arrays of the new model's parameters.
         """
-        raise NotImplementedError("You should implement this!")
+        raise NotImplementedError(ABC_METHOD_NOT_IMPL_MSG)
 
     ###########################################################################################
     # Specific "getters" and "setters" for the prototypes shared by every LVQ model.
@@ -171,7 +171,7 @@ class LVQBaseClass(
     ###########################################################################################
 
     @abstractmethod
-    def to_model_params_view(self, var_buffer: np.ndarray) -> Union[tuple, np.ndarray]:
+    def to_model_params_view(self, var_buffer: np.ndarray) -> tuple | np.ndarray:
         r"""
         Should return a single view into the var_buffer or a tuple of views. This depends on the
         model and its parameters.
@@ -187,7 +187,7 @@ class LVQBaseClass(
         ndarray or tuple
             Should return a view or tuple of views of the model parameters in appropriate shapes.
         """
-        raise NotImplementedError("You should implement this!")
+        raise NotImplementedError(ABC_METHOD_NOT_IMPL_MSG)
 
     @abstractmethod
     def to_prototypes_view(self, var_buffer: np.ndarray) -> np.ndarray:
@@ -206,7 +206,7 @@ class LVQBaseClass(
         ndarray of shape (n_prototypes, n_features)
             View into the var_buffer.
         """
-        raise NotImplementedError("You should implement this!")
+        raise NotImplementedError(ABC_METHOD_NOT_IMPL_MSG)
 
     ###########################################################################################
     # Solver Normalization functions
@@ -231,7 +231,7 @@ class LVQBaseClass(
             Same shape and size as input, but normalized. How to normalize depends on model
             implementation.
         """
-        raise NotImplementedError("You should implement this!")
+        raise NotImplementedError(ABC_METHOD_NOT_IMPL_MSG)
 
     @staticmethod
     def _normalize_prototypes(prototypes: np.ndarray) -> None:
@@ -284,12 +284,10 @@ class LVQBaseClass(
         i_prototype : int
             The index of the prototype to which the partial gradient was  computed.
         """
-        raise NotImplementedError("You should implement this!")
+        raise NotImplementedError(ABC_METHOD_NOT_IMPL_MSG)
 
     @abstractmethod
-    def mul_step_size(
-        self, step_size: Union[float, np.ndarray], gradient: np.ndarray
-    ) -> None:
+    def mul_step_size(self, step_size: float | np.ndarray, gradient: np.ndarray) -> None:
         r"""
         Should multiply the provided gradient with the provided step size and overwrite the
         values in ``gradient``.  Depending on the ``step_size`` being a float or array different
@@ -303,7 +301,7 @@ class LVQBaseClass(
         gradient : ndarray
             Same shape as the ``get_variables()`` would return.
         """
-        raise NotImplementedError("You should implement this!")
+        raise NotImplementedError(ABC_METHOD_NOT_IMPL_MSG)
 
     ###########################################################################################
     # Initialization function
@@ -315,7 +313,7 @@ class LVQBaseClass(
         Should initialize the variables, 1d numpy array to hold all model parameters. Should
         store these in self._variables.
         """
-        raise NotImplementedError("You should implement this!")
+        raise NotImplementedError(ABC_METHOD_NOT_IMPL_MSG)
 
     @abstractmethod
     def _check_model_params(self):
@@ -325,7 +323,7 @@ class LVQBaseClass(
         """
 
     @abstractmethod
-    def _init_model_params(self, X, y):
+    def _init_model_params(self, X, y):  # noqa: N803
         r"""
         Depending on the model, things such as self.prototypes_ should be initialized and set
         using the set methods or one should make sure the parameters are views into the variables
@@ -338,7 +336,7 @@ class LVQBaseClass(
         y : ndarray, with shape (n_samples)
             The labels
         """
-        raise NotImplementedError("You should implement this!")
+        raise NotImplementedError(ABC_METHOD_NOT_IMPL_MSG)
 
     def _check_prototype_params(self):
         """
@@ -358,34 +356,29 @@ class LVQBaseClass(
             prototype_n_per_class = np.asarray(prototype_n_per_class)
 
             if prototype_n_per_class.size != self.classes_.size:
-                raise ValueError(
-                    "Expected the number protoypes_per_class (size = {}) to have a number of elements "
-                    "equal to the number of classes (size = {}).",
-                    prototype_n_per_class.size,
-                    self.classes_.size,
+                msg = (
+                    f"Expected the number protoypes_per_class (size = {prototype_n_per_class.size}) to have a number of elements "
+                    f"equal to the number of classes (size = {self.classes_.size})."
                 )
+                raise ValueError(msg)
 
             if np.any(prototype_n_per_class <= 0.0):
-                raise ValueError(
-                    "Prototypes_per_class ({}) cannot contain any values less than or equal to zero.",
-                    prototype_n_per_class,
-                )
+                msg = f"Prototypes_per_class ({prototype_n_per_class}) cannot contain any values less than or equal to zero."
+                raise ValueError(msg)
 
             self._prototypes_shape = (
                 np.sum(prototype_n_per_class),
                 self.n_features_in_,
             )
         else:
-            raise ValueError(
-                "Expected prototypes_per_class to be either of type int or np.ndarray, but got type: {}",
-                type(prototype_n_per_class),
-            )
+            msg = f"Expected prototypes_per_class to be either of type int or np.ndarray, but got type: {type(prototype_n_per_class)}"
+            raise TypeError(msg)
 
         self._prototypes_size = np.prod(self._prototypes_shape)
 
     def _init_prototypes(
         self,
-        X: np.ndarray,
+        X: np.ndarray,  # noqa: N803
         y: np.ndarray,
     ) -> None:
         """
@@ -397,9 +390,7 @@ class LVQBaseClass(
         X : ndarray with shape (number of observations, number of dimensions)
         y : ndarray with size equal to the number of observations
         """
-        self.prototypes_labels_ = np.repeat(
-            np.arange(0, self.classes_.size), self.prototype_n_per_class
-        )
+        self.prototypes_labels_ = np.repeat(np.arange(0, self.classes_.size), self.prototype_n_per_class)
 
         # Sets initial value for prototypes....
         self.prototypes_ = self.to_prototypes_view(self._variables)
@@ -407,21 +398,17 @@ class LVQBaseClass(
         if self.prototype_init == "class-conditional-mean":
             conditional_mean = _conditional_mean(self.prototypes_labels_, X, y)
 
-            self.set_prototypes(
-                conditional_mean
-                + (1e-4 * self.random_state_.uniform(-1, 1, conditional_mean.shape))
-            )
+            self.set_prototypes(conditional_mean + (1e-4 * self.random_state_.uniform(-1, 1, conditional_mean.shape)))
         else:
-            raise ValueError(
-                "The provided value for the parameter 'prototype_init' is invalid."
-            )
+            msg = "The provided value for the parameter 'prototype_init' is invalid."
+            raise ValueError(msg)
 
     @abstractmethod
     def _init_objective(self) -> None:
         """
         Should initialize the ``self._objective``. Depends on the algorithm.
         """
-        raise NotImplementedError("You should implement this!")
+        raise NotImplementedError(ABC_METHOD_NOT_IMPL_MSG)
 
     def _init_distance(self) -> None:
         """
@@ -451,9 +438,7 @@ class LVQBaseClass(
     # Data and label validation
     ###########################################################################################
 
-    def _check_data_and_labels(
-        self, X: np.ndarray, labels: np.ndarray
-    ) -> Tuple[np.ndarray, np.ndarray]:
+    def _check_data_and_labels(self, X: np.ndarray, labels: np.ndarray) -> tuple[np.ndarray, np.ndarray]:  # noqa: N803
         """
         Functions performs a series of check mostly by using sklearn util functions.
         Additionally, it transform the labels into indexes of unique labels, which are stored in
@@ -483,9 +468,7 @@ class LVQBaseClass(
         labels : ndarray of indexes to self.classes_
         """
         # Check X
-        X, labels = self._validate_data(
-            X, labels, force_all_finite=self.force_all_finite
-        )
+        X, labels = self._validate_data(X, labels, force_all_finite=self.force_all_finite)  # noqa: N806
 
         # Check classification targets
         check_classification_targets(labels)
@@ -496,7 +479,8 @@ class LVQBaseClass(
 
         # Raise an error when the targets only contain a single unique class.
         if self.classes_.size <= 1:
-            raise ValueError("Classifier can't train when only one class is present.")
+            msg = "Classifier can't train when only one class is present."
+            raise ValueError(msg)
 
         return X, labels
 
@@ -504,7 +488,7 @@ class LVQBaseClass(
     # Before and after fit/solve function (initialization of things)
     ###########################################################################################
 
-    def _before_fit(self, X: np.ndarray, y: np.ndarray):
+    def _before_fit(self, X: np.ndarray, y: np.ndarray):  # noqa: N803
         """
         Should initialize:
             1. self._variables and algorithm specific parameters which should be
@@ -534,7 +518,7 @@ class LVQBaseClass(
 
         self._init_solver()
 
-    def _after_fit(self, X: np.ndarray, y: np.ndarray):
+    def _after_fit(self, X: np.ndarray, y: np.ndarray):  # noqa: N803
         """
         Method that by default does nothing but can be used by methods that need to compute
         transformation matrices, such that this does not need to be checked or done everytime
@@ -550,7 +534,7 @@ class LVQBaseClass(
     # Public API functions
     ###########################################################################################
 
-    def fit(self, X: np.ndarray, y: np.ndarray):
+    def fit(self, X: np.ndarray, y: np.ndarray):  # noqa: N803
         """Fit function that provides the general implementation of the LVQ algorithms. It checks the data, calls
          before_fit method, calls the solve method of the solver, and the after_fit method.
 
@@ -565,7 +549,7 @@ class LVQBaseClass(
             The trained model
         """
         # Check X and check and transform labels.
-        X, y_index = self._check_data_and_labels(X, y)
+        X, y_index = self._check_data_and_labels(X, y)  # noqa: N806
 
         # Initialize random_state_ that should be used to perform any rng.
         self.random_state_ = check_random_state(self.random_state)
@@ -580,7 +564,7 @@ class LVQBaseClass(
 
         return self
 
-    def _multiclass_decision_function(self, X: np.ndarray):
+    def _multiclass_decision_function(self, X: np.ndarray):  # noqa: N803
         """
         Computes the decision values and returns shape (n_observations, n_classes). The values
         are constructed by computing: the distance between an observation and the prototype with
@@ -611,7 +595,7 @@ class LVQBaseClass(
 
         return decision_values
 
-    def decision_function(self, X: np.ndarray):
+    def decision_function(self, X: np.ndarray):  # noqa: N803
         """
         Evaluates the decision function for the samples in X.
         Shape for binary class is (n_observations,) with the decision values for the "greater"
@@ -633,18 +617,18 @@ class LVQBaseClass(
         check_is_fitted(self)
 
         # Input validation
-        X = check_array(X, force_all_finite=self.force_all_finite)
+        X = check_array(X, force_all_finite=self.force_all_finite)  # noqa: N806
 
         decision_values = self._multiclass_decision_function(X)
 
-        if self.classes_.size == 2:
+        if self.classes_.size == 2:  # noqa: PLR2004
             # The decision function needs to return (n_samples,) for the "greater" class.
             return decision_values[:, 1]
 
         # else it should  return (n_samples, n_classes)
         return decision_values
 
-    def predict_proba(self, X: np.ndarray):
+    def predict_proba(self, X: np.ndarray):  # noqa: N803
         """
         Parameters
         ----------
@@ -659,20 +643,20 @@ class LVQBaseClass(
         check_is_fitted(self)
 
         # Input validation
-        X = check_array(X, force_all_finite=self.force_all_finite)
+        X = check_array(X, force_all_finite=self.force_all_finite)  # noqa: N806
 
         # Between -1 and 1
         decision_values = self._multiclass_decision_function(X)
 
         # Between 0 and 1
-        if self.classes_.size == 2:
+        if self.classes_.size == 2:  # noqa: PLR2004
             return (decision_values + 1) / 2.0
 
         # Softmax function (keeps the same scipy.stats.rankdata)
         exp_decision_values = np.exp(decision_values)
         return exp_decision_values / np.sum(exp_decision_values, axis=1)[:, np.newaxis]
 
-    def predict(self, X: np.ndarray, threshold: Union[int, float] = 0.5):
+    def predict(self, X: np.ndarray, threshold: float = 0.5):  # noqa: N803
         """Predict function
 
         The decision is made for the label of the prototype with the minimum decision value,
@@ -706,7 +690,7 @@ class LVQBaseClass(
         # X = self._validate_data(X, force_all_finite=self.force_all_finite)
         decision_values = self.decision_function(X)
 
-        if self.classes_.size == 2:
+        if self.classes_.size == 2:  # noqa: PLR2004
             return self.classes_[(decision_values > df_threshold).astype(int)]
 
         # Lower value is the closest prototype.
@@ -715,6 +699,4 @@ class LVQBaseClass(
 
 def _conditional_mean(p_labels: np.ndarray, data: np.ndarray, d_labels: np.ndarray):
     """Implements the conditional mean (ignoring nan values), i.e., mean per class"""
-    return np.array(
-        [np.nanmean(data[p_label == d_labels, :], axis=0) for p_label in p_labels]
-    )
+    return np.array([np.nanmean(data[p_label == d_labels, :], axis=0) for p_label in p_labels])

@@ -1,7 +1,8 @@
-from . import ActivationBaseClass
+from __future__ import annotations
+
 import numpy as np
 
-from typing import Union
+from sklvq.activations._base import ActivationBaseClass
 
 
 class Swish(ActivationBaseClass):
@@ -24,15 +25,12 @@ class Swish(ActivationBaseClass):
     Functions for Generalized Learning Vector Quantization - A Performance Comparison", 2019.
     """
 
-    __slots__ = "beta"
+    __slots__: tuple[str, ...] = ("beta",)
 
-    def __init__(self, beta: Union[int, float] = 1):
+    def __init__(self, beta: float = 1):
         if beta <= 0:
-            raise ValueError(
-                "The activation function {} expects beta > 0, but got beta = {}".format(
-                    type(self).__name__, beta
-                )
-            )
+            msg = f"The activation function {type(self).__name__} expects beta > 0, but got beta = {beta}"
+            raise ValueError(msg)
 
         self.beta = beta
 
@@ -68,9 +66,7 @@ class Swish(ActivationBaseClass):
         ndarray of shape (x.shape)
             Elementwise evaluation of the swish function's gradient.
         """
-        return (self.beta * _swish(x, self.beta)) + (
-            _sgd(x, self.beta) * (1 - self.beta * _swish(x, self.beta))
-        )
+        return (self.beta * _swish(x, self.beta)) + (_sgd(x, self.beta) * (1 - self.beta * _swish(x, self.beta)))
 
 
 def _sgd(x: np.ndarray, beta: int) -> np.ndarray:

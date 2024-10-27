@@ -1,10 +1,15 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-import numpy as np
-
 if TYPE_CHECKING:
-    from ..models import LVQBaseClass
+    import numpy as np
+
+    from sklvq.models import LVQBaseClass
+
+
+ABC_METHOD_NOT_IMPL_MSG = "You should implement this!"
 
 
 class DistanceBaseClass(ABC):
@@ -23,7 +28,7 @@ class DistanceBaseClass(ABC):
     __slots__ = ()
 
     @abstractmethod
-    def __call__(self, data: np.ndarray, model: "LVQBaseClass") -> np.ndarray:
+    def __call__(self, data: np.ndarray, model: LVQBaseClass) -> np.ndarray:
         """
         Should implement a distance function.
 
@@ -40,12 +45,10 @@ class DistanceBaseClass(ABC):
         ndarray with shape (n_samples, n_prototypes)
             Evaluation of the distance between each sample and prototype of the model.
         """
-        raise NotImplementedError("You should implement this!")
+        raise NotImplementedError(ABC_METHOD_NOT_IMPL_MSG)
 
     @abstractmethod
-    def gradient(
-        self, data: np.ndarray, model: "LVQBaseClass", i_prototype: int
-    ) -> np.ndarray:
+    def gradient(self, data: np.ndarray, model: LVQBaseClass, i_prototype: int) -> np.ndarray:
         """The distance gradient method.
 
         Parameters
@@ -65,4 +68,4 @@ class DistanceBaseClass(ABC):
             The gradient with respect to the prototype (i_prototype) and every sample in X.
 
         """
-        raise NotImplementedError("You should implement this!")
+        raise NotImplementedError(ABC_METHOD_NOT_IMPL_MSG)

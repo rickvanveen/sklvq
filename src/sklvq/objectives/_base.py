@@ -4,7 +4,9 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 if TYPE_CHECKING:
-    from ..models._base import LVQBaseClass
+    from sklvq.models._base import LVQBaseClass
+
+ABC_METHOD_NOT_IMPL_MSG = "You should implement this!"
 
 
 class ObjectiveBaseClass(ABC):
@@ -46,7 +48,7 @@ class ObjectiveBaseClass(ABC):
 
 
         """
-        raise NotImplementedError("You should implement this!")
+        raise NotImplementedError(ABC_METHOD_NOT_IMPL_MSG)
 
     @abstractmethod
     def gradient(
@@ -76,4 +78,4 @@ class ObjectiveBaseClass(ABC):
             The gradient
 
         """
-        raise NotImplementedError("You should implement this!")
+        raise NotImplementedError(ABC_METHOD_NOT_IMPL_MSG)
