@@ -13,8 +13,8 @@ unseen data, i.e., the generalizability of the model. We can use `crossvalidatio
 import numpy as np
 from sklearn.datasets import load_iris
 from sklearn.model_selection import (
-    cross_val_score,
     RepeatedKFold,
+    cross_val_score,
 )
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
@@ -51,11 +51,7 @@ repeated_10_fold = RepeatedKFold(n_splits=10, n_repeats=10)
 
 # Call the cross_val_score using all created instances and loaded data. Note it can accept
 # different and also multiple scoring parameters
-accuracy = cross_val_score(
-    pipeline, data, labels, cv=repeated_10_fold, scoring="accuracy"
-)
+accuracy = cross_val_score(pipeline, data, labels, cv=repeated_10_fold, scoring="accuracy")
 
 # Print the mean and standard deviation of the cross validation testing scores.
-print(
-    "Accuracy, mean (std): {:.2f} ({:.2f})".format(np.mean(accuracy), np.std(accuracy))
-)
+print(f"Accuracy, mean (std): {np.mean(accuracy):.2f} ({np.std(accuracy):.2f})")

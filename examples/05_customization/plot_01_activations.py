@@ -3,6 +3,7 @@
 Activation Functions
 ====================
 """
+
 from typing import Union
 
 import numpy as np
@@ -24,7 +25,6 @@ data, labels = load_iris(return_X_y=True)
 
 # This is the implementation of sklvq.activations.Sigmoid with some additional comments
 class CustomSigmoid(ActivationBaseClass):
-
     # Activation callables can have a custom init of which the parameters can be passed
     # through the `activation_params (Dict)' parameter of the LVQ algorithms. Or the
     # object can just be initialized before hand.

@@ -3,6 +3,7 @@
 Discriminant Functions
 ======================
 """
+
 import numpy as np
 from sklearn.datasets import load_iris
 from sklearn.metrics import classification_report
@@ -26,9 +27,7 @@ class CustomRelativeDistance(DiscriminantBaseClass):
         # dist_diff = distance to prototype with different label as X.
         return (dist_same - dist_diff) / (dist_same + dist_diff)
 
-    def gradient(
-        self, dist_same: np.ndarray, dist_diff: np.ndarray, winner_same: bool
-    ) -> np.ndarray:
+    def gradient(self, dist_same: np.ndarray, dist_diff: np.ndarray, winner_same: bool) -> np.ndarray:
         # Winner_same is an boolean flag to indicate if the considered prototype has the same or
         # a different label compared to the considered X.
         if winner_same:
