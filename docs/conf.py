@@ -1,4 +1,3 @@
-#
 # project-template documentation build configuration file, created by
 # sphinx-quickstart on Mon Jan 18 14:44:12 2016.
 #
@@ -13,13 +12,12 @@
 
 import os
 import sys
-from distutils.version import LooseVersion
 
 import sphinx
 import sphinx_rtd_theme
 from sphinx_gallery.sorting import FileNameSortKey
 
-from sklvq import __version__
+from sklvq.__about__ import __version__
 
 # __version__ = "0.1"
 
@@ -44,17 +42,12 @@ extensions = [
     "sphinx.ext.viewcode",
     "numpydoc",
     "sphinx_gallery.gen_gallery",
+    "sphinx.ext.imgmath",
 ]
 
 # this is needed for some reason...
 # see https://github.com/numpy/numpydoc/issues/69
 numpydoc_show_class_members = False
-
-# pngmath / imgmath compatibility layer for different sphinx versions
-if LooseVersion(sphinx.__version__) < LooseVersion("1.4"):
-    extensions.append("sphinx.ext.pngmath")
-else:
-    extensions.append("sphinx.ext.imgmath")
 
 autodoc_default_flags = ["members", "inherited-members"]
 
@@ -143,7 +136,7 @@ html_theme = "sphinx_rtd_theme"
 # html_theme_options = {}
 
 # Add any paths that contain custom themes here, relative to this directory.
-html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+html_theme_path = [sphinx_rtd_theme]
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".

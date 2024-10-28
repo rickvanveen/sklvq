@@ -48,6 +48,9 @@ Source = "https://github.com/rickvanveen/sklvq"
 [tool.hatch.version]
 path = "src/sklvq/__about__.py"
 
+[tool.hatch.envs.docs]
+features = ["docs"]
+
 [tool.hatch.envs.hatch-static-analysis]
 config-path = "ruff.toml"
 

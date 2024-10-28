@@ -121,3 +121,5 @@ ENV/
 scripts/
 scripts/*
 
+sg_execution_times.rst
+.ruff_cache
