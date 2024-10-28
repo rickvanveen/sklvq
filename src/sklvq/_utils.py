@@ -27,9 +27,9 @@ def _import_class_from_string(package_string: str, class_string: str) -> type:
     try:
         module = import_module("." + module_string, package_string)
         specified_class = getattr(module, class_string)
-    except (ModuleNotFoundError, AttributeError, TypeError):
+    except (ModuleNotFoundError, AttributeError, TypeError) as e:
         msg = f"{module_string}.{class_string} is not part of our collection"
-        raise ImportError(msg)
+        raise ImportError(msg) from e
     return specified_class
 
 

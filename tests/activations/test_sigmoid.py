@@ -1,8 +1,7 @@
 import numpy as np
+import pytest
 
 from .test_common import check_init_activation
-
-import pytest
 
 
 def test_sigmoid():

@@ -1,8 +1,7 @@
 import numpy as np
+import pytest
 
 from .test_common import check_init_activation
-
-import pytest
 
 
 def test_soft_plus():
@@ -30,16 +29,12 @@ def test_soft_plus():
     assert np.all(soft_plus(np.array([-2, -4, -6, -8, -20, -50, -100]) > 0))
 
     # Increasing upto gradient of beta...
-    assert np.max(soft_plus.gradient(np.array([0, 4, 8, 12, 20]))) == pytest.approx(
-        soft_plus.beta
-    )
+    assert np.max(soft_plus.gradient(np.array([0, 4, 8, 12, 20]))) == pytest.approx(soft_plus.beta)
 
     soft_plus = soft_plus_class(beta=10)
 
     # Increasing upto gradient of beta...
-    assert np.max(soft_plus.gradient(np.array([0, 4, 8, 12, 20]))) == pytest.approx(
-        soft_plus.beta
-    )
+    assert np.max(soft_plus.gradient(np.array([0, 4, 8, 12, 20]))) == pytest.approx(soft_plus.beta)
 
     # soft plus gradient becomes nan when 1 + (beta * e^x) becomes inf. Which happens with larger x.
     # which should probably raise an error.

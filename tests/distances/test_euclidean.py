@@ -1,10 +1,8 @@
 import numpy as np
 
-from .test_common import check_distance
-from .test_common import check_init_distance
-
-
 from sklvq.models import GLVQ
+
+from .test_common import check_distance, check_init_distance
 
 
 def test_euclidean():

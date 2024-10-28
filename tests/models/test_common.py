@@ -1,13 +1,9 @@
-import pytest
 import numpy as np
-
-from sklearn.utils.estimator_checks import check_estimator
+import pytest
 from sklearn import datasets
+from sklearn.utils.estimator_checks import check_estimator
 
-from sklvq import GLVQ
-from sklvq import GMLVQ
-from sklvq import LGMLVQ
-
+from sklvq import GLVQ, GMLVQ, LGMLVQ
 from sklvq.activations import Identity
 
 

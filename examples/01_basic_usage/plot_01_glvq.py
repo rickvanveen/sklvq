@@ -11,10 +11,10 @@ Example of how to fit the GLVQ `[1]`_ algorithm on the classic iris dataset.
 
 import matplotlib
 import matplotlib.pyplot as plt
+import numpy as np
 from sklearn.datasets import load_iris
 from sklearn.metrics import classification_report
 from sklearn.preprocessing import StandardScaler
-import numpy as np
 
 from sklvq import GLVQ
 

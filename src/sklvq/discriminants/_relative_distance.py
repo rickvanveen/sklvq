@@ -11,7 +11,7 @@ class RelativeDistance(DiscriminantBaseClass):
     References
     ----------
     _`[1]` Sato, A., and Yamada, K. (1996) "Generalized Learning Vector Quantization."
-    Advances in Neural Network Information Processing Systems, 423–429, 1996."""
+    Advances in Neural Network Information Processing Systems, 423-429, 1996."""
 
     __slots__ = ()
 

@@ -1,4 +1,5 @@
 import pytest
+
 from sklvq._utils import _import_class_from_string
 
 

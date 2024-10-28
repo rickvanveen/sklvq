@@ -304,7 +304,7 @@ class GLVQ(LVQBaseClass):
     def _check_model_params(self):
         self._check_prototype_params()
 
-    def _init_model_params(self, X, y) -> None:
+    def _init_model_params(self, X, y) -> None:  # noqa: N803
         self._init_prototypes(X, y)
 
     def _init_objective(self):

@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
-from sklvq.solvers._adaptive_moment_estimation import AdaptiveMomentEstimation
 from sklvq.objectives import GeneralizedLearningObjective
+from sklvq.solvers._adaptive_moment_estimation import AdaptiveMomentEstimation
 
 
 def test_steepest_gradient_descent():

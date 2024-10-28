@@ -144,9 +144,7 @@ for i, xy_dm in enumerate(zip(t_d, t_m)):
         linewidth=2.0,
     )
     ax[i].title.set_text(
-        "Relevance projection w.r.t. {}".format(
-            iris.target_names[model.prototypes_labels_[i]]
-        )
+        f"Relevance projection w.r.t. {iris.target_names[model.prototypes_labels_[i]]}"
     )
     ax[i].set_xlabel("First eigenvector")
     ax[i].set_ylabel("Second eigenvector")

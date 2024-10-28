@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
-from sklvq.solvers._waypoint_gradient_descent import WaypointGradientDescent
 from sklvq.objectives import GeneralizedLearningObjective
+from sklvq.solvers._waypoint_gradient_descent import WaypointGradientDescent
 
 
 def test_steepest_gradient_descent():

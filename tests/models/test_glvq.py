@@ -1,7 +1,5 @@
 import numpy as np
-
-from sklearn import datasets
-from sklearn import preprocessing
+from sklearn import datasets, preprocessing
 from sklearn.model_selection import (
     GridSearchCV,
     RepeatedStratifiedKFold,

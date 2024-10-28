@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # project-template documentation build configuration file, created by
 # sphinx-quickstart on Mon Jan 18 14:44:12 2016.
@@ -12,14 +11,13 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys
 import os
-
-import sphinx_rtd_theme
-from sphinx_gallery.sorting import FileNameSortKey
+import sys
+from distutils.version import LooseVersion
 
 import sphinx
-from distutils.version import LooseVersion
+import sphinx_rtd_theme
+from sphinx_gallery.sorting import FileNameSortKey
 
 from sklvq import __version__
 
@@ -313,7 +311,7 @@ texinfo_documents = [
 # Example configuration for intersphinx: refer to the Python standard library.
 # intersphinx configuration
 intersphinx_mapping = {
-    "python": ("https://docs.python.org/{.major}".format(sys.version_info), None),
+    "python": (f"https://docs.python.org/{sys.version_info.major}", None),
     "numpy": ("https://numpy.org/doc/stable/", None),
     "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
     "matplotlib": ("https://matplotlib.org/", None),

@@ -1,8 +1,6 @@
-import pytest
 import numpy as np
-
-from sklearn import datasets
-from sklearn import preprocessing
+import pytest
+from sklearn import datasets, preprocessing
 from sklearn.pipeline import make_pipeline
 
 from sklvq.models import GLVQ

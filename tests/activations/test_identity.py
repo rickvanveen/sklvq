@@ -1,6 +1,6 @@
-from .test_common import check_init_activation
-
 import numpy as np
+
+from .test_common import check_init_activation
 
 
 # Check if grab returns correct class, defaults of init (if any), basic workings are correct.

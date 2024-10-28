@@ -10,7 +10,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.datasets import load_breast_cancer
-from sklearn.metrics import roc_curve, roc_auc_score, confusion_matrix
+from sklearn.metrics import confusion_matrix, roc_auc_score, roc_curve
 from sklearn.preprocessing import StandardScaler
 
 from sklvq import GMLVQ
@@ -66,7 +66,7 @@ npc_fpr = fp / (fp + tn)
 fig, ax = plt.subplots()
 fig.suptitle("Receiver operating characteristic ")
 # Plot the ROC curve
-ax.plot(fpr, tpr, color="darkorange", lw=2, label="ROC AUC = {:.3f}".format(roc_auc))
+ax.plot(fpr, tpr, color="darkorange", lw=2, label=f"ROC AUC = {roc_auc:.3f}")
 # Plot the random line
 ax.plot([0, 1], [0, 1], color="navy", lw=2, linestyle="--")
 # Plot the NPC classifier

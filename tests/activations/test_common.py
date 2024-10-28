@@ -1,7 +1,6 @@
 from sklvq import activations
 from sklvq._utils import init_class
-from sklvq.activations import ALIASES
-from sklvq.activations import ActivationBaseClass
+from sklvq.activations import ALIASES, ActivationBaseClass
 
 
 def check_init_activation(activation_string):
@@ -17,5 +16,5 @@ def check_init_activation(activation_string):
 
 
 def test_aliases():
-    for value in ALIASES.keys():
+    for value in ALIASES:
         check_init_activation(value)

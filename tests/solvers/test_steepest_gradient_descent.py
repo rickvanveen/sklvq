@@ -1,10 +1,10 @@
 import numpy as np
 import pytest
-
-from sklvq.solvers._steepest_gradient_descent import SteepestGradientDescent
-from sklvq.objectives import GeneralizedLearningObjective
-from sklvq.models import GLVQ
 from sklearn.datasets import load_iris
+
+from sklvq.models import GLVQ
+from sklvq.objectives import GeneralizedLearningObjective
+from sklvq.solvers._steepest_gradient_descent import SteepestGradientDescent
 
 
 def test_steepest_gradient_descent():

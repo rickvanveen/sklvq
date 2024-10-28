@@ -37,7 +37,7 @@ def check_distance(distfun, data, model):
     # Same values in negative direction is same as the samples in the positive direction.
     assert dists[0, 0] == dists[1, 1]
 
-    for i_prototype in range(0, model.prototypes_.shape[1]):
+    for _i_prototype in range(model.prototypes_.shape[1]):
         # Check if shape of the gradient makes sense
         gradient = distfun.gradient(data, model, 0)
 

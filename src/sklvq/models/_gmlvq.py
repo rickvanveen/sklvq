@@ -442,7 +442,7 @@ class GMLVQ(LVQBaseClass):
         self._check_prototype_params()
         self._check_relevances_params()
 
-    def _init_model_params(self, X, y) -> None:
+    def _init_model_params(self, X, y) -> None:  # noqa: N803
         self._init_prototypes(X, y)
         self._init_relevances()
 

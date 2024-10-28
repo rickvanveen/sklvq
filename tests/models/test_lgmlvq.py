@@ -1,8 +1,6 @@
 import numpy as np
 import pytest
-
-from sklearn import datasets
-from sklearn import preprocessing
+from sklearn import datasets, preprocessing
 from sklearn.model_selection import (
     GridSearchCV,
     RepeatedStratifiedKFold,
@@ -90,8 +88,8 @@ def test_lgmlvq():
     assert np.all(search.cv_results_["mean_train_score"] > 0.75)
     assert np.all(search.cv_results_["mean_test_score"] > 0.75)
 
-    print("\nBest parameter (CV score=%0.3f):" % search.best_score_)
-    print(search.best_params_)
+    # print("\nBest parameter (CV score=%0.3f):" % search.best_score_)
+    # print(search.best_params_)
 
 
 def test_lgmlvq_relevances():

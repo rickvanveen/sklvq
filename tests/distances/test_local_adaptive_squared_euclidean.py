@@ -1,9 +1,8 @@
 import numpy as np
 
-from .test_common import check_distance
-from .test_common import check_init_distance
-
 from sklvq.models import LGMLVQ
+
+from .test_common import check_distance, check_init_distance
 
 
 def test_adaptive_squared_euclidean():
@@ -26,9 +25,7 @@ def test_adaptive_squared_euclidean():
 
     check_distance(model._distance, data, model)
 
-    model = LGMLVQ(
-        distance_type="local-adaptive-squared-euclidean", relevance_localization="class"
-    )
+    model = LGMLVQ(distance_type="local-adaptive-squared-euclidean", relevance_localization="class")
     model.fit(data, np.array([0, 1, 2]))
     model.set_prototypes(p)
     model.set_omega(o)
