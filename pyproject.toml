@@ -67,9 +67,23 @@ branch = true
 parallel = true
 omit = ["src/sklvq/__about__.py"]
 
+
 [tool.coverage.paths]
 sklvq = ["src/sklvq", "*/sklvq/src/sklvq"]
 tests = ["tests", "*/sklvq/tests"]
 
 [tool.coverage.report]
-exclude_lines = ["no cov", "if __name__ == .__main__.:", "if TYPE_CHECKING:"]
+exclude_lines = [
+    "no cov",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "if 0:",
+    "if self.verbose:",
+    "show_missing = True",
+]
