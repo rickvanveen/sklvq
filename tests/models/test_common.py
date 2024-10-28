@@ -22,9 +22,7 @@ def test_common_hyper_parameters(estimator):
         estimator(prototype_n_per_class=np.array([1, 1])).fit(X, y)
 
     with pytest.raises(TypeError):
-        estimator(prototype_n_per_class="100").fit(
-            np.array([[1, 2, 3], [1, 2, 3]]), np.array([1, 2])
-        )
+        estimator(prototype_n_per_class="100").fit(np.array([[1, 2, 3], [1, 2, 3]]), np.array([1, 2]))
 
     with pytest.raises(ValueError):
         estimator(prototype_n_per_class=np.array([1, 0, 1])).fit(X, y)
@@ -46,9 +44,7 @@ def test_common_hyper_parameters(estimator):
 
     activation_type = Identity
     with pytest.raises(TypeError):
-        estimator(activation_type=activation_type, activation_params={"beta": 0}).fit(
-            X, y
-        )
+        estimator(activation_type=activation_type, activation_params={"beta": 0}).fit(X, y)
 
 
 @pytest.mark.parametrize("estimator", [GMLVQ, LGMLVQ])

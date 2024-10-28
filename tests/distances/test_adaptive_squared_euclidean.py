@@ -29,9 +29,7 @@ def test_adaptive_squared_euclidean():
     check_distance(model._distance, data, model)
 
     # Check force_all_finite settings
-    model = GMLVQ(
-        distance_type="adaptive-squared-euclidean", force_all_finite="allow-nan"
-    )
+    model = GMLVQ(distance_type="adaptive-squared-euclidean", force_all_finite="allow-nan")
     model.fit(data, np.array([0, 1, 2]))
     model.set_prototypes(p)
     model.set_omega(o)

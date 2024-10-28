@@ -90,9 +90,7 @@ for i, lambda_ in enumerate(model.lambda_):
         ax[i].set_xticklabels([name[:-5] for name in iris.feature_names])
     else:
         ax[i].set_xticklabels([], visible=False)
-        ax[i].tick_params(
-            axis="x", which="both", bottom=False, top=False, labelbottom=False
-        )
+        ax[i].tick_params(axis="x", which="both", bottom=False, top=False, labelbottom=False)
     ax[i].set_ylabel("Weight")
     ax[i].legend()
 
@@ -143,9 +141,7 @@ for i, xy_dm in enumerate(zip(t_d, t_m)):
         edgecolors="black",
         linewidth=2.0,
     )
-    ax[i].title.set_text(
-        f"Relevance projection w.r.t. {iris.target_names[model.prototypes_labels_[i]]}"
-    )
+    ax[i].title.set_text(f"Relevance projection w.r.t. {iris.target_names[model.prototypes_labels_[i]]}")
     ax[i].set_xlabel("First eigenvector")
     ax[i].set_ylabel("Second eigenvector")
     ax[i].legend()

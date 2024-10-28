@@ -40,9 +40,7 @@ class RelativeDistance(DiscriminantBaseClass):
         """
         return (dist_same - dist_diff) / (dist_same + dist_diff)
 
-    def gradient(
-        self, dist_same: np.ndarray, dist_diff: np.ndarray, same_label: bool
-    ) -> np.ndarray:
+    def gradient(self, dist_same: np.ndarray, dist_diff: np.ndarray, same_label: bool) -> np.ndarray:
         r"""Computes the relative distance discriminant function's gradient.
 
             1. The partial derivative with respect to the closest prototypes with the same label (same_label=True):

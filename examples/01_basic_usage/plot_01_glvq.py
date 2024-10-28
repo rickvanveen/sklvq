@@ -93,9 +93,7 @@ for i, prototype in enumerate(model.prototypes_):
         ax[i].set_xticklabels([name[:-5] for name in iris.feature_names])
     else:
         ax[i].set_xticklabels([], visible=False)
-        ax[i].tick_params(
-            axis="x", which="both", bottom=False, top=False, labelbottom=False
-        )
+        ax[i].tick_params(axis="x", which="both", bottom=False, top=False, labelbottom=False)
     ax[i].set_ylabel("cm")
     ax[i].legend()
 

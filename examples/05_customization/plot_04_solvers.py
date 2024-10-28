@@ -73,9 +73,7 @@ class CustomSteepestGradientDescent(SolverBaseClass):
 
         for i_run in range(self.max_runs):
             # Randomize order of samples
-            shuffled_indices = shuffle(
-                np.array(range(labels.size)), random_state=model.random_state_
-            )
+            shuffled_indices = shuffle(np.array(range(labels.size)), random_state=model.random_state_)
 
             # Divide the shuffled indices into batches (not necessarily equal size,
             # see documentation of numpy.array_split).

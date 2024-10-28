@@ -8,7 +8,6 @@ from sklvq.solvers._steepest_gradient_descent import SteepestGradientDescent
 
 
 def test_steepest_gradient_descent():
-
     objective = GeneralizedLearningObjective(
         activation_type="identity",
         activation_params=None,

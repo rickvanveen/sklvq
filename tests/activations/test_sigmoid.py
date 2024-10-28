@@ -31,10 +31,7 @@ def test_sigmoid():
     assert np.all(sigmoid(np.array([1, 10, 100, 1000, 10000]) > 0))
 
     # Symmetry
-    assert np.all(
-        pytest.approx(sigmoid(np.array([1, 2, 3, 4])))
-        == (1 - sigmoid(np.array([-1, -2, -3, -4])))
-    )
+    assert np.all(pytest.approx(sigmoid(np.array([1, 2, 3, 4]))) == (1 - sigmoid(np.array([-1, -2, -3, -4]))))
 
     sigmoid = sigmoid_class(beta=10)
 

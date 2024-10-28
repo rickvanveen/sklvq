@@ -23,7 +23,6 @@ def check_init_distance(distance_string):
 
 
 def check_distance(distfun, data, model):
-
     dists = distfun(data, model)
     # Samples by prototypes
     assert np.all(dists.shape == (data.shape[0], model.prototypes_.shape[0]))

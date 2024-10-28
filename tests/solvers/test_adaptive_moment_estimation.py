@@ -6,7 +6,6 @@ from sklvq.solvers._adaptive_moment_estimation import AdaptiveMomentEstimation
 
 
 def test_steepest_gradient_descent():
-
     objective = GeneralizedLearningObjective(
         activation_type="identity",
         activation_params=None,

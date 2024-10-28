@@ -4,6 +4,7 @@ import numpy as np
 
 ABC_METHOD_NOT_IMPL_MSG = "You should implement this!"
 
+
 class DiscriminantBaseClass(ABC):
     """Discriminant base class
 
@@ -39,9 +40,7 @@ class DiscriminantBaseClass(ABC):
         raise NotImplementedError(ABC_METHOD_NOT_IMPL_MSG)
 
     @abstractmethod
-    def gradient(
-        self, dist_same: np.ndarray, dist_diff: np.ndarray, *, same_label: bool
-    ) -> np.ndarray:
+    def gradient(self, dist_same: np.ndarray, dist_diff: np.ndarray, *, same_label: bool) -> np.ndarray:
         """
         Should implement the discriminant function's  gradient
 

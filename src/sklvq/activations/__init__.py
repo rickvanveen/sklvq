@@ -11,6 +11,4 @@ ALIASES = {"soft+": "soft-plus"}
 
 
 def import_from_string(class_string, valid_strings=None) -> type:
-    return _import_from_string(
-        __name__, class_string, ALIASES, "activation_type", valid_strings
-    )
+    return _import_from_string(__name__, class_string, ALIASES, "activation_type", valid_strings)

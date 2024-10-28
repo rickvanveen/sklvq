@@ -53,9 +53,7 @@ class CustomSquaredEuclidean(DistanceBaseClass):
     # of the omega matrix needs to be returned (in this same vector). See the API
     # reference under Documentation or github for other distance functions and their
     # implementation.
-    def gradient(
-        self, data: np.ndarray, model: "LVQBaseClass", i_prototype: int
-    ) -> np.ndarray:
+    def gradient(self, data: np.ndarray, model: "LVQBaseClass", i_prototype: int) -> np.ndarray:
         prototypes = model.get_model_params()
         (num_samples, num_features) = data.shape
 

@@ -50,9 +50,7 @@ model.fit(data, labels)
 label_score = model.decision_function(data)
 
 # roc_curve expects the y_score to be with respect to the positive class.
-fpr, tpr, thresholds = roc_curve(
-    y_true=labels, y_score=label_score, pos_label=1, drop_intermediate=True
-)
+fpr, tpr, thresholds = roc_curve(y_true=labels, y_score=label_score, pos_label=1, drop_intermediate=True)
 roc_auc = roc_auc_score(y_true=labels, y_score=label_score)
 
 #  Sometimes it is good to know where the Nearest prototype classifier is on this curve. This can
