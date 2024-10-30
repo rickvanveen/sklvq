@@ -15,7 +15,7 @@ import sys
 
 import sphinx
 import sphinx_rtd_theme
-from sphinx_gallery.sorting import FileNameSortKey
+# from sphinx_gallery.sorting import FileNameSortKey
 
 from sklvq.__about__ import __version__
 
@@ -64,7 +64,7 @@ source_suffix = ".rst"
 # source_encoding = 'utf-8-sig'
 
 # Generate the plots for the gallery
-plot_gallery = True
+plot_gallery = "True"
 
 # The master toctree document.
 master_doc = "index"
@@ -136,7 +136,7 @@ html_theme = "sphinx_rtd_theme"
 # html_theme_options = {}
 
 # Add any paths that contain custom themes here, relative to this directory.
-html_theme_path = [sphinx_rtd_theme]
+# html_theme_path = [sphinx_rtd_theme]
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
@@ -316,7 +316,7 @@ sphinx_gallery_conf = {
     "doc_module": "sklvq",
     "backreferences_dir": os.path.join("generated"),
     "reference_url": {"sklvq": None},
-    "within_subsection_order": FileNameSortKey,
+    "within_subsection_order": "FileNameSortKey",
     "abort_on_example_error": True,
 }
 
