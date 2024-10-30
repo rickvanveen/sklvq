@@ -17,7 +17,7 @@ jobs:
           python-version: 3.12
       - name: "Install Hatch"
         run: |
-          python -m pip install hatch
+          pipx install hatch
       - name: "Format"
         run: |
           hatch fmt --formatter src/sklvq/ examples/ tests/ -- --check
@@ -31,7 +31,7 @@ jobs:
           python-version: 3.12
       - name: "Install Hatch"
         run: |
-          python -m pip install hatch
+          pipx install hatch
       - name: "Lint"
         run: |
           hatch fmt --linter src/sklvq/ -- --output-format=github
@@ -49,7 +49,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: "Install Hatch"
         run: |
-          python -m pip install hatch
+          pipx install hatch
       - name: "Test"
         run: |
           hatch run +py=${{ matrix.python-version }} test:pytest --cov=sklvq --junitxml=junit.xml tests/
