@@ -3,6 +3,7 @@
 Distance Functions
 ==================
 """
+
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -29,7 +30,6 @@ data, labels = load_iris(return_X_y=True)
 
 
 class CustomSquaredEuclidean(DistanceBaseClass):
-
     # The distance implementations use the sklearn pairwise distance function.
     def __init__(self, **other_kwargs):
         self.metric_kwargs = {"metric": "euclidean", "squared": True}
@@ -40,7 +40,11 @@ class CustomSquaredEuclidean(DistanceBaseClass):
     # The call function needs to return a matrix with the number of X points on the
     # rows and the columns the distance to the prototypes.
     def __call__(self, data: np.ndarray, model: "LVQBaseClass") -> np.ndarray:
-        return pairwise_distances(data, model.prototypes_, **self.metric_kwargs,)
+        return pairwise_distances(
+            data,
+            model.prototypes_,
+            **self.metric_kwargs,
+        )
 
     # The gradient is slightly more difficult as the gradient (with respect to 1
     # prototype) needs to be provided in a vector the size of all the prototypes.
@@ -49,9 +53,7 @@ class CustomSquaredEuclidean(DistanceBaseClass):
     # of the omega matrix needs to be returned (in this same vector). See the API
     # reference under Documentation or github for other distance functions and their
     # implementation.
-    def gradient(
-        self, data: np.ndarray, model: "LVQBaseClass", i_prototype: int
-    ) -> np.ndarray:
+    def gradient(self, data: np.ndarray, model: "LVQBaseClass", i_prototype: int) -> np.ndarray:
         prototypes = model.get_model_params()
         (num_samples, num_features) = data.shape
 
