@@ -138,7 +138,7 @@ ax.grid(True)
 # Plot the eigenvalues of the eigenvectors of the relevance matrix.
 fig, ax = plt.subplots()
 fig.suptitle("Eigenvalues")
-ax.bar(range(0, len(model.eigenvalues_)), model.eigenvalues_)
+ax.bar(range(len(model.eigenvalues_)), model.eigenvalues_)
 ax.set_ylabel("Weight")
 ax.grid(False)
 

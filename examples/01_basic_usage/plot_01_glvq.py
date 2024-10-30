@@ -8,8 +8,10 @@ Generalized LVQ (GLVQ)
 Example of how to fit the GLVQ `[1]`_ algorithm on the classic iris dataset.
 
 """
+
 import matplotlib
 import matplotlib.pyplot as plt
+import numpy as np
 from sklearn.datasets import load_iris
 from sklearn.metrics import classification_report
 from sklearn.preprocessing import StandardScaler
@@ -78,7 +80,7 @@ fig.suptitle("Prototype of each class")
 
 for i, prototype in enumerate(model.prototypes_):
     # Reverse the z-transform to go back to the original feature space.
-    prototype = scaler.inverse_transform(prototype)
+    prototype = scaler.inverse_transform(np.atleast_2d(prototype)).squeeze()
 
     ax[i].bar(
         range(num_features),
@@ -91,9 +93,7 @@ for i, prototype in enumerate(model.prototypes_):
         ax[i].set_xticklabels([name[:-5] for name in iris.feature_names])
     else:
         ax[i].set_xticklabels([], visible=False)
-        ax[i].tick_params(
-            axis="x", which="both", bottom=False, top=False, labelbottom=False
-        )
+        ax[i].tick_params(axis="x", which="both", bottom=False, top=False, labelbottom=False)
     ax[i].set_ylabel("cm")
     ax[i].legend()
 

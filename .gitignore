@@ -72,6 +72,8 @@ instance/
 
 # Sphinx documentation
 docs/_build/
+docs/auto_examples/
+docs/generated/
 
 # PyBuilder
 target/
@@ -116,12 +118,11 @@ ENV/
 # mypy
 .mypy_cache/
 
-.github/
-.github/*
-
 .idea/
 .idea/*
 
 scripts/
 scripts/*
 
+sg_execution_times.rst
+.ruff_cache
