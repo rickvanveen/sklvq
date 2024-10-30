@@ -47,12 +47,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: "Install Hatch"
-        run: |
-          pipx install hatch
       - name: "Test"
         run: |
-          hatch run +py=${{ matrix.python-version }} test:pytest --cov=sklvq --junitxml=junit.xml tests/
+          pytest --cov=sklvq --junitxml=junit.xml tests/
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
