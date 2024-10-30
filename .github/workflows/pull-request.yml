@@ -52,8 +52,7 @@ jobs:
           python -m pip install hatch
       - name: "Test"
         run: |
-          hatch run +py=${{ matrix.python-version }} test:pytest pytest --cov=sklvq --junitxml=junit.xml tests/
-          - name: Test with pytest
+          hatch run +py=${{ matrix.python-version }} test:pytest --cov=sklvq --junitxml=junit.xml tests/
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
@@ -63,6 +62,3 @@ jobs:
         uses: codecov/test-results-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-
-
-# hatch fmt --check src/sklvq -- --output-format=github > output.txt
