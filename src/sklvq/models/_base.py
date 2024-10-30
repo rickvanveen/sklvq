@@ -690,11 +690,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):  # lgtm [py/conflicting
         # X = self._validate_data(X, force_all_finite=self.force_all_finite)
         decision_values = self.decision_function(X)
 
-<<<<<<< HEAD:sklvq/models/_base.py
-        if self.classes_.size == 2:
-=======
         if self.classes_.size == 2:  # noqa: PLR2004
->>>>>>> d656485537b7a09d8dad110335e74b18a3275b7f:src/sklvq/models/_base.py
             return self.classes_[(decision_values > df_threshold).astype(int)]
 
         # Lower value is the closest prototype.

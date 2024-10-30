@@ -163,15 +163,11 @@ class GMLVQ(LVQBaseClass):
 
     _`[3]` Bunte, K., Schneider, P., Hammer, B., Schleif, F.-M., Villmann, T., & Biehl, M. (2012).
     "Limited Rank Matrix Learning, discriminative dimension reduction and visualization." Neural
-<<<<<<< HEAD:sklvq/models/_gmlvq.py
     Networks, 26, 159–173, 2012.
     
     _[4] van Veen, R., van Veen, R., Tamboli, N. R. B., Lövdal, ... & Biehl, M. (2024). 
     Subspace corrected relevance learning with application in neuroimaging. 
     Artificial Intelligence in Medicine, 149, 102786, 2024."""
-=======
-    Networks, 26, 159-173, 2012."""
->>>>>>> d656485537b7a09d8dad110335e74b18a3275b7f:src/sklvq/models/_gmlvq.py
 
     classes_: np.ndarray
     prototypes_: np.ndarray

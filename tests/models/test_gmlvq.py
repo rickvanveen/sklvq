@@ -81,7 +81,6 @@ def test_gmlvq_():
 
     assert np.all(np.isclose(model.lambda_, GMLVQ._compute_lambda(model.omega_hat_)))
     assert np.all(np.isclose(np.linalg.norm(model.eigenvectors_, axis=1), 1.0))
-<<<<<<< HEAD:sklvq/models/tests/test_gmlq.py
 
 def test_relevance_correction():
     
@@ -109,5 +108,3 @@ def test_relevance_correction():
 
 
 
-=======
->>>>>>> d656485537b7a09d8dad110335e74b18a3275b7f:tests/models/test_gmlq.py
