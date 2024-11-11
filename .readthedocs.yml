@@ -11,11 +11,15 @@ formats:
 
 # Build documentation in the docs/ directory with Sphinx
 sphinx:
-  configuration: doc/conf.py
+  configuration: docs/conf.py
 
+build:
+  os: ubuntu-22.04
+  tools:
+    python: "3.12"
+  
 # Optionally set the version of Python and requirements required to build your docs
 python:
-  version: 3.7
   install:
     - method: pip
       path: .

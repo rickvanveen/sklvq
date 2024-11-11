@@ -3,6 +3,7 @@
 Solvers
 =======
 """
+
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -45,7 +46,10 @@ class CustomSteepestGradientDescent(SolverBaseClass):
         self.callback = callback
 
     def solve(
-        self, data: np.ndarray, labels: np.ndarray, model: "LVQBaseClass",
+        self,
+        data: np.ndarray,
+        labels: np.ndarray,
+        model: "LVQBaseClass",
     ):
         # Calls the callback function is provided with the initial values.
         if self.callback is not None:
@@ -67,11 +71,9 @@ class CustomSteepestGradientDescent(SolverBaseClass):
         if batch_size <= 0:
             batch_size = data.shape[0]
 
-        for i_run in range(0, self.max_runs):
+        for i_run in range(self.max_runs):
             # Randomize order of samples
-            shuffled_indices = shuffle(
-                np.array(range(0, labels.size)), random_state=model.random_state_
-            )
+            shuffled_indices = shuffle(np.array(range(labels.size)), random_state=model.random_state_)
 
             # Divide the shuffled indices into batches (not necessarily equal size,
             # see documentation of numpy.array_split).

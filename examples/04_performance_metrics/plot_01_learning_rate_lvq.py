@@ -8,6 +8,7 @@ not each solver provides the same variables. Additionally, the options "lbfgs" a
 implemented in scipy and their callbacks are different from the others. See Scipy's documentation
 for further information.
 """
+
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
@@ -52,9 +53,7 @@ model = GMLVQ(
     solver_params={
         "max_runs": 15,
         "k": 3,
-        "step_size": np.array(
-            [0.75, 0.85]
-        ),  # Note we chose very large step_sizes here to show
+        "step_size": np.array([0.75, 0.85]),  # Note we chose very large step_sizes here to show
         # the usefulness of waypoint averaging.
         "callback": logger,
     },

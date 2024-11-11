@@ -29,7 +29,7 @@ feature_names = [name[:-5] for name in iris.feature_names]
 ###############################################################################
 # Fitting the Model
 # .................
-# Scale the data and create a GLVQ object with, e.g., custom distance function, activation
+# Scale the data and create a GMLVQ object with, e.g., a distance function, activation
 # function and solver. See the API reference under documentation for defaults and other
 # possible parameters.
 
@@ -51,7 +51,7 @@ model = GMLVQ(
 
 ###############################################################################
 # The next step is to fit the GMLVQ object to the data and use the predict method to make the
-# predictions. Note that this example only works on the training data and therefor does not say
+# predictions. Note that this example only works on the training data and therefore does not say
 # anything about the generalizability of the fitted model.
 
 # Train the model using the scaled data and true labels
@@ -66,7 +66,7 @@ print(classification_report(labels, predicted_labels))
 ###############################################################################
 # Extracting the Relevance Matrix
 # ...............................
-# In addition to the prototypes (see GLVQ example), GMLVQ learns a
+# In addition to the prototypes (see the GLVQ example), GMLVQ learns a
 # matrix `lambda_` which can tell us something about which features are most relevant for the
 # classification.
 
@@ -83,9 +83,9 @@ ax.grid(False)
 
 ###############################################################################
 #   Note that the relevance diagonal adds up to one. The most relevant features for
-#   distinguishing between the classes present in  the iris dataset seem to be (in decreasing
+#   distinguishing between the classes present in the iris dataset seem to be (in decreasing
 #   order) the petal length, petal width, sepal length, and sepal width. Although not very
-#   interesting for the iris dataset one could use this information to select only the top most
+#   interesting for the iris dataset, one could use this information to select only the top most
 #   relevant features to be used for the classification and thus reducing the dimensionality of
 #   the problem.
 
@@ -101,7 +101,8 @@ transformed_data = model.transform(data, scale=True)
 x_d = transformed_data[:, 0]
 y_d = transformed_data[:, 1]
 
-# Transform the model, i.e., the prototypes (scaled by square root of eigenvalues "scale = True")
+# Transform the model, i.e., the prototypes (scaled by square root of eigenvalues "scale = True"). These scaled
+# eigenvectors are stored in the attribute called `omega_hat_`.
 transformed_model = model.transform(model.prototypes_, scale=True)
 
 x_m = transformed_model[:, 0]
@@ -137,20 +138,20 @@ ax.grid(True)
 # Plot the eigenvalues of the eigenvectors of the relevance matrix.
 fig, ax = plt.subplots()
 fig.suptitle("Eigenvalues")
-ax.bar(range(0, len(model.eigenvalues_)), model.eigenvalues_)
+ax.bar(range(len(model.eigenvalues_)), model.eigenvalues_)
 ax.set_ylabel("Weight")
 ax.grid(False)
 
-# Plot the first two eigenvectors of the relevance matrix, which  is called `omega_hat`.
+# Plot the first two eigenvectors of the relevance matrix, which are stored in the attribute called `eigenvectors_`
 fig, ax = plt.subplots()
 fig.suptitle("First Eigenvector")
-ax.bar(feature_names, model.omega_hat_[:, 0])
+ax.bar(feature_names, model.eigenvectors_[0, :])
 ax.set_ylabel("Weight")
 ax.grid(False)
 
 fig, ax = plt.subplots()
 fig.suptitle("Second Eigenvector")
-ax.bar(feature_names, model.omega_hat_[:, 1])
+ax.bar(feature_names, model.eigenvectors_[1, :])
 ax.set_ylabel("Weight")
 ax.grid(False)
 
@@ -158,7 +159,7 @@ ax.grid(False)
 # In the plots from the eigenvalues and eigenvector we see a similar effects as we could see from
 # just the diagonal of `lambda_`. The two leading (most relevant or discriminating) eigenvectors
 # mostly use the petal length and petal width in their calculation. The diagonal of the
-# relevance matrix can therefor be considered as a summary of the relevances of the features.
+# relevance matrix can therefore be considered as a summary of the relevances of the features.
 
 ###############################################################################
 # References
