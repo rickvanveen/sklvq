@@ -32,16 +32,27 @@ class ProcessLogger:
     def __init__(self):
         self.states = np.array([])
 
-    # A callback function has to accept two arguments, i.e., model and state, where model is the
-    # current model, and state contains a number of the optimizers variables.
+    # A callback function has to accept one argument, i.e., state, which contains a
+    # number of the optimizers variables.
     def __call__(self, state):
         self.states = np.append(self.states, state)
         return False  # The callback function can also be used to stop training early,
         # if some condition is met by returning True.
 
 
+class AdvancedProcessLogger(ProcessLogger):
+    # A more advanced callback function to extract extra information
+    def __call__(self, state):
+        global model
+        model._after_fit([], [])
+        projected_prototypes = model.transform(model.to_prototypes_view(state['variables']), scale=True)
+        dotproducts = projected_prototypes.dot(projected_prototypes.T)
+        state['dotproducts'] = dotproducts[np.triu_indices(len(dotproducts))]
+        return super().__call__(state)
+
+
 # Initiate the "logger".
-logger = ProcessLogger()
+logger = AdvancedProcessLogger()
 
 scaler = StandardScaler()
 
@@ -95,3 +106,21 @@ ax.set_title("Learning Curves (Less is better)")
 ax.plot(iteration, nfun)
 ax.plot(iteration, tfun)
 _ = ax.legend(["Cost of regular gradient update", "Cost of average gradient update"])
+
+###############################################################################
+# The dot products of pairs of (projected) prototypes are considered characteristic quantities of
+# the system of prototypes `[1]`_. These can, in addition to the cost, be used to observe
+# development of the system of prototypes over time, during training. The flattening out of these
+# curves can be used to judge settlement / stability of the system.
+
+ax.set_title("Dot products of pairs of (projected) prototypes (flatter lines show stability)")
+dpfun = np.array([state["dotproducts"] for state in logger.states]).T
+ax = plt.axes()
+ax.plot(iteration, dpfun.T)
+
+
+###############################################################################
+# References
+# ..........
+# _`[1]` M. Biehl, A. Ghosh and B. Hammer, Dynamics and generalization ability of LVQ
+# # algorithms, in Journal of Machine Learning Research 8 (Feb):323-360, 2007.
