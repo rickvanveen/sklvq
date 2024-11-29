@@ -33,4 +33,3 @@ formats:
 python:
    install:
      - requirements: .
-     - extra_requirements: docs
