@@ -20,6 +20,7 @@ classifiers = [
     "Operating System :: POSIX",
     "Operating System :: Unix",
     "Programming Language :: Python",
+    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Topic :: Scientific/Engineering",
@@ -58,15 +59,23 @@ config-path = "ruff.toml"
 extend = "ruff.toml"
 target-version = "py311"
 
-[tool.hatch.envs.hatch-test]
+# [tool.hatch.envs.hatch-test]
+# features = ["tests"]
+
+[tool.hatch.envs.test]
 features = ["tests"]
+
+[tool.hatch.envs.test.scripts]
+test = "pytest tests"   
+
+[[tool.hatch.envs.test.matrix]]
+python = ["3.10", "3.11", "3.12"]
 
 [tool.coverage.run]
 source_pkgs = ["sklvq", "tests"]
 branch = true
 parallel = true
 omit = ["src/sklvq/__about__.py"]
-
 
 [tool.coverage.paths]
 sklvq = ["src/sklvq", "*/sklvq/src/sklvq"]
