@@ -1,0 +1,67 @@
+on:
+  push:
+    branches: "main"
+  pull_request:
+    branches: "main"
+
+  workflow_dispatch:
+
+jobs:
+  format:
+    name: Format
+    runs-on: ubunt-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+      - name: "Install Hatch"
+        run: |
+          pipx install hatch
+      - name: "Format"
+        run: |
+          hatch fmt --formatter src/sklvq/ examples/ tests/ -- --check
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+      - name: "Install Hatch"
+        run: |
+          pipx install hatch
+      - name: "Lint"
+        run: |
+          hatch fmt --linter src/sklvq/ -- --output-format=github
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: "Set env variables for Hatch"
+        run: |
+          echo "HATCH_PYTHON=$(which python)$ext" >> $GITHUB_ENV
+      - name: "Install Hatch"
+        run: |
+          pipx install hatch
+      - name: "Test"
+        run: |
+          hatch run +py=${{ matrix.python-version }} test:pytest --cov=sklvq --junitxml=junit.xml tests/
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}

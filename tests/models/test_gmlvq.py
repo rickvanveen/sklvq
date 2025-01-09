@@ -81,3 +81,30 @@ def test_gmlvq_():
 
     assert np.all(np.isclose(model.lambda_, GMLVQ._compute_lambda(model.omega_hat_)))
     assert np.all(np.isclose(np.linalg.norm(model.eigenvectors_, axis=1), 1.0))
+
+def test_relevance_correction():
+    
+    X, y = datasets.load_iris(return_X_y=True)
+    model = GMLVQ(random_state=1048).fit(X, y)
+
+    leading_eigenvector = model.eigenvectors_[0]
+
+    correction_vectors = np.atleast_2d(leading_eigenvector)
+
+    correction_matrix = np.identity(correction_vectors.shape[1]) - (
+        correction_vectors.T.dot(correction_vectors)
+    )
+    # Check if it is a symmetric matrix
+    assert np.allclose(correction_matrix, correction_matrix.T)
+
+    model2 = GMLVQ(relevance_correction=correction_matrix, random_state=1048).fit(X, y)
+
+    # Check that omega from the corrected model does not contain contribution from the vectors we wanted to remove
+    assert np.allclose(np.dot(model2.omega_, correction_vectors.T.dot(correction_vectors)), np.zeros(correction_vectors.shape[1]))
+
+
+
+       
+
+
+
