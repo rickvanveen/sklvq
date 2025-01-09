@@ -26,7 +26,7 @@ classifiers = [
     "Topic :: Scientific/Engineering",
     "Topic :: Software Development",
 ]
-dependencies = ["numpy>=1.17.3", "scikit-learn>=1.2.0", "scipy>=1.3.2"]
+dependencies = ["numpy>=1.17.3", "scikit-learn<=1.5.2", "scipy>=1.3.2"]
 
 [project.optional-dependencies]
 docs = [

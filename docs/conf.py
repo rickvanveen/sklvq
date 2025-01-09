@@ -13,8 +13,6 @@
 import os
 import sys
 
-import sphinx
-import sphinx_rtd_theme
 # from sphinx_gallery.sorting import FileNameSortKey
 
 from sklvq.__about__ import __version__
@@ -71,7 +69,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "sklvq"
-copyright = "2020, Rick van Veen"
+copyright = "2024, Rick van Veen"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

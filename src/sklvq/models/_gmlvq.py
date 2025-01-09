@@ -107,6 +107,11 @@ class GMLVQ(LVQBaseClass):
         Flag to indicate whether to normalize omega, whenever it is updated, such that the trace of the relevance matrix
         is equal to 1.
 
+    relevance_correction: np.ndarray, optional
+        Matrix that will be used to project out any contribution from unwanted directions in ``omega_`` during training.
+        When set this will be applied every update step before the ``relevance_normalization`` is applied.
+        The correction matrix is responsible for a mapping where the unwanted directions are removed `[4]`_.
+
     relevance_n_components: str {"all"} or int, optional, default="all"
         For a square relevance matrix use the string "all" (default). For a rectangular relevance matrix use set the
         number of components explicitly by providing it as an int.
@@ -158,7 +163,12 @@ class GMLVQ(LVQBaseClass):
 
     _`[3]` Bunte, K., Schneider, P., Hammer, B., Schleif, F.-M., Villmann, T., & Biehl, M. (2012).
     "Limited Rank Matrix Learning, discriminative dimension reduction and visualization." Neural
-    Networks, 26, 159-173, 2012."""
+    Networks, 26, 159–173, 2012.
+
+    _`[4]` van Veen, R., Tamboli, N. R. B., Lövdal, S., Meles, S. K., Renken, R. J., de Vries, G.-J., Arnaldi, D.,
+    Morbelli, S., Clavero, P., Obeso, J. A., Oroz, M. C. R., Leenders, K. L., Villmann, T., & Biehl, M. (2024).
+    Subspace corrected relevance learning with application in neuroimaging.
+    Artificial Intelligence in Medicine, 149, 102786, 2024. Elsevier BV."""
 
     classes_: np.ndarray
     prototypes_: np.ndarray
@@ -182,6 +192,7 @@ class GMLVQ(LVQBaseClass):
         prototype_n_per_class: int | np.ndarray = 1,
         relevance_init="identity",
         relevance_normalization: bool = True,  # noqa: FBT001, FBT002
+        relevance_correction: np.ndarray = None,
         relevance_n_components: str | int = "all",
         relevance_regularization: float = 0,
         random_state: int | np.random.RandomState = None,
@@ -193,6 +204,7 @@ class GMLVQ(LVQBaseClass):
         self.discriminant_params = discriminant_params
         self.relevance_init = relevance_init
         self.relevance_normalization = relevance_normalization
+        self.relevance_correction = relevance_correction
         self.relevance_n_components = relevance_n_components
         self.relevance_regularization = relevance_regularization
 
@@ -225,6 +237,10 @@ class GMLVQ(LVQBaseClass):
             1d numpy array that contains all the model parameters in continuous memory
         """
         np.copyto(self._variables, new_variables)
+
+        if self.relevance_correction is not None:
+            self._correct_omega(self.omega_)
+
         if self.relevance_normalization:
             GMLVQ._normalize_omega(self.omega_)
 
@@ -246,6 +262,9 @@ class GMLVQ(LVQBaseClass):
 
         self.set_prototypes(new_prototypes)
         self.set_omega(new_omega)
+
+        if self.relevance_correction is not None:
+            self._correct_omega(self.omega_)
 
         if self.relevance_normalization:
             GMLVQ._normalize_omega(self.omega_)
@@ -371,6 +390,10 @@ class GMLVQ(LVQBaseClass):
     def _normalize_omega(omega: np.ndarray) -> None:
         np.divide(omega, np.sqrt(np.einsum("ji, ji", omega, omega)), out=omega)
 
+    def _correct_omega(self, omega: np.ndarray) -> None:
+        # Note matmul is faster for larger matrices, for smaller dot is faster.
+        np.matmul(omega, self.relevance_correction, out=omega)
+
     ###########################################################################################
     # Solver helper functions
     ###########################################################################################
@@ -485,6 +508,9 @@ class GMLVQ(LVQBaseClass):
         else:
             msg = "Provided relevance_init is invalid."
             raise ValueError(msg)
+
+        if self.relevance_correction is not None:
+            self._correct_omega(self.omega_)
 
         if self.relevance_normalization:
             GMLVQ._normalize_omega(self.omega_)
