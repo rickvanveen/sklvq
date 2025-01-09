@@ -13,8 +13,6 @@
 import os
 import sys
 
-import sphinx
-import sphinx_rtd_theme
 # from sphinx_gallery.sorting import FileNameSortKey
 
 from sklvq.__about__ import __version__

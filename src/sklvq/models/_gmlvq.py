@@ -108,7 +108,7 @@ class GMLVQ(LVQBaseClass):
         is equal to 1.
 
     relevance_correction: np.ndarray, optional
-        Matrix that will be used to project out any contribution from unwanted directions in omega_ during training.
+        Matrix that will be used to project out any contribution from unwanted directions in ``omega_`` during training.
         When set this will be applied every update step before the ``relevance_normalization`` is applied.
         The correction matrix is responsible for a mapping where the unwanted directions are removed `[4]`_.
 
@@ -164,10 +164,11 @@ class GMLVQ(LVQBaseClass):
     _`[3]` Bunte, K., Schneider, P., Hammer, B., Schleif, F.-M., Villmann, T., & Biehl, M. (2012).
     "Limited Rank Matrix Learning, discriminative dimension reduction and visualization." Neural
     Networks, 26, 159–173, 2012.
-    
-    _[4] van Veen, R., van Veen, R., Tamboli, N. R. B., Lövdal, ... & Biehl, M. (2024). 
-    Subspace corrected relevance learning with application in neuroimaging. 
-    Artificial Intelligence in Medicine, 149, 102786, 2024."""
+
+    _`[4]` van Veen, R., Tamboli, N. R. B., Lövdal, S., Meles, S. K., Renken, R. J., de Vries, G.-J., Arnaldi, D.,
+    Morbelli, S., Clavero, P., Obeso, J. A., Oroz, M. C. R., Leenders, K. L., Villmann, T., & Biehl, M. (2024).
+    Subspace corrected relevance learning with application in neuroimaging.
+    Artificial Intelligence in Medicine, 149, 102786, 2024. Elsevier BV."""
 
     classes_: np.ndarray
     prototypes_: np.ndarray
