@@ -98,7 +98,8 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
                     **{kwarg_str: model._compute_lambda(omega)},  # noqa: SLF001
                 )
 
-        return cdists**2
+        # The missing-value helper already returns the squared distance.
+        return cdists if model.force_all_finite == "allow-nan" else cdists**2
 
     def gradient(self, data: np.ndarray, model: "LGMLVQ", i_prototype: int) -> np.ndarray:
         r"""Computes the gradient of the localized adaptive squared euclidean distance function

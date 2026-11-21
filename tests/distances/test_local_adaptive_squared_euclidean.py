@@ -123,7 +123,6 @@ def missing_model(request):
     return model
 
 
-@pytest.mark.xfail(strict=True, raises=AssertionError, reason="Local NaN distance squares the quadratic form twice")
 def test_missing_distance(missing_model):
     # Masked difference [3,-4,0] projects to [-1,-4], with squared length 17, not 289.
     expected = [[17]]

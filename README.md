@@ -39,8 +39,6 @@ model input validation or a general-purpose metric API test suite.
 Strict expected failures record these existing defects; an unexpected pass
 requires updating the regression test:
 
-- Both local relevance modes square the NaN quadratic distance a second time:
-  differences `[3, -2, NaN]` with identity relevance give `169` instead of `13`.
 - Global and local adaptive gradients can be nonzero for missing input
   coordinates when relevance has off-diagonal terms, although the masked
   distance is independent of those prototype coordinates.
