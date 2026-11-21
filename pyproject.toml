@@ -8,6 +8,7 @@ version = "0.3.0"
 description = "A collection of Learning Vector Quantization algorithms compatible with scikit-learn"
 readme = "README.md"
 license = "BSD-3-Clause"
+license-files = ["LICENSE"]
 requires-python = ">=3.11"
 
 maintainers = [{ name = "Rick van Veen", email = "r.van.veen133@gmail.com" }]

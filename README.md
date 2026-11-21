@@ -11,23 +11,6 @@ Documentation with install instruction and examples can be found here: https://s
 If you find any bugs or have any other suggestions on how to improve the code then please use the issue tracker on
 github (https://github.com/rickvanveen/sklvq/issues).
 
-See [CI overview](docs/ci.md) for the workflow diagram and local check commands.
-
-## Development
-
-Install [uv](https://docs.astral.sh/uv/getting-started/installation/), then:
-
-```sh
-uv sync --locked --extra tests
-uv run --locked --extra tests pytest tests/
-uv run --locked ruff check src/sklvq/ examples/ tests/
-uv run --locked ruff format --check src/sklvq/ examples/ tests/
-```
-
-The default development Python is 3.12; CI also tests 3.11. Commit `uv.lock`
-when changing dependencies. Build packages with `uv build`, and run the
-documentation examples with `uv run --locked --extra docs make -C docs html`.
-
 Please cite the following publication if you decide using the code in your research
 
 ```

@@ -24,7 +24,7 @@ Sklvq can be installed using pip::
 
     pip install sklvq
 
-Another option is to clone the repository and install it with pip::
+Another option is to clone the repository and run the setup.py file. The following (terminal/cmd) commands can be used to clone the repository and install sklvq with all dependencies::
 
     git clone https://github.com/rickvanveen/sklvq.git
     cd sklvq
@@ -63,34 +63,33 @@ The package can be cloned using the following commands::
     git clone https://github.com/rickvanveen/sklvq.git
     cd sklvq
 
-Install `uv <https://docs.astral.sh/uv/getting-started/installation/>`_, then
-create the development environment from the committed lockfile::
+Using the following addition to the `pip` command, one can install the dependencies automatically::
 
-    uv sync --locked --extra tests --extra docs
+    pip install .[tests]
 
-This installs the package, test and documentation dependencies, and Ruff.
-The default development Python is 3.12; CI also tests Python 3.11.
-After changing dependencies, run ``uv lock`` and commit ``uv.lock``.
+or in order to be able to build the documentation::
+
+    pip install .[docs]
+
+or simply by passing them at the same time (note the lack of whitespace)::
+
+    pip install .[tests,docs]
 
 
 Running Tests
 -------------
 
-Run tests from the repository root::
+Every module contains its own test folder. Where every file is prepended with `test_`. The tests
+can be run by using the following command when in the sklvq module folder::
 
-    uv run --locked --extra tests pytest tests/
-
-Check lint and formatting without changing files::
-
-    uv run --locked ruff check src/sklvq/ examples/ tests/
-    uv run --locked ruff format --check src/sklvq/ examples/ tests/
+    pytest .
 
 Building Docs
 -------------
 
-Build HTML documentation and execute the gallery examples from the repository root::
+The html docs can be build using the following command (in the docs folder)::
 
-    uv run --locked --extra docs make -C docs html
+    make html
 
 This will generate a build folder from which the index.html can be opened locally. Other options
 are also available see the 'Makefile' in the doc folder.
