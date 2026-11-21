@@ -20,7 +20,7 @@ python -m pytest
 
 Default collection is restricted to `tests/` (including doctests).
 
-### Known distance defects
+### Distance tests
 
 Correctness tests use explicit examples with hand-calculated expected distances
 and missing-input gradients. Finite-input gradients are checked by central finite
@@ -36,15 +36,11 @@ ordering, local matrix selection, rectangular factors, missing observations and
 preservation of caller-owned arrays after each distance/gradient call. Local tests
 also cover one-sample batches used by stochastic training. It does not duplicate
 model input validation or a general-purpose metric API test suite.
-Strict expected failures record these existing defects; an unexpected pass
-requires updating the regression test:
+Regression tests cover missing-value distance formulas, prototype-local matrix
+selection and zero prototype updates for missing coordinates.
 
-- Global and local adaptive gradients can be nonzero for missing input
-  coordinates when relevance has off-diagonal terms, although the masked
-  distance is independent of those prototype coordinates.
-
-The Euclidean gradient docstring also describes the squared-distance derivative.
-These implementation/documentation defects are left for a separate PR.
+Known documentation issue: the Euclidean gradient docstring describes the
+squared-distance derivative.
 
 Please cite the following publication if you decide using the code in your research
 

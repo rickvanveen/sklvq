@@ -85,25 +85,15 @@ def test_missing_gradient(missing_model):
     distance = AdaptiveSquaredEuclidean()
     data = np.array([[3, -4, np.nan], [np.nan, np.nan, np.nan]])
 
-    # Check observed prototype coordinates separately from the known missing-coordinate defect.
     # Columns: prototype x,y,z; then omega row 0 and row 1. The all-missing sample supplies only zeros.
     # Observed prototype entries come from -2*Omega.T@[-1,-4]; omega uses 2*outer([-1,-4], [3,-4,0]).
     expected_gradient = np.array([[2, 10, 0, -6, 8, 0, -24, 32, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0]])
     actual_gradient = distance.gradient(data, missing_model, 0)
     assert actual_gradient.shape == expected_gradient.shape
-    assert_allclose(actual_gradient[:, :2], expected_gradient[:, :2])
-    assert_allclose(actual_gradient[:, 3:], expected_gradient[:, 3:])
+    assert_allclose(actual_gradient, expected_gradient)
 
     # With nothing observed, the distance and every derivative must be zero.
     expected_all_missing_distance = [[0]]
     actual_all_missing_distance = distance(data[1:], missing_model)
     assert_array_equal(actual_all_missing_distance, expected_all_missing_distance)
     assert_array_equal(actual_gradient[1], expected_gradient[1])
-
-
-@pytest.mark.xfail(strict=True, raises=AssertionError, reason="Adaptive gradient is nonzero in a missing coordinate")
-def test_missing_coordinate_gradient(missing_model):
-    # The masked distance cannot depend on the last prototype coordinate, so its derivative must be zero.
-    expected_missing_derivative = [0]
-    actual = AdaptiveSquaredEuclidean().gradient(np.array([[3, -4, np.nan]]), missing_model, 0)
-    assert_array_equal(actual[:, 2], expected_missing_derivative)

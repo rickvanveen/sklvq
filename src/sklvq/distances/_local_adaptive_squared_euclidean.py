@@ -144,9 +144,14 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
         difference = data - prototype
 
         if model.force_all_finite == "allow-nan":
-            difference[np.isnan(difference)] = 0.0
+            missing = np.isnan(difference)
+            difference[missing] = 0.0
 
         _prototype_gradient(difference, omega, out=distance_gradient[:, : prototype.size])
+
+        # Cross-feature relevance must not create updates for unobserved coordinates.
+        if model.force_all_finite == "allow-nan":
+            distance_gradient[:, : prototype.size][missing] = 0.0
 
         distance_gradient_omega_view = distance_gradient[:, prototype.size :].reshape((num_samples, *omega.shape))
 

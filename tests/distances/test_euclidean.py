@@ -87,7 +87,7 @@ def test_missing_gradient(distance_type, power):
     assert actual.shape == expected.shape
     assert_allclose(actual, expected)
 
-    # Check the all-missing distance outside the partial-NaN expected failure.
+    # With nothing observed, the distance is zero too.
     expected_all_missing = [[0]]
     actual_all_missing = distance(data[1:], model)
     assert_array_equal(actual_all_missing, expected_all_missing)
