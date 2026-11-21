@@ -1,1 +1,6 @@
 line-length = 120
+target-version = "py311"
+
+[lint]
+# Keep the existing basic error checks explicit across Ruff upgrades.
+select = ["E4", "E7", "E9", "F"]

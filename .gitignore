@@ -52,6 +52,7 @@ htmlcov/
 .cache
 nosetests.xml
 coverage.xml
+junit.xml
 *.cover
 .hypothesis/
 
@@ -85,9 +86,6 @@ target/
 # Jupyter Notebook
 .ipynb_checkpoints
 
-# pyenv
-.python-version
-
 # celery beat schedule file
 celerybeat-schedule
 
@@ -120,9 +118,6 @@ ENV/
 
 .idea/
 .idea/*
-
-scripts/
-scripts/*
 
 sg_execution_times.rst
 .ruff_cache

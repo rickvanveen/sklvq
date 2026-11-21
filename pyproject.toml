@@ -1,26 +1,25 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["uv_build>=0.13.5,<0.14"]
+build-backend = "uv_build"
 
 [project]
 name = "sklvq"
-dynamic = ["version"]
+version = "0.3.0"
 description = "A collection of Learning Vector Quantization algorithms compatible with scikit-learn"
 readme = "README.md"
 license = "BSD-3-Clause"
+license-files = ["LICENSE"]
 requires-python = ">=3.11"
 
 maintainers = [{ name = "Rick van Veen", email = "r.van.veen133@gmail.com" }]
 classifiers = [
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved",
     "Operating System :: MacOS",
     "Operating System :: Microsoft :: Windows",
     "Operating System :: POSIX",
     "Operating System :: Unix",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Topic :: Scientific/Engineering",
@@ -41,58 +40,25 @@ tests = ["coverage", "pandas", "pytest", "pytest-cov"]
 
 [project.urls]
 Homepage = "https://github.com/rickvanveen/sklvq"
-Download = "https://github.com/rickvanveen/sklvq"
-Documentation = "https://github.com/rickvanveen/sklvq"
-Issues = "https://github.com/rickvanveen/sklvq"
+Documentation = "https://sklvq.readthedocs.io/en/latest/"
+Issues = "https://github.com/rickvanveen/sklvq/issues"
 Source = "https://github.com/rickvanveen/sklvq"
 
-[tool.hatch.version]
-path = "src/sklvq/__about__.py"
-
-[tool.hatch.envs.docs]
-features = ["docs"]
-
-[tool.hatch.envs.hatch-static-analysis]
-config-path = "ruff.toml"
-
-[tool.ruff]
-extend = "ruff.toml"
-target-version = "py311"
-
-# [tool.hatch.envs.hatch-test]
-# features = ["tests"]
-
-[tool.hatch.envs.test]
-features = ["tests"]
-
-[tool.hatch.envs.test.scripts]
-test = "pytest tests"   
-
-[[tool.hatch.envs.test.matrix]]
-python = ["3.10", "3.11", "3.12"]
+[dependency-groups]
+dev = ["ruff"]
 
 [tool.coverage.run]
-source_pkgs = ["sklvq", "tests"]
+source_pkgs = ["sklvq"]
 branch = true
 parallel = true
 omit = ["src/sklvq/__about__.py"]
 
 [tool.coverage.paths]
 sklvq = ["src/sklvq", "*/sklvq/src/sklvq"]
-tests = ["tests", "*/sklvq/tests"]
 
 [tool.coverage.report]
 exclude_lines = [
-    "no cov",
-    "if __name__ == .__main__.:",
     "if TYPE_CHECKING:",
     "raise NotImplementedError",
     "pragma: no cover",
-    "def __repr__",
-    "if self.debug:",
-    "if settings.DEBUG",
-    "raise AssertionError",
-    "if 0:",
-    "if self.verbose:",
-    "show_missing = True",
 ]
