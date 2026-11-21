@@ -25,6 +25,9 @@ jobs:
       - run: uv run --no-sync ruff check src/sklvq/ examples/ tests/
   test:
     name: Test (Python ${{ matrix.python-version }})
+    permissions:
+      contents: read
+      id-token: write
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -41,11 +44,15 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v7.1.1
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+          use_oidc: true
+          fail_ci_if_error: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          disable_search: true
           files: coverage.xml
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
-        uses: codecov/test-results-action@v1
+        uses: codecov/codecov-action@v7.1.1
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+          use_oidc: true
+          report_type: test_results
+          disable_search: true
           files: junit.xml
