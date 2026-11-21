@@ -8,6 +8,35 @@ from sklearn.model_selection import (
 from sklearn.pipeline import make_pipeline
 
 from sklvq import LGMLVQ
+from tests.distances._utils import finite_difference
+
+
+@pytest.mark.parametrize("localization", ["class", "prototypes"])
+def test_objective_gradient_matrix_selection(localization):
+    """Check distance derivatives and their accumulation into the real model's flat parameter buffer."""
+    prototypes = np.array([[0, 0], [3, 0], [0, 4], [3, 4]], dtype=float)
+    labels = np.array([0, 0, 1, 1])
+    factors = np.array([[[1, 0], [0, 2]], [[2, 0], [0, 1]], [[3, 0], [0, 1]], [[1, 0], [0, 1]]])
+
+    # Initialize real model state, stopping before training can change the controlled example.
+    model = LGMLVQ(
+        prototype_n_per_class=2,
+        relevance_localization=localization,
+        relevance_normalization=False,
+        activation_type="identity",
+        random_state=0,
+        solver_params={"callback": lambda state: True},
+    ).fit(prototypes, labels)
+    model.set_model_params((prototypes, factors[:2] if localization == "class" else factors))
+
+    # Multiple winners exercise both shared class factors and distinct same-class prototype factors.
+    data = np.array([[1, 2], [-2, 1], [4, 3]], dtype=float)
+    targets = np.array([0, 0, 1])
+    expected_gradient = finite_difference(lambda: model._objective(model, data, targets), [model.get_variables()])[0]
+    actual_gradient = model._objective.gradient(model, data, targets)
+
+    assert actual_gradient.shape == expected_gradient.shape
+    np.testing.assert_allclose(actual_gradient, expected_gradient, rtol=2e-5, atol=2e-7)
 
 
 def test_lgmlvq_hyper_params():

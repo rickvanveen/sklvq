@@ -100,20 +100,9 @@ def test_class_local_gradient(class_model):
     assert_allclose(actual_gradient, expected_gradient, rtol=2e-5, atol=2e-7)
 
 
-@pytest.mark.parametrize(
-    "i_prototype",
-    [
-        0,
-        pytest.param(
-            3,
-            marks=pytest.mark.xfail(
-                strict=True, raises=AssertionError, reason="Local gradient indexes omega by class instead of prototype"
-            ),
-        ),
-    ],
-)
+@pytest.mark.parametrize("i_prototype", [0, 3])
 def test_prototype_local_gradient(prototype_model, i_prototype):
-    """Check each selected factor's derivatives; prototype 3 exposes the known class-indexing defect."""
+    """Check each selected factor's derivatives; prototype 3 distinguishes prototype from class indexing."""
     distance = LocalAdaptiveSquaredEuclidean()
     data = np.array([[1, 2], [-2, 1]], dtype=float)
 

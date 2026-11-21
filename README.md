@@ -44,8 +44,6 @@ requires updating the regression test:
   `[3, -2, NaN]`, they return `1` instead of `sqrt(13)` and `13`, respectively.
 - Both local relevance modes square the NaN quadratic distance a second time:
   the same differences with identity relevance give `169` instead of `13`.
-- Prototype-local gradients select omega by class label instead of prototype
-  index. Distinct matrices and multiple prototypes per class expose this.
 - Global and local adaptive gradients can be nonzero for missing input
   coordinates when relevance has off-diagonal terms, although the masked
   distance is independent of those prototype coordinates.

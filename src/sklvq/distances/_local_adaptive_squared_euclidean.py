@@ -132,7 +132,8 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
         (prototypes, omegas) = model.get_model_params()
 
         prototype = prototypes[i_prototype, :]
-        omega = omegas[model.prototypes_labels_[i_prototype], :, :]
+        i_omega = i_prototype if model.relevance_localization == "prototypes" else model.prototypes_labels_[i_prototype]
+        omega = omegas[i_omega, :, :]
 
         num_samples, _ = data.shape
 
