@@ -39,11 +39,8 @@ model input validation or a general-purpose metric API test suite.
 Strict expected failures record these existing defects; an unexpected pass
 requires updating the regression test:
 
-- `Euclidean` and `SquaredEuclidean` with `force_all_finite="allow-nan"` square
-  the sum of observed differences rather than sum their squares. For differences
-  `[3, -2, NaN]`, they return `1` instead of `sqrt(13)` and `13`, respectively.
 - Both local relevance modes square the NaN quadratic distance a second time:
-  the same differences with identity relevance give `169` instead of `13`.
+  differences `[3, -2, NaN]` with identity relevance give `169` instead of `13`.
 - Global and local adaptive gradients can be nonzero for missing input
   coordinates when relevance has off-diagonal terms, although the masked
   distance is independent of those prototype coordinates.

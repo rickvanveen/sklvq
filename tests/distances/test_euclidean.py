@@ -62,7 +62,6 @@ def test_gradient(distance_type, power):
     assert_array_equal(actual_at_coincidence, expected_at_coincidence)
 
 
-@pytest.mark.xfail(strict=True, raises=AssertionError, reason="NaN distances sum differences before squaring")
 def test_missing_distance(distance_type, power):
     # Opposite signs expose square-of-sum errors; masking leaves a 3-4-5 triangle.
     model = make_distance_model([[0, 0, 0]])
