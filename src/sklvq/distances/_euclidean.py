@@ -100,4 +100,4 @@ class Euclidean(DistanceBaseClass):
 
 def _nan_euclidean(u: np.ndarray, v: np.ndarray) -> np.ndarray:
     # Euclidean distance between two vectors u and v, ignoring nans.
-    return np.sqrt(np.nansum(u - v) ** 2)
+    return np.sqrt(np.nansum((u - v) ** 2))

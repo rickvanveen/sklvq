@@ -98,7 +98,8 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
                     **{kwarg_str: model._compute_lambda(omega)},  # noqa: SLF001
                 )
 
-        return cdists**2
+        # The missing-value helper already returns the squared distance.
+        return cdists if model.force_all_finite == "allow-nan" else cdists**2
 
     def gradient(self, data: np.ndarray, model: "LGMLVQ", i_prototype: int) -> np.ndarray:
         r"""Computes the gradient of the localized adaptive squared euclidean distance function
@@ -132,7 +133,8 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
         (prototypes, omegas) = model.get_model_params()
 
         prototype = prototypes[i_prototype, :]
-        omega = omegas[model.prototypes_labels_[i_prototype], :, :]
+        i_omega = i_prototype if model.relevance_localization == "prototypes" else model.prototypes_labels_[i_prototype]
+        omega = omegas[i_omega, :, :]
 
         num_samples, _ = data.shape
 
@@ -142,9 +144,14 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
         difference = data - prototype
 
         if model.force_all_finite == "allow-nan":
-            difference[np.isnan(difference)] = 0.0
+            missing = np.isnan(difference)
+            difference[missing] = 0.0
 
         _prototype_gradient(difference, omega, out=distance_gradient[:, : prototype.size])
+
+        # Cross-feature relevance must not create updates for unobserved coordinates.
+        if model.force_all_finite == "allow-nan":
+            distance_gradient[:, : prototype.size][missing] = 0.0
 
         distance_gradient_omega_view = distance_gradient[:, prototype.size :].reshape((num_samples, *omega.shape))
 

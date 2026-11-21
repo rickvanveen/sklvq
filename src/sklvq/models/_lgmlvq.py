@@ -409,7 +409,8 @@ class LGMLVQ(LVQBaseClass):
             partial_gradient[:n_features],
             out=prots_view[i_prototype, :],
         )
-        omega_view = self.to_omega(gradient)[self.prototypes_labels_[i_prototype], :, :].ravel()
+        i_omega = i_prototype if self.relevance_localization == "prototypes" else self.prototypes_labels_[i_prototype]
+        omega_view = self.to_omega(gradient)[i_omega, :, :].ravel()
 
         np.add(omega_view, partial_gradient[n_features:], out=omega_view)
 
