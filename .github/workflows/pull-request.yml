@@ -1,67 +1,58 @@
+name: CI
+
 on:
   push:
-    branches: "main"
+    branches: ["main"]
   pull_request:
-    branches: "main"
-
+    branches: ["main"]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
-  format:
-    name: Format
-    runs-on: ubunt-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: 3.12
-      - name: "Install Hatch"
-        run: |
-          pipx install hatch
-      - name: "Format"
-        run: |
-          hatch fmt --formatter src/sklvq/ examples/ tests/ -- --check
-  lint:
-    name: Lint
+  quality:
+    name: Ruff
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.4.0
         with:
-          python-version: 3.12
-      - name: "Install Hatch"
-        run: |
-          pipx install hatch
-      - name: "Lint"
-        run: |
-          hatch fmt --linter src/sklvq/ -- --output-format=github
+          version: "0.13.5"
+          python-version: "3.12"
+      - run: uv sync --locked --only-group dev
+      - run: uv run --no-sync ruff format --check src/sklvq/ examples/ tests/
+      - run: uv run --no-sync ruff check src/sklvq/ examples/ tests/
   test:
-    name: Test
+    name: Test (Python ${{ matrix.python-version }})
+    permissions:
+      contents: read
+      id-token: write
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11", "3.12"]
+        python-version: ["3.11", "3.12"]
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.4.0
         with:
+          version: "0.13.5"
           python-version: ${{ matrix.python-version }}
-      - name: "Set env variables for Hatch"
-        run: |
-          echo "HATCH_PYTHON=$(which python)$ext" >> $GITHUB_ENV
-      - name: "Install Hatch"
-        run: |
-          pipx install hatch
-      - name: "Test"
-        run: |
-          hatch run +py=${{ matrix.python-version }} test:pytest --cov=sklvq --junitxml=junit.xml tests/
+      - run: uv sync --locked --no-dev --extra tests
+      - run: uv run --no-sync pytest --cov=src/sklvq --cov-report=xml --junitxml=junit.xml tests/
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v7.1.1
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+          use_oidc: true
+          fail_ci_if_error: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          disable_search: true
+          files: coverage.xml
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
-        uses: codecov/test-results-action@v1
+        uses: codecov/codecov-action@v7.1.1
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+          use_oidc: true
+          report_type: test_results
+          disable_search: true
+          files: junit.xml

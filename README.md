@@ -1,8 +1,8 @@
-[![ReadTheDocs](https://readthedocs.org/projects/sklvq/badge/?version=latest)](https://sklvq.readthedocs.io/en/latest/?badge=latest)
-[![CodeCov](https://codecov.io/gh/rickvanveen/sklvq/branch/develop/graph/badge.svg)](https://codecov.io/gh/rickvanveen/sklvq)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![CodeFactor](https://www.codefactor.io/repository/github/rickvanveen/sklvq/badge/develop)](https://www.codefactor.io/repository/github/rickvanveen/sklvq/overview/develop)
-[![CodeQL](https://github.com/rickvanveen/sklvq/workflows/CodeQL/badge.svg)](https://github.com/rickvanveen/sklvq/actions?query=workflow%3ACodeQL)
+[![Read the Docs](https://app.readthedocs.org/projects/sklvq/badge/?version=latest)](https://sklvq.readthedocs.io/en/latest/)
+[![CodeCov](https://codecov.io/gh/rickvanveen/sklvq/branch/main/graph/badge.svg)](https://codecov.io/gh/rickvanveen/sklvq)
+[![CI](https://github.com/rickvanveen/sklvq/actions/workflows/pull-request.yml/badge.svg?branch=main)](https://github.com/rickvanveen/sklvq/actions/workflows/pull-request.yml)
+[![CodeFactor](https://www.codefactor.io/repository/github/rickvanveen/sklvq/badge/main)](https://www.codefactor.io/repository/github/rickvanveen/sklvq/overview/main)
+[![CodeQL](https://github.com/rickvanveen/sklvq/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/rickvanveen/sklvq/actions/workflows/codeql.yml)
 
 # sklvq: Scikit Learning Vector Quantization
 
@@ -14,11 +14,8 @@ github (https://github.com/rickvanveen/sklvq/issues).
 ## Tests
 
 ```sh
-python -m pip install -e '.[tests]'
-python -m pytest
+uv run --locked --extra tests pytest tests/
 ```
-
-Default collection is restricted to `tests/` (including doctests).
 
 ### Distance tests
 
