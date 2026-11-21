@@ -11,12 +11,6 @@ Documentation with install instruction and examples can be found here: https://s
 If you find any bugs or have any other suggestions on how to improve the code then please use the issue tracker on
 github (https://github.com/rickvanveen/sklvq/issues).
 
-## Tests
-
-```sh
-uv run --locked --extra tests pytest tests/
-```
-
 Please cite the following publication if you decide using the code in your research
 
 ```
