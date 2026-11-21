@@ -1,3 +1,0 @@
-fixes:
-  - "::sklvq/"         # move root so for codecov.io "sklvq/" => "sklvq/sklvq/"
-  - disable_default_path_fixes: false

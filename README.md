@@ -1,7 +1,7 @@
 [![ReadTheDocs](https://readthedocs.org/projects/sklvq/badge/?version=latest)](https://sklvq.readthedocs.io/en/latest/?badge=latest)
-[![CodeCov](https://codecov.io/gh/rickvanveen/sklvq/branch/develop/graph/badge.svg)](https://codecov.io/gh/rickvanveen/sklvq)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![CodeFactor](https://www.codefactor.io/repository/github/rickvanveen/sklvq/badge/develop)](https://www.codefactor.io/repository/github/rickvanveen/sklvq/overview/develop)
+[![CodeCov](https://codecov.io/gh/rickvanveen/sklvq/branch/main/graph/badge.svg)](https://codecov.io/gh/rickvanveen/sklvq)
+[![CI](https://github.com/rickvanveen/sklvq/actions/workflows/pull-request.yml/badge.svg?branch=main)](https://github.com/rickvanveen/sklvq/actions/workflows/pull-request.yml)
+[![CodeFactor](https://www.codefactor.io/repository/github/rickvanveen/sklvq/badge/main)](https://www.codefactor.io/repository/github/rickvanveen/sklvq/overview/main)
 [![CodeQL](https://github.com/rickvanveen/sklvq/workflows/CodeQL/badge.svg)](https://github.com/rickvanveen/sklvq/actions?query=workflow%3ACodeQL)
 
 # sklvq: Scikit Learning Vector Quantization
@@ -10,6 +10,23 @@ Documentation with install instruction and examples can be found here: https://s
 
 If you find any bugs or have any other suggestions on how to improve the code then please use the issue tracker on
 github (https://github.com/rickvanveen/sklvq/issues).
+
+See [CI overview](docs/ci.md) for the workflow diagram and local check commands.
+
+## Development
+
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/), then:
+
+```sh
+uv sync --locked --extra tests
+uv run --locked --extra tests pytest tests/
+uv run --locked ruff check src/sklvq/ examples/ tests/
+uv run --locked ruff format --check src/sklvq/ examples/ tests/
+```
+
+The default development Python is 3.12; CI also tests 3.11. Commit `uv.lock`
+when changing dependencies. Build packages with `uv build`, and run the
+documentation examples with `uv run --locked --extra docs make -C docs html`.
 
 Please cite the following publication if you decide using the code in your research
 
