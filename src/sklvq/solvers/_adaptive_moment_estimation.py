@@ -102,13 +102,13 @@ class AdaptiveMomentEstimation(SolverBaseClass):
             raise ValueError(msg)
         self.max_runs = max_runs
 
-        if beta1 <= 0 or beta1 > 1.0:
-            msg = f"{type(self).__name__}:  Expected beta1 to be > 0 and <= 1.0 but got beta1 = {beta1}"
+        if not 0 < beta1 < 1:
+            msg = f"{type(self).__name__}: Expected 0 < beta1 < 1, got {beta1}"
             raise ValueError(msg)
         self.beta1 = beta1
 
-        if beta2 <= 0 or beta2 > 1.0:
-            msg = f"{type(self).__name__}:  Expected beta1 to be > 0 and <= 1.0 but got beta2 = {beta2}"
+        if not 0 < beta2 < 1:
+            msg = f"{type(self).__name__}: Expected 0 < beta2 < 1, got {beta2}"
             raise ValueError(msg)
         self.beta2 = beta2
 

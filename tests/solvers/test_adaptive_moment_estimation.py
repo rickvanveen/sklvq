@@ -5,7 +5,7 @@ from sklvq.objectives import GeneralizedLearningObjective
 from sklvq.solvers._adaptive_moment_estimation import AdaptiveMomentEstimation
 
 
-def test_steepest_gradient_descent():
+def test_invalid_adam_parameters():
     objective = GeneralizedLearningObjective(
         activation_type="identity",
         activation_params=None,
