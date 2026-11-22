@@ -63,7 +63,10 @@ class Euclidean(DistanceBaseClass):
         prototype:
 
             .. math::
-                \frac{\partial d}{\partial \mathbf{w}_i} = -2 \cdot (\mathbf{x} - \mathbf{w}_i)
+                \frac{\partial d}{\partial \mathbf{w}_i} =
+                \frac{\mathbf{w}_i - \mathbf{x}}{\lVert \mathbf{x} - \mathbf{w}_i \rVert_2}
+
+        At zero distance, the method returns a zero gradient.
 
         Parameters
         ----------

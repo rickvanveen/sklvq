@@ -52,7 +52,7 @@ class Swish(ActivationBaseClass):
         return _swish(x, self.beta)
 
     def gradient(self, x: np.ndarray) -> np.ndarray:
-        r"""Implements the sigmoid function's gradient:
+        r"""Implements the Swish function's gradient:
             .. math::
 
                 \frac{\partial f}{\partial \mathbf{x}} = \beta \cdot f(\mathbf{x}) + (\frac{1}{1 + e^{-\beta \cdot \mathbf{x}}}) \cdot (1 - \beta \cdot f(\mathbf{x}))
