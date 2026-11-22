@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import numpy as np
+from scipy.special import expit
 
 from sklvq.activations._base import ActivationBaseClass
 
@@ -49,10 +50,10 @@ class SoftPlus(ActivationBaseClass):
         ndarray of shape (x.shape)
             Elementwise evaluation of the soft+ function.
         """
-        return np.log(1 + np.exp(self.beta * x))
+        return np.logaddexp(0, self.beta * x)
 
     def gradient(self, x: np.ndarray) -> np.ndarray:
-        r"""Implements the sigmoid function's gradient:
+        r"""Implements the soft+ function's gradient:
             .. math::
 
                 \frac{\partial f}{\partial \mathbf{x}} = \frac{\beta \cdot e^{\beta \cdot \mathbf{x}}}{1 + e^{\beta \cdot \mathbf{x}}}
@@ -67,5 +68,4 @@ class SoftPlus(ActivationBaseClass):
             Elementwise evaluation of the soft+ function's gradient.
         """
 
-        exp = np.exp(self.beta * x)
-        return (self.beta * exp) / (1 + exp)
+        return self.beta * expit(self.beta * x)

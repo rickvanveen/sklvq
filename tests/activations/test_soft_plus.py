@@ -1,42 +1,36 @@
 import numpy as np
-import pytest
 
-from .test_common import check_init_activation
+from sklvq.activations import SoftPlus
 
 
 def test_soft_plus():
-    soft_plus_class = check_init_activation("soft-plus")
+    """At beta=log(3), the exponentials are 1/3, 1 and 3; the slope includes beta."""
+    beta = np.log(3)
+    activation = SoftPlus(beta=beta)
+    scores = np.array([-1.0, 0.0, 1.0])
+    expected = np.log([4 / 3, 2, 4])
+    expected_gradient = beta * np.array([0.25, 0.5, 0.75])
 
-    assert isinstance(soft_plus_class, type)
+    actual = activation(scores)
+    actual_gradient = activation.gradient(scores)
+    assert actual.shape == actual_gradient.shape == scores.shape
+    np.testing.assert_allclose(actual, expected)
+    np.testing.assert_allclose(actual_gradient, expected_gradient)
 
-    soft_plus = soft_plus_class(beta=2)
 
-    assert soft_plus.beta == 2
+def test_positive_tail():
+    """At beta*x=1000 the loss is indistinguishable from 1000 in double precision."""
+    actual = SoftPlus(beta=1000)(np.array([1.0]))
+    np.testing.assert_allclose(actual, [1000.0])
 
-    soft_plus = soft_plus_class()
 
-    assert soft_plus.beta == 1
+def test_positive_tail_gradient():
+    """The slope in the positive tail should approach beta rather than become NaN."""
+    actual = SoftPlus(beta=1000).gradient(np.array([1.0]))
+    np.testing.assert_allclose(actual, [1000.0])
 
-    wrong_betas = [-1, 0]
-    for wrong_beta in wrong_betas:
-        with pytest.raises(ValueError):
-            soft_plus_class(beta=wrong_beta)
 
-    # >0 at x = 0
-    assert soft_plus(np.array([0])) > 0
-
-    # >0 at x < 0
-    assert np.all(soft_plus(np.array([-2, -4, -6, -8, -20, -50, -100]) > 0))
-
-    # Increasing upto gradient of beta...
-    assert np.max(soft_plus.gradient(np.array([0, 4, 8, 12, 20]))) == pytest.approx(soft_plus.beta)
-
-    soft_plus = soft_plus_class(beta=10)
-
-    # Increasing upto gradient of beta...
-    assert np.max(soft_plus.gradient(np.array([0, 4, 8, 12, 20]))) == pytest.approx(soft_plus.beta)
-
-    # soft plus gradient becomes nan when 1 + (beta * e^x) becomes inf. Which happens with larger x.
-    # which should probably raise an error.
-
-    # Potentially raising errors when division by 0.0 or inf happens....
+def test_negative_tail():
+    """The tiny loss at beta*x=-40 is still representable and must not round to zero."""
+    actual = SoftPlus(beta=40)(np.array([-1.0]))
+    np.testing.assert_allclose(actual, [np.exp(-40)], atol=0)

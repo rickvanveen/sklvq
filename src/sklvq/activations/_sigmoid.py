@@ -66,5 +66,6 @@ class Sigmoid(ActivationBaseClass):
         ndarray of shape (x.shape)
            Elementwise evaluation of the sigmoid function's gradient.
         """
-        exp = np.exp(self.beta * x)
+        # The derivative is symmetric; the negative exponent avoids overflow in either tail.
+        exp = np.exp(-np.abs(float(self.beta) * x))
         return np.asarray((self.beta * exp) / (exp + 1.0) ** 2)
