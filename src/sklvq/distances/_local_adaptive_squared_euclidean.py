@@ -18,7 +18,7 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
 
     Parameters
     ----------
-    force_all_finite  : {True, False, "allow-nan"}
+    ensure_all_finite  : {True, False, "allow-nan"}
         Parameter to indicate that NaNLVQ distance variant should be used. If true no nans are
         allowed. If False or "allow-nan" nans are allowed.
 
@@ -70,7 +70,7 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
         distance_function = "mahalanobis"
         kwarg_str = "VI"
 
-        if model.force_all_finite == "allow-nan":
+        if model.ensure_all_finite == "allow-nan":
             distance_function = _nan_mahalanobis
             # RM because VI is filtered out of the  kwargs by cdist...
             kwarg_str = "RM"
@@ -99,7 +99,7 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
                 )
 
         # The missing-value helper already returns the squared distance.
-        return cdists if model.force_all_finite == "allow-nan" else cdists**2
+        return cdists if model.ensure_all_finite == "allow-nan" else cdists**2
 
     def gradient(self, data: np.ndarray, model: "LGMLVQ", i_prototype: int) -> np.ndarray:
         r"""Computes the gradient of the localized adaptive squared euclidean distance function
@@ -143,14 +143,14 @@ class LocalAdaptiveSquaredEuclidean(DistanceBaseClass):
         # Difference we need for both the prototype and omega part.
         difference = data - prototype
 
-        if model.force_all_finite == "allow-nan":
+        if model.ensure_all_finite == "allow-nan":
             missing = np.isnan(difference)
             difference[missing] = 0.0
 
         _prototype_gradient(difference, omega, out=distance_gradient[:, : prototype.size])
 
         # Cross-feature relevance must not create updates for unobserved coordinates.
-        if model.force_all_finite == "allow-nan":
+        if model.ensure_all_finite == "allow-nan":
             distance_gradient[:, : prototype.size][missing] = 0.0
 
         distance_gradient_omega_view = distance_gradient[:, prototype.size :].reshape((num_samples, *omega.shape))

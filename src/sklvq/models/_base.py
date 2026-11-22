@@ -7,7 +7,7 @@ import numpy as np
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.utils import check_random_state
 from sklearn.utils.multiclass import check_classification_targets
-from sklearn.utils.validation import check_array, check_is_fitted, check_scalar
+from sklearn.utils.validation import check_is_fitted, check_scalar, validate_data
 
 from sklvq import distances, solvers
 from sklvq._utils import init_class
@@ -22,7 +22,7 @@ ModelParamsType = np.ndarray
 ABC_METHOD_NOT_IMPL_MSG = "You should implement this!"
 
 
-class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):  # lgtm [py/conflicting-attributes]
+class LVQBaseClass(ClassifierMixin, BaseEstimator, ABC):
     """Learning Vector Quantization base class
 
     Abstract class for implementing LVQ models. It provides abstract methods with
@@ -65,7 +65,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):  # lgtm [py/conflicting
         prototype_init: str = "class-conditional-mean",
         prototype_n_per_class: int = 1,
         random_state: int | np.random.RandomState = None,
-        force_all_finite: str | bool = True,  # noqa: FBT002
+        ensure_all_finite: str | bool = True,  # noqa: FBT002
     ):
         self.distance_type = distance_type
         self.distance_params = distance_params
@@ -79,7 +79,12 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):  # lgtm [py/conflicting
         self.prototype_n_per_class = prototype_n_per_class
 
         self.random_state = random_state
-        self.force_all_finite = force_all_finite
+        self.ensure_all_finite = ensure_all_finite
+
+    def __sklearn_tags__(self):
+        tags = super().__sklearn_tags__()
+        tags.input_tags.allow_nan = self.ensure_all_finite == "allow-nan"
+        return tags
 
     ###########################################################################################
     # The "Getter" and "Setter" that are used by the solvers to set and get model params.
@@ -473,7 +478,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):  # lgtm [py/conflicting
         labels : ndarray of indexes to self.classes_
         """
         # Check X
-        X, labels = self._validate_data(X, labels, force_all_finite=self.force_all_finite)  # noqa: N806
+        X, labels = validate_data(self, X, labels, ensure_all_finite=self.ensure_all_finite)  # noqa: N806
 
         # Check classification targets
         check_classification_targets(labels)
@@ -622,7 +627,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):  # lgtm [py/conflicting
         check_is_fitted(self)
 
         # Input validation
-        X = check_array(X, force_all_finite=self.force_all_finite)  # noqa: N806
+        X = validate_data(self, X, reset=False, ensure_all_finite=self.ensure_all_finite)  # noqa: N806
 
         decision_values = self._multiclass_decision_function(X)
 
@@ -648,7 +653,7 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):  # lgtm [py/conflicting
         check_is_fitted(self)
 
         # Input validation
-        X = check_array(X, force_all_finite=self.force_all_finite)  # noqa: N806
+        X = validate_data(self, X, reset=False, ensure_all_finite=self.ensure_all_finite)  # noqa: N806
 
         # Between -1 and 1
         decision_values = self._multiclass_decision_function(X)
@@ -691,8 +696,6 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):  # lgtm [py/conflicting
         # Convert threshold to (normalized) decision function range [-1, 1]
         df_threshold = threshold * 2.0 - 1
 
-        # Input validation
-        # X = self._validate_data(X, force_all_finite=self.force_all_finite)
         decision_values = self.decision_function(X)
 
         if self.classes_.size == 2:  # noqa: PLR2004

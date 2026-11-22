@@ -16,7 +16,7 @@ class SquaredEuclidean(DistanceBaseClass):
 
     Parameters
     ----------
-    force_all_finite  : {True, False, "allow-nan"}
+    ensure_all_finite  : {True, False, "allow-nan"}
         Parameter to indicate that NaNLVQ distance variant should be used. If true no nans are
         allowed. If False or "allow-nan" nans are allowed.
 
@@ -54,7 +54,7 @@ class SquaredEuclidean(DistanceBaseClass):
             Evaluation of the distance between each sample and prototype of the model.
         """
         distance_function = "sqeuclidean"
-        if model.force_all_finite == "allow-nan":
+        if model.ensure_all_finite == "allow-nan":
             distance_function = _nan_squared_euclidean
 
         return cdist(data, model.prototypes_, distance_function)
@@ -84,7 +84,7 @@ class SquaredEuclidean(DistanceBaseClass):
         distance_gradient = -2 * (data - model.get_model_params()[i_prototype, :])
 
         # In case of nans replace nan values by 0.0
-        if model.force_all_finite == "allow-nan":
+        if model.ensure_all_finite == "allow-nan":
             distance_gradient[np.isnan(distance_gradient)] = 0.0
 
         # Return 1d array (the original memory)

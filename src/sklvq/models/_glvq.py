@@ -102,7 +102,7 @@ class GLVQ(LVQBaseClass):
         Set the random number generation for reproducibility purposes. Used in random offset of prototypes and
         shuffling of the data in the solvers.
 
-    force_all_finite : {True, "allow-nan"}, default=True
+    ensure_all_finite : {True, "allow-nan"}, default=True
         Whether to raise an error on np.inf, np.nan, pd.NA in array. The possibilities are:
 
         - True: Force all values of array to be finite.
@@ -142,7 +142,7 @@ class GLVQ(LVQBaseClass):
         prototype_init: str = "class-conditional-mean",
         prototype_n_per_class: int | np.ndarray = 1,
         random_state: int | np.random.RandomState = None,
-        force_all_finite: str | bool = True,  # noqa: FBT002
+        ensure_all_finite: str | bool = True,  # noqa: FBT002
     ):
         self.activation_type = activation_type
         self.activation_params = activation_params
@@ -159,7 +159,7 @@ class GLVQ(LVQBaseClass):
             prototype_init,
             prototype_n_per_class,
             random_state,
-            force_all_finite,
+            ensure_all_finite,
         )
 
     ###########################################################################################

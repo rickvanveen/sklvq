@@ -17,7 +17,7 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
 
     Parameters
     ----------
-    force_all_finite  : {True, False, "allow-nan"}
+    ensure_all_finite  : {True, False, "allow-nan"}
         Parameter to indicate that NaNLVQ distance variant should be used. If true no nans are
         allowed. If False or "allow-nan", nans are allowed.
 
@@ -62,7 +62,7 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
            Evaluation of the distance between each sample in the data and prototype of the model.
         """
 
-        if model.force_all_finite == "allow-nan":
+        if model.ensure_all_finite == "allow-nan":
             # RM because VI is filtered out of the  kwargs by cdist...
             return cdist(
                 data,
@@ -121,7 +121,7 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
 
         difference = data - prototype
 
-        if model.force_all_finite == "allow-nan":
+        if model.ensure_all_finite == "allow-nan":
             missing = np.isnan(difference)
             difference[missing] = 0.0
 
@@ -129,7 +129,7 @@ class AdaptiveSquaredEuclidean(DistanceBaseClass):
         _prototype_gradient(difference, omega, out=distance_gradient[:, : prototype.size])
 
         # Cross-feature relevance must not create updates for unobserved coordinates.
-        if model.force_all_finite == "allow-nan":
+        if model.ensure_all_finite == "allow-nan":
             distance_gradient[:, : prototype.size][missing] = 0.0
 
         # Omega view created in to hold the shape the _omega_gradient functions needs to output in.

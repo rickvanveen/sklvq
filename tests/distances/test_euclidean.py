@@ -29,7 +29,7 @@ def test_input_preservation(distance_type, power, missing):
     distance = distance_type()
     data = np.array([[3.0, np.nan if missing else 4.0]])
     model = make_distance_model([[0, 0], [3, 0]])
-    model.force_all_finite = "allow-nan" if missing else True
+    model.ensure_all_finite = "allow-nan" if missing else True
     originals = data.copy(), model.prototypes_.copy()
 
     # Check each call separately so later calls cannot hide an earlier modification.
@@ -65,7 +65,7 @@ def test_gradient(distance_type, power):
 def test_missing_distance(distance_type, power):
     # Opposite signs expose square-of-sum errors; masking leaves a 3-4-5 triangle.
     model = make_distance_model([[0, 0, 0]])
-    model.force_all_finite = "allow-nan"
+    model.ensure_all_finite = "allow-nan"
 
     expected = [[5]] if power == 1 else [[25]]
     actual = distance_type()(np.array([[3, -4, np.nan]]), model)
@@ -75,7 +75,7 @@ def test_missing_distance(distance_type, power):
 def test_missing_gradient(distance_type, power):
     """Check fixed derivatives for partial and entirely missing records, including zero-denominator handling."""
     model = make_distance_model([[0, 0, 0]])
-    model.force_all_finite = "allow-nan"
+    model.ensure_all_finite = "allow-nan"
     distance = distance_type()
     data = np.array([[3, -4, np.nan], [np.nan, np.nan, np.nan]])
 

@@ -3,7 +3,8 @@ from __future__ import annotations
 from typing import Tuple
 
 import numpy as np
-from sklearn.utils.validation import check_array, check_is_fitted
+from sklearn.base import TransformerMixin
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 from sklvq.models._base import LVQBaseClass
 from sklvq.objectives._generalized_learning_objective import GeneralizedLearningObjective
@@ -23,7 +24,7 @@ SOLVERS = [
 ]
 
 
-class GMLVQ(LVQBaseClass):
+class GMLVQ(TransformerMixin, LVQBaseClass):
     r"""Generalized Matrix Learning Vector Quantization
 
     This model uses the :class:`sklvq.objectives.GeneralizedLearningObjective` as its objective
@@ -120,7 +121,7 @@ class GMLVQ(LVQBaseClass):
         Set the random number generation for reproducibility purposes. Used in random offset of prototypes and
         shuffling of the data in the solvers. Potentially, also used in the random generation of relevance matrix.
 
-    force_all_finite : {True, "allow-nan"}, default=True
+    ensure_all_finite : {True, "allow-nan"}, default=True
         Whether to raise an error on np.inf, np.nan, pd.NA in array. The possibilities are:
 
         - True: Force all values of array to be finite.
@@ -196,7 +197,7 @@ class GMLVQ(LVQBaseClass):
         relevance_n_components: str | int = "all",
         relevance_regularization: float = 0,
         random_state: int | np.random.RandomState = None,
-        force_all_finite: str | bool = True,  # noqa: FBT002
+        ensure_all_finite: str | bool = True,  # noqa: FBT002
     ):
         self.activation_type = activation_type
         self.activation_params = activation_params
@@ -218,7 +219,7 @@ class GMLVQ(LVQBaseClass):
             prototype_init,
             prototype_n_per_class,
             random_state,
-            force_all_finite,
+            ensure_all_finite,
         )
 
     ###########################################################################################
@@ -584,7 +585,7 @@ class GMLVQ(LVQBaseClass):
         """
         check_is_fitted(self)
 
-        X = check_array(X)  # noqa: N806
+        X = validate_data(self, X, reset=False, ensure_all_finite=self.ensure_all_finite)  # noqa: N806
 
         if scale:
             return np.matmul(X, self.omega_hat_.T)
