@@ -36,7 +36,7 @@ def test_input_preservation(missing):
     distance = AdaptiveSquaredEuclidean()
     data = np.array([[3.0, np.nan if missing else 4.0]])
     model = make_distance_model([[0, 0], [3, 0]], [[1, 1], [0, 1]])
-    model.force_all_finite = "allow-nan" if missing else True
+    model.ensure_all_finite = "allow-nan" if missing else True
     originals = data.copy(), model.prototypes_.copy(), model.omega_.copy()
 
     # Check after each operation, independently of numerical correctness.
@@ -69,7 +69,7 @@ def test_gradient():
 def missing_model():
     # Off-diagonal relevance lets an observed feature influence another prototype coordinate.
     model = make_distance_model([[0, 0, 0]], [[1, 1, 0], [0, 1, 1]])
-    model.force_all_finite = "allow-nan"
+    model.ensure_all_finite = "allow-nan"
     return model
 
 

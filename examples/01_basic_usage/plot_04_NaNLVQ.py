@@ -56,7 +56,7 @@ model = GMLVQ(
     solver_type="waypoint-gradient-descent",
     solver_params={"max_runs": 10, "k": 3, "step_size": np.array([0.1, 0.05])},
     random_state=1428,
-    force_all_finite="allow-nan",  # This will make the data  validation  and distance function
+    ensure_all_finite="allow-nan",  # This will make the data  validation  and distance function
     # accept and deal with np.nan values.
 )
 
@@ -76,7 +76,7 @@ print(classification_report(labels, predicted_labels))
 
 ###############################################################################
 # The examples uses GMLVQ but all models and their compatible distance functions support the
-# `force_all_finite` option.
+# `ensure_all_finite` option.
 
 ###############################################################################
 # References

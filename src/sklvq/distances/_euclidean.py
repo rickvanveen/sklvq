@@ -16,7 +16,7 @@ class Euclidean(DistanceBaseClass):
 
     Parameters
     ----------
-    force_all_finite  : {True, False, "allow-nan"}
+    ensure_all_finite  : {True, False, "allow-nan"}
         Parameter to indicate that NaNLVQ distance variant should be used. If true no nans are
         allowed. If False or "allow-nan" nans are allowed.
 
@@ -53,7 +53,7 @@ class Euclidean(DistanceBaseClass):
             Evaluation of the distance between each sample and prototype of the model.
         """
         distance_function = "euclidean"
-        if model.force_all_finite == "allow-nan":
+        if model.ensure_all_finite == "allow-nan":
             distance_function = _nan_euclidean
 
         return cdist(data, model.prototypes_, distance_function)
@@ -87,7 +87,7 @@ class Euclidean(DistanceBaseClass):
 
         difference = data - prototype
 
-        if model.force_all_finite == "allow-nan" or False:
+        if model.ensure_all_finite == "allow-nan":
             difference[np.isnan(difference)] = 0.0
 
         # Euclidean distance to single prototype. Equal to: np.sqrt(np.sum((data - prototype)**2))

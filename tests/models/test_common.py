@@ -1,6 +1,8 @@
 import numpy as np
+import pandas as pd
 import pytest
 from sklearn import datasets
+from sklearn.utils import get_tags
 from sklearn.utils.estimator_checks import check_estimator
 
 from sklvq import GLVQ, GMLVQ, LGMLVQ
@@ -10,7 +12,24 @@ from sklvq.activations import Identity
 @pytest.mark.parametrize("estimator", [GLVQ, GMLVQ, LGMLVQ])
 def test_estimators(estimator):
     instance = estimator()
-    return check_estimator(instance)
+    check_estimator(instance)
+
+
+@pytest.mark.parametrize("estimator", [GLVQ, GMLVQ, LGMLVQ])
+def test_nan_validation_and_feature_names(estimator):
+    """The NaN-enabled classifier accepts missing observations but still checks its fitted columns."""
+    data = pd.DataFrame({"x": [0.0, 0.5, 3.0, 4.0], "y": [np.nan, 1.0, 3.0, 4.0]})
+    labels = [0, 0, 1, 1]
+    model = estimator(random_state=0)
+    assert not get_tags(model).input_tags.allow_nan
+    with pytest.raises(ValueError, match="NaN"):
+        model.fit(data, labels)
+
+    model.set_params(ensure_all_finite="allow-nan").fit(data, labels)
+    assert get_tags(model).input_tags.allow_nan
+    assert np.isfinite(model.predict_proba(data)).all()
+    with pytest.raises(ValueError, match="feature names"):
+        model.predict(data[["y", "x"]])
 
 
 @pytest.mark.parametrize("estimator", [GLVQ, GMLVQ, LGMLVQ])

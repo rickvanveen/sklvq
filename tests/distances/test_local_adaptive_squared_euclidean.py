@@ -72,7 +72,7 @@ def test_input_preservation(localization, missing):
     distance = LocalAdaptiveSquaredEuclidean()
     data = np.array([[3.0, np.nan if missing else 4.0]])
     model = make_distance_model([[0, 0], [1, 0]], [[[1, 0], [0, 1]], [[2, 0], [0, 1]]], localization)
-    model.force_all_finite = "allow-nan" if missing else True
+    model.ensure_all_finite = "allow-nan" if missing else True
     originals = data.copy(), model.prototypes_.copy(), model.omega_.copy()
 
     # Check after each call so an expected numerical defect cannot conceal a mutation.
@@ -119,7 +119,7 @@ def test_prototype_local_gradient(prototype_model, i_prototype):
 def missing_model(request):
     # Off-diagonal relevance exposes missing-coordinate derivatives in both localization modes.
     model = make_distance_model([[0, 0, 0]], [[[1, 1, 0], [0, 1, 1]]], request.param)
-    model.force_all_finite = "allow-nan"
+    model.ensure_all_finite = "allow-nan"
     return model
 
 

@@ -3,7 +3,8 @@ from __future__ import annotations
 from typing import Tuple
 
 import numpy as np
-from sklearn.utils.validation import check_array, check_is_fitted
+from sklearn.base import TransformerMixin
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 from sklvq.models._base import LVQBaseClass
 from sklvq.objectives._generalized_learning_objective import GeneralizedLearningObjective
@@ -23,7 +24,7 @@ SOLVERS = [
 ]
 
 
-class LGMLVQ(LVQBaseClass):
+class LGMLVQ(TransformerMixin, LVQBaseClass):
     r"""Localized Generalized Matrix Learning Vector Quantization
 
     This model uses the :class:`sklvq.objectives.GeneralizedLearningObjective` as its objective
@@ -121,7 +122,7 @@ class LGMLVQ(LVQBaseClass):
         Set the random number generation for reproducibility purposes. Used in random offset of prototypes and
         shuffling of the data in the solvers. Potentially, also used in the random generation of relevance matrix.
 
-    force_all_finite : {True, "allow-nan"}, default=True
+    ensure_all_finite : {True, "allow-nan"}, default=True
         Whether to raise an error on np.inf, np.nan, pd.NA in array. The possibilities are:
 
         - True: Force all values of array to be finite.
@@ -195,7 +196,7 @@ class LGMLVQ(LVQBaseClass):
         relevance_n_components: str | int = "all",
         relevance_localization: str = "prototypes",
         random_state: int | np.random.RandomState = None,
-        force_all_finite: str | int = True,  # noqa: FBT002
+        ensure_all_finite: str | bool = True,  # noqa: FBT002
     ):
         self.activation_type = activation_type
         self.activation_params = activation_params
@@ -216,7 +217,7 @@ class LGMLVQ(LVQBaseClass):
             prototype_init,
             prototype_n_per_class,
             random_state,
-            force_all_finite,
+            ensure_all_finite,
         )
 
     ###########################################################################################
@@ -587,7 +588,7 @@ class LGMLVQ(LVQBaseClass):
         matrix or (n_samples, n_columns, n_matrices) for multiple matrices.
         """
         check_is_fitted(self)
-        X = check_array(X)  # noqa: N806
+        X = validate_data(self, X, reset=False, ensure_all_finite=self.ensure_all_finite)  # noqa: N806
 
         if scale:
             transformation_matrix = self.omega_hat_[omega_hat_index, :, :]
@@ -600,9 +601,3 @@ class LGMLVQ(LVQBaseClass):
         transformed_data = np.einsum("in, jmn -> imj", X, transformation_matrix)
 
         return transformed_data[:, :, 0] if transformed_data.shape[2] == 1 else transformed_data
-
-    def _more_tags(self):
-        # For some reason lgmlvq (with default settings) does not perform well on one of the test
-        # cases build into sklearn's test cases. Which is something to look into, but this "fixes"
-        # it in the mean time...
-        return {"poor_score": True}

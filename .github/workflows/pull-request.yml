@@ -24,7 +24,7 @@ jobs:
       - run: uv run --no-sync ruff format --check src/sklvq/ examples/ tests/
       - run: uv run --no-sync ruff check src/sklvq/ examples/ tests/
   test:
-    name: Test (Python ${{ matrix.python-version }})
+    name: Test (Python ${{ matrix.python-version }}, sklearn ${{ matrix.sklearn }})
     permissions:
       contents: read
       id-token: write
@@ -32,7 +32,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.11", "3.12"]
+        python-version: ["3.11"]
+        sklearn: ["1.7.2", "1.8.0", "1.9.1"]
+        include:
+          - python-version: "3.12"
+            sklearn: "1.9.1"
     steps:
       - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v10.4.0
@@ -40,6 +44,7 @@ jobs:
           version: "0.13.5"
           python-version: ${{ matrix.python-version }}
       - run: uv sync --locked --no-dev --extra tests
+      - run: uv pip install "scikit-learn==${{ matrix.sklearn }}"
       - run: uv run --no-sync pytest --cov=src/sklvq --cov-report=xml --junitxml=junit.xml tests/
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v7.1.1

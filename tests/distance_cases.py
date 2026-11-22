@@ -11,7 +11,7 @@ def make_distance_model(prototypes, omega=None, localization=None):
     # Ordinary distances need only prototypes, the finite-value setting and a parameter getter.
     model = SimpleNamespace(
         prototypes_=np.array(prototypes, dtype=float),
-        force_all_finite=True,
+        ensure_all_finite=True,
     )
     model.get_model_params = lambda: model.prototypes_
 
