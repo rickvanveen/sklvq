@@ -114,7 +114,7 @@ def test_shared_hyper_params(estimator):
         estimator(relevance_init=6).fit(X, y)
 
     X_hat = estimator(random_state=31415).fit(X, y).transform(X, scale=True)
-    assert not np.all(np.isnan(X_hat))
+    assert np.isfinite(X_hat).all()
 
     X_hat2 = estimator(random_state=31415).fit_transform(X, y, scale=True)
     assert np.array_equiv(X_hat, X_hat2)
@@ -122,28 +122,19 @@ def test_shared_hyper_params(estimator):
 
 @pytest.mark.parametrize("estimator", [GLVQ, GMLVQ, LGMLVQ])
 def test_prediction(estimator):
-    X, y = datasets.load_iris(return_X_y=True)
-    # create 2 class data
-    X = X[y != 2]
-    y = y[y != 2]
+    """Binary thresholds act on the second class probability, not the raw decision score."""
+    prototypes = np.array([[0.0], [4.0]])
+    model = estimator(solver_params={"callback": lambda state: True}, random_state=0).fit(prototypes, ["a", "z"])
+    model.set_prototypes(prototypes)
+    X = np.array([[1.0], [2.0], [3.0]])
 
-    # Prototype initialization
-    model = estimator().fit(X, y)
-    c_pred = model.predict(X) == 1
-    c_df = model.decision_function(X) > 0
-    c_proba = [v[1] for v in model.predict_proba(X) > 0.5]
-    assert all(c_pred == c_df)
-    assert all(c_pred == c_proba)
-
-    # choosing a different threshold should typically lead to a different labeling;
-    # note that LGMLVQ has df values very close to +-1
-    assert not all(model.predict(X, threshold=0.03) == model.predict(X, threshold=0.97))
-
-    c_pred = model.predict(X, threshold=0.2) == 1
-    c_df = model.decision_function(X) > 0.2
-    c_proba = [v[1] for v in model.predict_proba(X) > (0.2 + 1) / 2]
-    assert all(c_pred == c_df)
-    assert all(c_pred == c_proba)
+    # Squared distances to a and z are (1,9), (4,4), and (9,1).
+    scores = model.decision_function(X)
+    assert scores.shape == (3,)
+    np.testing.assert_allclose(scores, [-0.8, 0.0, 0.8])
+    np.testing.assert_allclose(model.predict_proba(X), [[0.9, 0.1], [0.5, 0.5], [0.1, 0.9]])
+    np.testing.assert_array_equal(model.predict(X), ["a", "a", "z"])
+    np.testing.assert_array_equal(model.predict(X, threshold=0.2), ["a", "z", "z"])
 
     with pytest.raises(ValueError):
         model.predict(X, threshold=-1)
@@ -153,3 +144,41 @@ def test_prediction(estimator):
 
     with pytest.raises(TypeError):
         model.predict(X, threshold="0.5")
+
+
+def test_multiclass_prediction_uses_nearest_prototype_per_class():
+    """Class a's second prototype can win; probabilities follow classes_, not prototype order."""
+    prototypes = np.array([[0.0], [8.0], [4.0], [12.0]])
+    model = GLVQ(prototype_n_per_class=[2, 1, 1], solver_params={"callback": lambda state: True}, random_state=0)
+    model.fit(prototypes, ["a", "a", "b", "c"])
+    model.set_prototypes(prototypes)
+    data = np.array([[7.0], [11.0]])
+
+    # Nearest squared distances by class: (1,9,25) and (9,49,1).
+    expected_scores = np.array([[0.8, -0.8, -24 / 26], [-0.8, -48 / 50, 0.8]])
+    scores = model.decision_function(data)
+    assert scores.shape == (2, 3)
+    np.testing.assert_allclose(scores, expected_scores)
+    weights = np.exp(expected_scores)
+    np.testing.assert_allclose(model.predict_proba(data), weights / weights.sum(axis=1, keepdims=True))
+    np.testing.assert_array_equal(model.predict(data), ["a", "c"])
+
+
+@pytest.mark.parametrize("estimator", [GMLVQ, LGMLVQ])
+def test_normalize_inactive_relevance_gradient(estimator):
+    """A zero relevance update must stay zero when waypoint descent normalizes its gradient."""
+    data = np.array([[0.0, 0.0], [2.0, 1.0]])
+    model = estimator(solver_params={"callback": lambda state: True}, random_state=0).fit(data, [0, 1])
+    gradient = np.zeros_like(model.get_variables())
+    prototypes, omega = model.to_model_params_view(gradient)
+    prototypes[0] = [3.0, 4.0]
+
+    expected = np.zeros_like(omega)
+    if estimator is LGMLVQ:
+        # An inactive local matrix must not prevent its neighbor from being normalized.
+        omega[1, 0] = [3.0, 4.0]
+        expected[1, 0] = [0.6, 0.8]
+
+    model.normalize_variables(gradient)
+
+    np.testing.assert_allclose(omega, expected)

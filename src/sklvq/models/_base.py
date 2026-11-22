@@ -234,6 +234,11 @@ class LVQBaseClass(ABC, BaseEstimator, ClassifierMixin):  # lgtm [py/conflicting
         raise NotImplementedError(ABC_METHOD_NOT_IMPL_MSG)
 
     @staticmethod
+    def _normalize_omega(omega: np.ndarray) -> None:
+        norm = np.linalg.norm(omega, axis=(-2, -1), keepdims=True)
+        np.divide(omega, norm, out=omega, where=norm != 0)
+
+    @staticmethod
     def _normalize_prototypes(prototypes: np.ndarray) -> None:
         r"""
         Normalizes the provided prototypes array, i.e., it writes to the same memory. Performs

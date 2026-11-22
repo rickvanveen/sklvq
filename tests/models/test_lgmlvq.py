@@ -125,3 +125,27 @@ def test_lgmlvq_relevances():
 
     assert np.all(np.isclose(model.lambda_, LGMLVQ._compute_lambdas(model.omega_hat_)))
     assert np.all(np.isclose(np.linalg.norm(model.eigenvectors_, axis=1), 1.0))
+
+
+def test_scaled_transform_uses_selected_local_metrics():
+    """Projected squared distances must match each requested metric, in the requested order."""
+    data = np.array([[0.0, 1.0], [3.0, 2.0]])
+    model = LGMLVQ(relevance_init="random", solver_params={"callback": lambda state: True}, random_state=0)
+    model.fit(data, [0, 1])
+
+    transformed = model.transform(data, scale=True, omega_hat_index=[1, 0])
+    assert transformed.shape == (2, 2, 2)
+    actual = np.sum((transformed[1] - transformed[0]) ** 2, axis=0)
+    expected = [np.linalg.norm(omega @ (data[1] - data[0])) ** 2 for omega in model.omega_[[1, 0]]]
+    np.testing.assert_allclose(actual, expected)
+
+
+def test_transform_keeps_single_sample_axis():
+    """Transforming one sample should return the same row as slicing a batch transformation."""
+    data = np.array([[0.0, 1.0], [3.0, 2.0]])
+    model = LGMLVQ(solver_params={"callback": lambda state: True}, random_state=0).fit(data, [0, 1])
+    expected = model.transform(data)[:1]
+    actual = model.transform(data[:1])
+
+    assert actual.shape == expected.shape
+    np.testing.assert_allclose(actual, expected)
