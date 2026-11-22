@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from sklvq.models import LVQBaseClass
     from sklvq.objectives._base import ObjectiveBaseClass
 
-STATE_KEYS = ["variables", "nit", "fun", "step_size"]
+STATE_KEYS = ["step_size"]
 
 
 class SteepestGradientDescent(SolverBaseClass):
@@ -71,8 +71,10 @@ class SteepestGradientDescent(SolverBaseClass):
         Callable with signature callable(state). If the callable returns True the solver
         will stop even if ``max_runs`` is not reached yet. The state object contains the following:
 
-        - "variables"
-            Concatenated 1D ndarray of the model's parameters
+        - "model_params"
+            Detached model parameters by name: prototypes and, for matrix models, omega.
+        - "max_runs"
+            The iteration limit.
         - "nit"
             The current iteration counter
         - "fun"
@@ -145,8 +147,9 @@ class SteepestGradientDescent(SolverBaseClass):
 
         if self.callback is not None:
             state = _update_state(
+                model,
+                self.max_runs,
                 STATE_KEYS,
-                variables=np.copy(model.get_variables()),
                 nit="Initial",
                 fun=self.objective(model, data, labels),
             )
@@ -201,8 +204,9 @@ class SteepestGradientDescent(SolverBaseClass):
 
             if self.callback is not None:
                 state = _update_state(
+                    model,
+                    self.max_runs,
                     STATE_KEYS,
-                    variables=np.copy(model.get_variables()),
                     nit=i_run + 1,
                     fun=self.objective(model, data, labels),
                     step_size=step_size,

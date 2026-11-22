@@ -19,7 +19,7 @@ from sklvq.solvers._base import _update_state
 if TYPE_CHECKING:
     from sklvq.models import LVQBaseClass
 
-STATE_KEYS = ["variables", "nit", "fun", "step_size"]
+STATE_KEYS = ["step_size"]
 
 ###############################################################################
 # The sklvq package contains a number of different solvers.  Please see the API reference under
@@ -54,8 +54,9 @@ class CustomSteepestGradientDescent(SolverBaseClass):
         # Calls the callback function is provided with the initial values.
         if self.callback is not None:
             state = _update_state(
+                model,
+                self.max_runs,
                 STATE_KEYS,
-                variables=np.copy(model.get_variables()),
                 nit="Initial",
                 fun=self.objective(model, data, labels),
             )
@@ -110,8 +111,9 @@ class CustomSteepestGradientDescent(SolverBaseClass):
             # Call the callback function if provided with updated values.
             if self.callback is not None:
                 state = _update_state(
+                    model,
+                    self.max_runs,
                     STATE_KEYS,
-                    variables=np.copy(model.get_variables()),
                     nit=i_run + 1,
                     fun=self.objective(model, data, labels),
                     step_size=step_size,

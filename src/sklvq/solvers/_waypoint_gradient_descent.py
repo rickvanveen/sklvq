@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from sklvq.models import LVQBaseClass
     from sklvq.objectives._base import ObjectiveBaseClass
 
-STATE_KEYS = ["variables", "nit", "fun", "nfun", "tfun", "step_size"]
+STATE_KEYS = ["nfun", "tfun", "step_size"]
 
 
 class WaypointGradientDescent(SolverBaseClass):
@@ -80,8 +80,10 @@ class WaypointGradientDescent(SolverBaseClass):
         Callable with signature callable(state). If the callable returns True the solver
         will stop even if max_runs is not reached yet. The state object contains the following:
 
-        - "variables"
-            Concatenated 1D ndarray of the model's parameters
+        - "model_params"
+            Detached model parameters by name: prototypes and, for matrix models, omega.
+        - "max_runs"
+            The iteration limit.
         - "nit"
             The current iteration counter.
         - "fun"
@@ -179,9 +181,8 @@ class WaypointGradientDescent(SolverBaseClass):
         step_size = self.step_size
 
         if self.callback is not None:
-            variables = np.copy(model.get_variables())
             cost = self.objective(model, data, labels)
-            state = _update_state(STATE_KEYS, variables=variables, nit="Initial", nfun=cost, fun=cost)
+            state = _update_state(model, self.max_runs, STATE_KEYS, nit="Initial", nfun=cost, fun=cost)
             if self.callback(state):
                 return
 
@@ -213,8 +214,9 @@ class WaypointGradientDescent(SolverBaseClass):
             if self.callback is not None:
                 cost = self.objective(model, data, labels)
                 state = _update_state(
+                    model,
+                    self.max_runs,
                     STATE_KEYS,
-                    variables=np.copy(model.get_variables()),
                     nit=i_run + 1,
                     nfun=cost,
                     fun=cost,
@@ -272,8 +274,9 @@ class WaypointGradientDescent(SolverBaseClass):
 
             if self.callback is not None:
                 state = _update_state(
+                    model,
+                    self.max_runs,
                     STATE_KEYS,
-                    variables=np.copy(model.get_variables()),
                     nit=i_run + 1,
                     tfun=tentative_cost,
                     nfun=new_cost,

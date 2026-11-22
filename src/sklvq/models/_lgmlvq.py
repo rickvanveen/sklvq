@@ -179,6 +179,8 @@ class LGMLVQ(TransformerMixin, LVQBaseClass):
     omega_hat_: np.ndarray
     eigenvalues_: np.ndarray
 
+    _snapshot_params = ("prototypes", "omega")
+
     def __init__(
         self,
         distance_type: str | type = "local-adaptive-squared-euclidean",
