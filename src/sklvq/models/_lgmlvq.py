@@ -560,8 +560,7 @@ class LGMLVQ(LVQBaseClass):
 
         Returns
         -------
-        The data projected on columns of ``omega_hat_`` with shape (n_matrices, n_samples,
-        n_columns)
+        The projected data, with the same shape as returned by :meth:`transform`.
         """
         return self.fit(X, y).transform(X, **trans_params)
 
@@ -584,8 +583,8 @@ class LGMLVQ(LVQBaseClass):
 
         Returns
         -------
-        The data projected on columns of ``omega_hat_`` with shape (n_samples,
-        n_columns, n_matrices)
+        The projected data with shape (n_samples, n_columns) for one selected
+        matrix or (n_samples, n_columns, n_matrices) for multiple matrices.
         """
         check_is_fitted(self)
         X = check_array(X)  # noqa: N806

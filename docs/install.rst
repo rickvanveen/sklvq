@@ -2,94 +2,60 @@
 Install and Contribute
 ======================
 
-This page containst the lists of dependencies and install instructions for two scenarios. Firstly, "General use" for anyone who just whishes to use the algorithms. Secondly, instruction on how to install the package in order to be able to build the docs and run tests.
+Install sklvq
+=============
 
-General Use
-===========
+To use the published package in a uv project, run::
 
-This section contains the dependencies and install instructions for regular usage of the sklvq package. If you wish to contribute to the package please see the `Contribute`_ section.
+    uv add sklvq
 
-Dependencies
-------------
+To install it in an active Python environment with pip, run::
 
-The sklvq toolbox requires the following packages to be installed:
+    python -m pip install sklvq
 
-* numpy
-* scipy
-* scikit-learn
+Develop from source
+===================
 
-Installation
-------------
-Sklvq can be installed using pip::
-
-    pip install sklvq
-
-Another option is to clone the repository and run the setup.py file. The following (terminal/cmd) commands can be used to clone the repository and install sklvq with all dependencies::
+Install `uv <https://docs.astral.sh/uv/getting-started/installation/>`_, then
+clone the repository and create the project environment::
 
     git clone https://github.com/rickvanveen/sklvq.git
     cd sklvq
-    pip install .
+    uv sync --locked
 
-Or install using pip from GitHub directly::
+Run the commands below from the repository root. uv uses Python 3.12 by
+default and installs dependencies from ``uv.lock`` into ``.venv``.
+You do not need to activate the environment.
 
-    pip install -U git+https://github.com/rickvanveen/sklvq.git
+Run an example
+--------------
 
-Contribute
-==========
+To fit a GLVQ classifier on the Iris dataset and plot its prototypes, run::
 
-You can contribute to this code through pull requests on GitHub. Please, make sure that your code is coming with unit tests to ensure full coverage and continuous integration in the API. Follow the instruction below in order to install all necessary dependencies for development.
+    uv run --locked --extra docs python examples/01_basic_usage/plot_01_glvq.py
 
-Dependencies
-------------
+The ``docs`` extra includes Matplotlib for the gallery examples.
 
-In addition to the regular dependencies, sklvq requires a number of packages for testing and building the documentation:
+Run tests and checks
+--------------------
 
-Testing:
-    * pytest
-    * pytest-cov
+Run the full test suite on Python 3.12, or select Python 3.11 explicitly::
 
-Documentation:
-    * sphinx
-    * sphinx-gallery
-    * sphinx_rtd_theme
-    * numpydoc
-    * matplotlib
+    uv run --locked --extra tests pytest tests/
+    uv run --locked --python 3.11 --extra tests pytest tests/
 
-Installation
-------------
+To run part of the suite, replace ``tests/`` with a directory or test file,
+such as ``tests/activations/``. Check lint and formatting with Ruff::
 
-The package can be cloned using the following commands::
+    uv run --locked ruff check src/sklvq/ examples/ tests/
+    uv run --locked ruff format --check src/sklvq/ examples/ tests/
 
-    git clone https://github.com/rickvanveen/sklvq.git
-    cd sklvq
+Build the documentation
+-----------------------
 
-Using the following addition to the `pip` command, one can install the dependencies automatically::
+Build the HTML pages and execute the gallery examples with Sphinx::
 
-    pip install .[tests]
+    uv run --locked --extra docs sphinx-build -b html docs docs/_build/html
 
-or in order to be able to build the documentation::
-
-    pip install .[docs]
-
-or simply by passing them at the same time (note the lack of whitespace)::
-
-    pip install .[tests,docs]
-
-
-Running Tests
--------------
-
-Every module contains its own test folder. Where every file is prepended with `test_`. The tests
-can be run by using the following command when in the sklvq module folder::
-
-    pytest .
-
-Building Docs
--------------
-
-The html docs can be build using the following command (in the docs folder)::
-
-    make html
-
-This will generate a build folder from which the index.html can be opened locally. Other options
-are also available see the 'Makefile' in the doc folder.
+Open ``docs/_build/html/index.html`` in a browser. To render equations locally,
+install LaTeX and ``dvipng``.

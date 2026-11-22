@@ -38,13 +38,11 @@ class AdaptiveMomentEstimation(SolverBaseClass):
     for the update step:
 
     .. math::
-        \theta = \theta - \eta \cdot \hat{\mathbf{m}} \odot \hat{\mathbf{v}}^{\circ \frac{1}{2}},
+        \theta_i \leftarrow \theta_i -
+        \eta \frac{\hat{m}_i}{\sqrt{\hat{v}_i} + \epsilon},
 
-    with :math:`\eta` the ``step_size``. Additionally,  ``beta1``, and ``beta2``,  can be chosen
-    by the user.
-
-    Note that :math:`\odot` denotes the elementwise (Hadamard) product and :math:`\mathbf{x}^{
-    \circ y}` the elementwise power operation.
+    where :math:`\eta` is ``step_size`` and :math:`\epsilon` is ``epsilon``.
+    The square in the second moment estimate is taken elementwise.
 
     Parameters
     ----------
