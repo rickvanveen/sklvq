@@ -1688,7 +1688,7 @@ requires-dist = [
     { name = "pillow", marker = "extra == 'docs'" },
     { name = "pytest", marker = "extra == 'tests'" },
     { name = "pytest-cov", marker = "extra == 'tests'" },
-    { name = "scikit-learn", specifier = "<=1.5.2" },
+    { name = "scikit-learn", specifier = "==1.5.2" },
     { name = "scipy", specifier = ">=1.3.2" },
     { name = "sphinx", marker = "extra == 'docs'" },
     { name = "sphinx-gallery", marker = "extra == 'docs'" },
