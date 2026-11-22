@@ -1,4 +1,4 @@
-[![Read the Docs](https://app.readthedocs.org/projects/sklvq/badge/?version=latest)](https://sklvq.readthedocs.io/en/latest/)
+[![Read the Docs](https://img.shields.io/readthedocs/sklvq/latest)](https://sklvq.readthedocs.io/en/latest/)
 [![CodeCov](https://codecov.io/gh/rickvanveen/sklvq/branch/main/graph/badge.svg)](https://codecov.io/gh/rickvanveen/sklvq)
 [![CI](https://github.com/rickvanveen/sklvq/actions/workflows/pull-request.yml/badge.svg?branch=main)](https://github.com/rickvanveen/sklvq/actions/workflows/pull-request.yml)
 [![CodeFactor](https://www.codefactor.io/repository/github/rickvanveen/sklvq/badge/main)](https://www.codefactor.io/repository/github/rickvanveen/sklvq/overview/main)
