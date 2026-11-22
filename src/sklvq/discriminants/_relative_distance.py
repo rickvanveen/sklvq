@@ -77,14 +77,9 @@ class RelativeDistance(DiscriminantBaseClass):
             Evaluation of the relative distance function's gradient.
 
         """
-        if same_label:
-            return _gradient_same(dist_same, dist_diff)
-        return _gradient_diff(dist_same, dist_diff)
-
-
-def _gradient_same(dist_same: np.ndarray, dist_diff: np.ndarray) -> np.ndarray:
-    return 2 * dist_diff / (dist_same + dist_diff) ** 2
-
-
-def _gradient_diff(dist_same: np.ndarray, dist_diff: np.ndarray) -> np.ndarray:
-    return -2 * dist_same / (dist_same + dist_diff) ** 2
+        # Scale each pair before squaring so its normalized sum lies between 1 and 2.
+        scale = np.maximum(dist_same, dist_diff)
+        same = dist_same / scale
+        diff = dist_diff / scale
+        numerator = 2 * diff if same_label else -2 * same
+        return (numerator / (same + diff) ** 2) / scale
