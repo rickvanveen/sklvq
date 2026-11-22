@@ -5,7 +5,7 @@ from sklvq.objectives import GeneralizedLearningObjective
 from sklvq.solvers._waypoint_gradient_descent import WaypointGradientDescent
 
 
-def test_steepest_gradient_descent():
+def test_invalid_waypoint_parameters():
     objective = GeneralizedLearningObjective(
         activation_type="identity",
         activation_params=None,

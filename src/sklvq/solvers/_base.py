@@ -3,11 +3,10 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
 
+import numpy as np
 import scipy.optimize as spo
 
 if TYPE_CHECKING:
-    import numpy as np
-
     from sklvq.models._base import LVQBaseClass
     from sklvq.objectives._base import ObjectiveBaseClass
 
@@ -73,7 +72,25 @@ class ScipyBaseSolver(SolverBaseClass):
 
     def _objective_gradient_wrapper(self, variables, model, data, labels):
         model.set_variables(variables)
-        return self.objective.gradient(model, data, labels)
+        gradient = self.objective.gradient(model, data, labels)
+        normalize = getattr(model, "relevance_normalization", False)
+        correction = getattr(model, "relevance_correction", None)
+        if not normalize and correction is None:
+            return gradient
+
+        omega_gradient = model.to_omega(gradient)
+        if normalize:
+            trial = model.to_omega(variables)
+            if correction is not None:
+                trial = trial @ correction
+            # Differentiate W / ||W|| separately for each trial relevance matrix.
+            unit = model.omega_
+            radial = np.sum(unit * omega_gradient, axis=(-2, -1), keepdims=True)
+            omega_gradient -= unit * radial
+            omega_gradient /= np.linalg.norm(trial, axis=(-2, -1), keepdims=True)
+        if correction is not None:
+            omega_gradient[:] = omega_gradient @ correction.T
+        return gradient
 
     def solve(
         self,
@@ -99,7 +116,7 @@ class ScipyBaseSolver(SolverBaseClass):
 
         result = spo.minimize(
             self._objective_wrapper,
-            model.get_variables(),
+            model.get_variables().copy(),
             method=self.method,
             args=(model, data, labels),
             **params,

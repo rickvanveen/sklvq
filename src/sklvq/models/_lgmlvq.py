@@ -427,7 +427,7 @@ class LGMLVQ(LVQBaseClass):
         gradient : ndarray
             Same shape as the ``get_variables()`` would return.
         """
-        if isinstance(step_sizes, int) | isinstance(step_sizes, float):
+        if np.ndim(step_sizes) == 0:
             gradient *= step_sizes
             return
 
