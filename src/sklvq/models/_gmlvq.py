@@ -386,10 +386,6 @@ class GMLVQ(LVQBaseClass):
         self._normalize_prototypes(prototypes)
         self._normalize_omega(omega)
 
-    @staticmethod
-    def _normalize_omega(omega: np.ndarray) -> None:
-        np.divide(omega, np.sqrt(np.einsum("ji, ji", omega, omega)), out=omega)
-
     def _correct_omega(self, omega: np.ndarray) -> None:
         # Note matmul is faster for larger matrices, for smaller dot is faster.
         np.matmul(omega, self.relevance_correction, out=omega)

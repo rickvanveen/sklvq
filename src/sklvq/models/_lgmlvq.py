@@ -373,14 +373,6 @@ class LGMLVQ(LVQBaseClass):
         self._normalize_prototypes(prototypes)
         self._normalize_omega(omega)
 
-    @staticmethod
-    def _normalize_omega(omega: np.ndarray) -> None:
-        np.divide(
-            omega,
-            np.sqrt(np.einsum("ikj, ikj -> i", omega, omega)).reshape(omega.shape[0], 1, 1),
-            out=omega,
-        )
-
     ###########################################################################################
     # Solver helper functions
     ###########################################################################################
@@ -608,7 +600,7 @@ class LGMLVQ(LVQBaseClass):
 
         transformed_data = np.einsum("in, jmn -> imj", X, transformation_matrix)
 
-        return transformed_data.squeeze()
+        return transformed_data[:, :, 0] if transformed_data.shape[2] == 1 else transformed_data
 
     def _more_tags(self):
         # For some reason lgmlvq (with default settings) does not perform well on one of the test
