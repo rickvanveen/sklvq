@@ -1,20 +1,23 @@
+import pytest
+
 from sklvq import activations
 from sklvq._utils import init_class
-from sklvq.activations import ALIASES, ActivationBaseClass
+from sklvq.activations import Identity, Sigmoid, SoftPlus, Swish
 
 
-def check_init_activation(activation_string):
-    activation_class = init_class(activations, activation_string)
-
-    assert isinstance(activation_class, type)
-
-    activation_instance = activation_class()
-
-    assert isinstance(activation_instance, ActivationBaseClass)
-
-    return activation_class
+@pytest.mark.parametrize(
+    ("name", "expected"),
+    [("identity", Identity), ("sigmoid", Sigmoid), ("soft-plus", SoftPlus), ("soft+", SoftPlus), ("swish", Swish)],
+)
+def test_activation_name(name, expected):
+    """Model configuration must select the requested activation, including the soft+ alias."""
+    assert init_class(activations, name) is expected
 
 
-def test_aliases():
-    for value in ALIASES:
-        check_init_activation(value)
+@pytest.mark.parametrize("activation", [Sigmoid, SoftPlus, Swish])
+def test_beta(activation):
+    """The default steepness is one; zero and negative values are invalid."""
+    assert activation().beta == 1
+    for beta in (0, -1):
+        with pytest.raises(ValueError, match="beta"):
+            activation(beta=beta)
