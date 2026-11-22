@@ -51,6 +51,10 @@ class SolverBaseClass(ABC):
         raise NotImplementedError(ABC_METHOD_NOT_IMPL_MSG)
 
 
+class _CallbackStop(Exception):
+    """Stop at the accepted iterate, including on SciPy versions before 1.11."""
+
+
 class ScipyBaseSolver(SolverBaseClass):
     """ScipyBaseSolver
 
@@ -114,22 +118,46 @@ class ScipyBaseSolver(SolverBaseClass):
         if self.params is not None:
             params.update(self.params)
 
-        result = spo.minimize(
-            self._objective_wrapper,
-            model.get_variables().copy(),
-            method=self.method,
-            args=(model, data, labels),
-            **params,
-        )
+        if (callback := params.get("callback")) is not None:
+            max_runs = (params.get("options") or {}).get("maxiter")
+            if max_runs is None:
+                # scipy.optimize.minimize defaults for BFGS and L-BFGS-B.
+                max_runs = 200 * model.get_variables().size if self.method == "BFGS" else 15000
+
+            def report(nit):
+                return callback(_update_state(model, max_runs, (), nit=nit, fun=self.objective(model, data, labels)))
+
+            if report("Initial"):
+                return
+            iteration = 0
+
+            def on_iterate(xk):
+                nonlocal iteration
+                iteration += 1
+                model.set_variables(xk)
+                if report(iteration):
+                    raise _CallbackStop
+
+            params["callback"] = on_iterate
+
+        try:
+            result = spo.minimize(
+                self._objective_wrapper,
+                model.get_variables().copy(),
+                method=self.method,
+                args=(model, data, labels),
+                **params,
+            )
+        except _CallbackStop:
+            return
 
         # Update model
         model.set_variables(result.x)
 
 
-def _update_state(state_keys: list[str], **kwargs: Any) -> dict:
-    # Helper function that can be used to update state dict. The state_keys is a  list of strings
-    # indicating the keys the dictionary should hold. If not provided in the kwargs they are set
-    # to None.
+def _update_state(model: LVQBaseClass, max_runs: int, state_keys, **kwargs: Any) -> dict:
+    """Build a callback snapshot, leaving unavailable solver diagnostics as None."""
     state = dict.fromkeys(state_keys)
-    state.update(**kwargs)
+    state.update(model_params=model.get_model_params_snapshot(), max_runs=max_runs)
+    state.update({key: value.copy() if isinstance(value, np.ndarray) else value for key, value in kwargs.items()})
     return state

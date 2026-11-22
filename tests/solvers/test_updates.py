@@ -20,6 +20,7 @@ def scalar_model(start):
     model = GLVQ()
     model._variables = np.array([float(start)])
     model._prototypes_shape = (1, 1)
+    model.prototypes_ = model.to_prototypes_view(model._variables)
     model.random_state_ = np.random.RandomState(0)
     return model
 

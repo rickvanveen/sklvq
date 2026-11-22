@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from sklvq.models._base import LVQBaseClass
     from sklvq.objectives._base import ObjectiveBaseClass
 
-STATE_KEYS = ["variables", "nit", "fun", "m_hat", "v_hat"]
+STATE_KEYS = ["m_hat", "v_hat"]
 
 
 class AdaptiveMomentEstimation(SolverBaseClass):
@@ -65,8 +65,10 @@ class AdaptiveMomentEstimation(SolverBaseClass):
         Callable with signature callable(state). If the callable returns True the solver
         will stop (early). The state object contains the following information:
 
-        - "variables"
-            Concatenated 1D ndarray of the model's parameters
+        - "model_params"
+            Detached model parameters by name: prototypes and, for matrix models, omega.
+        - "max_runs"
+            The iteration limit.
         - "nit"
             The current iteration counter
         - "fun"
@@ -156,8 +158,9 @@ class AdaptiveMomentEstimation(SolverBaseClass):
 
         if self.callback is not None:
             state = _update_state(
+                model,
+                self.max_runs,
                 STATE_KEYS,
-                variables=np.copy(model.get_variables()),
                 nit="Initial",
                 fun=self.objective(model, data, labels),
             )
@@ -199,8 +202,9 @@ class AdaptiveMomentEstimation(SolverBaseClass):
 
             if self.callback is not None:
                 state = _update_state(
+                    model,
+                    self.max_runs,
                     STATE_KEYS,
-                    variables=np.copy(model.get_variables()),
                     nit=i_run + 1,
                     fun=self.objective(model, data, labels),
                     m_hat=m_hat,

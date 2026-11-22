@@ -37,6 +37,12 @@ class LVQBaseClass(ClassifierMixin, BaseEstimator, ABC):
     GLVQ, GMLVQ, LGMLVQ
     """
 
+    _snapshot_params = ("prototypes",)
+
+    def get_model_params_snapshot(self) -> dict[str, np.ndarray]:
+        """Return detached copies of the model's named training parameters."""
+        return {name: getattr(self, f"{name}_").copy() for name in self._snapshot_params}
+
     # Public attributes
     prototypes_: np.ndarray
 
