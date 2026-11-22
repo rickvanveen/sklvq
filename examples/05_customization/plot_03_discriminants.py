@@ -27,10 +27,10 @@ class CustomRelativeDistance(DiscriminantBaseClass):
         # dist_diff = distance to prototype with different label as X.
         return (dist_same - dist_diff) / (dist_same + dist_diff)
 
-    def gradient(self, dist_same: np.ndarray, dist_diff: np.ndarray, winner_same: bool) -> np.ndarray:
-        # Winner_same is an boolean flag to indicate if the considered prototype has the same or
+    def gradient(self, dist_same: np.ndarray, dist_diff: np.ndarray, same_label: bool) -> np.ndarray:
+        # same_label is an boolean flag to indicate if the considered prototype has the same or
         # a different label compared to the considered X.
-        if winner_same:
+        if same_label:
             return _gradient_same(dist_same, dist_diff)
         return _gradient_diff(dist_same, dist_diff)
 
