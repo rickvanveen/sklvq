@@ -206,7 +206,7 @@ class GeneralizedLearningObjective(ObjectiveBaseClass):
         activation_gradient = self.activation.gradient(discriminant_score)
 
         #  Computes the following partial derivatives: du/ddi, with i = 2
-        discriminant_gradient = self.discriminant.gradient(dist_same, dist_diff, winner_same)
+        discriminant_gradient = self.discriminant.gradient(dist_same, dist_diff, same_label=winner_same)
 
         # Computes the following partial derivatives: ddi/dwi, with i = 2
         distance_gradient = model._distance.gradient(data, model, i_prototype)  # noqa: SLF001
