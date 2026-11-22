@@ -16,6 +16,8 @@ jobs:
         with:
           version: "0.13.5"
           python-version: "3.12"
+      - name: Check release tag matches package version
+        run: test "$GITHUB_REF_NAME" = "$(uv version --short)"
       - name: Build package
         run: uv build
       - name: Publish package
