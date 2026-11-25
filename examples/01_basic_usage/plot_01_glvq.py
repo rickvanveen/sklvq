@@ -15,6 +15,7 @@ import numpy as np
 from sklearn.datasets import load_iris
 from sklearn.metrics import classification_report
 from sklearn.preprocessing import StandardScaler
+import numpy as np
 
 from sklvq import GLVQ
 
